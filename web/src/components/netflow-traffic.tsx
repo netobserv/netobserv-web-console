@@ -583,13 +583,17 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
 
   // invalidate metric scope / group if not available
   React.useEffect(() => {
+    const scopes = getAvailableScopes();
     if (
       initState.current.includes('configLoaded') &&
-      !getAvailableScopes()
-        .map(sc => sc.id)
-        .includes(model.metricScope)
+      scopes.length > 0 &&
+      !scopes.some(sc => sc.id === model.metricScope)
     ) {
-      model.setMetricScope(defaultMetricScope);
+      if (scopes.some(sc => sc.id === defaultMetricScope)) {
+        model.setMetricScope(defaultMetricScope);
+      } else {
+        model.setMetricScope(scopes[0].id);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getAvailableScopes, model.metricScope, model.setMetricScope]);
