@@ -86,14 +86,20 @@ func (e *PromDisabledMetricsError) Error() string {
 
 type PromMissingLabelsError struct {
 	StructuredError   `json:"-"`
-	PromMissingLabels bool     `json:"promMissingLabels,omitempty"`
-	Missing           []string `json:"missing,omitempty"`
+	PromMissingLabels bool                `json:"promMissingLabels,omitempty"`
+	Missing           map[string][]string `json:"missing,omitempty"`
 }
 
-func NewPromMissingLabels(missing []string) *PromMissingLabelsError {
+func NewPromMissingLabels(missing map[string][]string) *PromMissingLabelsError {
 	return &PromMissingLabelsError{PromMissingLabels: true, Missing: missing}
 }
 
 func (e *PromMissingLabelsError) Error() string {
-	return fmt.Sprintf("some requested labels are missing in Prometheus metrics: %s", strings.Join(e.Missing, ", "))
+	var smallestSet []string
+	for _, labels := range e.Missing {
+		if smallestSet == nil || len(smallestSet) > len(labels) {
+			smallestSet = labels
+		}
+	}
+	return fmt.Sprintf("some requested labels are missing in Prometheus metrics: %s", strings.Join(smallestSet, ", "))
 }

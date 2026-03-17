@@ -169,7 +169,7 @@ func (h *Handlers) getTopologyFlows(ctx context.Context, cl clients, params url.
 		for _, filters := range filterGroups {
 			lq, pq, code, err := buildTopologyQuery(h.Cfg, h.PromInventory, filters, in, &qr, isDev)
 			if err != nil {
-				return nil, code, errors.New("Can't build query: " + err.Error())
+				return nil, code, err
 			}
 			if pq != nil {
 				promQ = append(promQ, pq)

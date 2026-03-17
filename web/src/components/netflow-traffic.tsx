@@ -468,9 +468,13 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
               const errStr = genErr.toString();
               if (errStr !== model.chipsPopoverMessage) {
                 let filtersDisabled = false;
+                const filtersFieldNames = model.filters.list.map(filter => {
+                  return model.config.columns.find(col => col.filter === filter.def.id)?.field;
+                });
+                const missingLabels = genErr.getClosestLabelsSet(filtersFieldNames);
                 model.filters.list.forEach(filter => {
                   const fieldName = model.config.columns.find(col => col.filter === filter.def.id)?.field;
-                  if (!fieldName || genErr.missing.includes(fieldName)) {
+                  if (!fieldName || missingLabels.includes(fieldName)) {
                     filtersDisabled = true;
                     filter.values.forEach(fv => {
                       fv.disabled = true;

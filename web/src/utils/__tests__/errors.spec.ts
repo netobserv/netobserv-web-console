@@ -3,6 +3,7 @@ import {
   getStructuredHTTPError,
   LokiResponseError,
   PromDisabledMetrics,
+  PromMissingLabels,
   PromUnsupported
 } from '../errors';
 
@@ -106,5 +107,28 @@ describe('getGenericHTTPError', () => {
     const structured = getStructuredHTTPError(err);
     expect(LokiResponseError.isTypeOf(structured)).toBe(true);
     expect(String(structured)).toEqual('max entries limit');
+  });
+
+  it('should get Prometheus error with missing labels', () => {
+    const err = {
+      response: {
+        data: {
+          promMissingLabels: true,
+          missing: {
+            metric1: ['foo', 'bar'],
+            metric2: ['foo', 'baz'],
+            metric3: ['foo', 'bar', 'baz']
+          }
+        }
+      }
+    };
+    const structured = getStructuredHTTPError(err);
+    expect(PromUnsupported.isTypeOf(structured)).toBe(false);
+    expect(PromMissingLabels.isTypeOf(structured)).toBe(true);
+    expect(String(structured)).toEqual(
+      'This request could not be performed with Prometheus metrics because some of the required labels are missing.'
+    );
+    expect((structured as PromMissingLabels).getClosestLabelsSet(['abc', 'foo', 'bar'])).toEqual(['foo', 'bar']);
+    expect((structured as PromMissingLabels).getClosestLabelsSet(['foo'])).toEqual([]);
   });
 });

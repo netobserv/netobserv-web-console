@@ -40,7 +40,7 @@ func NewInventory(cfg *config.Prometheus) *Inventory {
 type SearchResult struct {
 	Found         []string // Multiple metrics in case we need to run <ingress metric> OR <egress metric>
 	Candidates    []string
-	MissingLabels []string
+	MissingLabels map[string][]string
 }
 
 func (i *Inventory) Search(neededLabels []string, valueField string) SearchResult {
@@ -82,9 +82,11 @@ func (i *Inventory) searchWithDir(neededLabels []string, valueField string, dir 
 				return sr
 			}
 			sr.Candidates = append(sr.Candidates, m.Name)
-		} else if m.Enabled && len(missingLabels) > 0 && (sr.MissingLabels == nil || len(missingLabels) < len(sr.MissingLabels)) {
-			// Keep smaller possible set of missing labels
-			sr.MissingLabels = missingLabels
+		} else if m.Enabled && len(missingLabels) > 0 {
+			if sr.MissingLabels == nil {
+				sr.MissingLabels = make(map[string][]string)
+			}
+			sr.MissingLabels[m.Name] = missingLabels
 		}
 	}
 	log.Debugf("No metric match for %v / %s / %s", neededLabels, valueField, dir)

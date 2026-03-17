@@ -101,5 +101,5 @@ func TestInventory_Search_RTT_Candidate(t *testing.T) {
 func TestInventory_Search_MissingLabels(t *testing.T) {
 	inv := NewInventory(&config.Prometheus{Metrics: configuredMetrics})
 	search := inv.Search([]string{"SrcK8S_Namespace", "DstK8S_Namespace", "SrcK8S_HostName"}, "Bytes")
-	assert.Equal(t, []string{"SrcK8S_HostName"}, search.MissingLabels)
+	assert.Equal(t, map[string][]string{"netobserv_metric_1bis": {"SrcK8S_HostName"}}, search.MissingLabels)
 }
