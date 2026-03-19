@@ -468,9 +468,13 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
               const errStr = genErr.toString();
               if (errStr !== model.chipsPopoverMessage) {
                 let filtersDisabled = false;
+                const filtersFieldNames = model.filters.list.map(filter => {
+                  return model.config.columns.find(col => col.filter === filter.def.id)?.field;
+                });
+                const missingLabels = genErr.getClosestLabelsSet(filtersFieldNames);
                 model.filters.list.forEach(filter => {
                   const fieldName = model.config.columns.find(col => col.filter === filter.def.id)?.field;
-                  if (!fieldName || genErr.missing.includes(fieldName)) {
+                  if (!fieldName || missingLabels.includes(fieldName)) {
                     filtersDisabled = true;
                     filter.values.forEach(fv => {
                       fv.disabled = true;
@@ -583,13 +587,17 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
 
   // invalidate metric scope / group if not available
   React.useEffect(() => {
+    const scopes = getAvailableScopes();
     if (
       initState.current.includes('configLoaded') &&
-      !getAvailableScopes()
-        .map(sc => sc.id)
-        .includes(model.metricScope)
+      scopes.length > 0 &&
+      !scopes.some(sc => sc.id === model.metricScope)
     ) {
-      model.setMetricScope(defaultMetricScope);
+      if (scopes.some(sc => sc.id === defaultMetricScope)) {
+        model.setMetricScope(defaultMetricScope);
+      } else {
+        model.setMetricScope(scopes[0].id);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getAvailableScopes, model.metricScope, model.setMetricScope]);

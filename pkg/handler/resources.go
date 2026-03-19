@@ -188,7 +188,7 @@ func (h *Handlers) getLabelValues(ctx context.Context, cl clients, label string,
 		return resp, code, nil
 	}
 	// Loki disabled AND label not managed in metrics => send an error
-	return nil, http.StatusBadRequest, apierrors.NewPromMissingLabels([]string{label})
+	return nil, http.StatusBadRequest, apierrors.NewPromMissingLabels(map[string][]string{"": {label}})
 }
 
 func (h *Handlers) GetNames(ctx context.Context) func(w http.ResponseWriter, r *http.Request) {

@@ -1,3 +1,5 @@
+import * as _ from 'lodash';
+
 export interface StructuredError {
   toString(): string;
 }
@@ -53,22 +55,43 @@ export class PromDisabledMetrics implements StructuredError {
 
 export class PromMissingLabels implements StructuredError {
   promMissingLabels: boolean;
-  constructor(public missing: string[], public context?: string) {
+  constructor(public missing: { [k: string]: string[] }, public context?: string) {
     this.promMissingLabels = true;
   }
 
   toString(this: PromMissingLabels): string {
     const context = this.context ? `${this.context}: ` : '';
-    return `${context}This request could not be performed with Prometheus metrics, as they are missing some of the required labels.`;
+    return `${context}This request could not be performed with Prometheus metrics because some of the required labels are missing.`;
   }
 
   getSuggestions(): string[] {
+    let smallestSet: string[] = [];
+    Object.values(this.missing).forEach(v => {
+      if (smallestSet.length === 0 || smallestSet.length > v.length) {
+        smallestSet = v;
+      }
+    });
     return [
-      `Try using different filters and/or aggregations; for example, try removing these dependencies from your query: ${this.missing.join(
+      `Try using different filters and/or aggregations; for example, try removing these dependencies from your query: ${smallestSet.join(
         ', '
       )}`,
       'Install and enable Loki in the FlowCollector API (spec.loki.enable)'
     ];
+  }
+
+  getClosestLabelsSet(activeFilterFields: (string | undefined)[]): string[] {
+    // The error contains a set of metrics for which there are missing labels
+    // We want to retain the smallest set of labels that allows us to display the view by disabling as few filters as possible
+    return Object.values(this.missing)
+      .filter(missingLabels => {
+        // Keep only those that would allow displaying the view
+        const d = _.difference(missingLabels, activeFilterFields);
+        return d.length === 0;
+      })
+      .reduce((prev, cur) => {
+        // Keep smallest set
+        return prev.length === 0 || prev.length > cur.length ? cur : prev;
+      }, []);
   }
 
   static isTypeOf = (err: StructuredError | string): err is PromMissingLabels => {
