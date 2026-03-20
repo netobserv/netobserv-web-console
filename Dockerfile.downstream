@@ -34,7 +34,7 @@ COPY pkg/ pkg/
 ENV GOEXPERIMENT strictfipsruntime
 RUN go build -tags strictfipsruntime -ldflags "-X 'main.buildVersion=$BUILDVERSION' -X 'main.buildDate=`date +%Y-%m-%d\ %H:%M`'" -mod vendor -o plugin-backend cmd/plugin-backend.go
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal:9.7-1773204619
+FROM registry.access.redhat.com/ubi9/ubi-minimal:9.7-1773939694
 ARG BUILDVERSION
 ARG BUILDVERSION_Y
 
