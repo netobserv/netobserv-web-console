@@ -242,7 +242,7 @@ export const RecordPanel: React.FC<RecordDrawerProps> = ({
         return undefined;
       }
       const filterKey = { def: def, compare: FilterCompare.equal };
-      const filterValues: FilterValue[] = values.map(v => ({v: v}));
+      const filterValues: FilterValue[] = values.map(v => ({ v: v }));
       const isDelete = doesIncludeFilter(filters, filterKey, filterValues);
       return {
         type: 'filter',
