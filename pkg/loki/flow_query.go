@@ -104,7 +104,8 @@ func (q *FlowQueryBuilder) addFilter(filter filters.Match) error {
 		return fmt.Errorf("unauthorized sign in flows request: %s", filter.Values)
 	}
 
-	values := strings.Split(filter.Values, ",")
+	// Space must be url-encoded
+	values := strings.Split(strings.ReplaceAll(filter.Values, " ", "%20"), ",")
 
 	// Stream selector labels
 	if q.config.IsLabel(filter.Key) {

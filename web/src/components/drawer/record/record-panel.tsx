@@ -30,6 +30,7 @@ import {
   Filter,
   FilterCompare,
   FilterDefinition,
+  FilterValue,
   findFromFilters,
   removeFromFilters
 } from '../../../model/filters';
@@ -125,6 +126,8 @@ export const RecordPanel: React.FC<RecordDrawerProps> = ({
           return getGenericFilter(col, (value as number[])[2]);
         case ColumnsId.flowdirints:
           return getDirIntsFilter();
+        case ColumnsId.tlstypes:
+          return getGenericAnyOfFilter(col, value as string[]);
         default:
           return getGenericFilter(col, value);
       }
@@ -231,6 +234,37 @@ export const RecordPanel: React.FC<RecordDrawerProps> = ({
       isDelete
     };
   }, [columns, filterDefinitions, filters, record.fields.IfDirections, record.fields.Interfaces, setFilters, t]);
+
+  const getGenericAnyOfFilter = React.useCallback(
+    (col: Column, values: string[]): RecordFieldFilter | undefined => {
+      const def = col.quickFilter ? findFilter(filterDefinitions, col.quickFilter) : undefined;
+      if (!def) {
+        return undefined;
+      }
+      const filterKey = { def: def, compare: FilterCompare.equal };
+      const filterValues: FilterValue[] = values.map(v => ({v: v}));
+      const isDelete = doesIncludeFilter(filters, filterKey, filterValues);
+      return {
+        type: 'filter',
+        onClick: () => {
+          if (isDelete) {
+            setFilters(removeFromFilters(filters, filterKey));
+          } else {
+            const newFilters = _.cloneDeep(filters);
+            const found = findFromFilters(newFilters, filterKey);
+            if (found) {
+              found.values = filterValues;
+            } else {
+              newFilters.push({ def: def, compare: FilterCompare.equal, values: filterValues });
+            }
+            setFilters(newFilters);
+          }
+        },
+        isDelete: isDelete
+      };
+    },
+    [filterDefinitions, filters, setFilters]
+  );
 
   const getGenericFilter = React.useCallback(
     (col: Column, value: unknown): RecordFieldFilter | undefined => {

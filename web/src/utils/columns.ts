@@ -80,6 +80,7 @@ export enum ColumnsId {
   ifdirs = 'IfDirections',
   flowdirints = 'FlowDirInts',
   udns = 'Udns',
+  tlstypes = 'TLSTypes',
   recordtype = 'RecordType',
   bytesab = 'Bytes_AB',
   bytesba = 'Bytes_BA',
