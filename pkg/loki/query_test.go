@@ -20,10 +20,28 @@ func TestFlowQuery_AddLabelFilters(t *testing.T) {
 	assert.Equal(t, `/loki/api/v1/query_range?query={app="netobserv-flowcollector",foo="bar",flis="flas"}`, urlQuery)
 }
 
-func TestQuery_BackQuote_Error(t *testing.T) {
+func TestQuery_AuthorizedChars(t *testing.T) {
 	cfg := config.Loki{URL: "/", Labels: []string{"lab1", "lab2"}}
 	query := NewFlowQueryBuilderWithDefaults(&cfg)
-	assert.Error(t, query.addFilter(filters.NewRegexMatch("key", "backquoted`val")))
+	err := query.addFilter(filters.NewRegexMatch("key", "with/slash"))
+	assert.NoError(t, err)
+
+	query = NewFlowQueryBuilderWithDefaults(&cfg)
+	err = query.addFilter(filters.NewRegexMatch("key", "with.dot"))
+	assert.NoError(t, err)
+
+	query = NewFlowQueryBuilderWithDefaults(&cfg)
+	err = query.addFilter(filters.NewRegexMatch("key", "with-dash"))
+	assert.NoError(t, err)
+
+	query = NewFlowQueryBuilderWithDefaults(&cfg)
+	err = query.addFilter(filters.NewRegexMatch("key", "with space"))
+	assert.NoError(t, err)
+
+	query = NewFlowQueryBuilderWithDefaults(&cfg)
+	err = query.addFilter(filters.NewRegexMatch("key", "backquoted`val"))
+	assert.Error(t, err)
+	assert.Equal(t, "unauthorized sign in flows request: backquoted`val", err.Error())
 }
 
 func TestFlowQuery_AddNotLabelFilters(t *testing.T) {
