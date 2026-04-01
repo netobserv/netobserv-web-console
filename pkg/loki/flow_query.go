@@ -22,7 +22,7 @@ const (
 	emptyMatch      = `""`
 )
 
-// can contains only alphanumeric / '-' / '_' / '.' / ',' / '"' / '*' / ':' / '/' characteres
+// can contains only alphanumeric / ' ' / '-' / '_' / '.' / ',' / '"' / '*' / ':' / '/' characteres
 var filterRegexpValidation = regexp.MustCompile(`^[\w -_.,\"*:/]*$`)
 
 // FlowQueryBuilder stores a state to build a LogQL query
