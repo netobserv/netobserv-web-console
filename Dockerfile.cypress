@@ -34,7 +34,7 @@ COPY pkg/ pkg/
 
 RUN CGO_ENABLED=0 go build -ldflags "$LDFLAGS" -mod vendor -o plugin-backend cmd/plugin-backend.go
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal:9.7-1773939694
+FROM registry.access.redhat.com/ubi9/ubi-minimal:9.7-1775623882
 
 COPY --from=web-builder /opt/app-root/web/dist ./web/dist
 COPY --from=go-builder /opt/app-root/plugin-backend ./
