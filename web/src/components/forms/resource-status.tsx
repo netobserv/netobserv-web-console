@@ -15,6 +15,29 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from '../../utils/url';
 import { ComponentStatus, ExporterStatus } from './pipeline';
 
+/** `FlowCollector.status` fields used by this form (mirrors operator CRD shape). */
+export type FlowCollectorStatus = {
+  conditions?: K8sResourceCondition[];
+  components?: {
+    agent?: ComponentStatus;
+    processor?: ComponentStatus;
+    plugin?: ComponentStatus;
+  };
+  integrations?: {
+    loki?: ComponentStatus;
+    monitoring?: ComponentStatus;
+    exporters?: ExporterStatus[];
+  };
+};
+
+function flowCollectorStatus(existing: K8sResourceKind | null): FlowCollectorStatus | undefined {
+  const raw = existing?.status;
+  if (raw == null || typeof raw !== 'object') {
+    return undefined;
+  }
+  return raw as FlowCollectorStatus;
+}
+
 export type ResourceStatusProps = {
   group: string;
   version: string;
@@ -154,8 +177,7 @@ const WAITING_NO_STATUS_FIELD = new Set(['FlowCollectorController', 'StaticContr
 
 type ConditionTone = 'error' | 'warning' | 'progress' | 'success' | 'unused' | 'unknown';
 
-function waitingComponentState(existing: K8sResourceKind | null, suffix: string): string | undefined {
-  const st = existing?.status as any;
+function waitingComponentState(st: FlowCollectorStatus | undefined, suffix: string): string | undefined {
   if (!st) return undefined;
   const { components, integrations } = st;
   switch (suffix) {
@@ -178,7 +200,7 @@ function waitingComponentState(existing: K8sResourceKind | null, suffix: string)
 }
 
 /** One tone per row: drives icon and message color. */
-function conditionTone(c: K8sResourceCondition, existing: K8sResourceKind | null): ConditionTone {
+function conditionTone(c: K8sResourceCondition, fcStatus: FlowCollectorStatus | undefined): ConditionTone {
   const { type, status, reason } = c;
 
   if (type === 'ConfigurationIssue') {
@@ -190,10 +212,11 @@ function conditionTone(c: K8sResourceCondition, existing: K8sResourceKind | null
   if (type.startsWith('Waiting')) {
     const suffix = type.slice('Waiting'.length);
     if (status === 'False' && reason === 'Ready') return 'success';
-    if (status === 'Unknown' && reason === 'Unused') return 'unused';
+    // Operator `setUnused` sets reason `ComponentUnused`; `toCondition` default is `Unused`.
+    if (status === 'Unknown' && (reason === 'Unused' || reason === 'ComponentUnused')) return 'unused';
     if (status !== 'True') return 'unknown';
 
-    const st = waitingComponentState(existing, suffix);
+    const st = waitingComponentState(fcStatus, suffix);
     if (st === 'Failure') return 'error';
     if (st === 'Degraded') return 'warning';
     if (st === 'InProgress') return 'progress';
@@ -233,30 +256,32 @@ export const ResourceStatus: FC<ResourceStatusProps> = ({
     );
   }
 
+  const fcStatus = flowCollectorStatus(existing);
+
   const components: ComponentRowData[] = [];
-  if (existing.status?.components?.agent) {
-    components.push({ id: 'agent', name: t('eBPF Agent'), status: existing.status.components.agent });
+  if (fcStatus?.components?.agent) {
+    components.push({ id: 'agent', name: t('eBPF Agent'), status: fcStatus.components.agent });
   }
-  if (existing.status?.components?.processor) {
-    components.push({ id: 'processor', name: t('Flowlogs Pipeline'), status: existing.status.components.processor });
+  if (fcStatus?.components?.processor) {
+    components.push({ id: 'processor', name: t('Flowlogs Pipeline'), status: fcStatus.components.processor });
   }
-  if (existing.status?.components?.plugin) {
-    components.push({ id: 'plugin', name: t('Console Plugin'), status: existing.status.components.plugin });
+  if (fcStatus?.components?.plugin) {
+    components.push({ id: 'plugin', name: t('Console Plugin'), status: fcStatus.components.plugin });
   }
-  if (existing.status?.integrations?.loki) {
-    components.push({ id: 'loki', name: 'Loki', status: existing.status.integrations.loki });
+  if (fcStatus?.integrations?.loki) {
+    components.push({ id: 'loki', name: 'Loki', status: fcStatus.integrations.loki });
   }
-  if (existing.status?.integrations?.monitoring) {
-    components.push({ id: 'monitoring', name: t('Monitoring'), status: existing.status.integrations.monitoring });
+  if (fcStatus?.integrations?.monitoring) {
+    components.push({ id: 'monitoring', name: t('Monitoring'), status: fcStatus.integrations.monitoring });
   }
-  const exporters: ExporterStatus[] = existing.status?.integrations?.exporters || [];
+  const exporters: ExporterStatus[] = fcStatus?.integrations?.exporters || [];
 
   const sortConditions = [
     (c: K8sResourceCondition) => c.type === 'Ready',
     (c: K8sResourceCondition) => c.type === 'ConfigurationIssue',
     (c: K8sResourceCondition) => c.type === 'KafkaReady'
   ];
-  const conditions = ((existing?.status?.conditions || []) as K8sResourceCondition[]).sort((a, b) => {
+  const conditions = (fcStatus?.conditions || []).sort((a, b) => {
     for (const pred of sortConditions) {
       if (pred(a) && pred(b)) {
         return 0;
@@ -293,7 +318,7 @@ export const ResourceStatus: FC<ResourceStatusProps> = ({
         </Thead>
         <Tbody>
           {conditions.map((condition, i) => {
-            const tone = conditionTone(condition, existing);
+            const tone = conditionTone(condition, fcStatus);
             return (
               <Tr
                 id={`${condition.type}-row`}
