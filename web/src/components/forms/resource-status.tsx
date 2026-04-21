@@ -146,6 +146,67 @@ const ComponentStatusTable: FC<{
   );
 };
 
+/**
+ * `Waiting*` FlowCollector conditions use inverted polarity (operator `statuses.go`): `True` means not ready.
+ * Component state on the same status object is the source of truth for Failure / Degraded / InProgress.
+ */
+const WAITING_NO_STATUS_FIELD = new Set(['FlowCollectorController', 'StaticController', 'NetworkPolicy']);
+
+type ConditionTone = 'error' | 'warning' | 'progress' | 'success' | 'unused' | 'unknown';
+
+function waitingComponentState(existing: K8sResourceKind | null, suffix: string): string | undefined {
+  const st = existing?.status as any;
+  if (!st) return undefined;
+  const { components, integrations } = st;
+  switch (suffix) {
+    case 'EBPFAgents':
+      return components?.agent?.state;
+    case 'WebConsole':
+      return components?.plugin?.state;
+    case 'FLPMonolith':
+    case 'FLPParent':
+    case 'FLPTransformer':
+      return components?.processor?.state;
+    case 'Monitoring':
+      return integrations?.monitoring?.state;
+    case 'LokiStack':
+    case 'DemoLoki':
+      return integrations?.loki?.state;
+    default:
+      return undefined;
+  }
+}
+
+/** One tone per row: drives icon and message color. */
+function conditionTone(c: K8sResourceCondition, existing: K8sResourceKind | null): ConditionTone {
+  const { type, status, reason } = c;
+
+  if (type === 'ConfigurationIssue') {
+    if (status === 'True' && reason === 'Error') return 'error';
+    if (status === 'True' && reason === 'Warnings') return 'warning';
+    return 'unknown';
+  }
+
+  if (type.startsWith('Waiting')) {
+    const suffix = type.slice('Waiting'.length);
+    if (status === 'False' && reason === 'Ready') return 'success';
+    if (status === 'Unknown' && reason === 'Unused') return 'unused';
+    if (status !== 'True') return 'unknown';
+
+    const st = waitingComponentState(existing, suffix);
+    if (st === 'Failure') return 'error';
+    if (st === 'Degraded') return 'warning';
+    if (st === 'InProgress') return 'progress';
+    if (st === 'Ready') return 'success';
+    return WAITING_NO_STATUS_FIELD.has(suffix) ? 'error' : 'progress';
+  }
+
+  if (status === 'True') return 'success';
+  if (status === 'False' && reason === 'Pending') return 'progress';
+  if (status === 'False' && reason !== 'Valid') return 'error';
+  return 'unknown';
+}
+
 export const ResourceStatus: FC<ResourceStatusProps> = ({
   group,
   version,
@@ -232,16 +293,7 @@ export const ResourceStatus: FC<ResourceStatusProps> = ({
         </Thead>
         <Tbody>
           {conditions.map((condition, i) => {
-            const isWarning =
-              condition.type === 'ConfigurationIssue' && condition.status === 'True' && condition.reason === 'Warnings';
-            const isError =
-              (condition.type === 'ConfigurationIssue' &&
-                condition.status === 'True' &&
-                condition.reason === 'Error') ||
-              (condition.type !== 'ConfigurationIssue' &&
-                condition.status === 'False' &&
-                condition.reason !== 'Pending' &&
-                condition.reason !== 'Valid');
+            const tone = conditionTone(condition, existing);
             return (
               <Tr
                 id={`${condition.type}-row`}
@@ -250,14 +302,16 @@ export const ResourceStatus: FC<ResourceStatusProps> = ({
                 key={i}
               >
                 <Td>
-                  {isError ? (
+                  {tone === 'error' ? (
                     <ExclamationCircleIcon color="var(--pf-v5-global--danger-color--100)" />
-                  ) : isWarning ? (
+                  ) : tone === 'warning' ? (
                     <ExclamationTriangleIcon color="var(--pf-v5-global--warning-color--100)" />
-                  ) : condition.status === 'True' && condition.type !== 'ConfigurationIssue' ? (
-                    <CheckCircleIcon color="var(--pf-v5-global--success-color--100)" />
-                  ) : condition.status === 'False' && condition.reason === 'Pending' ? (
+                  ) : tone === 'progress' ? (
                     <HourglassHalfIcon color="var(--pf-v5-global--info-color--100)" />
+                  ) : tone === 'unused' ? (
+                    <BanIcon color="var(--pf-v5-global--disabled-color--100)" />
+                  ) : tone === 'success' ? (
+                    <CheckCircleIcon color="var(--pf-v5-global--success-color--100)" />
                   ) : (
                     <UnknownIcon color="var(--pf-v5-global--disabled-color--100)" />
                   )}{' '}
@@ -267,9 +321,9 @@ export const ResourceStatus: FC<ResourceStatusProps> = ({
                 <Td>{condition.reason}</Td>
                 <Td
                   style={
-                    isWarning
+                    tone === 'warning'
                       ? { color: 'var(--pf-v5-global--warning-color--200)' }
-                      : isError
+                      : tone === 'error'
                       ? { color: 'var(--pf-v5-global--danger-color--100)' }
                       : undefined
                   }
