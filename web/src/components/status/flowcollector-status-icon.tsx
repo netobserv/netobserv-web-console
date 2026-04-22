@@ -51,7 +51,7 @@ export const FlowCollectorStatusIcon: React.FC<FlowCollectorStatusIconProps> = (
   }, [status]);
 
   return (
-    <Tooltip content={tooltipContent} position="bottom">
+    <Tooltip id="flowcollector-status-tooltip" content={tooltipContent} position="bottom">
       <span style={{ display: 'inline-flex', verticalAlign: 'middle' }}>{icon}</span>
     </Tooltip>
   );
