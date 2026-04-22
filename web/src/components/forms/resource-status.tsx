@@ -69,17 +69,17 @@ const stateColor = (state: string | undefined): LabelColor => {
 const StateIcon: FC<{ state: string | undefined }> = ({ state }) => {
   switch (state) {
     case 'Ready':
-      return <CheckCircleIcon color="var(--pf-v5-global--success-color--100)" />;
+      return <CheckCircleIcon color="var(--pf-t--global--icon--color--status--success--default)" />;
     case 'Degraded':
-      return <ExclamationTriangleIcon color="var(--pf-v5-global--warning-color--100)" />;
+      return <ExclamationTriangleIcon color="var(--pf-t--global--icon--color--status--warning--default)" />;
     case 'Failure':
-      return <ExclamationCircleIcon color="var(--pf-v5-global--danger-color--100)" />;
+      return <ExclamationCircleIcon color="var(--pf-t--global--icon--color--status--danger--default)" />;
     case 'InProgress':
-      return <HourglassHalfIcon color="var(--pf-v5-global--info-color--100)" />;
+      return <HourglassHalfIcon color="var(--pf-t--global--icon--color--status--info--default)" />;
     case 'Unused':
-      return <BanIcon color="var(--pf-v5-global--disabled-color--100)" />;
+      return <BanIcon color="var(--pf-t--global--icon--color--disabled)" />;
     default:
-      return <UnknownIcon color="var(--pf-v5-global--disabled-color--100)" />;
+      return <UnknownIcon color="var(--pf-t--global--icon--color--disabled)" />;
   }
 };
 
@@ -158,7 +158,7 @@ const ComponentStatusTable: FC<{
           ))}
           {unusedComponents.length > 0 && (
             <Tr>
-              <Td colSpan={4} style={{ color: 'var(--pf-v5-global--disabled-color--100)', fontStyle: 'italic' }}>
+              <Td colSpan={4} style={{ color: 'var(--pf-t--global--text--color--disabled)', fontStyle: 'italic' }}>
                 {t('Unused: {{list}}', { list: unusedComponents.map(c => c.name).join(', ') })}
               </Td>
             </Tr>
@@ -224,6 +224,7 @@ function conditionTone(c: K8sResourceCondition, fcStatus: FlowCollectorStatus | 
     return WAITING_NO_STATUS_FIELD.has(suffix) ? 'error' : 'progress';
   }
 
+  if (type === 'Ready' && status === 'True' && reason === 'Ready,Degraded') return 'warning';
   if (status === 'True') return 'success';
   if (status === 'False' && reason === 'Pending') return 'progress';
   if (status === 'False' && reason !== 'Valid') return 'error';
@@ -328,17 +329,17 @@ export const ResourceStatus: FC<ResourceStatusProps> = ({
               >
                 <Td>
                   {tone === 'error' ? (
-                    <ExclamationCircleIcon color="var(--pf-v5-global--danger-color--100)" />
+                    <ExclamationCircleIcon color="var(--pf-t--global--icon--color--status--danger--default)" />
                   ) : tone === 'warning' ? (
-                    <ExclamationTriangleIcon color="var(--pf-v5-global--warning-color--100)" />
+                    <ExclamationTriangleIcon color="var(--pf-t--global--icon--color--status--warning--default)" />
                   ) : tone === 'progress' ? (
-                    <HourglassHalfIcon color="var(--pf-v5-global--info-color--100)" />
+                    <HourglassHalfIcon color="var(--pf-t--global--icon--color--status--info--default)" />
                   ) : tone === 'unused' ? (
-                    <BanIcon color="var(--pf-v5-global--disabled-color--100)" />
+                    <BanIcon color="var(--pf-t--global--icon--color--disabled)" />
                   ) : tone === 'success' ? (
-                    <CheckCircleIcon color="var(--pf-v5-global--success-color--100)" />
+                    <CheckCircleIcon color="var(--pf-t--global--icon--color--status--success--default)" />
                   ) : (
-                    <UnknownIcon color="var(--pf-v5-global--disabled-color--100)" />
+                    <UnknownIcon color="var(--pf-t--global--icon--color--disabled)" />
                   )}{' '}
                   {condition.type}
                 </Td>
@@ -347,9 +348,9 @@ export const ResourceStatus: FC<ResourceStatusProps> = ({
                 <Td
                   style={
                     tone === 'warning'
-                      ? { color: 'var(--pf-v5-global--warning-color--200)' }
+                      ? { color: 'var(--pf-t--global--text--color--status--warning--default)' }
                       : tone === 'error'
-                      ? { color: 'var(--pf-v5-global--danger-color--100)' }
+                      ? { color: 'var(--pf-t--global--text--color--status--danger--default)' }
                       : undefined
                   }
                 >
