@@ -28,7 +28,7 @@ import Modal from './modal';
 
 const COLUMNS_DRAG_ZONE = 'netobs-columns-modal';
 
-export const columnFilterKeys = ['source', 'destination', 'time', 'host', 'namespace', 'owner', 'ip', 'dns'];
+export const columnFilterKeys = ['source', 'destination', 'time', 'host', 'namespace', 'owner', 'ip', 'dns', 'tls'];
 
 export interface ColumnsModalProps {
   isModalOpen: boolean;

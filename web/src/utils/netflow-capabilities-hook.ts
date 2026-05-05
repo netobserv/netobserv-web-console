@@ -4,15 +4,7 @@ import { limitValues, topValues } from '../components/dropdowns/query-options-pa
 import { ViewId } from '../components/netflow-traffic';
 import { Config } from '../model/config';
 import { Filter, FilterDefinition, Filters, getEnabledFilters } from '../model/filters';
-import {
-  DataSource,
-  filtersToString,
-  FlowQuery,
-  FlowScope,
-  MetricType,
-  PacketLoss,
-  RecordType
-} from '../model/flow-query';
+import { DataSource, FlowScope, MetricType, PacketLoss, RecordType, StructuredFlowQuery } from '../model/flow-query';
 import { parseQuickFilters, QuickFilter } from '../model/quick-filters';
 import { resolveGroupTypes, ScopeConfigDef } from '../model/scope';
 import { TopologyOptions } from '../model/topology';
@@ -21,7 +13,7 @@ import { Column, ColumnsId } from './columns';
 import { ContextSingleton } from './context';
 import { computeStepInterval, TimeRange } from './datetime';
 import { checkFilterAvailable, getFilterDefinitions } from './filter-definitions';
-import { dnsIdMatcher, droppedIdMatcher, OverviewPanel, rttIdMatcher } from './overview-panels';
+import { dnsIdMatcher, droppedIdMatcher, OverviewPanel, rttIdMatcher, tlsIdMatcher } from './overview-panels';
 
 export interface ConfigCapabilities {
   allowLoki: boolean;
@@ -31,6 +23,7 @@ export interface ConfigCapabilities {
   isDNSTracking: boolean;
   isFlowRTT: boolean;
   isPktDrop: boolean;
+  isTLSTracking: boolean;
   isPromOnly: boolean;
   availableScopes: ScopeConfigDef[];
   allowedMetricTypes: MetricType[];
@@ -41,7 +34,7 @@ export interface ConfigCapabilities {
   filterDefs: FilterDefinition[];
   quickFilters: QuickFilter[];
   defaultFilters: Filter[];
-  flowQuery: FlowQuery;
+  flowQuery: StructuredFlowQuery;
   fetchFunctions: ReturnType<typeof getBackAndForthFetch>;
 }
 
@@ -103,6 +96,8 @@ export function useConfigCapabilities(params: {
 
   const isPktDrop = React.useMemo(() => config.features.includes('pktDrop'), [config.features]);
 
+  const isTLSTracking = React.useMemo(() => config.features.includes('tlsTracking'), [config.features]);
+
   const isPromOnly = React.useMemo(() => !allowLoki || dataSource === 'prom', [allowLoki, dataSource]);
 
   // Derived collections
@@ -146,9 +141,10 @@ export function useConfigCapabilities(params: {
         panel =>
           (isPktDrop || !panel.id.includes(droppedIdMatcher)) &&
           (isDNSTracking || !panel.id.includes(dnsIdMatcher)) &&
-          (isFlowRTT || !panel.id.includes(rttIdMatcher))
+          (isFlowRTT || !panel.id.includes(rttIdMatcher)) &&
+          (isTLSTracking || !panel.id.includes(tlsIdMatcher))
       ),
-    [isDNSTracking, isFlowRTT, isPktDrop, panels]
+    [isDNSTracking, isFlowRTT, isPktDrop, isTLSTracking, panels]
   );
 
   const selectedPanels = React.useMemo(() => availablePanels.filter(panel => panel.isSelected), [availablePanels]);
@@ -189,11 +185,10 @@ export function useConfigCapabilities(params: {
     return quickFilters.filter(qf => qf.default).flatMap(qf => qf.filters);
   }, [forcedNamespace, quickFilters]);
 
-  const flowQuery = React.useMemo((): FlowQuery => {
-    const enabledFilters = getEnabledFilters(forcedFilters || filters);
-    const query: FlowQuery = {
+  const flowQuery = React.useMemo((): StructuredFlowQuery => {
+    const query: StructuredFlowQuery = {
       namespace: forcedNamespace,
-      filters: filtersToString(enabledFilters.list, enabledFilters.match === 'any'),
+      structuredFilters: getEnabledFilters(forcedFilters || filters),
       limit: limitValues.includes(limit) ? limit : limitValues[0],
       recordType: recordType,
       dataSource: dataSource,
@@ -242,10 +237,8 @@ export function useConfigCapabilities(params: {
   ]);
 
   const fetchFunctions = React.useMemo(() => {
-    const enabledFilters = getEnabledFilters(forcedFilters || filters);
-    const matchAny = enabledFilters.match === 'any';
-    return getBackAndForthFetch(filterDefs, enabledFilters, matchAny);
-  }, [forcedFilters, filters, filterDefs]);
+    return getBackAndForthFetch(filterDefs);
+  }, [filterDefs]);
 
   return {
     allowLoki,
@@ -255,6 +248,7 @@ export function useConfigCapabilities(params: {
     isDNSTracking,
     isFlowRTT,
     isPktDrop,
+    isTLSTracking,
     isPromOnly,
     availableScopes,
     allowedMetricTypes,

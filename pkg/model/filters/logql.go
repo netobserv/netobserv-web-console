@@ -271,12 +271,22 @@ func NumericLineFilter(key string, values []string, not, moreThan bool) (LineFil
 		typeNumber)
 }
 
-func ArrayLineFilter(key string, values []string, not bool) LineFilter {
+// ArrayLineFilter returns a LineFilter and true if it has an empty match
+func ArrayLineFilter(key string, values []string, not bool) (LineFilter, bool) {
+	if len(values) == 1 && (values[0] == "" || values[0] == `""`) {
+		// Special case, filter for n/a; note that logQL json doesn't support arrays, so we need a different solution
+		if not {
+			// key!=n/a
+			return RegexMatchLineFilter(key, true, ".*"), false
+		}
+		// key=n/a
+		return NotContainsKeyLineFilter(key), false
+	}
 	lf := LineFilter{key: key, not: not}
 	for _, value := range values {
 		lf.values = append(lf.values, lineMatch{valueType: typeRegexArrayContains, value: value})
 	}
-	return lf
+	return lf, false
 }
 
 // StringLineFilter returns a LineFilter and true if it has an empty match

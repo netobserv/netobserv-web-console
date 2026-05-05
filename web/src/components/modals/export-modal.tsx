@@ -20,7 +20,7 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { getExportFlowsURL } from '../../api/routes';
 import { Filter } from '../../model/filters';
-import { FlowQuery } from '../../model/flow-query';
+import { StructuredFlowQuery } from '../../model/flow-query';
 import { Column, getFullColumnName } from '../../utils/columns';
 import { getTimeRangeOptions, TimeRange } from '../../utils/datetime';
 import { formatDuration, getDateSInMiliseconds } from '../../utils/duration';
@@ -34,7 +34,7 @@ export interface ExportModalProps {
   isModalOpen: boolean;
   setModalOpen: (v: boolean) => void;
   range: number | TimeRange;
-  flowQuery: FlowQuery;
+  flowQuery: StructuredFlowQuery;
   columns: Column[];
   filters: Filter[];
   id?: string;

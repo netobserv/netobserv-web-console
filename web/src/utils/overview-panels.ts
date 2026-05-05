@@ -5,6 +5,7 @@ import { Feature, isAllowed } from './features-gate';
 export const dnsIdMatcher = 'dns_latency';
 export const rttIdMatcher = 'rtt';
 export const droppedIdMatcher = 'dropped';
+export const tlsIdMatcher = 'tls_';
 export const customPanelMatcher = 'custom';
 
 export const getRateFunctionFromId = (id: string) => {
@@ -42,6 +43,10 @@ export type OverviewPanelId =
   | `cause_dropped_packet_rates`
   | 'name_dns_latency_flows'
   | 'rcode_dns_latency_flows'
+  | 'tls_usage_global'
+  | 'tls_per_cipher_suite'
+  | 'tls_per_version'
+  | 'tls_per_group'
   | `custom_${StatFunction}_${AggregateBy}_${MetricType}`
   | `custom_${AggregateBy}_${MetricType}`
   | `custom_${MetricType}`;
@@ -76,11 +81,13 @@ export const defaultPanelIds: OverviewPanelId[] = [
   'rcode_dns_latency_flows',
   'bottom_min_rtt', // should remove from defaults?
   'top_avg_rtt',
-  'top_p90_rtt'
+  'top_p90_rtt',
+  'tls_usage_global',
+  'tls_per_version'
 ];
 
 export const getDefaultOverviewPanels = (customIds?: string[]): OverviewPanel[] => {
-  let ids: OverviewPanelId[] = [];
+  let ids: OverviewPanelId[] = ['tls_usage_global', 'tls_per_version', 'tls_per_group', 'tls_per_cipher_suite'];
 
   /* list of panels and default selection behavior
    *  isSelected can safely be used on feature related panels
@@ -324,6 +331,30 @@ export const getOverviewPanelInfo = (
         tooltip: t(
           'The top DNS response code extracted from DNS response headers compared to total over the selected interval'
         )
+      };
+    case 'tls_usage_global':
+      return {
+        title: t('TLS usage'),
+        topTitle: t('TLS usage (network flows per second)'),
+        chartType: t('donut or lines')
+      };
+    case 'tls_per_version':
+      return {
+        title: t('TLS usage per version'),
+        topTitle: t('TLS per version (network flows per second)'),
+        chartType: t('donut or lines')
+      };
+    case 'tls_per_group':
+      return {
+        title: t('TLS usage per group'),
+        topTitle: t('TLS per group (network flows per second)'),
+        chartType: t('donut or lines')
+      };
+    case 'tls_per_cipher_suite':
+      return {
+        title: t('TLS usage per cipher suite'),
+        topTitle: t('TLS per cipher suite (network flows per second)'),
+        chartType: t('donut or lines')
       };
     default:
       const parsedId = parseCustomMetricId(id);

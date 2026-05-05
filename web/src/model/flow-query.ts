@@ -1,5 +1,5 @@
 import { Field } from '../api/ipfix';
-import { Filter } from './filters';
+import { Filter, Filters } from './filters';
 
 export type RecordType = 'allConnections' | 'newConnection' | 'heartbeat' | 'endConnection' | 'flowLog';
 export type DataSource = 'auto' | 'loki' | 'prom';
@@ -21,6 +21,10 @@ export type NodeType = FlowScope | 'unknown';
 // 'owners'...
 export type Groups = string;
 
+export type StructuredFlowQuery = Omit<FlowQuery, 'filters'> & {
+  structuredFilters: Filters;
+};
+
 export interface FlowQuery {
   timeRange?: number;
   startTime?: string;
@@ -40,13 +44,21 @@ export interface FlowQuery {
   step?: string;
 }
 
+export const structuredToRawQuery = (q: StructuredFlowQuery): FlowQuery => {
+  const raw = {
+    ...q,
+    filters: filtersToString(q.structuredFilters.list, q.structuredFilters.match === 'any'),
+    structuredFilters: undefined
+  };
+  delete raw.structuredFilters;
+  return raw;
+};
+
 export const filtersToString = (filters: Filter[], matchAny: boolean): string => {
-  const matches: string[] = [];
-  filters.forEach(f => {
-    const str = f.def.encoder(f.values, f.compare, matchAny);
-    matches.push(str);
+  const encoded = filters.map(f => {
+    return f.def.encoder(f.values, f.compare, matchAny);
   });
-  return encodeURIComponent(matches.join(matchAny ? '|' : '&'));
+  return encodeURIComponent(encoded.join(matchAny ? '|' : '&'));
 };
 
 export const filterByHashId = (hashId: string): string => {

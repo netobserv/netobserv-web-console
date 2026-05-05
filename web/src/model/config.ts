@@ -14,7 +14,8 @@ export type Feature =
   | 'udnMapping'
   | 'packetTranslation'
   | 'networkEvents'
-  | 'ipsec';
+  | 'ipsec'
+  | 'tlsTracking';
 
 export type RecordingAnnotations = { [recordName: string]: { [key: string]: string } };
 

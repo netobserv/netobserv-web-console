@@ -376,6 +376,11 @@ export const getFormattedValue = (v: number, mt: MetricType, mf: MetricFunction,
           return valueFormat(v, 1, t('P'));
         }
         return valueFormat(v, 1, t('Pps'));
+      case 'Flows':
+        if (mf !== 'rate') {
+          return valueFormat(v, 1, t('flows'));
+        }
+        return valueFormat(v, 1, t('fps'));
       default:
         return valueFormat(v, 1);
     }

@@ -126,25 +126,24 @@ func (q *FlowQueryBuilder) addLineFilters(filter filters.Match, values []string)
 		return
 	}
 
-	if q.config.IsArray(filter.Key) {
-		q.lineFilters = append(q.lineFilters, filters.ArrayLineFilter(filter.Key, values, filter.Not))
+	var lf filters.LineFilter
+	var hasEmptyMatch bool
+	switch {
+	case q.config.IsArray(filter.Key):
+		lf, hasEmptyMatch = filters.ArrayLineFilter(filter.Key, values, filter.Not)
+	case q.config.IsNumeric(filter.Key):
+		lf, hasEmptyMatch = filters.NumericLineFilter(filter.Key, values, filter.Not, filter.MoreThanOrEqual)
+	case filter.Regex:
+		lf, hasEmptyMatch = filters.StringLineFilterCheckExact(filter.Key, values, filter.Not)
+	default:
+		lf, hasEmptyMatch = filters.StringLineFilter(filter.Key, values, filter.Not)
+	}
+	// if there is at least an empty exact match, there is no uniform/safe way to filter by text,
+	// so we should use JSON label matchers instead of text line matchers
+	if hasEmptyMatch {
+		q.jsonFilters = append(q.jsonFilters, lf.AsLabelFilters())
 	} else {
-		var lf filters.LineFilter
-		var hasEmptyMatch bool
-		if q.config.IsNumeric(filter.Key) {
-			lf, hasEmptyMatch = filters.NumericLineFilter(filter.Key, values, filter.Not, filter.MoreThanOrEqual)
-		} else if filter.Regex {
-			lf, hasEmptyMatch = filters.StringLineFilterCheckExact(filter.Key, values, filter.Not)
-		} else {
-			lf, hasEmptyMatch = filters.StringLineFilter(filter.Key, values, filter.Not)
-		}
-		// if there is at least an empty exact match, there is no uniform/safe way to filter by text,
-		// so we should use JSON label matchers instead of text line matchers
-		if hasEmptyMatch {
-			q.jsonFilters = append(q.jsonFilters, lf.AsLabelFilters())
-		} else {
-			q.lineFilters = append(q.lineFilters, lf)
-		}
+		q.lineFilters = append(q.lineFilters, lf)
 	}
 }
 
