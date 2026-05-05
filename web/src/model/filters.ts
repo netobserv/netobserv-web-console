@@ -77,7 +77,9 @@ export type FilterId =
   | 'xlat_src_port'
   | 'xlat_dst_port'
   | 'ipsec_success'
-  | 'ipsec_retcode';
+  | 'ipsec_retcode'
+  | 'tcp_flags'
+  | 'tls_types';
 
 export interface FilterConfigDef {
   id: string;

@@ -28,6 +28,7 @@ const defaultCaps: ConfigCapabilities = {
   isDNSTracking: false,
   isFlowRTT: false,
   isPktDrop: false,
+  isTLSTracking: false,
   isPromOnly: true,
   availableScopes: [],
   allowedMetricTypes: [],

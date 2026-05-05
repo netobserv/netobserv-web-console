@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Config, defaultConfig } from '../model/config';
 import { buildExportQuery } from '../model/export-query';
-import { FlowQuery, FlowScope, isTimeMetric } from '../model/flow-query';
+import { FlowQuery, FlowScope, isTimeMetric, StructuredFlowQuery, structuredToRawQuery } from '../model/flow-query';
 import { ContextSingleton } from '../utils/context';
 import { TimeRange } from '../utils/datetime';
 import { parseGenericMetrics, parseTopologyMetrics } from '../utils/metrics';
@@ -73,7 +73,8 @@ export const queryPrometheusMetric = (query: string): Promise<unknown> => {
   });
 };
 
-export const getExportFlowsURL = (params: FlowQuery, columns?: string[]): string => {
+export const getExportFlowsURL = (q: StructuredFlowQuery, columns?: string[]): string => {
+  const params = structuredToRawQuery(q);
   const exportQuery = buildExportQuery(params, columns);
   return `${ContextSingleton.getHost()}/api/loki/export?${exportQuery}`;
 };
@@ -169,7 +170,11 @@ export const getFlowMetrics = (params: FlowQuery, range: number | TimeRange): Pr
   });
 };
 
-export const getFlowGenericMetrics = (params: FlowQuery, range: number | TimeRange): Promise<GenericMetricsResult> => {
+export const getFlowGenericMetrics = (
+  q: StructuredFlowQuery,
+  range: number | TimeRange
+): Promise<GenericMetricsResult> => {
+  const params = structuredToRawQuery(q);
   return getFlowMetricsGeneric(params, res => {
     return parseGenericMetrics(
       res.result as RawTopologyMetrics[],

@@ -22,7 +22,8 @@ import {
 import { getFlowGenericMetrics } from '../../../api/routes';
 import { ScopeSlider } from '../../../components/slider/scope-slider';
 import { Config } from '../../../model/config';
-import { FlowQuery, FlowScope, RecordType } from '../../../model/flow-query';
+import { FilterCompare, FilterDefinition } from '../../../model/filters';
+import { FlowScope, RecordType, StructuredFlowQuery } from '../../../model/flow-query';
 import { getStat } from '../../../model/metrics';
 import { useNetflowContext } from '../../../model/netflow-context';
 import { ScopeConfigDef } from '../../../model/scope';
@@ -30,6 +31,7 @@ import { TimeRange } from '../../../utils/datetime';
 import { getDNSErrorDescription, getDNSRcodeDescription } from '../../../utils/dns';
 import { getDSCPServiceClassName } from '../../../utils/dscp';
 import { getStructuredHTTPError, StructuredError } from '../../../utils/errors';
+import { findFilter } from '../../../utils/filter-definitions';
 import { localStorageOverviewKebabKey, useLocalStorage } from '../../../utils/local-storage-hook';
 import { observeDOMRect, toNamedMetric } from '../../../utils/metrics-helper';
 import {
@@ -43,7 +45,8 @@ import {
   OverviewPanelId,
   OverviewPanelInfo,
   parseCustomMetricId,
-  rttIdMatcher
+  rttIdMatcher,
+  tlsIdMatcher
 } from '../../../utils/overview-panels';
 import { convertRemToPixels } from '../../../utils/panel';
 import { formatPort } from '../../../utils/port';
@@ -81,6 +84,7 @@ export interface NetflowOverviewProps {
   metrics: NetflowMetrics;
   loading?: boolean;
   isDark?: boolean;
+  filterDefinitions: FilterDefinition[];
   resetDefaultFilters?: (c?: Config) => void;
   clearFilters?: () => void;
   truncateLength: TruncateLength;
@@ -119,7 +123,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
           const rateMetrics = initRateMetricKeys(ratePanels.map(p => p.id)) as RateMetrics;
           (Object.keys(rateMetrics) as (keyof typeof rateMetrics)[]).map(key => {
             const metricType = key === 'bytes' ? 'Bytes' : 'Packets';
-            const fq: FlowQuery = { ...baseQuery, function: 'rate', type: metricType };
+            const fq: StructuredFlowQuery = { ...baseQuery, function: 'rate', type: metricType };
             promises.push(
               Result.fromPromise(getMetrics(fq, range)).then(res => {
                 //set matching value and apply changes on the entire object to trigger refresh
@@ -142,7 +146,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
         ) as TotalRateMetrics;
         (Object.keys(totalRateMetric) as (keyof typeof totalRateMetric)[]).map(key => {
           const metricType = key === 'bytes' ? 'Bytes' : 'Packets';
-          const fq: FlowQuery = { ...baseQuery, function: 'rate', aggregateBy: 'app', type: metricType };
+          const fq: StructuredFlowQuery = { ...baseQuery, function: 'rate', aggregateBy: 'app', type: metricType };
           promises.push(
             Result.fromPromise(getMetrics(fq, range)).then(res => {
               //set matching value and apply changes on the entire object to trigger refresh
@@ -169,7 +173,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
         const droppedRateMetrics = initRateMetricKeys(droppedPanels.map(p => p.id)) as RateMetrics;
         (Object.keys(droppedRateMetrics) as (keyof typeof droppedRateMetrics)[]).map(key => {
           const metricType = key === 'bytes' ? 'PktDropBytes' : 'PktDropPackets';
-          const fq: FlowQuery = { ...baseQuery, function: 'rate', type: metricType };
+          const fq: StructuredFlowQuery = { ...baseQuery, function: 'rate', type: metricType };
           promises.push(
             Result.fromPromise(getMetrics(fq, range)).then(res => {
               //set matching value and apply changes on the entire object to trigger refresh
@@ -189,7 +193,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
         const totalDroppedRateMetric = initRateMetricKeys(droppedPanels.map(p => p.id)) as TotalRateMetrics;
         (Object.keys(totalDroppedRateMetric) as (keyof typeof totalDroppedRateMetric)[]).map(key => {
           const metricType = key === 'bytes' ? 'PktDropBytes' : 'PktDropPackets';
-          const fq: FlowQuery = { ...baseQuery, function: 'rate', aggregateBy: 'app', type: metricType };
+          const fq: StructuredFlowQuery = { ...baseQuery, function: 'rate', aggregateBy: 'app', type: metricType };
           promises.push(
             Result.fromPromise(getMetrics(fq, range)).then(res => {
               //set matching value and apply changes on the entire object to trigger refresh
@@ -207,13 +211,13 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
         });
 
         //get drop state & cause
-        const fqState: FlowQuery = {
+        const fqState: StructuredFlowQuery = {
           ...baseQuery,
           function: 'rate',
           type: 'PktDropPackets',
           aggregateBy: 'PktDropLatestState'
         };
-        const fqCause: FlowQuery = {
+        const fqCause: StructuredFlowQuery = {
           ...baseQuery,
           function: 'rate',
           type: 'PktDropPackets',
@@ -254,7 +258,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
         //set dns metrics
         const dnsLatencyMetrics = initFunctionMetricKeys(dnsPanels.map(p => p.id)) as FunctionMetrics;
         (Object.keys(dnsLatencyMetrics) as (keyof typeof dnsLatencyMetrics)[]).map(fn => {
-          const fq: FlowQuery = { ...baseQuery, function: fn, type: 'DnsLatencyMs' };
+          const fq: StructuredFlowQuery = { ...baseQuery, function: fn, type: 'DnsLatencyMs' };
           promises.push(
             Result.fromPromise(getMetrics(fq, range)).then(res => {
               const dnsLatency = res
@@ -272,7 +276,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
 
         const totalDnsLatencyMetric = initFunctionMetricKeys(dnsPanels.map(p => p.id)) as TotalFunctionMetrics;
         (Object.keys(totalDnsLatencyMetric) as (keyof typeof totalDnsLatencyMetric)[]).map(fn => {
-          const fq: FlowQuery = { ...baseQuery, function: fn, aggregateBy: 'app', type: 'DnsLatencyMs' };
+          const fq: StructuredFlowQuery = { ...baseQuery, function: fn, aggregateBy: 'app', type: 'DnsLatencyMs' };
           promises.push(
             Result.fromPromise(getMetrics(fq, range)).then(res => {
               const totalDnsLatency = res
@@ -290,14 +294,24 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
 
         //set rcode metrics
         if (dnsPanels.some(p => p.id.includes('rcode_dns_latency_flows'))) {
-          const fqNames: FlowQuery = { ...baseQuery, aggregateBy: 'DnsName', function: 'count', type: 'DnsFlows' };
-          const fqCodes: FlowQuery = {
+          const fqNames: StructuredFlowQuery = {
+            ...baseQuery,
+            aggregateBy: 'DnsName',
+            function: 'count',
+            type: 'DnsFlows'
+          };
+          const fqCodes: StructuredFlowQuery = {
             ...baseQuery,
             aggregateBy: 'DnsFlagsResponseCode',
             function: 'count',
             type: 'DnsFlows'
           };
-          const fqTotal: FlowQuery = { ...baseQuery, aggregateBy: 'app', function: 'count', type: 'DnsFlows' };
+          const fqTotal: StructuredFlowQuery = {
+            ...baseQuery,
+            aggregateBy: 'app',
+            function: 'count',
+            type: 'DnsFlows'
+          };
           promises.push(
             ...[
               //get dns names
@@ -345,7 +359,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
         //set RTT metrics
         const rttMetrics = initFunctionMetricKeys(rttPanels.map(p => p.id)) as FunctionMetrics;
         (Object.keys(rttMetrics) as (keyof typeof rttMetrics)[]).map(fn => {
-          const fq: FlowQuery = { ...baseQuery, function: fn, type: 'TimeFlowRttNs' };
+          const fq: StructuredFlowQuery = { ...baseQuery, function: fn, type: 'TimeFlowRttNs' };
           promises.push(
             Result.fromPromise(getMetrics(fq, range)).then(res => {
               //set matching value and apply changes on the entire object to trigger refresh
@@ -364,7 +378,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
 
         const totalRttMetric = initFunctionMetricKeys(rttPanels.map(p => p.id)) as TotalFunctionMetrics;
         (Object.keys(totalRttMetric) as (keyof typeof totalRttMetric)[]).map(fn => {
-          const fq: FlowQuery = { ...baseQuery, function: fn, aggregateBy: 'app', type: 'TimeFlowRttNs' };
+          const fq: StructuredFlowQuery = { ...baseQuery, function: fn, aggregateBy: 'app', type: 'TimeFlowRttNs' };
           promises.push(
             Result.fromPromise(getMetrics(fq, range)).then(res => {
               //set matching value and apply changes on the entire object to trigger refresh
@@ -384,6 +398,150 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
         setMetrics({ ...currentMetrics, rtt: Result.empty(), totalRtt: Result.empty() });
       }
 
+      const tlsPanels = props.panels.filter(p => p.id.includes(tlsIdMatcher));
+      if (!_.isEmpty(tlsPanels)) {
+        // Get TLS usage stats
+        const filterProto = findFilter(props.filterDefinitions, 'protocol')!;
+        const filterTCPFlags = findFilter(props.filterDefinitions, 'tcp_flags')!;
+        const filterTLSTypes = findFilter(props.filterDefinitions, 'tls_types')!;
+        // fqHasTLS: traffic with TLS info recognized
+        const fqHasTLS: StructuredFlowQuery = {
+          ...baseQuery,
+          function: 'rate',
+          type: 'Flows',
+          aggregateBy: 'app',
+          structuredFilters: {
+            ...baseQuery.structuredFilters,
+            list: _.concat(baseQuery.structuredFilters.list, [
+              {
+                def: filterTLSTypes,
+                compare: FilterCompare.notEqual,
+                values: [{ v: `""` }]
+              }
+            ])
+          }
+        };
+        // fqNoTLS: TCP ACK traffic with no TLS header recognized
+        const fqNoTLS: StructuredFlowQuery = {
+          ...baseQuery,
+          function: 'rate',
+          type: 'Flows',
+          aggregateBy: 'app',
+          structuredFilters: {
+            ...baseQuery.structuredFilters,
+            list: _.concat(baseQuery.structuredFilters.list, [
+              {
+                def: filterTCPFlags,
+                compare: FilterCompare.equal,
+                values: [{ v: 'ACK' }]
+              },
+              {
+                def: filterTLSTypes,
+                compare: FilterCompare.equal,
+                values: [{ v: `""` }]
+              }
+            ])
+          }
+        };
+        // fqTLSOther: non-TCP traffic
+        const fqTLSOther: StructuredFlowQuery = {
+          ...baseQuery,
+          function: 'rate',
+          type: 'Flows',
+          aggregateBy: 'app',
+          structuredFilters: {
+            ...baseQuery.structuredFilters,
+            list: _.concat(baseQuery.structuredFilters.list, [
+              {
+                def: filterProto,
+                compare: FilterCompare.notEqual,
+                values: [{ v: '6' }]
+              }
+            ])
+          }
+        };
+        const fqByVersion: StructuredFlowQuery = {
+          ...baseQuery,
+          function: 'rate',
+          type: 'Flows',
+          aggregateBy: 'TLSVersion'
+        };
+        const fqByCipherSuite: StructuredFlowQuery = {
+          ...baseQuery,
+          function: 'rate',
+          type: 'Flows',
+          aggregateBy: 'TLSCipherSuite'
+        };
+        const fqByGroup: StructuredFlowQuery = {
+          ...baseQuery,
+          function: 'rate',
+          type: 'Flows',
+          aggregateBy: 'TLSGroup'
+        };
+        promises.push(
+          ...[
+            Result.fromPromise(getFlowGenericMetrics(fqTLSOther, range)).then(res => {
+              const tlsUsageOther = res
+                .map(success => (success.metrics.length > 0 ? { ...success.metrics[0], name: 'non TCP' } : undefined))
+                .mapError(err => getStructuredHTTPError(err, `TLS usage - non TCP`));
+              currentMetrics = { ...currentMetrics, tlsUsageOther };
+              setMetrics(currentMetrics);
+              return res.map(r => r.stats).or(emptyStats);
+            }),
+            Result.fromPromise(getFlowGenericMetrics(fqNoTLS, range)).then(res => {
+              const tlsUsageNoTLS = res
+                .map(success => (success.metrics.length > 0 ? { ...success.metrics[0], name: 'no TLS' } : undefined))
+                .mapError(err => getStructuredHTTPError(err, `TLS usage - no TLS`));
+              currentMetrics = { ...currentMetrics, tlsUsageNoTLS };
+              setMetrics(currentMetrics);
+              return res.map(r => r.stats).or(emptyStats);
+            }),
+            Result.fromPromise(getFlowGenericMetrics(fqHasTLS, range)).then(res => {
+              const tlsUsageTLS = res
+                .map(success => (success.metrics.length > 0 ? { ...success.metrics[0], name: 'TLS' } : undefined))
+                .mapError(err => getStructuredHTTPError(err, `TLS usage - has TLS`));
+              currentMetrics = { ...currentMetrics, tlsUsageTLS };
+              setMetrics(currentMetrics);
+              return res.map(r => r.stats).or(emptyStats);
+            }),
+            Result.fromPromise(getFlowGenericMetrics(fqByVersion, range)).then(res => {
+              const tlsUsagePerVersion = res
+                .map(success => success.metrics)
+                .mapError(err => getStructuredHTTPError(err, `TLS by version`));
+              currentMetrics = { ...currentMetrics, tlsUsagePerVersion };
+              setMetrics(currentMetrics);
+              return res.map(r => r.stats).or(emptyStats);
+            }),
+            Result.fromPromise(getFlowGenericMetrics(fqByCipherSuite, range)).then(res => {
+              const tlsUsagePerCipher = res
+                .map(success => success.metrics)
+                .mapError(err => getStructuredHTTPError(err, `TLS by cipher suite`));
+              currentMetrics = { ...currentMetrics, tlsUsagePerCipher };
+              setMetrics(currentMetrics);
+              return res.map(r => r.stats).or(emptyStats);
+            }),
+            Result.fromPromise(getFlowGenericMetrics(fqByGroup, range)).then(res => {
+              const tlsUsagePerGroup = res
+                .map(success => success.metrics)
+                .mapError(err => getStructuredHTTPError(err, `TLS by group`));
+              currentMetrics = { ...currentMetrics, tlsUsagePerGroup };
+              setMetrics(currentMetrics);
+              return res.map(r => r.stats).or(emptyStats);
+            })
+          ]
+        );
+      } else {
+        setMetrics({
+          ...currentMetrics,
+          tlsUsageOther: Result.empty(),
+          tlsUsageNoTLS: Result.empty(),
+          tlsUsageTLS: Result.empty(),
+          tlsUsagePerCipher: Result.empty(),
+          tlsUsagePerGroup: Result.empty(),
+          tlsUsagePerVersion: Result.empty()
+        });
+      }
+
       const customPanels = props.panels.filter(p => p.id.startsWith(customPanelMatcher));
       if (!_.isEmpty(customPanels)) {
         //set custom metrics
@@ -394,13 +552,13 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
             const key = id.replaceAll(customPanelMatcher + '_', '');
             const getMetricFunc = parsedId.aggregateBy ? getFlowGenericMetrics : getMetrics;
             if (parsedId.isValid) {
-              const fq: FlowQuery = {
+              const fq: StructuredFlowQuery = {
                 ...baseQuery,
                 type: parsedId.type,
                 function: parsedId.fn,
                 aggregateBy: parsedId.aggregateBy || metricScope
               };
-              const fqTotal: FlowQuery = {
+              const fqTotal: StructuredFlowQuery = {
                 ...baseQuery,
                 type: parsedId.type,
                 function: parsedId.fn,
@@ -445,7 +603,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
         return results;
       });
     },
-    [props.panels, caps.flowQuery, caps.fetchFunctions, config.features, fetchCallbacks]
+    [props.panels, caps.flowQuery, caps.fetchFunctions, config.features, fetchCallbacks, props.filterDefinitions]
   );
 
   React.useImperativeHandle(ref, () => ({
@@ -1024,6 +1182,126 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
             doubleWidth: options.graph!.type !== 'donut'
           };
         }
+        case 'tls_usage_global': {
+          const results = [props.metrics.tlsUsageOther, props.metrics.tlsUsageNoTLS, props.metrics.tlsUsageTLS];
+          const panelError = results.map(r => r.error).find(e => e !== undefined);
+          if (panelError) {
+            return {
+              calculatedTitle: info.topTitle,
+              element: <PanelErrorIndicator error={panelError} metricType={'TLS usage'} showDetails={!isFocus} />
+            };
+          }
+          // No error at this point
+          const metrics = results.filter(r => !!r.result).map(r => r.result!);
+          const options = getKebabOptions(id, {
+            showTop: true,
+            graph: { options: ['bar_line', 'donut'], type: 'donut' }
+          });
+          const isDonut = options.graph?.type === 'donut';
+          return {
+            calculatedTitle: info.topTitle,
+            element: _.isEmpty(metrics) ? (
+              emptyGraph(!isFocus)
+            ) : isDonut ? (
+              <MetricsDonut
+                id={id}
+                subTitle={info.subtitle}
+                limit={props.limit}
+                metricType={'Flows'}
+                metricFunction="rate"
+                topKMetrics={metrics}
+                showOthers={false}
+                smallerTexts={smallerTexts}
+                showLegend={!isFocus}
+                animate={animate}
+              />
+            ) : (
+              <MetricsGraph
+                id={id}
+                metricType={'Flows'}
+                metricFunction="rate"
+                metrics={metrics}
+                limit={props.limit}
+                showBar={false}
+                showArea={true}
+                showLine={true}
+                showScatter={true}
+                itemsPerRow={2}
+                smallerTexts={smallerTexts}
+                tooltipsTruncate={false}
+                showLegend={!isFocus}
+                animate={animate}
+              />
+            ),
+            kebab: <PanelKebab id={id} options={options} setOptions={opts => setKebabOptions(id, opts)} />,
+            bodyClassSmall: options.graph!.type === 'donut',
+            doubleWidth: options.graph!.type !== 'donut'
+          };
+        }
+        case 'tls_per_version':
+        case 'tls_per_group':
+        case 'tls_per_cipher_suite': {
+          const result =
+            id === 'tls_per_version'
+              ? props.metrics.tlsUsagePerVersion
+              : id === 'tls_per_group'
+              ? props.metrics.tlsUsagePerGroup
+              : props.metrics.tlsUsagePerCipher;
+          if (result.error) {
+            return {
+              calculatedTitle: info.topTitle,
+              element: (
+                <PanelErrorIndicator error={result.error} metricType={'TLS usage breakdown'} showDetails={!isFocus} />
+              )
+            };
+          }
+          // No error at this point
+          const metric = sortMetrics(result).or([]);
+          const options = getKebabOptions(id, {
+            showTop: true,
+            graph: { options: ['bar_line', 'donut'], type: 'donut' }
+          });
+          const isDonut = options.graph?.type === 'donut';
+          return {
+            calculatedTitle: info.topTitle,
+            element: _.isEmpty(metric) ? (
+              emptyGraph(!isFocus)
+            ) : isDonut ? (
+              <MetricsDonut
+                id={id}
+                subTitle={info.subtitle}
+                limit={props.limit}
+                metricType={'Flows'}
+                metricFunction="rate"
+                topKMetrics={metric}
+                showOthers={false}
+                smallerTexts={smallerTexts}
+                showLegend={!isFocus}
+                animate={animate}
+              />
+            ) : (
+              <MetricsGraph
+                id={id}
+                metricType={'Flows'}
+                metricFunction="rate"
+                metrics={metric}
+                limit={props.limit}
+                showBar={false}
+                showArea={true}
+                showLine={true}
+                showScatter={true}
+                itemsPerRow={2}
+                smallerTexts={smallerTexts}
+                tooltipsTruncate={false}
+                showLegend={!isFocus}
+                animate={animate}
+              />
+            ),
+            kebab: <PanelKebab id={id} options={options} setOptions={opts => setKebabOptions(id, opts)} />,
+            bodyClassSmall: options.graph!.type === 'donut',
+            doubleWidth: options.graph!.type !== 'donut'
+          };
+        }
         default: {
           const parsedId = parseCustomMetricId(id);
           if (parsedId.isValid) {
@@ -1104,6 +1382,12 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
       props.metrics.dnsRCode,
       props.metrics.droppedCause,
       props.metrics.droppedState,
+      props.metrics.tlsUsageNoTLS,
+      props.metrics.tlsUsageOther,
+      props.metrics.tlsUsageTLS,
+      props.metrics.tlsUsagePerCipher,
+      props.metrics.tlsUsagePerGroup,
+      props.metrics.tlsUsagePerVersion,
       getLatencyMetrics,
       getTopKRateMetrics,
       getNamedTopKCustomMetrics,

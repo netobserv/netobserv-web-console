@@ -20,7 +20,7 @@ import { Column, ColumnSizeMap, getDefaultColumns, getFullColumnName } from '../
 import './columns-modal.css';
 import Modal, { ensureRootElement } from './modal';
 
-export const columnFilterKeys = ['source', 'destination', 'time', 'host', 'namespace', 'owner', 'ip', 'dns'];
+export const columnFilterKeys = ['source', 'destination', 'time', 'host', 'namespace', 'owner', 'ip', 'dns', 'tls'];
 
 export interface ColumnsModalProps {
   isModalOpen: boolean;

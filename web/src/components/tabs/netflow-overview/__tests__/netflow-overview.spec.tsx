@@ -7,6 +7,7 @@ import { ScopeDefSample } from '../../../../components/__tests-data__/scopes';
 import { TruncateLength } from '../../../../components/dropdowns/truncate-dropdown';
 import { FlowScope, RecordType } from '../../../../model/flow-query';
 import { Result } from '../../../../utils/result';
+import { FilterDefinitionSample } from '../../../__tests-data__/filters';
 import { ShuffledDefaultPanels } from '../../../__tests-data__/panels';
 import { NetflowOverview, NetflowOverviewProps } from '../netflow-overview';
 
@@ -21,6 +22,7 @@ describe('<NetflowOverview />', () => {
     forcedSize: { width: 800, height: 800 } as DOMRect,
     scopes: ScopeDefSample,
     metricScope: 'host' as FlowScope,
+    filterDefinitions: FilterDefinitionSample,
     setMetricScope: jest.fn()
   };
 

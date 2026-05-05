@@ -16,7 +16,7 @@ export interface MetricsDonutProps {
   metricType: MetricType;
   metricFunction: MetricFunction;
   topKMetrics: (GenericMetric | NamedMetric)[];
-  totalMetric: GenericMetric | NamedMetric;
+  totalMetric?: GenericMetric | NamedMetric;
   showOthers: boolean;
   othersName?: string;
   showLast?: boolean;
@@ -53,7 +53,10 @@ export const MetricsDonut: React.FC<MetricsDonutProps> = ({
     [metricFunction, showLast]
   );
 
-  let total = getStats(totalMetric.stats);
+  // If total metric isn't provided, use the sum of the provided metrics
+  let total = totalMetric
+    ? getStats(totalMetric.stats)
+    : topKMetrics.map(m => getStats(m.stats)).reduce((prev, cur) => prev + cur);
   let filtered = topKMetrics;
   if (showOutOfScope === false) {
     filtered = (filtered as NamedMetric[]).filter(m => {

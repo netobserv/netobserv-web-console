@@ -10,6 +10,8 @@ jest.mock('../../../api/routes', () => ({
   getRole: jest.fn(() => Promise.resolve('admin'))
 }));
 
+const emptyFilters = { match: 'all' as const, list: [] };
+
 describe('<ExportModal />', () => {
   const props: ExportModalProps = {
     isModalOpen: true,
@@ -17,7 +19,13 @@ describe('<ExportModal />', () => {
     columns: ShuffledColumnSample,
     filters: [],
     range: 300,
-    flowQuery: { recordType: 'flowLog', dataSource: 'auto', limit: 100, filters: '', packetLoss: 'all' },
+    flowQuery: {
+      recordType: 'flowLog',
+      dataSource: 'auto',
+      limit: 100,
+      structuredFilters: emptyFilters,
+      packetLoss: 'all'
+    },
     id: 'export-modal'
   };
 
