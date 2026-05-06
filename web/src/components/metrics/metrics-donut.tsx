@@ -11,7 +11,8 @@ import './metrics-content.css';
 
 export interface MetricsDonutProps {
   id: string;
-  subTitle?: string;
+  internalText?: string;
+  internalSubtitle?: string;
   limit: number;
   metricType: MetricType;
   metricFunction: MetricFunction;
@@ -29,7 +30,8 @@ export interface MetricsDonutProps {
 
 export const MetricsDonut: React.FC<MetricsDonutProps> = ({
   id,
-  subTitle,
+  internalText,
+  internalSubtitle,
   metricFunction,
   limit,
   metricType,
@@ -167,8 +169,8 @@ export const MetricsDonut: React.FC<MetricsDonutProps> = ({
                 top: 0
               }
         }
-        title={`${getFormattedValue(total, metricType, metricFunction, t)}`}
-        subTitle={subTitle ? subTitle : t('Total')}
+        title={internalText || `${getFormattedValue(total, metricType, metricFunction, t)}`}
+        subTitle={internalSubtitle || t('Total')}
       />
     </div>
   );

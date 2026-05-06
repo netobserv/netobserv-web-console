@@ -110,7 +110,6 @@ export const ErrorComponent: React.FC<ErrorProps> = ({ title, error }) => {
 
     getStatus(ContextSingleton.getForcedNamespace())
       .then(status => {
-        console.info('status result', status);
         setStatus(status);
         setStatusError(undefined);
       })

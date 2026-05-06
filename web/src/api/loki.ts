@@ -147,12 +147,11 @@ export type NetflowMetrics = {
   totalDnsLatency: Result<TotalFunctionMetrics, StructuredError | string>;
   totalDnsCount: Result<GenericMetric, StructuredError | string>;
   totalRtt: Result<TotalFunctionMetrics, StructuredError | string>;
-  tlsUsageOther: Result<GenericMetric, StructuredError | string>;
-  tlsUsageNoTLS: Result<GenericMetric, StructuredError | string>;
-  tlsUsageTLS: Result<GenericMetric, StructuredError | string>;
   tlsUsagePerVersion: Result<GenericMetric[], StructuredError | string>;
   tlsUsagePerCipher: Result<GenericMetric[], StructuredError | string>;
   tlsUsagePerGroup: Result<GenericMetric[], StructuredError | string>;
+  tlsFlowRate: Result<GenericMetric, StructuredError | string>;
+  totalFlowRate: Result<GenericMetric, StructuredError | string>;
   custom: Map<string, Result<TopologyMetrics[] | GenericMetric[], StructuredError | string>>;
   totalCustom: Map<string, Result<TopologyMetrics | GenericMetric, StructuredError | string>>;
 };
@@ -172,12 +171,11 @@ export const defaultNetflowMetrics: NetflowMetrics = {
   totalDnsLatency: Result.empty(),
   totalDnsCount: Result.empty(),
   totalRtt: Result.empty(),
-  tlsUsageOther: Result.empty(),
-  tlsUsageNoTLS: Result.empty(),
-  tlsUsageTLS: Result.empty(),
   tlsUsagePerCipher: Result.empty(),
   tlsUsagePerGroup: Result.empty(),
   tlsUsagePerVersion: Result.empty(),
+  tlsFlowRate: Result.empty(),
+  totalFlowRate: Result.empty(),
   custom: new Map(),
   totalCustom: new Map()
 };

@@ -7,7 +7,7 @@ export type Match = 'any' | 'all' | 'bidirectional';
 export type PacketLoss = 'dropped' | 'hasDrops' | 'sent' | 'all';
 export type MetricFunction = 'count' | 'sum' | 'avg' | 'min' | 'max' | 'p90' | 'p99' | 'rate';
 export type StatFunction = MetricFunction | 'last';
-export type MetricType = 'Flows' | 'DnsFlows' | Field;
+export type MetricType = 'Flows' | 'DnsFlows' | 'TlsFlows' | Field;
 // scope are configurable and can be any string
 // such as 'app', 'cluster', 'zone', 'host', 'namespace', 'owner', 'resource'...
 export type FlowScope = string;

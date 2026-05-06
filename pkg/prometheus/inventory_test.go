@@ -4,10 +4,25 @@ import (
 	"testing"
 
 	"github.com/netobserv/network-observability-console-plugin/pkg/config"
+	"github.com/netobserv/network-observability-console-plugin/pkg/utils/constants"
 	"github.com/stretchr/testify/assert"
 )
 
 var configuredMetrics = []config.MetricInfo{
+	{
+		Enabled:   true,
+		Name:      "netobserv_metric_tls_flows_total",
+		Type:      "Counter",
+		Direction: config.AnyDirection,
+		Labels:    []string{"SrcK8S_Namespace", "DstK8S_Namespace"},
+	},
+	{
+		Enabled:   false,
+		Name:      "netobserv_metric_tls_flows_disabled",
+		Type:      "Counter",
+		Direction: config.AnyDirection,
+		Labels:    []string{"SrcK8S_Namespace", "DstK8S_Namespace"},
+	},
 	{
 		Enabled:    true,
 		Name:       "netobserv_metric_1",
@@ -81,13 +96,18 @@ func TestInventory_Search(t *testing.T) {
 	assert.Empty(t, search.Found)
 	assert.Empty(t, search.Candidates)
 
-	// Search flows metrics
+	// Search flows metrics (and TLS metric is skipped)
 	search = inv.Search([]string{"SrcK8S_Namespace", "DstK8S_Namespace"}, "")
 	assert.Equal(t, []string{"netobserv_metric_3"}, search.Found)
 	assert.Empty(t, search.Candidates)
 
 	search = inv.Search([]string{"SrcK8S_HostName", "DstK8S_HostName"}, "")
 	assert.Equal(t, []string{"netobserv_metric_3"}, search.Found)
+	assert.Empty(t, search.Candidates)
+
+	// Search TLS flows metrics
+	search = inv.Search([]string{"SrcK8S_Namespace", "DstK8S_Namespace"}, constants.MetricTypeTLSFlows)
+	assert.Equal(t, []string{"netobserv_metric_tls_flows_total"}, search.Found)
 	assert.Empty(t, search.Candidates)
 }
 

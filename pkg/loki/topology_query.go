@@ -28,6 +28,15 @@ type TopologyInput struct {
 	Groups         string
 }
 
+func (in *TopologyInput) GetActualDataField() string {
+	switch in.DataField {
+	case constants.MetricTypeFlows, constants.MetricTypeDNSFlows, constants.MetricTypeTLSFlows:
+		return ""
+	default:
+		return in.DataField
+	}
+}
+
 type TopologyQueryBuilder struct {
 	*FlowQueryBuilder
 	topology           *TopologyInput
@@ -69,15 +78,6 @@ func GetLabelsAndFilter(kl map[string][]string, aggregate, groups string) ([]str
 		}
 	}
 	return fields, filter
-}
-
-func getField(metricType string) string {
-	switch metricType {
-	case constants.MetricTypeFlows, constants.MetricTypeDNSFlows:
-		return ""
-	default:
-		return metricType
-	}
 }
 
 func getFactor(metricType string) string {
@@ -124,7 +124,6 @@ func (q *TopologyQueryBuilder) Build() string {
 	}
 	strLabels := strings.Join(labels, ",")
 
-	dataField := getField(q.topology.DataField)
 	factor := getFactor(q.topology.DataField)
 	function, quantile := GetFunctionWithQuantile(q.topology.MetricFunction)
 
@@ -171,15 +170,20 @@ func (q *TopologyQueryBuilder) Build() string {
 		q.appendFilter(sb, extraFilter)
 	}
 
-	if dataField == constants.MetricTypeDNSLatency {
+	switch q.topology.DataField {
+	case constants.MetricTypeDNSLatency:
 		q.appendDNSLatencyFilter(sb)
-	} else if dataField == constants.MetricTypeDNSFlows {
+	case constants.MetricTypeDNSFlows:
 		q.appendDNSFilter(sb)
-	} else if dataField == constants.MetricTypeFlowRTT {
+	case constants.MetricTypeTLSFlows:
+		q.appendTLSFilter(sb)
+	case constants.MetricTypeFlowRTT:
 		q.appendRTTFilter(sb)
 	}
 
 	q.appendJSON(sb, true)
+
+	dataField := q.topology.GetActualDataField()
 	if len(dataField) > 0 {
 		sb.WriteString("|unwrap ")
 		sb.WriteString(dataField)
