@@ -170,6 +170,7 @@ export const parseCustomMetricId = (id: string) => {
     switch (type) {
       case 'Flows':
       case 'DnsFlows':
+      case 'TlsFlows':
         fn = 'count';
         break;
       case 'Bytes':
@@ -336,6 +337,7 @@ export const getOverviewPanelInfo = (
       return {
         title: t('TLS usage'),
         topTitle: t('TLS usage (network flows per second)'),
+        subtitle: t('TLS traffic'),
         chartType: t('donut or lines')
       };
     case 'tls_per_version':

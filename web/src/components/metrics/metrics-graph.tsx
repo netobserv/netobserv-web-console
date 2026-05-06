@@ -69,7 +69,8 @@ export const MetricsGraph: React.FC<MetricsGraphProps> = ({
     childName: `${showBar ? 'bar-' : 'area-'}${idx}`,
     name: (m as NamedMetric).shortName || (m as GenericMetric).name,
     tooltipName:
-      (tooltipsTruncate ? (m as NamedMetric).shortName : (m as NamedMetric).fullName) || (m as GenericMetric).name
+      (tooltipsTruncate ? (m as NamedMetric).shortName || (m as GenericMetric).name : (m as NamedMetric).fullName) ||
+      (m as GenericMetric).name
   }));
 
   const topKDatapoints: ChartDataPoint[][] = filteredMetrics.map(toDatapoints);

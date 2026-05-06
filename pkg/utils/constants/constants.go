@@ -19,6 +19,7 @@ const (
 	MetricTypeDroppedPackets = "PktDropPackets"
 	MetricTypeDNSLatency     = "DnsLatencyMs"
 	MetricTypeDNSFlows       = "DnsFlows"
+	MetricTypeTLSFlows       = "TlsFlows"
 	MetricTypeFlowRTT        = "TimeFlowRttNs"
 	DefaultMetricType        = MetricTypeBytes
 

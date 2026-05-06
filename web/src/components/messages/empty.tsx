@@ -45,7 +45,6 @@ export const Empty: React.FC<EmptyProps> = ({ showDetails, resetDefaultFilters, 
     getStatus(ContextSingleton.getForcedNamespace())
       .then(status => {
         if (isMounted) {
-          console.info('status result', status);
           setStatus(status);
           setStatusError(undefined);
         }

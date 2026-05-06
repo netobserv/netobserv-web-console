@@ -224,6 +224,10 @@ func (q *FlowQueryBuilder) appendDNSFilter(sb *strings.Builder) {
 	sb.WriteString("`")
 }
 
+func (q *FlowQueryBuilder) appendTLSFilter(sb *strings.Builder) {
+	sb.WriteString(`|="TLSTypes"`)
+}
+
 func (q *FlowQueryBuilder) appendDNSLatencyFilter(sb *strings.Builder) {
 	// ensure DnsLatencyMs field is specified and value is not zero
 	// |~`"DnsLatencyMs`!~`DnsLatencyMs%22:0[,}]`

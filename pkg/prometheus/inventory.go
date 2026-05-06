@@ -33,6 +33,12 @@ func NewInventory(cfg *config.Prometheus) *Inventory {
 			cpy.ValueField = constants.MetricTypeDNSFlows
 			toAppend = append(toAppend, cpy)
 		}
+		// Simulate Flows and TLSFlows value fields
+		if strings.Contains(cfg.Metrics[i].Name, "_tls_flows") {
+			cfg.Metrics[i].ValueField = constants.MetricTypeTLSFlows
+		} else if strings.Contains(cfg.Metrics[i].Name, "_flows") {
+			cfg.Metrics[i].ValueField = constants.MetricTypeFlows
+		}
 	}
 	return &Inventory{metrics: append(cfg.Metrics, toAppend...)}
 }

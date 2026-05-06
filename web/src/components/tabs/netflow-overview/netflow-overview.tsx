@@ -22,7 +22,7 @@ import {
 import { getFlowGenericMetrics } from '../../../api/routes';
 import { ScopeSlider } from '../../../components/slider/scope-slider';
 import { Config } from '../../../model/config';
-import { FilterCompare, FilterDefinition } from '../../../model/filters';
+import { FilterDefinition } from '../../../model/filters';
 import { FlowScope, RecordType, StructuredFlowQuery } from '../../../model/flow-query';
 import { getStat } from '../../../model/metrics';
 import { useNetflowContext } from '../../../model/netflow-context';
@@ -31,7 +31,7 @@ import { TimeRange } from '../../../utils/datetime';
 import { getDNSErrorDescription, getDNSRcodeDescription } from '../../../utils/dns';
 import { getDSCPServiceClassName } from '../../../utils/dscp';
 import { getStructuredHTTPError, StructuredError } from '../../../utils/errors';
-import { findFilter } from '../../../utils/filter-definitions';
+import { valueFormat } from '../../../utils/format';
 import { localStorageOverviewKebabKey, useLocalStorage } from '../../../utils/local-storage-hook';
 import { observeDOMRect, toNamedMetric } from '../../../utils/metrics-helper';
 import {
@@ -401,109 +401,58 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
       const tlsPanels = props.panels.filter(p => p.id.includes(tlsIdMatcher));
       if (!_.isEmpty(tlsPanels)) {
         // Get TLS usage stats
-        const filterProto = findFilter(props.filterDefinitions, 'protocol')!;
-        const filterTCPFlags = findFilter(props.filterDefinitions, 'tcp_flags')!;
-        const filterTLSTypes = findFilter(props.filterDefinitions, 'tls_types')!;
-        // fqHasTLS: traffic with TLS info recognized
-        const fqHasTLS: StructuredFlowQuery = {
+        const fqTotal: StructuredFlowQuery = {
           ...baseQuery,
           function: 'rate',
           type: 'Flows',
-          aggregateBy: 'app',
-          structuredFilters: {
-            ...baseQuery.structuredFilters,
-            list: _.concat(baseQuery.structuredFilters.list, [
-              {
-                def: filterTLSTypes,
-                compare: FilterCompare.notEqual,
-                values: [{ v: `""` }]
-              }
-            ])
-          }
+          aggregateBy: 'app'
         };
-        // fqNoTLS: TCP ACK traffic with no TLS header recognized
-        const fqNoTLS: StructuredFlowQuery = {
+        promises.push(
+          Result.fromPromise(getFlowGenericMetrics(fqTotal, range)).then(res => {
+            const totalFlowRate = res
+              .map(success => (success.metrics.length > 0 ? { ...success.metrics[0], name: 'Total flows' } : undefined))
+              .mapError(err => getStructuredHTTPError(err, `Total flow rate`));
+            currentMetrics = { ...currentMetrics, totalFlowRate };
+            setMetrics(currentMetrics);
+            return res.map(r => r.stats).or(emptyStats);
+          })
+        );
+        const fqTLS: StructuredFlowQuery = {
           ...baseQuery,
           function: 'rate',
-          type: 'Flows',
-          aggregateBy: 'app',
-          structuredFilters: {
-            ...baseQuery.structuredFilters,
-            list: _.concat(baseQuery.structuredFilters.list, [
-              {
-                def: filterTCPFlags,
-                compare: FilterCompare.equal,
-                values: [{ v: 'ACK' }]
-              },
-              {
-                def: filterTLSTypes,
-                compare: FilterCompare.equal,
-                values: [{ v: `""` }]
-              }
-            ])
-          }
+          type: 'TlsFlows',
+          aggregateBy: 'app'
         };
-        // fqTLSOther: non-TCP traffic
-        const fqTLSOther: StructuredFlowQuery = {
-          ...baseQuery,
-          function: 'rate',
-          type: 'Flows',
-          aggregateBy: 'app',
-          structuredFilters: {
-            ...baseQuery.structuredFilters,
-            list: _.concat(baseQuery.structuredFilters.list, [
-              {
-                def: filterProto,
-                compare: FilterCompare.notEqual,
-                values: [{ v: '6' }]
-              }
-            ])
-          }
-        };
+        promises.push(
+          Result.fromPromise(getFlowGenericMetrics(fqTLS, range)).then(res => {
+            const tlsFlowRate = res
+              .map(success => (success.metrics.length > 0 ? { ...success.metrics[0], name: 'TLS flows' } : undefined))
+              .mapError(err => getStructuredHTTPError(err, `TLS flow rate`));
+            currentMetrics = { ...currentMetrics, tlsFlowRate };
+            setMetrics(currentMetrics);
+            return res.map(r => r.stats).or(emptyStats);
+          })
+        );
         const fqByVersion: StructuredFlowQuery = {
           ...baseQuery,
           function: 'rate',
-          type: 'Flows',
+          type: 'TlsFlows',
           aggregateBy: 'TLSVersion'
         };
         const fqByCipherSuite: StructuredFlowQuery = {
           ...baseQuery,
           function: 'rate',
-          type: 'Flows',
+          type: 'TlsFlows',
           aggregateBy: 'TLSCipherSuite'
         };
         const fqByGroup: StructuredFlowQuery = {
           ...baseQuery,
           function: 'rate',
-          type: 'Flows',
+          type: 'TlsFlows',
           aggregateBy: 'TLSGroup'
         };
         promises.push(
           ...[
-            Result.fromPromise(getFlowGenericMetrics(fqTLSOther, range)).then(res => {
-              const tlsUsageOther = res
-                .map(success => (success.metrics.length > 0 ? { ...success.metrics[0], name: 'non TCP' } : undefined))
-                .mapError(err => getStructuredHTTPError(err, `TLS usage - non TCP`));
-              currentMetrics = { ...currentMetrics, tlsUsageOther };
-              setMetrics(currentMetrics);
-              return res.map(r => r.stats).or(emptyStats);
-            }),
-            Result.fromPromise(getFlowGenericMetrics(fqNoTLS, range)).then(res => {
-              const tlsUsageNoTLS = res
-                .map(success => (success.metrics.length > 0 ? { ...success.metrics[0], name: 'no TLS' } : undefined))
-                .mapError(err => getStructuredHTTPError(err, `TLS usage - no TLS`));
-              currentMetrics = { ...currentMetrics, tlsUsageNoTLS };
-              setMetrics(currentMetrics);
-              return res.map(r => r.stats).or(emptyStats);
-            }),
-            Result.fromPromise(getFlowGenericMetrics(fqHasTLS, range)).then(res => {
-              const tlsUsageTLS = res
-                .map(success => (success.metrics.length > 0 ? { ...success.metrics[0], name: 'TLS' } : undefined))
-                .mapError(err => getStructuredHTTPError(err, `TLS usage - has TLS`));
-              currentMetrics = { ...currentMetrics, tlsUsageTLS };
-              setMetrics(currentMetrics);
-              return res.map(r => r.stats).or(emptyStats);
-            }),
             Result.fromPromise(getFlowGenericMetrics(fqByVersion, range)).then(res => {
               const tlsUsagePerVersion = res
                 .map(success => success.metrics)
@@ -533,9 +482,8 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
       } else {
         setMetrics({
           ...currentMetrics,
-          tlsUsageOther: Result.empty(),
-          tlsUsageNoTLS: Result.empty(),
-          tlsUsageTLS: Result.empty(),
+          tlsFlowRate: Result.empty(),
+          totalFlowRate: Result.empty(),
           tlsUsagePerCipher: Result.empty(),
           tlsUsagePerGroup: Result.empty(),
           tlsUsagePerVersion: Result.empty()
@@ -603,7 +551,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
         return results;
       });
     },
-    [props.panels, caps.flowQuery, caps.fetchFunctions, config.features, fetchCallbacks, props.filterDefinitions]
+    [props.panels, caps.flowQuery, caps.fetchFunctions, config.features, fetchCallbacks]
   );
 
   React.useImperativeHandle(ref, () => ({
@@ -802,6 +750,17 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
     [props.metrics.totalCustom, t, props.truncateLength]
   );
 
+  const pctTLS = React.useMemo(() => {
+    if (props.metrics.totalFlowRate.result && props.metrics.tlsFlowRate.result) {
+      const tls = getStat(props.metrics.tlsFlowRate.result.stats, 'rate');
+      const total = getStat(props.metrics.totalFlowRate.result.stats, 'rate');
+      if (total > 0) {
+        return (100 * tls) / total;
+      }
+    }
+    return undefined;
+  }, [props.metrics.totalFlowRate, props.metrics.tlsFlowRate]);
+
   const smallerTexts = props.truncateLength >= TruncateLength.M;
   const getPanelContent = React.useCallback(
     (id: OverviewPanelId, info: OverviewPanelInfo, isFocus: boolean, animate: boolean): PanelContent => {
@@ -839,7 +798,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
             ) : !_.isEmpty(metrics.result) && namedTotalMetric.result ? (
               <MetricsDonut
                 id={id}
-                subTitle={info.subtitle}
+                internalSubtitle={info.subtitle}
                 limit={props.limit}
                 metricType={metricType}
                 metricFunction={'rate'}
@@ -981,7 +940,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
             ) : isDonut && !_.isEmpty(topKMetrics.result) && namedTotalMetric.result ? (
               <MetricsDonut
                 id={id}
-                subTitle={info.subtitle}
+                internalSubtitle={info.subtitle}
                 limit={props.limit}
                 metricType={metricType}
                 metricFunction="rate"
@@ -1076,7 +1035,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
               options!.graph!.type === 'donut' ? (
                 <MetricsDonut
                   id={id}
-                  subTitle={info.subtitle}
+                  internalSubtitle={info.subtitle}
                   limit={props.limit}
                   metricType={metricType}
                   metricFunction={getFunctionFromId(id)}
@@ -1124,11 +1083,12 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
             id === 'name_dns_latency_flows' ? sortMetrics(props.metrics.dnsName) : sortMetrics(props.metrics.dnsRCode);
           const namedTotalMetric = props.metrics.totalDnsCount;
           const options = getKebabOptions(id, {
-            showNoError: true,
+            showNoError: id === 'rcode_dns_latency_flows' ? true : undefined,
             showTop: true,
             showApp: { text: t('Show total'), value: true },
             graph: { options: ['bar_line', 'donut'], type: 'donut' }
           });
+          const othersName = id === 'rcode_dns_latency_flows' ? 'NoError' : undefined;
           const isDonut = options!.graph!.type === 'donut';
           const showTopOnly = isDonut || (options.showTop && !options.showApp!.value);
           const showTotalOnly = !options.showTop && options.showApp!.value;
@@ -1141,14 +1101,14 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
               isDonut ? (
                 <MetricsDonut
                   id={id}
-                  subTitle={info.subtitle}
+                  internalSubtitle={info.subtitle}
                   limit={props.limit}
                   metricType={metricType}
                   metricFunction="sum"
                   topKMetrics={topKMetrics.result!}
                   totalMetric={namedTotalMetric.result}
-                  showOthers={options.showNoError!}
-                  othersName={'NoError'}
+                  showOthers={options.showNoError || false}
+                  othersName={othersName}
                   smallerTexts={smallerTexts}
                   showLegend={!isFocus}
                   animate={animate}
@@ -1164,8 +1124,8 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
                   topAsBars={true}
                   showTop={options.showTop!}
                   showTotal={options.showApp!.value}
-                  showOthers={options.showNoError!}
-                  othersName={'NoError'}
+                  showOthers={options.showNoError || false}
+                  othersName={othersName}
                   smallerTexts={smallerTexts}
                   showTotalDrop={false}
                   showLegend={!isFocus}
@@ -1183,8 +1143,9 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
           };
         }
         case 'tls_usage_global': {
-          const results = [props.metrics.tlsUsageOther, props.metrics.tlsUsageNoTLS, props.metrics.tlsUsageTLS];
-          const panelError = results.map(r => r.error).find(e => e !== undefined);
+          const panelError = [props.metrics.tlsFlowRate, props.metrics.totalFlowRate]
+            .map(r => r.error)
+            .find(e => e !== undefined);
           if (panelError) {
             return {
               calculatedTitle: info.topTitle,
@@ -1192,47 +1153,50 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
             };
           }
           // No error at this point
-          const metrics = results.filter(r => !!r.result).map(r => r.result!);
+          const metrics = props.metrics.tlsFlowRate.result;
+          const total = props.metrics.totalFlowRate.result;
           const options = getKebabOptions(id, {
-            showTop: true,
             graph: { options: ['bar_line', 'donut'], type: 'donut' }
           });
           const isDonut = options.graph?.type === 'donut';
           return {
             calculatedTitle: info.topTitle,
-            element: _.isEmpty(metrics) ? (
-              emptyGraph(!isFocus)
-            ) : isDonut ? (
-              <MetricsDonut
-                id={id}
-                subTitle={info.subtitle}
-                limit={props.limit}
-                metricType={'Flows'}
-                metricFunction="rate"
-                topKMetrics={metrics}
-                showOthers={false}
-                smallerTexts={smallerTexts}
-                showLegend={!isFocus}
-                animate={animate}
-              />
-            ) : (
-              <MetricsGraph
-                id={id}
-                metricType={'Flows'}
-                metricFunction="rate"
-                metrics={metrics}
-                limit={props.limit}
-                showBar={false}
-                showArea={true}
-                showLine={true}
-                showScatter={true}
-                itemsPerRow={2}
-                smallerTexts={smallerTexts}
-                tooltipsTruncate={false}
-                showLegend={!isFocus}
-                animate={animate}
-              />
-            ),
+            element:
+              metrics === undefined ? (
+                emptyGraph(!isFocus)
+              ) : isDonut ? (
+                <MetricsDonut
+                  id={id}
+                  internalSubtitle={info.subtitle}
+                  internalText={pctTLS ? valueFormat(pctTLS, 0, t('%')) : 'n/a'}
+                  limit={props.limit}
+                  metricType={'Flows'}
+                  metricFunction="rate"
+                  topKMetrics={[metrics]}
+                  totalMetric={total}
+                  showOthers={true}
+                  smallerTexts={smallerTexts}
+                  showLegend={!isFocus}
+                  animate={animate}
+                />
+              ) : (
+                <MetricsGraph
+                  id={id}
+                  metricType={'Flows'}
+                  metricFunction="rate"
+                  metrics={[metrics, total!]}
+                  limit={props.limit}
+                  showBar={false}
+                  showArea={true}
+                  showLine={true}
+                  showScatter={true}
+                  itemsPerRow={2}
+                  smallerTexts={smallerTexts}
+                  tooltipsTruncate={false}
+                  showLegend={!isFocus}
+                  animate={animate}
+                />
+              ),
             kebab: <PanelKebab id={id} options={options} setOptions={opts => setKebabOptions(id, opts)} />,
             bodyClassSmall: options.graph!.type === 'donut',
             doubleWidth: options.graph!.type !== 'donut'
@@ -1269,7 +1233,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
             ) : isDonut ? (
               <MetricsDonut
                 id={id}
-                subTitle={info.subtitle}
+                internalSubtitle={info.subtitle}
                 limit={props.limit}
                 metricType={'Flows'}
                 metricFunction="rate"
@@ -1326,7 +1290,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
                 isDonut ? (
                   <MetricsDonut
                     id={id}
-                    subTitle={info.subtitle}
+                    internalSubtitle={info.subtitle}
                     limit={props.limit}
                     metricType={metricType}
                     metricFunction={metricFunction}
@@ -1382,9 +1346,8 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
       props.metrics.dnsRCode,
       props.metrics.droppedCause,
       props.metrics.droppedState,
-      props.metrics.tlsUsageNoTLS,
-      props.metrics.tlsUsageOther,
-      props.metrics.tlsUsageTLS,
+      props.metrics.totalFlowRate,
+      props.metrics.tlsFlowRate,
       props.metrics.tlsUsagePerCipher,
       props.metrics.tlsUsagePerGroup,
       props.metrics.tlsUsagePerVersion,
@@ -1397,6 +1360,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
       setKebabOptions,
       smallerTexts,
       sortMetrics,
+      pctTLS,
       t
     ]
   );
