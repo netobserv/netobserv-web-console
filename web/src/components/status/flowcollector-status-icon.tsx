@@ -36,15 +36,15 @@ export const FlowCollectorStatusIcon: React.FC<FlowCollectorStatusIconProps> = (
   const icon = React.useMemo(() => {
     switch (status) {
       case 'ready':
-        return <ConnectedIcon color="var(--pf-t--global--icon--color--status--success--default)" />;
+        return <ConnectedIcon color="var(--pf-v5-global--success-color--100)" />;
       case 'degraded':
-        return <ExclamationTriangleIcon color="var(--pf-t--global--icon--color--status--warning--default)" />;
+        return <ExclamationTriangleIcon color="var(--pf-v5-global--warning-color--100)" />;
       case 'pending':
-        return <ExclamationTriangleIcon color="var(--pf-t--global--icon--color--status--warning--default)" />;
+        return <ExclamationTriangleIcon color="var(--pf-v5-global--warning-color--100)" />;
       case 'error':
-        return <ExclamationCircleIcon color="var(--pf-t--global--icon--color--status--danger--default)" />;
+        return <ExclamationCircleIcon color="var(--pf-v5-global--danger-color--100)" />;
       case 'onHold':
-        return <PauseCircleIcon color="var(--pf-t--global--icon--color--status--info--default)" />;
+        return <PauseCircleIcon color="var(--pf-v5-global--info-color--100)" />;
       case 'loading':
         return <Spinner size="md" />;
     }

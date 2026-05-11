@@ -69,17 +69,17 @@ const stateColor = (state: string | undefined): LabelColor => {
 const StateIcon: FC<{ state: string | undefined }> = ({ state }) => {
   switch (state) {
     case 'Ready':
-      return <CheckCircleIcon color="var(--pf-t--global--icon--color--status--success--default)" />;
+      return <CheckCircleIcon color="var(--pf-v5-global--success-color--100)" />;
     case 'Degraded':
-      return <ExclamationTriangleIcon color="var(--pf-t--global--icon--color--status--warning--default)" />;
+      return <ExclamationTriangleIcon color="var(--pf-v5-global--warning-color--100)" />;
     case 'Failure':
-      return <ExclamationCircleIcon color="var(--pf-t--global--icon--color--status--danger--default)" />;
+      return <ExclamationCircleIcon color="var(--pf-v5-global--danger-color--100)" />;
     case 'InProgress':
-      return <HourglassHalfIcon color="var(--pf-t--global--icon--color--status--info--default)" />;
+      return <HourglassHalfIcon color="var(--pf-v5-global--info-color--100)" />;
     case 'Unused':
-      return <BanIcon color="var(--pf-t--global--icon--color--disabled)" />;
+      return <BanIcon color="var(--pf-v5-global--disabled-color--100)" />;
     default:
-      return <UnknownIcon color="var(--pf-t--global--icon--color--disabled)" />;
+      return <UnknownIcon color="var(--pf-v5-global--disabled-color--100)" />;
   }
 };
 
@@ -329,17 +329,17 @@ export const ResourceStatus: FC<ResourceStatusProps> = ({
               >
                 <Td>
                   {tone === 'error' ? (
-                    <ExclamationCircleIcon color="var(--pf-t--global--icon--color--status--danger--default)" />
+                    <ExclamationCircleIcon color="var(--pf-v5-global--danger-color--100)" />
                   ) : tone === 'warning' ? (
-                    <ExclamationTriangleIcon color="var(--pf-t--global--icon--color--status--warning--default)" />
+                    <ExclamationTriangleIcon color="var(--pf-v5-global--warning-color--100)" />
                   ) : tone === 'progress' ? (
-                    <HourglassHalfIcon color="var(--pf-t--global--icon--color--status--info--default)" />
+                    <HourglassHalfIcon color="var(--pf-v5-global--info-color--100)" />
                   ) : tone === 'unused' ? (
-                    <BanIcon color="var(--pf-t--global--icon--color--disabled)" />
+                    <BanIcon color="var(--pf-v5-global--disabled-color--100)" />
                   ) : tone === 'success' ? (
-                    <CheckCircleIcon color="var(--pf-t--global--icon--color--status--success--default)" />
+                    <CheckCircleIcon color="var(--pf-v5-global--success-color--100)" />
                   ) : (
-                    <UnknownIcon color="var(--pf-t--global--icon--color--disabled)" />
+                    <UnknownIcon color="var(--pf-v5-global--disabled-color--100)" />
                   )}{' '}
                   {condition.type}
                 </Td>
@@ -348,9 +348,9 @@ export const ResourceStatus: FC<ResourceStatusProps> = ({
                 <Td
                   style={
                     tone === 'warning'
-                      ? { color: 'var(--pf-t--global--text--color--status--warning--default)' }
+                      ? { color: 'var(--pf-v5-global--warning-color--200)' }
                       : tone === 'error'
-                      ? { color: 'var(--pf-t--global--text--color--status--danger--default)' }
+                      ? { color: 'var(--pf-v5-global--danger-color--100)' }
                       : undefined
                   }
                 >
