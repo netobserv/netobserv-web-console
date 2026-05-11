@@ -118,7 +118,7 @@ export const MetricsDonut: React.FC<MetricsDonutProps> = ({
     name: m.name
   }));
 
-  const legentComponent = (
+  const legendComponent = (
     <ChartLegend
       labelComponent={<ChartLabel className={smallerTexts ? 'small-chart-label' : ''} />}
       data={legendData}
@@ -134,16 +134,19 @@ export const MetricsDonut: React.FC<MetricsDonutProps> = ({
     return observeDimensions(containerRef, dimensions, setDimensions);
   }, [containerRef, dimensions, setDimensions]);
 
+  // Hide legend on small screens to prevent overlap/cropping
+  const showLegendResponsive = showLegend && dimensions.width >= 550;
+
   return (
     <div id={id} className="metrics-content-div" ref={containerRef} data-test-metrics={topKMetrics.length}>
       <ChartDonut
         themeColor={ChartThemeColor.multiUnordered}
         constrainToVisibleArea
-        legendData={showLegend ? legendData : undefined}
+        legendData={showLegendResponsive ? legendData : undefined}
         legendOrientation="vertical"
         legendPosition="right"
         legendAllowWrap={true}
-        legendComponent={showLegend ? legentComponent : undefined}
+        legendComponent={showLegendResponsive ? legendComponent : undefined}
         radius={showLegend ? dimensions.height / 3 : undefined}
         innerRadius={showLegend ? dimensions.height / 4 : undefined}
         width={dimensions.width}
@@ -155,11 +158,11 @@ export const MetricsDonut: React.FC<MetricsDonutProps> = ({
         allowTooltip={showLegend}
         animate={animate}
         padding={
-          showLegend
+          showLegendResponsive
             ? {
                 bottom: 20,
                 left: 20,
-                right: 400,
+                right: 350,
                 top: 20
               }
             : {
