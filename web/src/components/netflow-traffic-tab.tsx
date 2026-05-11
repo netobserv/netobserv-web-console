@@ -238,6 +238,34 @@ export const NetflowTrafficTab: React.FC<NetflowTrafficTabProps> = ({ match, obj
           match: 'bidirectional'
         });
         break;
+      case 'ClusterUserDefinedNetwork':
+        setForcedFilters({
+          list: [
+            {
+              def: findFilter(filterDefinitions, 'udns')!,
+              compare: FilterCompare.equal,
+              values: [{ v: obj!.metadata!.name as string }]
+            }
+          ],
+          match: 'bidirectional'
+        });
+        break;
+      case 'UserDefinedNetwork':
+        setForcedFilters({
+          list: [
+            {
+              def: findFilter(filterDefinitions, 'udns')!,
+              compare: FilterCompare.equal,
+              values: [
+                {
+                  v: `${obj!.metadata!.namespace!}.${obj!.metadata!.name!}`
+                }
+              ]
+            }
+          ],
+          match: 'bidirectional'
+        });
+        break;
     }
   }, [config, obj, previous, t]);
 
