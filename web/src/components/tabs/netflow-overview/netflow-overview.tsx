@@ -1168,7 +1168,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
                 <MetricsDonut
                   id={id}
                   internalSubtitle={info.subtitle}
-                  internalText={pctTLS ? valueFormat(pctTLS, 0, t('%')) : 'n/a'}
+                  internalText={pctTLS !== undefined ? valueFormat(pctTLS, 0, '%') : 'n/a'}
                   limit={props.limit}
                   metricType={'Flows'}
                   metricFunction="rate"
@@ -1184,7 +1184,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
                   id={id}
                   metricType={'Flows'}
                   metricFunction="rate"
-                  metrics={[metrics, total!]}
+                  metrics={total ? [metrics, total] : [metrics]}
                   limit={props.limit}
                   showBar={false}
                   showArea={true}

@@ -48,9 +48,10 @@ export const getFetchFunctions = (filterDefinitions: FilterDefinition[]) => {
 const encodedPipe = encodeURIComponent('|');
 const getFlowsBNF = (initialQuery: StructuredFlowQuery, orig: Filter[], swapped: Filter[]): Promise<RecordsResult> => {
   // Combine original filters and swapped. Note that we leave any potential overlapping flows: they can be deduped with "showDuplicates: false".
+  const rawQuery = structuredToRawQuery(initialQuery);
   const matchAny = initialQuery.structuredFilters.match === 'any';
   const newFilters = filtersToString(orig, matchAny) + encodedPipe + filtersToString(swapped, matchAny);
-  return getFlowRecords({ ...initialQuery, filters: newFilters });
+  return getFlowRecords({ ...rawQuery, filters: newFilters });
 };
 
 const getMetricsBNF = (
