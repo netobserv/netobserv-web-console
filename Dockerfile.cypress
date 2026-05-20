@@ -1,6 +1,6 @@
 ARG BUILDSCRIPT=
 ARG LDFLAGS=
-FROM docker.io/library/node:24-alpine as web-builder
+FROM docker.io/library/node:24-alpine AS web-builder
 
 USER node
 
@@ -20,7 +20,7 @@ WORKDIR /opt/app-root/web
 RUN TRANSPILE_ONLY=true npm run build$BUILDSCRIPT
 RUN TRANSPILE_ONLY=true npm run build:static
 
-FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.25 as go-builder
+FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.25 AS go-builder
 
 ARG LDFLAGS
 WORKDIR /opt/app-root

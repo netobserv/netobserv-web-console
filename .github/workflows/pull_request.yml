@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: ['*']
 
+permissions:
+  contents: read
+
 jobs:
   build-test-backend:
     name: Build, lint, test backend
@@ -13,11 +16,13 @@ jobs:
     - name: install make
       run: sudo apt-get install make
     - name: set up go 1.x
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v6
       with:
         go-version: '1.25'
     - name: checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v6
+      with:
+        persist-credentials: false
     - name: build, lint, test
       run: make backend && git diff --exit-code
     - name: check clean vendors
@@ -41,7 +46,9 @@ jobs:
       with:
         node-version: 22
     - name: checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v6
+      with:
+        persist-credentials: false
     - name: build and test
       run: TYPECHECK=true make frontend && git diff --exit-code
     - name: Report coverage
@@ -59,11 +66,13 @@ jobs:
     - name: install make
       run: sudo apt-get install make
     - name: set up go 1.x
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v6
       with:
         go-version: '1.25'
     - name: checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v6
+      with:
+        persist-credentials: false
     - name: run benchmark comparison
       run: make benchmark-server-compare
     - name: upload benchmark results
