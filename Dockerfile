@@ -20,5 +20,6 @@ FROM --platform=linux/$TARGETARCH registry.access.redhat.com/ubi9/ubi-minimal:9.
 
 COPY --from=web-builder /opt/app-root/web/dist ./web/dist
 COPY --from=go-builder /opt/app-root/plugin-backend ./
+USER 65532:65532
 
 ENTRYPOINT ["./plugin-backend"]
