@@ -121,19 +121,33 @@ export const HealthSummary: React.FC<HealthSummaryProps> = ({ rules, stats, forc
 
   let title = t('The network looks healthy');
   let statusClass: StatusClass = 'success';
-  if (summaryStats.critical.firingAlerts > 0 || summaryStats.critical.pendingAlerts > 0 || summaryStats.critical.recordingRules > 0) {
+  if (
+    summaryStats.critical.firingAlerts > 0 ||
+    summaryStats.critical.pendingAlerts > 0 ||
+    summaryStats.critical.recordingRules > 0
+  ) {
     statusClass = 'critical';
     title = t('There are critical network issues');
-  } else if (summaryStats.warning.firingAlerts > 0 || summaryStats.warning.pendingAlerts > 0 || summaryStats.warning.recordingRules > 0) {
+  } else if (
+    summaryStats.warning.firingAlerts > 0 ||
+    summaryStats.warning.pendingAlerts > 0 ||
+    summaryStats.warning.recordingRules > 0
+  ) {
     statusClass = 'warning';
     title = t('There are network warnings');
-  } else if (summaryStats.info.firingAlerts > 0 || summaryStats.info.pendingAlerts > 0 || summaryStats.info.recordingRules > 0) {
+  } else if (
+    summaryStats.info.firingAlerts > 0 ||
+    summaryStats.info.pendingAlerts > 0 ||
+    summaryStats.info.recordingRules > 0
+  ) {
     statusClass = 'info';
     title = t('The network looks relatively healthy, with minor issues');
   }
 
-  const criticalTotal = summaryStats.critical.firingAlerts + summaryStats.critical.pendingAlerts + summaryStats.critical.recordingRules;
-  const warningTotal = summaryStats.warning.firingAlerts + summaryStats.warning.pendingAlerts + summaryStats.warning.recordingRules;
+  const criticalTotal =
+    summaryStats.critical.firingAlerts + summaryStats.critical.pendingAlerts + summaryStats.critical.recordingRules;
+  const warningTotal =
+    summaryStats.warning.firingAlerts + summaryStats.warning.pendingAlerts + summaryStats.warning.recordingRules;
   const infoTotal = summaryStats.info.firingAlerts + summaryStats.info.pendingAlerts + summaryStats.info.recordingRules;
 
   // Build details like the old Alert summary
@@ -141,8 +155,13 @@ export const HealthSummary: React.FC<HealthSummaryProps> = ({ rules, stats, forc
   const details: string[] = [];
 
   // Critical
-  if (summaryStats.critical.firingAlerts > 0 || summaryStats.critical.pendingAlerts > 0 || summaryStats.critical.recordingRules > 0) {
-    const total = summaryStats.critical.firingAlerts + summaryStats.critical.pendingAlerts + summaryStats.critical.recordingRules;
+  if (
+    summaryStats.critical.firingAlerts > 0 ||
+    summaryStats.critical.pendingAlerts > 0 ||
+    summaryStats.critical.recordingRules > 0
+  ) {
+    const total =
+      summaryStats.critical.firingAlerts + summaryStats.critical.pendingAlerts + summaryStats.critical.recordingRules;
     const parts = [];
     if (summaryStats.critical.firingAlerts > 0) {
       parts.push(t('{{count}} firing alerts', { count: summaryStats.critical.firingAlerts }));
@@ -159,8 +178,13 @@ export const HealthSummary: React.FC<HealthSummaryProps> = ({ rules, stats, forc
   }
 
   // Warning
-  if (summaryStats.warning.firingAlerts > 0 || summaryStats.warning.pendingAlerts > 0 || summaryStats.warning.recordingRules > 0) {
-    const total = summaryStats.warning.firingAlerts + summaryStats.warning.pendingAlerts + summaryStats.warning.recordingRules;
+  if (
+    summaryStats.warning.firingAlerts > 0 ||
+    summaryStats.warning.pendingAlerts > 0 ||
+    summaryStats.warning.recordingRules > 0
+  ) {
+    const total =
+      summaryStats.warning.firingAlerts + summaryStats.warning.pendingAlerts + summaryStats.warning.recordingRules;
     const parts = [];
     if (summaryStats.warning.firingAlerts > 0) {
       parts.push(t('{{count}} firing alerts', { count: summaryStats.warning.firingAlerts }));
@@ -177,7 +201,11 @@ export const HealthSummary: React.FC<HealthSummaryProps> = ({ rules, stats, forc
   }
 
   // Info
-  if (summaryStats.info.firingAlerts > 0 || summaryStats.info.pendingAlerts > 0 || summaryStats.info.recordingRules > 0) {
+  if (
+    summaryStats.info.firingAlerts > 0 ||
+    summaryStats.info.pendingAlerts > 0 ||
+    summaryStats.info.recordingRules > 0
+  ) {
     const total = summaryStats.info.firingAlerts + summaryStats.info.pendingAlerts + summaryStats.info.recordingRules;
     const parts = [];
     if (summaryStats.info.firingAlerts > 0) {
@@ -268,7 +296,11 @@ export const HealthSummary: React.FC<HealthSummaryProps> = ({ rules, stats, forc
                 total={criticalTotal}
                 detail={
                   criticalTotal > 0
-                    ? formatMetricDetail(summaryStats.critical.firingAlerts, summaryStats.critical.pendingAlerts, summaryStats.critical.recordingRules)
+                    ? formatMetricDetail(
+                        summaryStats.critical.firingAlerts,
+                        summaryStats.critical.pendingAlerts,
+                        summaryStats.critical.recordingRules
+                      )
                     : undefined
                 }
               />
@@ -282,7 +314,11 @@ export const HealthSummary: React.FC<HealthSummaryProps> = ({ rules, stats, forc
                 total={warningTotal}
                 detail={
                   warningTotal > 0
-                    ? formatMetricDetail(summaryStats.warning.firingAlerts, summaryStats.warning.pendingAlerts, summaryStats.warning.recordingRules)
+                    ? formatMetricDetail(
+                        summaryStats.warning.firingAlerts,
+                        summaryStats.warning.pendingAlerts,
+                        summaryStats.warning.recordingRules
+                      )
                     : undefined
                 }
               />
@@ -296,7 +332,11 @@ export const HealthSummary: React.FC<HealthSummaryProps> = ({ rules, stats, forc
                 total={infoTotal}
                 detail={
                   infoTotal > 0
-                    ? formatMetricDetail(summaryStats.info.firingAlerts, summaryStats.info.pendingAlerts, summaryStats.info.recordingRules)
+                    ? formatMetricDetail(
+                        summaryStats.info.firingAlerts,
+                        summaryStats.info.pendingAlerts,
+                        summaryStats.info.recordingRules
+                      )
                     : undefined
                 }
               />

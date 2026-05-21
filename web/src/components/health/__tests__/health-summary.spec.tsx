@@ -63,9 +63,7 @@ const createMockStats = (): HealthStats => ({
 
 describe('HealthSummary', () => {
   it('should count only firing alerts when no pending alerts exist', () => {
-    const rules: Rule[] = [
-      createMockRule('critical', 2, 'firing')
-    ];
+    const rules: Rule[] = [createMockRule('critical', 2, 'firing')];
     const stats = createMockStats();
 
     render(<HealthSummary rules={rules} stats={stats} />);
@@ -75,10 +73,7 @@ describe('HealthSummary', () => {
   });
 
   it('should count both firing and pending alerts together', () => {
-    const rules: Rule[] = [
-      createMockRule('critical', 1, 'firing'),
-      createMockRule('critical', 1, 'pending')
-    ];
+    const rules: Rule[] = [createMockRule('critical', 1, 'firing'), createMockRule('critical', 1, 'pending')];
     const stats = createMockStats();
 
     render(<HealthSummary rules={rules} stats={stats} />);
@@ -88,10 +83,7 @@ describe('HealthSummary', () => {
   });
 
   it('should show critical status when pending critical alerts exist', () => {
-    const rules: Rule[] = [
-      createMockRule('critical', 0, 'firing'),
-      createMockRule('critical', 1, 'pending')
-    ];
+    const rules: Rule[] = [createMockRule('critical', 0, 'firing'), createMockRule('critical', 1, 'pending')];
     const stats = createMockStats();
 
     const { container } = render(<HealthSummary rules={rules} stats={stats} />);
@@ -102,10 +94,7 @@ describe('HealthSummary', () => {
   });
 
   it('should show warning status when pending warning alerts exist', () => {
-    const rules: Rule[] = [
-      createMockRule('warning', 0, 'firing'),
-      createMockRule('warning', 2, 'pending')
-    ];
+    const rules: Rule[] = [createMockRule('warning', 0, 'firing'), createMockRule('warning', 2, 'pending')];
     const stats = createMockStats();
 
     render(<HealthSummary rules={rules} stats={stats} />);
@@ -116,10 +105,7 @@ describe('HealthSummary', () => {
   });
 
   it('should show info status when pending info alerts exist', () => {
-    const rules: Rule[] = [
-      createMockRule('info', 0, 'firing'),
-      createMockRule('info', 1, 'pending')
-    ];
+    const rules: Rule[] = [createMockRule('info', 0, 'firing'), createMockRule('info', 1, 'pending')];
     const stats = createMockStats();
 
     render(<HealthSummary rules={rules} stats={stats} />);
@@ -130,10 +116,7 @@ describe('HealthSummary', () => {
   });
 
   it('should count firing, pending, and recording rules separately in breakdown', () => {
-    const rules: Rule[] = [
-      createMockRule('critical', 1, 'firing'),
-      createMockRule('critical', 2, 'pending')
-    ];
+    const rules: Rule[] = [createMockRule('critical', 1, 'firing'), createMockRule('critical', 2, 'pending')];
 
     // Add recording rules to stats
     const stats = createMockStats();
