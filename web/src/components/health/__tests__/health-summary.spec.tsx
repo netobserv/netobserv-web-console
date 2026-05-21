@@ -7,6 +7,7 @@ import { HealthSummary } from '../health-summary';
 // Mock i18next
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     t: (key: string, params?: any) => {
       // Simple mock implementation that returns the key with interpolated params
       if (params) {
@@ -34,11 +35,13 @@ const createMockRule = (severity: string, alertCount: number, state: 'firing' | 
   duration: 0,
   labels: { severity },
   annotations: { summary: `Test ${severity} ${state}` },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   state: state as any,
   type: 'alerting',
   alerts: Array.from({ length: alertCount }, (_, i) => ({
     labels: { severity, alertname: `test-${severity}-${i}` },
     annotations: { summary: `Test ${severity} ${state}` },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     state: state as any,
     value: 50,
     activeAt: '2026-05-20T10:00:00Z'
@@ -184,6 +187,7 @@ describe('HealthSummary', () => {
         duration: 0,
         labels: { severity: 'critical' },
         annotations: { summary: 'Test critical' },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         state: 'inactive' as any,
         type: 'alerting',
         alerts: [] // No alerts = inactive
