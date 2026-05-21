@@ -34,13 +34,12 @@ const createMockRule = (severity: string, alertCount: number, state: 'firing' | 
   duration: 0,
   labels: { severity },
   annotations: { summary: `Test ${severity} ${state}` },
-  state: state,
-  health: 'ok',
+  state: state as any,
   type: 'alerting',
   alerts: Array.from({ length: alertCount }, (_, i) => ({
     labels: { severity, alertname: `test-${severity}-${i}` },
     annotations: { summary: `Test ${severity} ${state}` },
-    state: state,
+    state: state as any,
     value: 50,
     activeAt: '2026-05-20T10:00:00Z'
   }))
@@ -185,8 +184,7 @@ describe('HealthSummary', () => {
         duration: 0,
         labels: { severity: 'critical' },
         annotations: { summary: 'Test critical' },
-        state: 'inactive',
-        health: 'ok',
+        state: 'inactive' as any,
         type: 'alerting',
         alerts: [] // No alerts = inactive
       }
