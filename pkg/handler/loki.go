@@ -35,7 +35,7 @@ func newLokiClient(cfg *config.Loki, requestHeader http.Header, useStatusConfig,
 		headers[lokiOrgIDHeader] = []string{cfg.TenantID}
 	}
 
-	if token, err := auth.RetrieveToken(requestHeader, cfg.ForwardUserToken, cfg.TokenPath); err != nil {
+	if token, _, err := auth.RetrieveToken(requestHeader, cfg.ForwardUserToken, cfg.TokenPath); err != nil {
 		hlog.WithError(err).Warn("Continuing without token authentication. This may cause authentication failures if the Loki server requires authentication.")
 	} else if token != "" {
 		headers[auth.AuthHeader] = []string{"Bearer " + token}

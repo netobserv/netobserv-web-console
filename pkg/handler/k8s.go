@@ -17,9 +17,9 @@ import (
 
 func (h *Handlers) GetUDNIdss(ctx context.Context) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		token, err := auth.RetrieveToken(r.Header, h.Cfg.Kubernetes.ForwardUserToken, h.Cfg.Kubernetes.TokenPath)
+		token, code, err := auth.RetrieveToken(r.Header, h.Cfg.Kubernetes.ForwardUserToken, h.Cfg.Kubernetes.TokenPath)
 		if err != nil {
-			apierrors.Write(w, http.StatusInternalServerError, err)
+			apierrors.Write(w, code, err)
 			return
 		}
 
@@ -66,9 +66,9 @@ func (h *Handlers) GetUDNIdss(ctx context.Context) func(w http.ResponseWriter, r
 
 func (h *Handlers) GetFlowCollector(ctx context.Context) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		token, err := auth.RetrieveToken(r.Header, h.Cfg.Kubernetes.ForwardUserToken, h.Cfg.Kubernetes.TokenPath)
+		token, code, err := auth.RetrieveToken(r.Header, h.Cfg.Kubernetes.ForwardUserToken, h.Cfg.Kubernetes.TokenPath)
 		if err != nil {
-			apierrors.Write(w, http.StatusInternalServerError, err)
+			apierrors.Write(w, code, err)
 			return
 		}
 

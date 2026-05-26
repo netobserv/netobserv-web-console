@@ -160,7 +160,8 @@ export const getK8SUDNIds = (): Promise<string[]> => {
 // no-explicit-any disabled: returns unstructured resource from k8s client (TODO: provide a basic typical structure?)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getFlowCollector = (): Promise<any> => {
-  return axios.get(ContextSingleton.getHost() + '/api/resources/flowcollector', {})
+  return axios
+    .get(ContextSingleton.getHost() + '/api/resources/flowcollector', {})
     .then(r => r.data)
     .catch(err => {
       if (err.response?.data?.message) {

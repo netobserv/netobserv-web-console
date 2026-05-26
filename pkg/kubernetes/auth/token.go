@@ -11,29 +11,33 @@ import (
 func getTokenFromHeader(header http.Header) (string, error) {
 	authValue := header.Get(AuthHeader)
 	if authValue != "" {
-		parts := strings.Split(authValue, "Bearer ")
-		if len(parts) != 2 {
+		if !strings.HasPrefix(authValue, "Bearer ") {
 			return "", errors.New("missing Bearer token in Authorization header")
 		}
-		return parts[1], nil
+		token := strings.TrimSpace(strings.TrimPrefix(authValue, "Bearer "))
+		if token == "" {
+			return "", errors.New("empty Bearer token in Authorization header")
+		}
+		return token, nil
 	}
 	return "", errors.New("missing Authorization header")
 }
 
-func RetrieveToken(requestHeader http.Header, forwardUserToken bool, tokenPath string) (string, error) {
+// Returns the bearer token, and the relevant http code (200 or error)
+func RetrieveToken(requestHeader http.Header, forwardUserToken bool, tokenPath string) (string, int, error) {
 	if forwardUserToken {
 		token, err := getTokenFromHeader(requestHeader)
 		if err != nil {
-			return "", fmt.Errorf("failed to read bearer token from request: %w", err)
+			return "", http.StatusUnauthorized, fmt.Errorf("failed to read bearer token from request: %w", err)
 		}
-		return token, nil
+		return token, http.StatusOK, nil
 	}
 	if tokenPath != "" {
 		bytes, err := os.ReadFile(tokenPath)
 		if err != nil {
-			return "", fmt.Errorf("failed to read authorization token from path '%s': %w", tokenPath, err)
+			return "", http.StatusInternalServerError, fmt.Errorf("failed to read authorization token from path '%s': %w", tokenPath, err)
 		}
-		return string(bytes), nil
+		return string(bytes), http.StatusOK, nil
 	}
-	return "", nil
+	return "", http.StatusOK, nil
 }

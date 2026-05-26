@@ -27,7 +27,7 @@ const config: Config = {
   ],
   moduleNameMapper: {
     "\\.(s?css|less)$": "<rootDir>/pluginToStandaloneMapper/mapper.tsx",
-    "@console/*": "<rootDir>/pluginToStandaloneMapper/mapper.tsx"
+    "^@console/.*$": "<rootDir>/pluginToStandaloneMapper/mapper.tsx"
   },
   testEnvironment: 'jsdom',
   transform: {
