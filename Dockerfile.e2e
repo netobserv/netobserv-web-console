@@ -1,7 +1,7 @@
 # Dockerfile for running Cypress E2E tests in OpenShift CI
 # This runs tests against a real OpenShift cluster
 
-FROM cypress/included:15.9.0
+FROM cypress/included:15.16.0
 
 # Install additional dependencies
 USER root
