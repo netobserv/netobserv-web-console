@@ -1,4 +1,4 @@
-import { Spinner, Tooltip } from '@patternfly/react-core';
+import { Spinner } from '@patternfly/react-core';
 import {
   ConnectedIcon,
   ExclamationCircleIcon,
@@ -6,37 +6,13 @@ import {
   PauseCircleIcon
 } from '@patternfly/react-icons';
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 import { FlowCollectorOverallStatus } from '../forms/utils';
 
 export interface FlowCollectorStatusIconProps {
   status: FlowCollectorOverallStatus;
-  error?: string;
 }
 
-export const FlowCollectorStatusIcon: React.FC<FlowCollectorStatusIconProps> = ({ status, error }) => {
-  const { t } = useTranslation('plugin__netobserv-plugin');
-
-  const tooltipContent = React.useMemo(() => {
-    if (error) {
-      return error;
-    }
-    switch (status) {
-      case 'ready':
-        return t('FlowCollector is ready');
-      case 'degraded':
-        return t('FlowCollector is degraded');
-      case 'pending':
-        return t('FlowCollector is pending');
-      case 'error':
-        return t('FlowCollector has errors');
-      case 'onHold':
-        return t('FlowCollector is on hold');
-      case 'loading':
-        return t('Loading FlowCollector status...');
-    }
-  }, [status, error, t]);
-
+export const FlowCollectorStatusIcon: React.FC<FlowCollectorStatusIconProps> = ({ status }) => {
   const icon = React.useMemo(() => {
     switch (status) {
       case 'ready':
@@ -54,11 +30,7 @@ export const FlowCollectorStatusIcon: React.FC<FlowCollectorStatusIconProps> = (
     }
   }, [status]);
 
-  return (
-    <Tooltip id="flowcollector-status-tooltip" content={tooltipContent} position="bottom">
-      <span style={{ display: 'inline-flex', verticalAlign: 'middle' }}>{icon}</span>
-    </Tooltip>
-  );
+  return <span style={{ display: 'inline-flex', verticalAlign: 'middle' }}>{icon}</span>;
 };
 
 export default FlowCollectorStatusIcon;

@@ -120,7 +120,6 @@ export function useK8sWatchResource(req: any) {
     }
 
     if (config.consoleMode === 'Mock') {
-      console.log('entering mockK8SResource');
       setError(null);
       mockK8SResource(req, setResource, setLoaded, reloads > 0, () => setReloads(reloads+1));
     } else {

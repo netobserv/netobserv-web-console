@@ -1,5 +1,5 @@
 import { K8sResourceKind, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { Button } from '@patternfly/react-core';
+import { Button, Tooltip } from '@patternfly/react-core';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { flowCollectorStatusPath, useNavigate } from '../../utils/url';
@@ -22,15 +22,37 @@ export const FlowCollectorStatusIndicator: React.FC = () => {
 
   const status = getFlowCollectorOverallStatus(fc, loadError);
 
+  const tooltipContent = React.useMemo(() => {
+    if (loadError) {
+      return String(loadError);
+    }
+    switch (status) {
+      case 'ready':
+        return t('FlowCollector is ready');
+      case 'degraded':
+        return t('FlowCollector is degraded');
+      case 'pending':
+        return t('FlowCollector is pending');
+      case 'error':
+        return t('FlowCollector has errors');
+      case 'onHold':
+        return t('FlowCollector is on hold');
+      case 'loading':
+        return t('Loading FlowCollector status...');
+    }
+  }, [status, loadError, t]);
+
   return (
-    <Button
-      id="flowcollector-status-indicator"
-      variant="plain"
-      aria-label={t('FlowCollector status')}
-      onClick={() => navigate(flowCollectorStatusPath)}
-    >
-      <FlowCollectorStatusIcon status={status} error={loadError ? String(loadError) : undefined} />
-    </Button>
+    <Tooltip id="flowcollector-status-tooltip" content={tooltipContent} position="bottom">
+      <Button
+        id="flowcollector-status-indicator"
+        variant="plain"
+        aria-label={t('FlowCollector status')}
+        onClick={() => navigate(flowCollectorStatusPath)}
+      >
+        <FlowCollectorStatusIcon status={status} />
+      </Button>
+    </Tooltip>
   );
 };
 

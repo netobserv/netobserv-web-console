@@ -190,6 +190,7 @@ export function mockK8SResource(req: any, setResource: (r: any) => void, setLoad
           break;
         case 'FlowCollector':
           setResource(mockFlowCollector());
+          onChange();
           break;
         case 'FlowCollectorSlice':
           if (req.name === 'flowcollectorslice-sample') {
