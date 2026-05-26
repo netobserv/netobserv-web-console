@@ -110,7 +110,6 @@ export function useK8sWatchResource(req: any) {
   }, []);
 
   React.useEffect(() => {
-    console.log('useEffect: ', req, resource, config.consoleMode, error);
     if (!req) {
       setError("useK8sWatchResource: No request provided");
       return;
@@ -127,14 +126,13 @@ export function useK8sWatchResource(req: any) {
         }).catch(err => {
           setError(err);
           setLoaded(true);
-          console.log('error: ', err);
         });
       } else {
         setResource(null);
         setLoaded(true);
       }
     }
-  }, [req?.groupVersionKind?.kind, resource, config.consoleMode]);
+  }, [req?.groupVersionKind?.kind, req?.name, req?.namespace, config.consoleMode]);
 
   return React.useMemo(() => {
     return [resource || null, loaded, error];
