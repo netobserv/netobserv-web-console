@@ -121,14 +121,14 @@ endif
 
 .PHONY: start
 start: YQ build-backend install-frontend ## Run backend and frontend
-	$(YQ) '.server.port |= 9002 | .server.metricsPort |= 9003 | .loki.useMocks |= false' ./config/sample-config.yaml > ./config/config.yaml
+	$(YQ) '.server.port |= 9002 | .server.metricsPort |= 9003 | .consoleMode |= "Standalone"' ./config/sample-config.yaml > ./config/config.yaml
 	@echo "### Starting backend on http://localhost:9002"
 	bash -c "trap 'fuser -k 9002/tcp' EXIT; \
 					./plugin-backend $(CMDLINE_ARGS) & cd web && npm run start"
 
 .PHONY: start-backend
 start-backend: YQ build-backend
-	$(YQ) '.server.port |= 9002 | .server.metricsPort |= 9003 | .loki.useMocks |= false' ./config/sample-config.yaml > ./config/config.yaml
+	$(YQ) '.server.port |= 9002 | .server.metricsPort |= 9003 | .consoleMode |= "Standalone"' ./config/sample-config.yaml > ./config/config.yaml
 	bash -c "trap 'fuser -k 9002/tcp' EXIT; \
 					./plugin-backend $(CMDLINE_ARGS)"
 
@@ -242,12 +242,12 @@ benchmark-aggregations: ## Run aggregation level benchmarks
 
 .PHONY: serve
 serve: YQ ## Run backend
-	$(YQ) '.server.port |= 9001 | .server.metricsPort |= 9002 | .loki.useMocks |= false' ./config/sample-config.yaml > ./config/config.yaml
+	$(YQ) '.server.port |= 9001 | .server.metricsPort |= 9002 | .consoleMode |= "Standalone"' ./config/sample-config.yaml > ./config/config.yaml
 	./plugin-backend $(CMDLINE_ARGS)
 
 .PHONY: serve-mock
 serve-mock: YQ ## Run backend using mocks
-	$(YQ) '.server.port |= 9001 | .server.metricsPort |= 9002 | .loki.useMocks |= true' ./config/sample-config.yaml > ./config/config.yaml
+	$(YQ) '.server.port |= 9001 | .server.metricsPort |= 9002 | .consoleMode |= "Mock"' ./config/sample-config.yaml > ./config/config.yaml
 	./plugin-backend $(CMDLINE_ARGS)
 
 ##@ Images

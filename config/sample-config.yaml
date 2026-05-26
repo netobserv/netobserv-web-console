@@ -1,3 +1,4 @@
+consoleMode: Standalone
 server:
   port: 9001
   metricsPort: 9002
@@ -18,7 +19,6 @@ loki:
     #    - SrcK8S_Zone
     #    - DstK8S_Zone
   tenantID: netobserv
-  useMocks: false
 prometheus:
   url: https://localhost:9090
   timeout: 30s

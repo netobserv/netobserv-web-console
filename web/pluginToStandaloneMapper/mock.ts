@@ -2,11 +2,115 @@ import _ from 'lodash';
 import { flowCollectorSchema, flowMetricSchema, flowCollectorSliceSchema } from './schemas';
 import { getFlowCollectorJS, getFlowMetricJS, getFlowCollectorSliceJS } from './templates';
 
+const mockFlowCollector = () => {
+  const fc = _.cloneDeep(getFlowCollectorJS());
+  fc.spec!.loki.enable = false;
+  fc.spec!.exporters = [{ type: "Kafka" }, { type: "OpenTelemetry" }]
+  fc.status = {
+    "conditions": [
+      {
+        "lastTransitionTime": "2025-04-08T09:01:44Z",
+        "message": "4 ready components, 0 with failure, 1 pending",
+        "reason": "Ready,Degraded",
+        "status": "True",
+        "type": "Ready"
+      },
+      {
+        "lastTransitionTime": "2025-04-08T09:01:43Z",
+        "message": "",
+        "reason": "Valid",
+        "status": "False",
+        "type": "ConfigurationIssue"
+      },
+      {
+        "lastTransitionTime": "2025-04-08T09:01:44Z",
+        "message": "",
+        "reason": "Ready",
+        "status": "True",
+        "type": "AgentReady"
+      },
+      {
+        "lastTransitionTime": "2025-04-08T09:01:45Z",
+        "message": "",
+        "reason": "Ready",
+        "status": "True",
+        "type": "ProcessorReady"
+      },
+      {
+        "lastTransitionTime": "2025-04-08T09:01:44Z",
+        // eslint-disable-next-line max-len
+        "message": "Deployment netobserv-plugin not ready: 1/1 (Deployment does not have minimum availability.)",
+        "reason": "DeploymentNotReady",
+        "status": "False",
+        "type": "PluginReady"
+      },
+      {
+        "lastTransitionTime": "2025-04-08T09:01:44Z",
+        "message": "",
+        "reason": "Ready",
+        "status": "True",
+        "type": "MonitoringReady"
+      },
+      {
+        "lastTransitionTime": "2026-01-15T16:05:26Z",
+        // eslint-disable-next-line max-len
+        "message": "LokiStack has warnings [name: loki, namespace: netobserv]: Warning: schema needs update",
+        "reason": "LokiStackWarnings",
+        "status": "True",
+        "type": "LokiWarning"
+      }
+    ],
+    "components": {
+      "agent": {
+        "state": "Ready",
+        "desiredReplicas": 3,
+        "readyReplicas": 3
+      },
+      "processor": {
+        "state": "Ready",
+        "desiredReplicas": 1,
+        "readyReplicas": 1
+      },
+      "plugin": {
+        "state": "InProgress",
+        "reason": "DeploymentNotReady",
+        // eslint-disable-next-line max-len
+        "message": "Deployment netobserv-plugin not ready: 1/1",
+        "desiredReplicas": 1,
+        "readyReplicas": 0
+      }
+    },
+    "integrations": {
+      "monitoring": {
+        "state": "Ready"
+      },
+      "loki": {
+        "state": "Unused"
+      },
+      "exporters": [
+        {
+          "name": "kafka-exporter",
+          "type": "Kafka",
+          "state": "Ready",
+          "reason": "Configured"
+        },
+        {
+          "name": "otel-exporter",
+          "type": "OpenTelemetry",
+          "state": "Ready",
+          "reason": "Configured"
+        }
+      ]
+    }
+  };
+  return fc;
+};
+
 // File only used in tests console
-export function mockK8SResource(req: any, resource: any, setResource: (r: any) => void, setLoaded: (r: boolean) => void) {
+export function mockK8SResource(req: any, setResource: (r: any) => void, setLoaded: (r: boolean) => void, isReload: boolean, onChange: () => void) {
   const kind = req.kind || req.groupVersionKind.kind;
   // simulate a loading
-  if (resource == null) {
+  if (!isReload) {
     setTimeout(() => {
       switch (kind) {
         case 'CustomResourceDefinition':
@@ -85,107 +189,7 @@ export function mockK8SResource(req: any, resource: any, setResource: (r: any) =
           }
           break;
         case 'FlowCollector':
-          const fc = _.cloneDeep(getFlowCollectorJS());
-          fc.spec!.loki.enable = false;
-          fc.spec!.exporters = [{ type: "Kafka" }, { type: "OpenTelemetry" }]
-          fc.status = {
-            "conditions": [
-              {
-                "lastTransitionTime": "2025-04-08T09:01:44Z",
-                "message": "4 ready components, 0 with failure, 1 pending",
-                "reason": "Ready,Degraded",
-                "status": "True",
-                "type": "Ready"
-              },
-              {
-                "lastTransitionTime": "2025-04-08T09:01:43Z",
-                "message": "",
-                "reason": "Valid",
-                "status": "False",
-                "type": "ConfigurationIssue"
-              },
-              {
-                "lastTransitionTime": "2025-04-08T09:01:44Z",
-                "message": "",
-                "reason": "Ready",
-                "status": "True",
-                "type": "AgentReady"
-              },
-              {
-                "lastTransitionTime": "2025-04-08T09:01:45Z",
-                "message": "",
-                "reason": "Ready",
-                "status": "True",
-                "type": "ProcessorReady"
-              },
-              {
-                "lastTransitionTime": "2025-04-08T09:01:44Z",
-                // eslint-disable-next-line max-len
-                "message": "Deployment netobserv-plugin not ready: 1/1 (Deployment does not have minimum availability.)",
-                "reason": "DeploymentNotReady",
-                "status": "False",
-                "type": "PluginReady"
-              },
-              {
-                "lastTransitionTime": "2025-04-08T09:01:44Z",
-                "message": "",
-                "reason": "Ready",
-                "status": "True",
-                "type": "MonitoringReady"
-              },
-              {
-                "lastTransitionTime": "2026-01-15T16:05:26Z",
-                // eslint-disable-next-line max-len
-                "message": "LokiStack has warnings [name: loki, namespace: netobserv]: Warning: schema needs update",
-                "reason": "LokiStackWarnings",
-                "status": "True",
-                "type": "LokiWarning"
-              }
-            ],
-            "components": {
-              "agent": {
-                "state": "Ready",
-                "desiredReplicas": 3,
-                "readyReplicas": 3
-              },
-              "processor": {
-                "state": "Ready",
-                "desiredReplicas": 1,
-                "readyReplicas": 1
-              },
-              "plugin": {
-                "state": "InProgress",
-                "reason": "DeploymentNotReady",
-                // eslint-disable-next-line max-len
-                "message": "Deployment netobserv-plugin not ready: 1/1",
-                "desiredReplicas": 1,
-                "readyReplicas": 0
-              }
-            },
-            "integrations": {
-              "monitoring": {
-                "state": "Ready"
-              },
-              "loki": {
-                "state": "Unused"
-              },
-              "exporters": [
-                {
-                  "name": "kafka-exporter",
-                  "type": "Kafka",
-                  "state": "Ready",
-                  "reason": "Configured"
-                },
-                {
-                  "name": "otel-exporter",
-                  "type": "OpenTelemetry",
-                  "state": "Ready",
-                  "reason": "Configured"
-                }
-              ]
-            }
-          }
-          setResource(fc);
+          setResource(mockFlowCollector());
           break;
         case 'FlowCollectorSlice':
           if (req.name === 'flowcollectorslice-sample') {
@@ -206,7 +210,7 @@ export function mockK8SResource(req: any, resource: any, setResource: (r: any) =
   } else if (kind === 'FlowCollector') {
     // simulate an update
     setTimeout(() => {
-      const fc = _.cloneDeep(resource);
+      const fc = mockFlowCollector();
       if (Math.random() < 0.7 && fc.status) {
         const states = ['Ready', 'InProgress', 'Degraded', 'Failure'];
         const r = Math.random();
@@ -223,6 +227,7 @@ export function mockK8SResource(req: any, resource: any, setResource: (r: any) =
         }
       }
       setResource(fc);
+      onChange();
     }, 10000);
   }
 }

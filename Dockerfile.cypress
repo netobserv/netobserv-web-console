@@ -47,7 +47,7 @@ COPY --from=go-builder /opt/app-root/plugin-backend ./
 
 COPY mocks mocks
 COPY config/sample-config.yaml ./config/config.yaml
-RUN sed -i -e 's/useMocks: false/useMocks: true/g' ./config/config.yaml
+RUN sed -i -e 's/consoleMode: .*/consoleMode: Mock/g' ./config/config.yaml
 COPY scripts/cypress.sh .
 RUN mkdir -p /.config && chmod 775 -R /.config
 ENV HOME=/home/user

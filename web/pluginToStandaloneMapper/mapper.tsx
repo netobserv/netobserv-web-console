@@ -20,7 +20,7 @@ import { useK8sModelsWithColors } from '../src/utils/k8s-models-hook';
 import { useTheme } from '../src/utils/theme-hook';
 import { safeJSToYAML } from '../src/utils/yaml';
 import { k8sModels } from './k8s-models';
-import { Config, defaultConfig } from '../src/model/config';
+import { Config } from '../src/model/config';
 import { loadConfig } from '../src/utils/config';
 import { mockK8SResource } from './mock';
 import { getFlowCollector } from '../src/api/routes';
@@ -101,7 +101,8 @@ export function useK8sWatchResource(req: any) {
   const [loaded, setLoaded] = React.useState(false);
   const [resource, setResource] = React.useState<any | null>(null);
   const [error, setError] = React.useState<any | null>(null);
-  const [config, setConfig] = React.useState<Config>(defaultConfig);
+  const [config, setConfig] = React.useState<Config | null>(null);
+  const [reloads, setReloads] = React.useState(0);
 
   React.useEffect(() => {
     loadConfig().then(v => {
@@ -110,14 +111,20 @@ export function useK8sWatchResource(req: any) {
   }, []);
 
   React.useEffect(() => {
+    if (!config) {
+      return
+    }
     if (!req) {
       setError("useK8sWatchResource: No request provided");
       return;
     }
 
     if (config.consoleMode === 'Mock') {
-      mockK8SResource(req, resource, setResource, setLoaded);
+      console.log('entering mockK8SResource');
+      setError(null);
+      mockK8SResource(req, setResource, setLoaded, reloads > 0, () => setReloads(reloads+1));
     } else {
+      console.log('calling API');
       if (req.groupVersionKind?.kind === 'FlowCollector') {
         getFlowCollector().then(fc => {
           setResource(fc);
@@ -132,7 +139,7 @@ export function useK8sWatchResource(req: any) {
         setLoaded(true);
       }
     }
-  }, [req?.groupVersionKind?.kind, req?.name, req?.namespace, config.consoleMode]);
+  }, [req?.groupVersionKind?.kind, req?.name, req?.namespace, config?.consoleMode, reloads]);
 
   return React.useMemo(() => {
     return [resource || null, loaded, error];
