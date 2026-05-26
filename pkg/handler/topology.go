@@ -152,7 +152,7 @@ func (h *Handlers) getTopologyFlows(ctx context.Context, cl clients, params url.
 	hlog.Debugf("GetTopology query params: %s", params)
 
 	dataSources := make(map[constants.DataSource]bool)
-	if h.Cfg.Loki.UseMocks {
+	if h.Cfg.ConsoleMode == config.Mock {
 		dataSources["mock"] = true
 	}
 

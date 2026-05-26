@@ -29,7 +29,7 @@ export const FlowCollectorStatusIndicator: React.FC = () => {
       aria-label={t('FlowCollector status')}
       onClick={() => navigate(flowCollectorStatusPath)}
     >
-      <FlowCollectorStatusIcon status={status} />
+      <FlowCollectorStatusIcon status={status} error={loadError ? String(loadError) : undefined} />
     </Button>
   );
 };

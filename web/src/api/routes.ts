@@ -157,6 +157,19 @@ export const getK8SUDNIds = (): Promise<string[]> => {
   });
 };
 
+// no-explicit-any disabled: returns unstructured resource from k8s client (TODO: provide a basic typical structure?)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getFlowCollector = (): Promise<any> => {
+  return axios.get(ContextSingleton.getHost() + '/api/resources/flowcollector', {})
+    .then(r => r.data)
+    .catch(err => {
+      if (err.response?.data?.message) {
+        throw new Error(`${err}: ${err.response.data.message}`);
+      }
+      throw err;
+    });
+};
+
 export const getFlowMetrics = (params: FlowQuery, range: number | TimeRange): Promise<FlowMetricsResult> => {
   return getFlowMetricsGeneric(params, res => {
     return parseTopologyMetrics(
@@ -231,6 +244,7 @@ export const getConfig = (): Promise<Config> => {
       dataSources: r.data.dataSources || defaultConfig.dataSources,
       promLabels: r.data.promLabels || defaultConfig.promLabels,
       lokiLabels: r.data.lokiLabels || defaultConfig.lokiLabels,
+      consoleMode: r.data.consoleMode || defaultConfig.consoleMode,
       maxChunkAgeMs: r.data.maxChunkAgeMs,
       recordingAnnotations: r.data.recordingAnnotations || defaultConfig.recordingAnnotations
     };

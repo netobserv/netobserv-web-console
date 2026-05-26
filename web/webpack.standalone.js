@@ -78,7 +78,7 @@ module.exports = {
       /dynamic-plugin-sdk/,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       function (resource) {
-        resource.request = path.resolve(__dirname, "moduleMapper/dummy");
+        resource.request = path.resolve(__dirname, "pluginToStandaloneMapper/mapper");
       }
     ),
     new MiniCssExtractPlugin(

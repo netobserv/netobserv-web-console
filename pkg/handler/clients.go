@@ -48,7 +48,7 @@ func newPromClients(cfg *config.Config, requestHeader http.Header, namespace str
 func newLokiClients(cfg *config.Config, requestHeader http.Header, useLokiStatus bool) clients {
 	var lokiClient httpclient.Caller
 	if cfg.IsLokiEnabled() {
-		lokiClient = newLokiClient(&cfg.Loki, requestHeader, useLokiStatus)
+		lokiClient = newLokiClient(&cfg.Loki, requestHeader, useLokiStatus, cfg.ConsoleMode == config.Mock)
 	}
 	return clients{loki: lokiClient}
 }

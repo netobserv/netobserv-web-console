@@ -19,16 +19,25 @@ var (
 	log = logrus.WithField("module", "config")
 )
 
+type AuthCheckType string
+
+const (
+	CheckAuthenticated AuthCheckType = "authenticated"
+	CheckAdmin         AuthCheckType = "admin"
+	CheckDenyAll       AuthCheckType = "denyAll"
+	CheckNone          AuthCheckType = "none"
+)
+
 type Server struct {
-	Port        int    `yaml:"port,omitempty" json:"port,omitempty"`
-	MetricsPort int    `yaml:"metricsPort,omitempty" json:"metricsPort,omitempty"`
-	CertPath    string `yaml:"certPath,omitempty" json:"certPath,omitempty"`
-	KeyPath     string `yaml:"keyPath,omitempty" json:"keyPath,omitempty"`
-	CORSOrigin  string `yaml:"corsOrigin,omitempty" json:"corsOrigin,omitempty"`
-	CORSMethods string `yaml:"corsMethods,omitempty" json:"corsMethods,omitempty"`
-	CORSHeaders string `yaml:"corsHeaders,omitempty" json:"corsHeaders,omitempty"`
-	CORSMaxAge  string `yaml:"corsMaxAge,omitempty" json:"corsMaxAge,omitempty"`
-	AuthCheck   string `yaml:"authCheck,omitempty" json:"authCheck,omitempty"`
+	Port        int           `yaml:"port,omitempty" json:"port,omitempty"`
+	MetricsPort int           `yaml:"metricsPort,omitempty" json:"metricsPort,omitempty"`
+	CertPath    string        `yaml:"certPath,omitempty" json:"certPath,omitempty"`
+	KeyPath     string        `yaml:"keyPath,omitempty" json:"keyPath,omitempty"`
+	CORSOrigin  string        `yaml:"corsOrigin,omitempty" json:"corsOrigin,omitempty"`
+	CORSMethods string        `yaml:"corsMethods,omitempty" json:"corsMethods,omitempty"`
+	CORSHeaders string        `yaml:"corsHeaders,omitempty" json:"corsHeaders,omitempty"`
+	CORSMaxAge  string        `yaml:"corsMaxAge,omitempty" json:"corsMaxAge,omitempty"`
+	AuthCheck   AuthCheckType `yaml:"authCheck,omitempty" json:"authCheck,omitempty"`
 }
 
 type Prometheus struct {
@@ -64,6 +73,11 @@ type MetricInfo struct {
 	ValueField string        `yaml:"valueField,omitempty" json:"valueField,omitempty"`
 	Direction  FlowDirection `yaml:"direction,omitempty" json:"direction,omitempty"`
 	Labels     []string      `yaml:"labels,omitempty" json:"labels,omitempty"`
+}
+
+type K8SConfig struct {
+	TokenPath        string `yaml:"tokenPath,omitempty" json:"tokenPath,omitempty"`
+	ForwardUserToken bool   `yaml:"forwardUserToken,omitempty" json:"forwardUserToken,omitempty"`
 }
 
 type PortNaming struct {
@@ -126,6 +140,14 @@ type FieldConfig struct {
 	Description string `yaml:"description" json:"description"`
 }
 
+type ConsoleMode string
+
+const (
+	Standalone      ConsoleMode = "Standalone"
+	OpenShiftPlugin ConsoleMode = "OpenShiftPlugin"
+	Mock            ConsoleMode = "Mock"
+)
+
 type Frontend struct {
 	BuildVersion         string                       `yaml:"buildVersion" json:"buildVersion"`
 	BuildDate            string                       `yaml:"buildDate" json:"buildDate"`
@@ -141,7 +163,7 @@ type Frontend struct {
 	Features             []string                     `yaml:"features" json:"features"`
 	Fields               []FieldConfig                `yaml:"fields" json:"fields"`
 	DataSources          []string                     `yaml:"dataSources" json:"dataSources"`
-	LokiMocks            bool                         `yaml:"lokiMocks,omitempty" json:"lokiMocks,omitempty"`
+	ConsoleMode          ConsoleMode                  `yaml:"consoleMode" json:"consoleMode"`
 	LokiLabels           []string                     `yaml:"lokiLabels" json:"lokiLabels"`
 	PromLabels           []string                     `yaml:"promLabels" json:"promLabels"`
 	MaxChunkAgeMs        int                          `yaml:"maxChunkAgeMs,omitempty" json:"maxChunkAgeMs,omitempty"` // populated at query time
@@ -149,12 +171,14 @@ type Frontend struct {
 }
 
 type Config struct {
-	Loki       Loki       `yaml:"loki" json:"loki"`
-	Prometheus Prometheus `yaml:"prometheus" json:"prometheus"`
-	Frontend   Frontend   `yaml:"frontend" json:"frontend"`
-	Server     Server     `yaml:"server,omitempty" json:"server,omitempty"`
-	Path       string     `yaml:"-" json:"-"`
-	Static     bool
+	ConsoleMode ConsoleMode `yaml:"consoleMode" json:"consoleMode"`
+	Loki        Loki        `yaml:"loki" json:"loki"`
+	Prometheus  Prometheus  `yaml:"prometheus" json:"prometheus"`
+	Kubernetes  K8SConfig   `yaml:"kubernetes" json:"kubernetes"`
+	Frontend    Frontend    `yaml:"frontend" json:"frontend"`
+	Server      Server      `yaml:"server,omitempty" json:"server,omitempty"`
+	Path        string      `yaml:"-" json:"-"`
+	Static      bool
 }
 
 func ReadFile(version, date, filename string) (*Config, error) {
@@ -175,6 +199,9 @@ func ReadFile(version, date, filename string) (*Config, error) {
 		},
 		Prometheus: Prometheus{
 			Timeout: Duration{Duration: 30 * time.Second},
+		},
+		Kubernetes: K8SConfig{
+			ForwardUserToken: true,
 		},
 		Frontend: Frontend{
 			BuildVersion: version,
@@ -220,9 +247,9 @@ func ReadFile(version, date, filename string) (*Config, error) {
 		return nil, err
 	}
 
+	cfg.Frontend.ConsoleMode = cfg.ConsoleMode
 	if cfg.IsLokiEnabled() {
 		cfg.Frontend.DataSources = append(cfg.Frontend.DataSources, string(constants.DataSourceLoki))
-		cfg.Frontend.LokiMocks = cfg.Loki.UseMocks
 		cfg.Frontend.LokiLabels = cfg.Loki.Labels
 		cfg.Loki.FieldsType = make(map[string]string)
 		cfg.Loki.FieldsFormat = make(map[string]string)
@@ -319,7 +346,10 @@ func (c *Config) GetAuthChecker() (auth.Checker, error) {
 	if c.Server.AuthCheck == "auto" {
 		// FORWARD mode
 		checkType = auth.CheckAuthenticated
-		if (c.IsLokiEnabled() && !c.Loki.ForwardUserToken) ||
+		if c.ConsoleMode == Standalone {
+			// No access management yet
+			checkType = auth.CheckNone
+		} else if (c.IsLokiEnabled() && !c.Loki.ForwardUserToken) ||
 			(c.IsPromEnabled() && !c.Prometheus.ForwardUserToken) {
 			// HOST or DISABLED mode
 			checkType = auth.CheckAdmin

@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/netobserv/network-observability-console-plugin/pkg/config"
 	"github.com/netobserv/network-observability-console-plugin/pkg/handler/apierrors"
 	"github.com/netobserv/network-observability-console-plugin/pkg/metrics"
 )
@@ -24,7 +25,7 @@ func (h *Handlers) ExportFlows(ctx context.Context) func(w http.ResponseWriter, 
 			err.Write(w, http.StatusBadRequest)
 			return
 		}
-		cl := newLokiClient(&h.Cfg.Loki, r.Header, false)
+		cl := newLokiClient(&h.Cfg.Loki, r.Header, false, h.Cfg.ConsoleMode == config.Mock)
 		var code int
 		startTime := time.Now()
 		defer func() {

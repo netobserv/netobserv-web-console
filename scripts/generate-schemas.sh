@@ -5,7 +5,7 @@ fcsSchema=`kubectl get crd flowcollectorslices.flows.netobserv.io -ojsonpath='{.
 fmSchema=`kubectl get crd flowmetrics.flows.netobserv.io -ojsonpath='{.spec.versions[0].schema.openAPIV3Schema}' | jq`
 date=`LC_ALL=en_US.utf8 date`
 
-cat <<EOF > web/moduleMapper/schemas.ts
+cat <<EOF > web/pluginToStandaloneMapper/schemas.ts
 // Auto-generated on ${date} by scripts/generate-schemas.sh ; DO NOT EDIT (edit the script instead).
 // File only used in tests or dev console
 

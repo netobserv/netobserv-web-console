@@ -21,7 +21,7 @@ func (h *Handlers) GetFrontendConfig() func(w http.ResponseWriter, r *http.Reque
 		}
 		if h.Cfg.IsLokiEnabled() {
 			// (Re)load Loki max chunk age
-			lokiClient := newLokiClient(&h.Cfg.Loki, r.Header, true)
+			lokiClient := newLokiClient(&h.Cfg.Loki, r.Header, true, h.Cfg.ConsoleMode == config.Mock)
 			if maxChunkAge, err := h.fetchIngesterMaxChunkAge(lokiClient); err != nil {
 				// Log the error, but keep returning known config
 				hlog.Errorf("Could not get max chunk age: %v", err)

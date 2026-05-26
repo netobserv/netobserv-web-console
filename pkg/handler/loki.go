@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -30,29 +29,19 @@ const (
 	lokiOrgIDHeader = "X-Scope-OrgID"
 )
 
-func newLokiClient(cfg *config.Loki, requestHeader http.Header, useStatusConfig bool) httpclient.Caller {
+func newLokiClient(cfg *config.Loki, requestHeader http.Header, useStatusConfig, useMocks bool) httpclient.Caller {
 	headers := map[string][]string{}
 	if cfg.TenantID != "" {
 		headers[lokiOrgIDHeader] = []string{cfg.TenantID}
 	}
 
-	if cfg.ForwardUserToken {
-		token := requestHeader.Get(auth.AuthHeader)
-		if token != "" {
-			headers[auth.AuthHeader] = []string{token}
-		} else {
-			hlog.Debug("Missing Authorization token in user request")
-		}
-	} else if cfg.TokenPath != "" {
-		bytes, err := os.ReadFile(cfg.TokenPath)
-		if err != nil {
-			hlog.WithError(err).Warnf("Failed to read authorization token from path '%s'. Continuing without token authentication. This may cause authentication failures if the Loki server requires authentication.", cfg.TokenPath)
-		} else {
-			headers[auth.AuthHeader] = []string{"Bearer " + string(bytes)}
-		}
+	if token, err := auth.RetrieveToken(requestHeader, cfg.ForwardUserToken, cfg.TokenPath); err != nil {
+		hlog.WithError(err).Warn("Continuing without token authentication. This may cause authentication failures if the Loki server requires authentication.")
+	} else if token != "" {
+		headers[auth.AuthHeader] = []string{"Bearer " + token}
 	}
 
-	if cfg.UseMocks {
+	if useMocks {
 		hlog.Debug("Mocking Loki Client")
 		return new(lokiclientmock.LokiClientMock)
 	}
@@ -194,7 +183,7 @@ func (h *Handlers) getLokiStatus(r *http.Request) ([]byte, int, apierrors.Struct
 	if h.Cfg.Loki.Status != "" {
 		return []byte(h.Cfg.Loki.Status), 200, nil
 	}
-	lokiClient := newLokiClient(&h.Cfg.Loki, r.Header, true)
+	lokiClient := newLokiClient(&h.Cfg.Loki, r.Header, true, h.Cfg.ConsoleMode == config.Mock)
 	baseURL := strings.TrimRight(h.Cfg.Loki.GetStatusURL(), "/")
 	return executeLokiQuery(fmt.Sprintf("%s/%s", baseURL, "ready"), lokiClient)
 }
@@ -234,7 +223,7 @@ func (h *Handlers) LokiMetrics() func(w http.ResponseWriter, r *http.Request) {
 			err.Write(w, http.StatusBadRequest)
 			return
 		}
-		lokiClient := newLokiClient(&h.Cfg.Loki, r.Header, true)
+		lokiClient := newLokiClient(&h.Cfg.Loki, r.Header, true, h.Cfg.ConsoleMode == config.Mock)
 		baseURL := strings.TrimRight(h.Cfg.Loki.GetStatusURL(), "/")
 
 		resp, code, err := executeLokiQuery(fmt.Sprintf("%s/%s", baseURL, "metrics"), lokiClient)
@@ -259,7 +248,7 @@ func (h *Handlers) LokiBuildInfos() func(w http.ResponseWriter, r *http.Request)
 			err.Write(w, http.StatusBadRequest)
 			return
 		}
-		lokiClient := newLokiClient(&h.Cfg.Loki, r.Header, true)
+		lokiClient := newLokiClient(&h.Cfg.Loki, r.Header, true, h.Cfg.ConsoleMode == config.Mock)
 		baseURL := strings.TrimRight(h.Cfg.Loki.GetStatusURL(), "/")
 
 		resp, code, err := executeLokiQuery(fmt.Sprintf("%s/%s", baseURL, "loki/api/v1/status/buildinfo"), lokiClient)
@@ -306,7 +295,7 @@ func (h *Handlers) LokiLimits() func(w http.ResponseWriter, r *http.Request) {
 			writeJSON(w, http.StatusNoContent, "Loki is disabled")
 			return
 		}
-		lokiClient := newLokiClient(&h.Cfg.Loki, r.Header, true)
+		lokiClient := newLokiClient(&h.Cfg.Loki, r.Header, true, h.Cfg.ConsoleMode == config.Mock)
 		limits, err := h.fetchLokiLimits(lokiClient)
 		if err != nil {
 			hlog.WithError(err).Error("cannot fetch Loki limits")

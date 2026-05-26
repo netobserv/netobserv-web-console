@@ -11,12 +11,16 @@ import { FlowCollectorOverallStatus } from '../forms/utils';
 
 export interface FlowCollectorStatusIconProps {
   status: FlowCollectorOverallStatus;
+  error?: string;
 }
 
-export const FlowCollectorStatusIcon: React.FC<FlowCollectorStatusIconProps> = ({ status }) => {
+export const FlowCollectorStatusIcon: React.FC<FlowCollectorStatusIconProps> = ({ status, error }) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
 
   const tooltipContent = React.useMemo(() => {
+    if (error) {
+      return error;
+    }
     switch (status) {
       case 'ready':
         return t('FlowCollector is ready');
@@ -31,7 +35,7 @@ export const FlowCollectorStatusIcon: React.FC<FlowCollectorStatusIconProps> = (
       case 'loading':
         return t('Loading FlowCollector status...');
     }
-  }, [status, t]);
+  }, [status, error, t]);
 
   const icon = React.useMemo(() => {
     switch (status) {

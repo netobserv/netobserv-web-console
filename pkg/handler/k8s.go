@@ -17,9 +17,10 @@ import (
 
 func (h *Handlers) GetUDNIdss(ctx context.Context) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		token, err := auth.GetUserToken(r.Header)
+		token, err := auth.RetrieveToken(r.Header, h.Cfg.Kubernetes.ForwardUserToken, h.Cfg.Kubernetes.TokenPath)
 		if err != nil {
 			apierrors.Write(w, http.StatusInternalServerError, err)
+			return
 		}
 
 		cudns, err := resources.List(ctx, token, schema.GroupVersionResource{
@@ -60,5 +61,32 @@ func (h *Handlers) GetUDNIdss(ctx context.Context) func(w http.ResponseWriter, r
 			values = append(values, fmt.Sprintf("%s/%s", md["namespace"], md["name"]))
 		}
 		writeJSON(w, http.StatusOK, utils.NonEmpty(utils.Dedup(values)))
+	}
+}
+
+func (h *Handlers) GetFlowCollector(ctx context.Context) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		token, err := auth.RetrieveToken(r.Header, h.Cfg.Kubernetes.ForwardUserToken, h.Cfg.Kubernetes.TokenPath)
+		if err != nil {
+			apierrors.Write(w, http.StatusInternalServerError, err)
+			return
+		}
+
+		fc, err := resources.Get(ctx, token, "", "cluster", schema.GroupVersionResource{
+			Group:    "flows.netobserv.io",
+			Version:  "v1beta2",
+			Resource: "flowcollectors",
+		})
+		if err != nil {
+			var k8sErr *kerr.StatusError
+			if errors.As(err, &k8sErr) {
+				apierrors.Write(w, int(k8sErr.ErrStatus.Code), err)
+			} else {
+				apierrors.Write(w, http.StatusInternalServerError, err)
+			}
+			return
+		}
+
+		writeJSON(w, http.StatusOK, fc)
 	}
 }

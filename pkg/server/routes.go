@@ -78,13 +78,16 @@ func setupRoutes(ctx context.Context, cfg *config.Config, authChecker auth.Check
 		r.PathPrefix("/").Handler(http.FileServer(http.Dir("./web/dist/")))
 	}
 
-	if cfg.Prometheus.AlertManager.URL != "" {
-		// When AlertManager URL is configured, we don't use the Console proxy; doing our own proxy instead (likely, we're in standalone mode)
+	switch cfg.ConsoleMode {
+	case config.Standalone:
 		api.HandleFunc("/prometheus/api/v1/rules", h.PromProxyRules())
 		api.HandleFunc("/prometheus/api/v1/query", h.PromProxyQuery())
 		api.HandleFunc("/alertmanager/api/v2/silences", h.PromProxySilences())
-	} else if cfg.Loki.UseMocks {
-		// Add route for alerts (otherwise, the route is provided by the Console itself)
+		api.HandleFunc("/resources/flowcollector", h.GetFlowCollector(ctx))
+	case config.OpenShiftPlugin:
+		// Those paths are handled by the Console proxy, nothing to do
+	case config.Mock:
+		// Redirect to mocks
 		api.HandleFunc("/prometheus/api/v1/rules", alertingmock.GetRules())
 		api.HandleFunc("/prometheus/api/v1/query", alertingmock.GetQuery())
 		api.HandleFunc("/alertmanager/api/v2/silences", alertingmock.GetSilences())

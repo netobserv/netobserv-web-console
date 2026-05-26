@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/netobserv/network-observability-console-plugin/pkg/kubernetes/client"
 	"github.com/sirupsen/logrus"
@@ -73,18 +72,6 @@ func (b *DenyAllChecker) CheckAdmin(_ context.Context, _ http.Header) error {
 	return errors.New("deny all auth mode selected")
 }
 
-func GetUserToken(header http.Header) (string, error) {
-	authValue := header.Get(AuthHeader)
-	if authValue != "" {
-		parts := strings.Split(authValue, "Bearer ")
-		if len(parts) != 2 {
-			return "", errors.New("missing Bearer token in Authorization header")
-		}
-		return parts[1], nil
-	}
-	return "", errors.New("missing Authorization header")
-}
-
 func runTokenReview(ctx context.Context, apiProvider client.APIProvider, token string, preds []authPredicate) error {
 	client, err := apiProvider()
 	if err != nil {
@@ -130,7 +117,7 @@ type BearerTokenChecker struct {
 
 func (c *BearerTokenChecker) CheckAuth(ctx context.Context, header http.Header) error {
 	hlog.Debug("Checking authenticated user")
-	token, err := GetUserToken(header)
+	token, err := getTokenFromHeader(header)
 	if err != nil {
 		return err
 	}
@@ -145,7 +132,7 @@ func (c *BearerTokenChecker) CheckAuth(ctx context.Context, header http.Header) 
 
 func (c *BearerTokenChecker) CheckAdmin(ctx context.Context, header http.Header) error {
 	hlog.Debug("Checking admin user")
-	token, err := GetUserToken(header)
+	token, err := getTokenFromHeader(header)
 	if err != nil {
 		return err
 	}

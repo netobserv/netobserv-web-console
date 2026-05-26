@@ -23,7 +23,6 @@ type Loki struct {
 	StatusCAPath       string            `yaml:"statusCaPath,omitempty" json:"statusCaPath,omitempty"`
 	StatusUserCertPath string            `yaml:"statusUserCertPath,omitempty" json:"statusUserCertPath,omitempty"`
 	StatusUserKeyPath  string            `yaml:"statusUserKeyPath,omitempty" json:"statusUserKeyPath,omitempty"`
-	UseMocks           bool              `yaml:"useMocks,omitempty" json:"useMocks,omitempty"`
 	ForwardUserToken   bool              `yaml:"forwardUserToken,omitempty" json:"forwardUserToken,omitempty"`
 	labelsMap          map[string]struct{}
 }
