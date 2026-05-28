@@ -4,8 +4,7 @@ on:
     types: [labeled]
 
 env:
-  WF_REGISTRY: quay.io/netobserv
-  WF_IMAGE: network-observability-console-plugin
+  WF_ORG: netobserv
 
 permissions:
   contents: read
@@ -24,7 +23,9 @@ jobs:
       - name: get short sha
         run: echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
       - name: build and save image
-        run: OCI_BUILD_OPTS="--label quay.expires-after=2w" IMAGE=${{ env.WF_REGISTRY }}/${{ env.WF_IMAGE }}:${{ env.short_sha }} CLEAN_BUILD=1 make tar-image
+        run: OCI_BUILD_OPTS="--label quay.expires-after=2w" IMAGE_ORG=${{ env.WF_ORG }} VERSION=${{ env.short_sha }} CLEAN_BUILD=1 make tar-image
+      - name: build and save standalone image
+        run: OCI_BUILD_OPTS="--label quay.expires-after=2w" IMAGE_ORG=${{ env.WF_ORG }} VERSION=${{ env.short_sha }} CLEAN_BUILD=1 STANDALONE=true make tar-image
       - name: save PR number
         run: |
           echo ${{ github.event.number }} > ./out/pr-id

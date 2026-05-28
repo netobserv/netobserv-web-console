@@ -25,6 +25,7 @@ jobs:
       - name: load images
         run: |
           docker load --input ./image.tar
+          docker load --input ./image-standalone.tar
       - name: docker login to quay.io
         uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
         with:
@@ -34,6 +35,7 @@ jobs:
       - name: push images
         run: |
           DOCKER_BUILDKIT=1 docker push $(cat ./name)
+          DOCKER_BUILDKIT=1 docker push $(cat ./name-standalone)
       - uses: actions/github-script@v9
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
@@ -42,16 +44,18 @@ jobs:
             var issueNumber = Number(fs.readFileSync('./pr-id'));
             var shortSha = String(fs.readFileSync('./short-sha')).trim();
             var mainImage = fs.readFileSync('./name');
+            var standaloneImage = fs.readFileSync('./name-standalone');
             github.rest.issues.createComment({
               issue_number: issueNumber,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `New image:
+              body: `New images:
             \`\`\`bash
             ${mainImage}
+            ${standaloneImage}
             \`\`\`
 
-            It will expire in two weeks.
+            They will expire in two weeks.
 
             To deploy this build, run from the operator repo, assuming the operator is running:
             \`\`\`bash
