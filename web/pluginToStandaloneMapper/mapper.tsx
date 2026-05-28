@@ -22,7 +22,7 @@ import { safeJSToYAML } from '../src/utils/yaml';
 import { k8sModels } from './k8s-models';
 import { Config } from '../src/model/config';
 import { loadConfig } from '../src/utils/config';
-import { mockK8SResource } from './mock';
+import { mockK8SResource } from './mock/mock';
 import { getFlowCollector } from '../src/api/routes';
 
 // This Mapper is used to resolve @Console imports from @openshift-console for JEST / Standalone

@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import { flowCollectorSchema, flowMetricSchema, flowCollectorSliceSchema } from './schemas';
-import { getFlowCollectorJS, getFlowMetricJS, getFlowCollectorSliceJS } from './templates';
+import { flowCollectorSchema, flowMetricSchema, flowCollectorSliceSchema } from '../schemas';
+import { getFlowCollectorJS, getFlowMetricJS, getFlowCollectorSliceJS } from '../templates';
 
 const mockFlowCollector = () => {
   const fc = _.cloneDeep(getFlowCollectorJS());
