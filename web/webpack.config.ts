@@ -96,8 +96,8 @@ module.exports = {
       pluginMetadata: {
         name: "netobserv-plugin",
         version: "0.1.0",
-        displayName: "NetObserv Plugin for OCP Console",
-        description: "This plugin adds network observability pages to Openshift console",
+        displayName: "NetObserv Plugin for the OpenShift Console",
+        description: "This plugin adds network observability views to the OpenShift Console",
         exposedModules: {
           "netflowParent": "./components/netflow-traffic-parent.tsx",
           "netflowTab": "./components/netflow-traffic-tab.tsx",
@@ -475,7 +475,7 @@ if (process.env.FLAVOR === 'static') {
       pluginMetadata: {
         name: "netobserv-plugin-static",
         version: "0.1.0",
-        displayName: "NetObserv Static Plugin for OCP Console",
+        displayName: "NetObserv Static Plugin for the OpenShift Console",
         description: "This plugin adds custom forms for FlowCollector, FlowCollectorSlice and FlowMetrics APIs",
         exposedModules: {
           "flowCollectorWizard": "./components/forms/flowCollector-wizard.tsx",
