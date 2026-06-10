@@ -20,7 +20,7 @@ WORKDIR /opt/app-root/web
 RUN TRANSPILE_ONLY=true npm run build$BUILDSCRIPT
 RUN TRANSPILE_ONLY=true npm run build:static
 
-FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.25 AS go-builder
+FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.26 AS go-builder
 
 ARG LDFLAGS
 WORKDIR /opt/app-root
