@@ -46,7 +46,7 @@ Performance benchmarks run automatically on every pull request via GitHub Action
 ```yaml
 - Job: benchmark-server
 - Runs on: ubuntu-latest
-- Go version: 1.25
+- Go version: 1.26
 ```
 
 **What happens in CI:**
