@@ -20,27 +20,25 @@ export const FlowCollectorStatusIndicator: React.FC = () => {
     isList: false
   });
 
-  const status = getFlowCollectorOverallStatus(fc, loadError);
+  const { status, message } = getFlowCollectorOverallStatus(fc, loadError);
+  const appendMsg = message ? ': ' + message : '';
 
   const tooltipContent = React.useMemo(() => {
-    if (loadError) {
-      return String(loadError);
-    }
     switch (status) {
       case 'ready':
         return t('FlowCollector is ready');
       case 'degraded':
-        return t('FlowCollector is degraded');
+        return t('FlowCollector is degraded') + appendMsg;
       case 'pending':
         return t('FlowCollector is pending');
       case 'error':
-        return t('FlowCollector has errors');
+        return t('FlowCollector errors: ') + appendMsg;
       case 'onHold':
         return t('FlowCollector is on hold');
       case 'loading':
         return t('Loading FlowCollector status...');
     }
-  }, [status, loadError, t]);
+  }, [status, message, t]);
 
   return (
     <Tooltip id="flowcollector-status-tooltip" content={tooltipContent} position="bottom">

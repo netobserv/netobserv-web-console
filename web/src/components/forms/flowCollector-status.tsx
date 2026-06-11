@@ -38,7 +38,7 @@ export const FlowCollectorStatus: FC<FlowCollectorStatusProps> = () => {
     >
       <Consumer>
         {ctx => {
-          const status = getFlowCollectorOverallStatus(ctx.data, ctx.loadError);
+          const { status } = getFlowCollectorOverallStatus(ctx.data, ctx.loadError);
           const showTrafficButton = status === 'ready' || status === 'degraded';
           const configIssue = (
             (ctx.data?.status?.conditions as Array<{

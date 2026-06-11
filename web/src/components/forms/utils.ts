@@ -9,31 +9,32 @@ export type FlowCollectorOverallStatus = 'ready' | 'degraded' | 'pending' | 'err
 export const getFlowCollectorOverallStatus = (
   cr: K8sResourceKind | undefined,
   loadError: unknown
-): FlowCollectorOverallStatus => {
+): { status: FlowCollectorOverallStatus, message?: string } => {
   if (loadError) {
-    return 'error';
+    return { status: 'error', message: String(loadError) };
   }
   if (!cr) {
-    return 'loading';
+    return { status: 'loading' };
   }
   if (cr.spec?.execution?.mode === 'OnHold') {
-    return 'onHold';
+    return { status: 'onHold' };
   }
   const conditions = cr.status?.conditions as K8sResourceCondition[] | undefined;
   if (!conditions) {
-    return 'pending';
+    return { status: 'pending' };
   }
+  const message = conditions.filter(c => c.type !== 'Ready' && c.status === 'True').map(c => c.message).join('; ');
   const readyCondition = conditions.find(c => c.type === 'Ready');
   if (readyCondition?.status === 'True') {
     if (readyCondition.reason === 'Ready,Degraded') {
-      return 'degraded';
+      return { status: 'degraded', message };
     }
-    return 'ready';
+    return { status: 'ready' };
   }
   if (readyCondition?.status === 'False') {
-    return readyCondition.reason === 'Pending' ? 'pending' : 'error';
+    return readyCondition.reason === 'Pending' ? { status: 'pending' } : { status: 'error', message };
   }
-  return 'pending';
+  return { status: 'pending' };
 };
 
 export const appendRecursive = (obj: any, key: string, value?: string) => {
