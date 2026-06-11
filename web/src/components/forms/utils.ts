@@ -9,7 +9,7 @@ export type FlowCollectorOverallStatus = 'ready' | 'degraded' | 'pending' | 'err
 export const getFlowCollectorOverallStatus = (
   cr: K8sResourceKind | undefined,
   loadError: unknown
-): { status: FlowCollectorOverallStatus, message?: string } => {
+): { status: FlowCollectorOverallStatus; message?: string } => {
   if (loadError) {
     return { status: 'error', message: String(loadError) };
   }
@@ -23,7 +23,11 @@ export const getFlowCollectorOverallStatus = (
   if (!conditions) {
     return { status: 'pending' };
   }
-  const message = conditions.filter(c => c.type !== 'Ready' && c.status === 'True').map(c => c.message).join('; ');
+  const message =
+    conditions
+      .filter(c => c.type !== 'Ready' && c.status === 'True' && c.message)
+      .map(c => c.message)
+      .join('; ') || undefined;
   const readyCondition = conditions.find(c => c.type === 'Ready');
   if (readyCondition?.status === 'True') {
     if (readyCondition.reason === 'Ready,Degraded') {

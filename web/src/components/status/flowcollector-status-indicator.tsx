@@ -32,13 +32,13 @@ export const FlowCollectorStatusIndicator: React.FC = () => {
       case 'pending':
         return t('FlowCollector is pending');
       case 'error':
-        return t('FlowCollector errors: ') + appendMsg;
+        return t('FlowCollector has errors') + appendMsg;
       case 'onHold':
         return t('FlowCollector is on hold');
       case 'loading':
         return t('Loading FlowCollector status...');
     }
-  }, [status, message, t]);
+  }, [status, appendMsg, t]);
 
   return (
     <Tooltip id="flowcollector-status-tooltip" content={tooltipContent} position="bottom">

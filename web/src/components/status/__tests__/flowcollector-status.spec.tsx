@@ -7,28 +7,28 @@ import { FlowCollectorStatusIndicator } from '../flowcollector-status-indicator'
 
 describe('getFlowCollectorOverallStatus', () => {
   it('should return loading when CR is undefined', () => {
-    expect(getFlowCollectorOverallStatus(undefined, null)).toBe('loading');
+    expect(getFlowCollectorOverallStatus(undefined, null)).toEqual({ status: 'loading' });
   });
 
   it('should return error on load error', () => {
-    expect(getFlowCollectorOverallStatus(undefined, 'some error')).toBe('error');
+    expect(getFlowCollectorOverallStatus(undefined, 'some error')).toEqual({ status: 'error', message: 'some error' });
   });
 
   it('should return onHold when execution mode is OnHold', () => {
     const cr = { spec: { execution: { mode: 'OnHold' } } };
-    expect(getFlowCollectorOverallStatus(cr, null)).toBe('onHold');
+    expect(getFlowCollectorOverallStatus(cr, null)).toEqual({ status: 'onHold' });
   });
 
   it('should return pending when no conditions', () => {
     const cr = { spec: {} };
-    expect(getFlowCollectorOverallStatus(cr, null)).toBe('pending');
+    expect(getFlowCollectorOverallStatus(cr, null)).toEqual({ status: 'pending' });
   });
 
   it('should return ready when Ready condition is True', () => {
     const cr = {
       status: { conditions: [{ type: 'Ready', status: 'True', reason: 'Ready' }] }
     };
-    expect(getFlowCollectorOverallStatus(cr, null)).toBe('ready');
+    expect(getFlowCollectorOverallStatus(cr, null)).toEqual({ status: 'ready' });
   });
 
   it('should return degraded when Ready is True with reason Ready,Degraded', () => {
@@ -37,14 +37,14 @@ describe('getFlowCollectorOverallStatus', () => {
         conditions: [{ type: 'Ready', status: 'True', reason: 'Ready,Degraded' }]
       }
     };
-    expect(getFlowCollectorOverallStatus(cr, null)).toBe('degraded');
+    expect(getFlowCollectorOverallStatus(cr, null)).toEqual({ status: 'degraded' });
   });
 
   it('should return pending when Ready condition is missing', () => {
     const cr = {
       status: { conditions: [{ type: 'AgentReady', status: 'True', reason: 'Ready' }] }
     };
-    expect(getFlowCollectorOverallStatus(cr, null)).toBe('pending');
+    expect(getFlowCollectorOverallStatus(cr, null)).toEqual({ status: 'pending' });
   });
 
   it('should return pending when Ready is False with reason Pending', () => {
@@ -56,7 +56,7 @@ describe('getFlowCollectorOverallStatus', () => {
         ]
       }
     };
-    expect(getFlowCollectorOverallStatus(cr, null)).toBe('pending');
+    expect(getFlowCollectorOverallStatus(cr, null)).toEqual({ status: 'pending' });
   });
 
   it('should return error when Ready is False with non-Pending reason', () => {
@@ -64,11 +64,11 @@ describe('getFlowCollectorOverallStatus', () => {
       status: {
         conditions: [
           { type: 'Ready', status: 'False', reason: 'Failed' },
-          { type: 'PluginReady', status: 'False', reason: 'CrashLoopBackOff' }
+          { type: 'PluginNotReady', status: 'True', reason: 'CrashLoopBackOff', message: 'Plugin fails to start' }
         ]
       }
     };
-    expect(getFlowCollectorOverallStatus(cr, null)).toBe('error');
+    expect(getFlowCollectorOverallStatus(cr, null)).toEqual({ status: 'error', message: 'Plugin fails to start' });
   });
 
   it('should return ready when Ready is True regardless of other conditions', () => {
@@ -81,7 +81,7 @@ describe('getFlowCollectorOverallStatus', () => {
         ]
       }
     };
-    expect(getFlowCollectorOverallStatus(cr, null)).toBe('ready');
+    expect(getFlowCollectorOverallStatus(cr, null)).toEqual({ status: 'ready' });
   });
 });
 
