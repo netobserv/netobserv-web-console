@@ -2,7 +2,6 @@ import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { render } from '@testing-library/react';
 import * as React from 'react';
 import { getFlowCollectorOverallStatus } from '../../forms/utils';
-import { FlowCollectorStatusIcon } from '../flowcollector-status-icon';
 import { FlowCollectorStatusIndicator } from '../flowcollector-status-indicator';
 
 describe('getFlowCollectorOverallStatus', () => {
@@ -85,38 +84,6 @@ describe('getFlowCollectorOverallStatus', () => {
   });
 });
 
-describe('<FlowCollectorStatusIcon />', () => {
-  it('should render spinner for loading', () => {
-    const { container } = render(<FlowCollectorStatusIcon status="loading" />);
-    expect(container.querySelector('[role="progressbar"]')).toBeTruthy();
-  });
-
-  it('should render icon for ready', () => {
-    const { container } = render(<FlowCollectorStatusIcon status="ready" />);
-    expect(container.querySelector('svg')).toBeTruthy();
-  });
-
-  it('should render icon for degraded', () => {
-    const { container } = render(<FlowCollectorStatusIcon status="degraded" />);
-    expect(container.querySelector('svg')).toBeTruthy();
-  });
-
-  it('should render icon for pending', () => {
-    const { container } = render(<FlowCollectorStatusIcon status="pending" />);
-    expect(container.querySelector('svg')).toBeTruthy();
-  });
-
-  it('should render icon for error', () => {
-    const { container } = render(<FlowCollectorStatusIcon status="error" />);
-    expect(container.querySelector('svg')).toBeTruthy();
-  });
-
-  it('should render icon for onHold', () => {
-    const { container } = render(<FlowCollectorStatusIcon status="onHold" />);
-    expect(container.querySelector('svg')).toBeTruthy();
-  });
-});
-
 const useK8sWatchResourceMock = useK8sWatchResource as jest.Mock;
 
 describe('<FlowCollectorStatusIndicator />', () => {
@@ -150,6 +117,32 @@ describe('<FlowCollectorStatusIndicator />', () => {
 
   it('should render icon on load error', () => {
     useK8sWatchResourceMock.mockReturnValue([null, false, 'load error']);
+    const { container } = render(<FlowCollectorStatusIndicator />);
+    expect(container.querySelector('svg')).toBeTruthy();
+  });
+
+  it('should render icon for degraded', () => {
+    useK8sWatchResourceMock.mockReturnValue([
+      { status: { conditions: [{ type: 'Ready', status: 'True', reason: 'Ready,Degraded' }] } },
+      true,
+      null
+    ]);
+    const { container } = render(<FlowCollectorStatusIndicator />);
+    expect(container.querySelector('svg')).toBeTruthy();
+  });
+
+  it('should render icon for pending', () => {
+    useK8sWatchResourceMock.mockReturnValue([
+      { status: { conditions: [{ type: 'Ready', status: 'False', reason: 'Pending' }] } },
+      true,
+      null
+    ]);
+    const { container } = render(<FlowCollectorStatusIndicator />);
+    expect(container.querySelector('svg')).toBeTruthy();
+  });
+
+  it('should render icon for onHold', () => {
+    useK8sWatchResourceMock.mockReturnValue([{ spec: { execution: { mode: 'OnHold' } } }, true, null]);
     const { container } = render(<FlowCollectorStatusIndicator />);
     expect(container.querySelector('svg')).toBeTruthy();
   });

@@ -1,12 +1,17 @@
 import { K8sResourceKind, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { Button, Tooltip } from '@patternfly/react-core';
+import { Button, Spinner, Tooltip } from '@patternfly/react-core';
+import {
+  ConnectedIcon,
+  ExclamationCircleIcon,
+  ExclamationTriangleIcon,
+  PauseCircleIcon
+} from '@patternfly/react-icons';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { flowCollectorStatusPath, useNavigate } from '../../utils/url';
 import { getFlowCollectorOverallStatus } from '../forms/utils';
-import { FlowCollectorStatusIcon } from './flowcollector-status-icon';
 
-export const FlowCollectorStatusIndicator: React.FC = () => {
+export const FlowCollectorStatusIndicator: React.FC<{ handleClick?: boolean }> = ({ handleClick }) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
   const navigate = useNavigate();
 
@@ -40,15 +45,33 @@ export const FlowCollectorStatusIndicator: React.FC = () => {
     }
   }, [status, appendMsg, t]);
 
+  const icon = React.useMemo(() => {
+    switch (status) {
+      case 'ready':
+        return <ConnectedIcon color="var(--pf-t--global--icon--color--status--success--default)" />;
+      case 'degraded':
+        return <ExclamationTriangleIcon color="var(--pf-t--global--icon--color--status--warning--default)" />;
+      case 'pending':
+        return <ExclamationTriangleIcon color="var(--pf-t--global--icon--color--status--warning--default)" />;
+      case 'error':
+        return <ExclamationCircleIcon color="var(--pf-t--global--icon--color--status--danger--default)" />;
+      case 'onHold':
+        return <PauseCircleIcon color="var(--pf-t--global--icon--color--status--info--default)" />;
+      case 'loading':
+        return <Spinner size="md" />;
+    }
+  }, [status]);
+
   return (
     <Tooltip id="flowcollector-status-tooltip" content={tooltipContent} position="bottom">
       <Button
         id="flowcollector-status-indicator"
         variant="plain"
         aria-label={t('FlowCollector status')}
-        onClick={() => navigate(flowCollectorStatusPath)}
+        onClick={handleClick !== false ? () => navigate(flowCollectorStatusPath) : undefined}
+        style={handleClick === false ? { cursor: 'default' } : undefined}
       >
-        <FlowCollectorStatusIcon status={status} />
+        <span style={{ display: 'inline-flex', verticalAlign: 'middle' }}>{icon}</span>
       </Button>
     </Tooltip>
   );

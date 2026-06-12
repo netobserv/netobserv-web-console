@@ -13,7 +13,7 @@ import {
 } from '@patternfly/react-core';
 import { useTranslation } from 'react-i18next';
 import { flowCollectorEditPath, flowCollectorNewPath, netflowTrafficPath, useNavigate } from '../../utils/url';
-import { FlowCollectorStatusIcon } from '../status/flowcollector-status-icon';
+import FlowCollectorStatusIndicator from '../status/flowcollector-status-indicator';
 import './forms.css';
 import { Pipeline } from './pipeline';
 import { ResourceStatus } from './resource-status';
@@ -59,9 +59,7 @@ export const FlowCollectorStatus: FC<FlowCollectorStatusProps> = () => {
                     </Title>
                   </FlexItem>
                   <FlexItem>
-                    <Button variant="plain" aria-label={t('FlowCollector status')} style={{ cursor: 'default' }}>
-                      <FlowCollectorStatusIcon status={status} />
-                    </Button>
+                    <FlowCollectorStatusIndicator handleClick={false} />
                   </FlexItem>
                 </Flex>
               </div>
