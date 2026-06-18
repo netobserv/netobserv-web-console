@@ -2,7 +2,7 @@ import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import * as React from 'react';
 
-import { defaultNetflowMetrics, NetflowMetrics } from '../../../api/loki';
+import { defaultNetflowMetrics, NetflowMetrics } from '../../../api/query-response';
 import { Result } from '../../../utils/result';
 import { metrics } from '../../__tests-data__/metrics';
 import { MetricsQuerySummary } from '../metrics-query-summary';

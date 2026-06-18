@@ -1,4 +1,4 @@
-import { FlowMetricsResult, RawTopologyMetrics } from '../../api/loki';
+import { FlowMetricsResult, RawTopologyMetrics } from '../../api/query-response';
 import { getFlowMetrics, getFlowRecords } from '../../api/routes';
 import { FilterDefinitionSample } from '../../components/__tests-data__/filters';
 import { ScopeDefSample } from '../../components/__tests-data__/scopes';

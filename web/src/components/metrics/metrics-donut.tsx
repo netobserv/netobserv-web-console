@@ -1,7 +1,7 @@
 import { ChartDonut, ChartLabel, ChartLegend, ChartThemeColor } from '@patternfly/react-charts';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { GenericMetric, MetricStats, NamedMetric } from '../../api/loki';
+import { GenericMetric, MetricStats, NamedMetric } from '../../api/query-response';
 import { MetricFunction, MetricType } from '../../model/flow-query';
 import { getStat } from '../../model/metrics';
 import { localStorageOverviewDonutDimensionKey, useLocalStorage } from '../../utils/local-storage-hook';

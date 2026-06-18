@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Record } from '../api/ipfix';
-import { defaultNetflowMetrics } from '../api/loki';
+import { defaultNetflowMetrics } from '../api/query-response';
 import { Config, defaultConfig } from '../model/config';
 import { DisabledFilters, Filters, getDisabledFiltersRecord } from '../model/filters';
 import {

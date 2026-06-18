@@ -3,7 +3,7 @@ import _ from 'lodash';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Record } from '../../api/ipfix';
-import { getFunctionMetricKey, getRateMetricKey, NetflowMetrics, Stats } from '../../api/loki';
+import { getFunctionMetricKey, getRateMetricKey, NetflowMetrics, Stats } from '../../api/query-response';
 import { Config } from '../../model/config';
 import { Filter, Filters, filtersEqual, hasIndexFields, hasNonIndexFields } from '../../model/filters';
 import { FlowScope, MetricType, RecordType, StatFunction } from '../../model/flow-query';

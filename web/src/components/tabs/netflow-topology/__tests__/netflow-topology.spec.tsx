@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import * as React from 'react';
 
-import { TopologyMetrics } from '../../../../api/loki';
+import { TopologyMetrics } from '../../../../api/query-response';
 import { FilterDefinitionSample } from '../../../../components/__tests-data__/filters';
 import { ScopeDefSample } from '../../../../components/__tests-data__/scopes';
 import { Config } from '../../../../model/config';

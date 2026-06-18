@@ -14,7 +14,7 @@ import {
 import { ExclamationCircleIcon, ExclamationTriangleIcon } from '@patternfly/react-icons';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Status } from '../../api/loki';
+import { Status } from '../../api/query-response';
 import { getBuildInfo, getLimits, getLokiMetrics, getStatus } from '../../api/routes';
 import { ContextSingleton } from '../../utils/context';
 import {

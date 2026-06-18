@@ -18,7 +18,7 @@ import {
 import _ from 'lodash';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { TopologyMetrics } from '../../../../api/loki';
+import { TopologyMetrics } from '../../../../api/query-response';
 import { HealthStats } from '../../../../components/health/health-helper';
 import { Config } from '../../../../model/config';
 import { Filter, FilterDefinition, Filters } from '../../../../model/filters';

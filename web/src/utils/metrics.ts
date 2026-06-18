@@ -11,7 +11,7 @@ import {
   Stats,
   TopologyMetricPeer,
   TopologyMetrics
-} from '../api/loki';
+} from '../api/query-response';
 import { FlowScope, MetricFunction, MetricType, topologyTlsVersionAggregateSuffix } from '../model/flow-query';
 import { getCustomScopes } from '../model/scope';
 import { NodeData } from '../model/topology';

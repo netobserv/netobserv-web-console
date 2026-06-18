@@ -1,6 +1,6 @@
 import { TFunction } from 'i18next';
 import * as React from 'react';
-import { GenericMetric, NamedMetric, TopologyMetricPeer, TopologyMetrics } from '../api/loki';
+import { GenericMetric, NamedMetric, TopologyMetricPeer, TopologyMetrics } from '../api/query-response';
 import { TruncateLength } from '../components/dropdowns/truncate-dropdown';
 import { FlowScope } from '../model/flow-query';
 import { NodeData } from '../model/topology';

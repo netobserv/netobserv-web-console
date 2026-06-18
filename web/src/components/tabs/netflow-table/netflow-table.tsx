@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 
 import { Record } from '../../../api/ipfix';
-import { defaultNetflowMetrics, Stats } from '../../../api/loki';
+import { defaultNetflowMetrics, Stats } from '../../../api/query-response';
 import { Config } from '../../../model/config';
 import { useNetflowContext } from '../../../model/netflow-context';
 import { Column, ColumnsId, ColumnSizeMap } from '../../../utils/columns';

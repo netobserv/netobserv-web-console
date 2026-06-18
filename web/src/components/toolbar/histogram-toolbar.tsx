@@ -1,7 +1,7 @@
 import { Toolbar, ToolbarItem } from '@patternfly/react-core';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { TopologyMetrics } from '../../api/loki';
+import { TopologyMetrics } from '../../api/query-response';
 import { getTimeRangeOptions, TimeRange } from '../../utils/datetime';
 import { formatDuration, getDateMsInSeconds, getDateSInMiliseconds, parseDuration } from '../../utils/duration';
 import { defaultTimeRange } from '../../utils/router';

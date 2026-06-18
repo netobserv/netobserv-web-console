@@ -1,7 +1,7 @@
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { Text } from '@patternfly/react-core';
 import * as React from 'react';
-import { TopologyMetricPeer } from '../../../api/loki';
+import { TopologyMetricPeer } from '../../../api/query-response';
 
 export interface PeerResourceLinkProps {
   peer: TopologyMetricPeer;

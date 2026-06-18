@@ -30,7 +30,7 @@ const testCaps = {
   fetchFunctions: {}
 } as unknown as ConfigCapabilities;
 
-import { defaultNetflowMetrics } from '../../../../api/loki';
+import { defaultNetflowMetrics } from '../../../../api/query-response';
 import { FetchCallbacks } from '../../../../model/netflow-context';
 
 const testFetchCallbacks: FetchCallbacks = {

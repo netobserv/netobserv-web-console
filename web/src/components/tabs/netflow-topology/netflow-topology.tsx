@@ -13,7 +13,7 @@ import {
   RateMetrics,
   Stats,
   TopologyMetrics
-} from '../../../api/loki';
+} from '../../../api/query-response';
 import { getK8SUDNIds } from '../../../api/routes';
 import { Config } from '../../../model/config';
 import { FilterDefinition, Filters } from '../../../model/filters';

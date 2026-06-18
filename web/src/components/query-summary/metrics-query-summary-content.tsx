@@ -3,7 +3,7 @@ import { DomainIcon, OutlinedClockIcon, TachometerAltIcon } from '@patternfly/re
 import _ from 'lodash';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { getRateMetricKey, NetflowMetrics } from '../../api/loki';
+import { getRateMetricKey, NetflowMetrics } from '../../api/query-response';
 import { MetricType } from '../../model/flow-query';
 import { Warning } from '../../model/warnings';
 import { valueFormat } from '../../utils/format';

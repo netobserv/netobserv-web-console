@@ -18,7 +18,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { FaQuestion } from 'react-icons/fa';
 import { TbWorldWww } from 'react-icons/tb';
-import { TopologyMetricPeer } from '../../../../../api/loki';
+import { TopologyMetricPeer } from '../../../../../api/query-response';
 import { Match } from '../../../../../model/flow-query';
 import { Decorated, NodeData } from '../../../../../model/topology';
 import { useTheme } from '../../../../../utils/theme-hook';

@@ -17,7 +17,7 @@ import {
   Stats,
   Status,
   StreamResult
-} from './loki';
+} from './query-response';
 
 export const getFlowRecords = (params: FlowQuery): Promise<RecordsResult> => {
   return axios.get(ContextSingleton.getHost() + '/api/loki/flow/records', { params }).then(r => {

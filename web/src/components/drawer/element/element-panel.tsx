@@ -15,7 +15,7 @@ import { BaseEdge } from '@patternfly/react-topology';
 import _ from 'lodash';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { TopologyMetrics } from '../../../api/loki';
+import { TopologyMetrics } from '../../../api/query-response';
 import { RuleDetails } from '../../../components/health/rule-details';
 import { Filter, FilterDefinition, Filters } from '../../../model/filters';
 import { MetricType } from '../../../model/flow-query';

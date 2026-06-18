@@ -2,7 +2,7 @@ import { MenuToggle, Select, SelectList, SelectOption } from '@patternfly/react-
 import { FilterIcon } from '@patternfly/react-icons';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { TopologyMetricPeer } from '../../../api/loki';
+import { TopologyMetricPeer } from '../../../api/query-response';
 import { Filter, FilterDefinition, Filters } from '../../../model/filters';
 import { NodeType } from '../../../model/flow-query';
 import { FilterDir, isDirElementFiltered, toggleDirElementFilter } from '../../../model/topology';

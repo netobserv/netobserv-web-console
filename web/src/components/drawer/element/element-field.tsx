@@ -1,6 +1,6 @@
 import { Flex, FlexItem, Text, TextContent, TextVariants } from '@patternfly/react-core';
 import * as React from 'react';
-import { TopologyMetricPeer } from '../../../api/loki';
+import { TopologyMetricPeer } from '../../../api/query-response';
 import { Filter, FilterDefinition, Filters } from '../../../model/filters';
 import { NodeType } from '../../../model/flow-query';
 import { PeerResourceLink } from '../../tabs/netflow-topology/peer-resource-link';

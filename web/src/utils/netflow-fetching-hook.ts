@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Record } from '../api/ipfix';
-import { defaultNetflowMetrics, NetflowMetrics, Stats } from '../api/loki';
+import { defaultNetflowMetrics, NetflowMetrics, Stats } from '../api/query-response';
 import { NetflowTrafficDrawerHandle } from '../components/drawer/netflow-traffic-drawer';
 import { ViewId } from '../components/netflow-traffic';
 import { Config } from '../model/config';

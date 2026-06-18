@@ -3,7 +3,7 @@ import { BaseEdge, BaseNode, NodeModel } from '@patternfly/react-topology';
 import { fireEvent, render, waitFor } from '@testing-library/react';
 import * as React from 'react';
 
-import { TopologyMetrics } from '../../../../api/loki';
+import { TopologyMetrics } from '../../../../api/query-response';
 import { Filters } from '../../../../model/filters';
 import { FlowScope, MetricType } from '../../../../model/flow-query';
 import { NodeData } from '../../../../model/topology';

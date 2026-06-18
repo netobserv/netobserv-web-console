@@ -25,7 +25,7 @@ import {
 } from '@patternfly/react-icons';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { NamedMetric, TopologyMetrics } from '../../api/loki';
+import { NamedMetric, TopologyMetrics } from '../../api/query-response';
 import { TimeRange } from '../../utils/datetime';
 import { getDateMsInSeconds } from '../../utils/duration';
 import { localStorageHistogramGuidedTourDoneKey, useLocalStorage } from '../../utils/local-storage-hook';

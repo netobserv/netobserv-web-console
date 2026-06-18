@@ -2,7 +2,7 @@ import { Card } from '@patternfly/react-core';
 import _ from 'lodash';
 import * as React from 'react';
 import { Record } from '../../api/ipfix';
-import { Stats } from '../../api/loki';
+import { Stats } from '../../api/query-response';
 import { RecordType } from '../../model/flow-query';
 import { Warning } from '../../model/warnings';
 import { TimeRange } from '../../utils/datetime';

@@ -1,7 +1,7 @@
 import { Flex, FlexItem, Text, TextVariants } from '@patternfly/react-core';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { TopologyMetrics } from '../../../api/loki';
+import { TopologyMetrics } from '../../../api/query-response';
 import { isTimeMetric, MetricType } from '../../../model/flow-query';
 import { getStat } from '../../../model/metrics';
 import { getFormattedValue } from '../../../utils/metrics';

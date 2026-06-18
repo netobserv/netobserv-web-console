@@ -13,7 +13,7 @@ import {
 import { SearchIcon } from '@patternfly/react-icons';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Status } from '../../api/loki';
+import { Status } from '../../api/query-response';
 import { getStatus } from '../../api/routes';
 import { Config } from '../../model/config';
 import { ContextSingleton } from '../../utils/context';

@@ -1,4 +1,4 @@
-import { MetricStats } from '../api/loki';
+import { MetricStats } from '../api/query-response';
 import { percentileValues } from '../utils/metrics';
 import { StatFunction } from './flow-query';
 

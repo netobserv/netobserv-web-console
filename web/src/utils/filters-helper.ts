@@ -149,7 +149,6 @@ export const bnfFilterValue = (
 };
 
 export const isLokiLabel = (filter: FilterDefinition, config: Config): boolean => {
-  console.log('#################');
   const allowLoki = config.dataSources.some(ds => ds === 'loki');
   if (!allowLoki) {
     return false;

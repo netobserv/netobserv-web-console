@@ -1,5 +1,5 @@
 import { TFunction } from 'i18next';
-import { GenericMetric, MetricStats, RawTopologyMetrics, TopologyMetricPeer, TopologyMetrics } from '../../api/loki';
+import { GenericMetric, MetricStats, RawTopologyMetrics, TopologyMetricPeer, TopologyMetrics } from '../../api/query-response';
 import { ScopeDefSample } from '../../components/__tests-data__/scopes';
 import { NodeData } from '../../model/topology';
 import { ContextSingleton } from '../context';

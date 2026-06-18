@@ -15,7 +15,7 @@ import {
 } from '@patternfly/react-topology';
 import { TFunction } from 'i18next';
 import _ from 'lodash';
-import { GenericMetricTls, MetricStats, TopologyMetricPeer, TopologyMetrics } from '../api/loki';
+import { GenericMetricTls, MetricStats, TopologyMetricPeer, TopologyMetrics } from '../api/query-response';
 import { TruncateLength } from '../components/dropdowns/truncate-dropdown';
 import { getResourceSeverity, HealthStat, HealthStats, Severity } from '../components/health/health-helper';
 import {

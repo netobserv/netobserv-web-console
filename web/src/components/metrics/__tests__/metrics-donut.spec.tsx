@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import * as React from 'react';
 
-import { NamedMetric } from '../../../api/loki';
+import { NamedMetric } from '../../../api/query-response';
 import { metrics } from '../../__tests-data__/metrics';
 import { MetricsDonut, MetricsDonutProps } from '../metrics-donut';
 

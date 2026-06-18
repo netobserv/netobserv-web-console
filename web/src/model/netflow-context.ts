@@ -1,7 +1,7 @@
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import * as React from 'react';
 import { Record } from '../api/ipfix';
-import { defaultNetflowMetrics, NetflowMetrics } from '../api/loki';
+import { defaultNetflowMetrics, NetflowMetrics } from '../api/query-response';
 import { StructuredError } from '../utils/errors';
 import { ConfigCapabilities } from '../utils/netflow-capabilities-hook';
 import { Config, defaultConfig } from './config';

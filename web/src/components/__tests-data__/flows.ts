@@ -1,6 +1,6 @@
 import flowsJson from '../../../../mocks/loki/flow_records.json';
 import { FlowDirection, Record } from '../../api/ipfix';
-import { parseStream, RecordsResult, StreamResult } from '../../api/loki';
+import { parseStream, RecordsResult, StreamResult } from '../../api/query-response';
 
 export const FlowsMock: Record[] = flowsJson.data.result.flatMap(r => parseStream(r as unknown as StreamResult));
 

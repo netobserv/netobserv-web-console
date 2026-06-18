@@ -13,7 +13,7 @@ import _ from 'lodash';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Record } from '../../api/ipfix';
-import { NetflowMetrics, Stats } from '../../api/loki';
+import { NetflowMetrics, Stats } from '../../api/query-response';
 import { RecordType } from '../../model/flow-query';
 import { Warning } from '../../model/warnings';
 import { compareStrings } from '../../utils/base-compare';

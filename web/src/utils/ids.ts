@@ -3,7 +3,7 @@
  */
 
 import { Record } from '../api/ipfix';
-import { TopologyMetricPeer } from '../api/loki';
+import { TopologyMetricPeer } from '../api/query-response';
 import { getCustomScopeIds } from '../model/scope';
 
 export const idUnknown = '-';

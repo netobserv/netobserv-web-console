@@ -1,4 +1,4 @@
-import { FlowMetricsResult, RecordsResult } from '../api/loki';
+import { FlowMetricsResult, RecordsResult } from '../api/query-response';
 import { getFlowMetrics, getFlowRecords } from '../api/routes';
 import { Filter, FilterDefinition } from '../model/filters';
 import { filtersToString, StructuredFlowQuery, structuredToRawQuery } from '../model/flow-query';

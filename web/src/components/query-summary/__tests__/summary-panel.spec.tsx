@@ -1,7 +1,7 @@
 import { render, waitFor } from '@testing-library/react';
 import * as React from 'react';
 
-import { defaultNetflowMetrics } from '../../../api/loki';
+import { defaultNetflowMetrics } from '../../../api/query-response';
 import { FlowsSample } from '../../../components/__tests-data__/flows';
 import { RecordType } from '../../../model/flow-query';
 import { SummaryPanelContent } from '../summary-panel-content';

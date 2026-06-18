@@ -18,7 +18,7 @@ import {
   Stats,
   TotalFunctionMetrics,
   TotalRateMetrics
-} from '../../../api/loki';
+} from '../../../api/query-response';
 import { getFlowGenericMetrics } from '../../../api/routes';
 import { ScopeSlider } from '../../../components/slider/scope-slider';
 import { Config } from '../../../model/config';

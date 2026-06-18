@@ -13,7 +13,7 @@ import {
 } from '@patternfly/react-charts';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { GenericMetric, NamedMetric } from '../../api/loki';
+import { GenericMetric, NamedMetric } from '../../api/query-response';
 import { MetricFunction, MetricType } from '../../model/flow-query';
 import { localStorageOverviewMetricsDimensionKey, useLocalStorage } from '../../utils/local-storage-hook';
 import { getFormattedValue } from '../../utils/metrics';

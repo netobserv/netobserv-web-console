@@ -2,7 +2,7 @@ import { useResolvedExtensions } from '@openshift-console/dynamic-plugin-sdk';
 import { act, fireEvent, render, waitFor } from '@testing-library/react';
 import * as React from 'react';
 import { AlertsResult, SilencedAlert } from '../../api/alert';
-import { FlowMetricsResult, GenericMetricsResult } from '../../api/loki';
+import { FlowMetricsResult, GenericMetricsResult } from '../../api/query-response';
 import { getConfig, getFlowGenericMetrics, getFlowMetrics, getFlowRecords, getRole } from '../../api/routes';
 import { FlowQuery } from '../../model/flow-query';
 import { FullConfigResultSample, SimpleConfigResultSample } from '../__tests-data__/config';

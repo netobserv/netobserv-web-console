@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { defaultNetflowMetrics, Stats } from '../../api/loki';
+import { defaultNetflowMetrics, Stats } from '../../api/query-response';
 import { canTick, handleQueryError, handleQueryResult, InitState } from '../netflow-fetching-hook';
 
 describe('canTick', () => {

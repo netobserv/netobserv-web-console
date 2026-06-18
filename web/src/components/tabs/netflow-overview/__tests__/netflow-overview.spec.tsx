@@ -1,7 +1,7 @@
 import { render, waitFor } from '@testing-library/react';
 import * as React from 'react';
 
-import { defaultNetflowMetrics } from '../../../../api/loki';
+import { defaultNetflowMetrics } from '../../../../api/query-response';
 import { droppedMetrics, metrics } from '../../../../components/__tests-data__/metrics';
 import { ScopeDefSample } from '../../../../components/__tests-data__/scopes';
 import { TruncateLength } from '../../../../components/dropdowns/truncate-dropdown';
