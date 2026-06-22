@@ -9,7 +9,6 @@ import (
 )
 
 type StreamMerger struct {
-	Merger
 	index        map[string]indexedStream
 	merged       model.Streams
 	stats        []interface{}

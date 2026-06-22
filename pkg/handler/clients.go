@@ -9,7 +9,7 @@ import (
 	"github.com/netobserv/network-observability-console-plugin/pkg/config"
 	"github.com/netobserv/network-observability-console-plugin/pkg/handler/apierrors"
 	"github.com/netobserv/network-observability-console-plugin/pkg/httpclient"
-	"github.com/netobserv/network-observability-console-plugin/pkg/loki"
+	"github.com/netobserv/network-observability-console-plugin/pkg/merger"
 	"github.com/netobserv/network-observability-console-plugin/pkg/model"
 	"github.com/netobserv/network-observability-console-plugin/pkg/prometheus"
 	"github.com/prometheus/client_golang/api"
@@ -53,7 +53,7 @@ func newLokiClients(cfg *config.Config, requestHeader http.Header, useLokiStatus
 	return clients{loki: lokiClient}
 }
 
-func (c *clients) fetchLokiSingle(logQL string, merger loki.Merger) (int, apierrors.StructuredError) {
+func (c *clients) fetchLokiSingle(logQL string, merger merger.Merger) (int, apierrors.StructuredError) {
 	qr, code, err := fetchLogQL(logQL, c.loki)
 	if err != nil {
 		return code, err
@@ -71,7 +71,7 @@ func (c *clients) getPromClient(isDev bool) api.Client {
 	return c.promAdmin
 }
 
-func (c *clients) fetchPrometheusSingle(ctx context.Context, promQL *prometheus.Query, merger loki.Merger, client api.Client) (int, apierrors.StructuredError) {
+func (c *clients) fetchPrometheusSingle(ctx context.Context, promQL *prometheus.Query, merger merger.Merger, client api.Client) (int, apierrors.StructuredError) {
 	qr, code, err := prometheus.QueryMatrix(ctx, client, promQL)
 	if err != nil {
 		return code, apierrors.NewPromClientError(err)
@@ -82,7 +82,7 @@ func (c *clients) fetchPrometheusSingle(ctx context.Context, promQL *prometheus.
 	return code, nil
 }
 
-func (c *clients) fetchSingle(ctx context.Context, logQL string, promQL *prometheus.Query, merger loki.Merger, isDev bool) (int, apierrors.StructuredError) {
+func (c *clients) fetchSingle(ctx context.Context, logQL string, promQL *prometheus.Query, merger merger.Merger, isDev bool) (int, apierrors.StructuredError) {
 	if promQL != nil {
 		client := c.getPromClient(isDev)
 		if client == nil {
@@ -96,7 +96,7 @@ func (c *clients) fetchSingle(ctx context.Context, logQL string, promQL *prometh
 	return c.fetchLokiSingle(logQL, merger)
 }
 
-func (c *clients) fetchParallel(ctx context.Context, logQL []string, promQL []*prometheus.Query, merger loki.Merger, isDev bool) (int, apierrors.StructuredError) {
+func (c *clients) fetchParallel(ctx context.Context, logQL []string, promQL []*prometheus.Query, merger merger.Merger, isDev bool) (int, apierrors.StructuredError) {
 	type errorWithCode struct {
 		err  apierrors.StructuredError
 		code int

@@ -12,6 +12,7 @@ import (
 	"github.com/netobserv/network-observability-console-plugin/pkg/config"
 	"github.com/netobserv/network-observability-console-plugin/pkg/handler/apierrors"
 	"github.com/netobserv/network-observability-console-plugin/pkg/loki"
+	"github.com/netobserv/network-observability-console-plugin/pkg/merger"
 	"github.com/netobserv/network-observability-console-plugin/pkg/metrics"
 	"github.com/netobserv/network-observability-console-plugin/pkg/model"
 	"github.com/netobserv/network-observability-console-plugin/pkg/model/fields"
@@ -161,7 +162,7 @@ func (h *Handlers) getTopologyFlows(ctx context.Context, cl clients, params url.
 		return nil, http.StatusBadRequest, err
 	}
 	isDev := params.Get(namespaceKey) != ""
-	merger := loki.NewMatrixMerger(reqLimit)
+	mm := merger.NewMatrixMerger(reqLimit)
 	if len(filterGroups) > 1 {
 		// match any, and multiple filters => run in parallel then aggregate
 		var lokiQ []string
@@ -179,7 +180,7 @@ func (h *Handlers) getTopologyFlows(ctx context.Context, cl clients, params url.
 				dataSources[constants.DataSourceLoki] = true
 			}
 		}
-		code, err := cl.fetchParallel(ctx, lokiQ, promQ, merger, isDev)
+		code, err := cl.fetchParallel(ctx, lokiQ, promQ, mm, isDev)
 		if err != nil {
 			return nil, code, err
 		}
@@ -199,13 +200,13 @@ func (h *Handlers) getTopologyFlows(ctx context.Context, cl clients, params url.
 		if promQ != nil {
 			dataSources[constants.DataSourceProm] = true
 		}
-		code, err = cl.fetchSingle(ctx, lokiQ, promQ, merger, isDev)
+		code, err = cl.fetchSingle(ctx, lokiQ, promQ, mm, isDev)
 		if err != nil {
 			return nil, code, err
 		}
 	}
 
-	qresp := merger.Get()
+	qresp := mm.Get()
 	qresp.Stats.DataSources = []constants.DataSource{}
 	for str, ok := range dataSources {
 		if ok {
