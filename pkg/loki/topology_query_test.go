@@ -5,6 +5,7 @@ import (
 
 	"github.com/netobserv/network-observability-console-plugin/pkg/config"
 	"github.com/netobserv/network-observability-console-plugin/pkg/utils/constants"
+	"github.com/netobserv/network-observability-console-plugin/pkg/utils/queryparams"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -29,7 +30,7 @@ var aggregateKeyLabels = map[string][]string{
 }
 
 func TestBuildTopologyQuery_SimpleAggregate(t *testing.T) {
-	in := TopologyInput{
+	in := queryparams.TopologyInput{
 		Start:          "(start)",
 		End:            "",
 		Top:            "50",
@@ -53,7 +54,7 @@ func TestBuildTopologyQuery_SimpleAggregate(t *testing.T) {
 }
 
 func TestBuildTopologyQuery_GroupsAndAggregate(t *testing.T) {
-	in := TopologyInput{
+	in := queryparams.TopologyInput{
 		Start:          "(start)",
 		End:            "",
 		Top:            "50",
@@ -78,7 +79,7 @@ func TestBuildTopologyQuery_GroupsAndAggregate(t *testing.T) {
 }
 
 func TestBuildTopologyQuery_CustomAggregate(t *testing.T) {
-	in := TopologyInput{
+	in := queryparams.TopologyInput{
 		Start:          "(start)",
 		End:            "",
 		Top:            "50",
@@ -102,7 +103,7 @@ func TestBuildTopologyQuery_CustomAggregate(t *testing.T) {
 }
 
 func TestBuildTopologyQuery_CustomLabelAggregate(t *testing.T) {
-	in := TopologyInput{
+	in := queryparams.TopologyInput{
 		Start:          "(start)",
 		End:            "",
 		Top:            "50",
@@ -126,7 +127,7 @@ func TestBuildTopologyQuery_CustomLabelAggregate(t *testing.T) {
 }
 
 func TestBuildTopologyQuery_TlsFlowsOwnerPlusTlsVersionAggregate(t *testing.T) {
-	in := TopologyInput{
+	in := queryparams.TopologyInput{
 		Start:          "(start)",
 		End:            "",
 		Top:            "50",
