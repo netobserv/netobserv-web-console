@@ -14,19 +14,15 @@ const (
 	topologyDefaultLimit = "100"
 )
 
-// TopologyInput is an alias kept for backwards compatibility within this package.
-// New code should use queryparams.TopologyInput directly.
-type TopologyInput = queryparams.TopologyInput
-
 // TopologyQueryBuilder builds LogQL metric queries for topology views.
 type TopologyQueryBuilder struct {
 	*FlowQueryBuilder
-	topology           *TopologyInput
+	topology           *queryparams.TopologyInput
 	aggregateKeyLabels map[string][]string
 }
 
 // NewTopologyQuery creates a new TopologyQueryBuilder for the given Loki config and topology input.
-func NewTopologyQuery(cfg *config.Loki, kl map[string][]string, in *TopologyInput) (*TopologyQueryBuilder, error) {
+func NewTopologyQuery(cfg *config.Loki, kl map[string][]string, in *queryparams.TopologyInput) (*TopologyQueryBuilder, error) {
 	var rt constants.RecordType
 	if slices.Contains(constants.AnyConnectionType, string(in.RecordType)) {
 		rt = "endConnection"

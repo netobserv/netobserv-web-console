@@ -19,6 +19,7 @@ import (
 	"github.com/netobserv/network-observability-console-plugin/pkg/model/filters"
 	"github.com/netobserv/network-observability-console-plugin/pkg/prometheus"
 	"github.com/netobserv/network-observability-console-plugin/pkg/utils/constants"
+	"github.com/netobserv/network-observability-console-plugin/pkg/utils/queryparams"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 )
@@ -83,8 +84,8 @@ func (h *Handlers) GetTopology(ctx context.Context) func(w http.ResponseWriter, 
 	}
 }
 
-func (h *Handlers) extractTopologyQueryParams(params url.Values, ds constants.DataSource) (*loki.TopologyInput, filters.MultiQueries, v1.Range, int, error) {
-	in := loki.TopologyInput{DataSource: ds}
+func (h *Handlers) extractTopologyQueryParams(params url.Values, ds constants.DataSource) (*queryparams.TopologyInput, filters.MultiQueries, v1.Range, int, error) {
+	in := queryparams.TopologyInput{DataSource: ds}
 	qr := v1.Range{}
 	var reqLimit int
 	var err error
@@ -273,7 +274,7 @@ func buildTopologyQuery(
 	cfg *config.Config,
 	promInventory *prometheus.Inventory,
 	filters filters.SingleQuery,
-	in *loki.TopologyInput,
+	in *queryparams.TopologyInput,
 	qr *v1.Range,
 	isDev bool,
 ) (string, *prometheus.Query, int, error) {
@@ -311,7 +312,7 @@ func buildTopologyQuery(
 	return EncodeQuery(qb.Build()), nil, http.StatusOK, nil
 }
 
-func getEligiblePromMetric(kl map[string][]string, promInventory *prometheus.Inventory, filters filters.SingleQuery, in *loki.TopologyInput, isDev bool) (*prometheus.SearchResult, string) {
+func getEligiblePromMetric(kl map[string][]string, promInventory *prometheus.Inventory, filters filters.SingleQuery, in *queryparams.TopologyInput, isDev bool) (*prometheus.SearchResult, string) {
 	if in.DataSource != constants.DataSourceAuto && in.DataSource != constants.DataSourceProm {
 		return nil, ""
 	}
