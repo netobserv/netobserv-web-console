@@ -6,7 +6,7 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/json-iterator/go v1.1.12
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/netobserv/netobserv-ebpf-agent v1.11.4-community.0.20260526070517-19644c4749ad
+	github.com/netobserv/netobserv-ebpf-agent v1.11.5-community
 	github.com/prometheus/client_golang v1.23.2
 	github.com/prometheus/common v0.68.1
 	github.com/sirupsen/logrus v1.9.4
@@ -58,7 +58,7 @@ require (
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/net v0.55.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
-	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/sys v0.46.0 // indirect
 	golang.org/x/term v0.43.0 // indirect
 	golang.org/x/text v0.37.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
