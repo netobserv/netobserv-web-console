@@ -1,4 +1,4 @@
-// Package model contains data models for Loki-specific types and shared query response types.
+// Package model contains data models for Loki-specific types (streams, entries, and label responses).
 package model
 
 import (

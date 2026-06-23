@@ -11,7 +11,6 @@ import (
 
 // MatrixMerger aggregates multiple Matrix results from Loki or Prometheus queries.
 type MatrixMerger struct {
-	Merger
 	index        map[string]indexedSampleStream
 	merged       model.Matrix
 	stats        []interface{}
