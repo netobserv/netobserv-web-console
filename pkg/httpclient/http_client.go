@@ -43,7 +43,7 @@ func NewTransport(timeout time.Duration, skipTLS bool, capath string, userCertPa
 		transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 		slog.Warn("skipping TLS checks. SSL certificate verification is now disabled !")
 	} else if capath != "" || userCertPath != "" {
-		transport.TLSClientConfig = &tls.Config{}
+		transport.TLSClientConfig = &tls.Config{MinVersion: tls.VersionTLS13}
 
 		if capath != "" {
 			caCert, err := os.ReadFile(capath)
