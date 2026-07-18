@@ -145,9 +145,11 @@ export const ErrorComponent: React.FC<ErrorProps> = ({ title, error }) => {
             {status && <StatusTexts status={status} />}
             {statusError && (
               <Content component={ContentVariants.blockquote}>
-                {t('Check for errors in health dashboard. Status endpoint is returning: {{statusError}}', {
-                  statusError
-                })}
+                {ContextSingleton.isStandalone()
+                  ? t('Status endpoint is returning: {{statusError}}', { statusError })
+                  : t('Check for errors in health dashboard. Status endpoint is returning: {{statusError}}', {
+                      statusError
+                    })}
               </Content>
             )}
           </Content>

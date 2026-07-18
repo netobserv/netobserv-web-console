@@ -5,6 +5,29 @@ import { Config } from '../../model/config';
 import { ContextSingleton } from '../../utils/context';
 import { Link } from '../../utils/url';
 
+type ButtonLinkProps = Omit<React.ComponentProps<typeof Link>, 'to'>;
+
+const FlowCollectorLink: React.FC<ButtonLinkProps> = props => {
+  const flowCollectorK8SModel = ContextSingleton.getFlowCollectorK8SModel()!;
+  return (
+    <Link
+      {...props}
+      target="_blank"
+      to={{
+        pathname: `/k8s/cluster/${flowCollectorK8SModel.apiGroup}~${flowCollectorK8SModel.apiVersion}~${flowCollectorK8SModel.kind}/cluster`
+      }}
+    />
+  );
+};
+
+const HealthDashboardLink: React.FC<ButtonLinkProps> = props => (
+  <Link
+    {...props}
+    target="_blank"
+    to={{ pathname: '/monitoring/dashboards/grafana-dashboard-netobserv-health' }}
+  />
+);
+
 export interface EmptyProps {
   resetDefaultFilters?: (c?: Config) => void;
   clearFilters?: () => void;
@@ -28,32 +51,12 @@ export const SecondaryAction: React.FC<EmptyProps> = ({
     <>
       <EmptyStateActions>
         {!isStandalone && flowCollectorK8SModel && (
-          <Button
-            variant="link"
-            component={(props: React.FunctionComponent) => (
-              <Link
-                {...props}
-                target="_blank"
-                to={{
-                  pathname: `/k8s/cluster/${flowCollectorK8SModel.apiGroup}~${flowCollectorK8SModel.apiVersion}~${flowCollectorK8SModel.kind}/cluster`
-                }}
-              />
-            )}
-          >
+          <Button variant="link" component={FlowCollectorLink} data-test="flowcollector-link">
             {t('Show FlowCollector CR')}
           </Button>
         )}
         {!isStandalone && (
-          <Button
-            variant="link"
-            component={(props: React.FunctionComponent) => (
-              <Link
-                {...props}
-                target="_blank"
-                to={{ pathname: '/monitoring/dashboards/grafana-dashboard-netobserv-health' }}
-              />
-            )}
-          >
+          <Button variant="link" component={HealthDashboardLink} data-test="health-dashboard-link">
             {t('Show health dashboard')}
           </Button>
         )}

@@ -29,7 +29,7 @@ describe('<SecondaryAction />', () => {
     jest.spyOn(ContextSingleton, 'isStandalone').mockReturnValue(false);
     ContextSingleton.setFlowCollectorK8SModel(flowCollectorModel);
 
-    render(<SecondaryAction />);
+    const { rerender } = render(<SecondaryAction />);
 
     const flowCollectorLink = screen.getByRole('link', { name: 'Show FlowCollector CR' });
     expect(flowCollectorLink).toHaveAttribute(
@@ -37,10 +37,19 @@ describe('<SecondaryAction />', () => {
       '/k8s/cluster/flows.netobserv.io~v1beta2~FlowCollector/cluster'
     );
     expect(flowCollectorLink).toHaveAttribute('target', '_blank');
+    expect(flowCollectorLink).toHaveAttribute('data-test', 'flowcollector-link');
 
     const healthDashboardLink = screen.getByRole('link', { name: 'Show health dashboard' });
     expect(healthDashboardLink).toHaveAttribute('href', '/monitoring/dashboards/grafana-dashboard-netobserv-health');
     expect(healthDashboardLink).toHaveAttribute('target', '_blank');
+    expect(healthDashboardLink).toHaveAttribute('data-test', 'health-dashboard-link');
+
+    healthDashboardLink.focus();
+    rerender(<SecondaryAction />);
+
+    expect(screen.getByRole('link', { name: 'Show FlowCollector CR' })).toBe(flowCollectorLink);
+    expect(screen.getByRole('link', { name: 'Show health dashboard' })).toBe(healthDashboardLink);
+    expect(healthDashboardLink).toHaveFocus();
   });
 
   it('hides OpenShift console links in standalone mode and preserves other actions', () => {

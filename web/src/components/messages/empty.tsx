@@ -82,9 +82,11 @@ export const Empty: React.FC<EmptyProps> = ({ showDetails, resetDefaultFilters, 
           )}
           {statusError !== undefined && (
             <Content className="netobserv-error-message" component={ContentVariants.p}>
-              {t('Check for errors in health dashboard. Status endpoint is returning: {{statusError}}', {
-                statusError
-              })}
+              {ContextSingleton.isStandalone()
+                ? t('Status endpoint is returning: {{statusError}}', { statusError })
+                : t('Check for errors in health dashboard. Status endpoint is returning: {{statusError}}', {
+                    statusError
+                  })}
             </Content>
           )}
           <Content className="empty-text-content">

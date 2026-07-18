@@ -377,6 +377,7 @@
   "Description": "Description",
   "No results found": "No results found",
   "Clear or reset filters and try again.": "Clear or reset filters and try again.",
+  "Status endpoint is returning: {{statusError}}": "Status endpoint is returning: {{statusError}}",
   "Check for errors in health dashboard. Status endpoint is returning: {{statusError}}": "Check for errors in health dashboard. Status endpoint is returning: {{statusError}}",
   "Suggestions to avoid this error:": "Suggestions to avoid this error:",
   "Reduce the Query Options -> limit to reduce the number of results": "Reduce the Query Options -> limit to reduce the number of results",
