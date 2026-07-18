@@ -22,11 +22,12 @@ export const SecondaryAction: React.FC<EmptyProps> = ({
 }) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
   const flowCollectorK8SModel = ContextSingleton.getFlowCollectorK8SModel();
+  const isStandalone = ContextSingleton.isStandalone();
 
   return (
     <>
       <EmptyStateActions>
-        {flowCollectorK8SModel && (
+        {!isStandalone && flowCollectorK8SModel && (
           <Button
             variant="link"
             component={(props: React.FunctionComponent) => (
@@ -42,18 +43,20 @@ export const SecondaryAction: React.FC<EmptyProps> = ({
             {t('Show FlowCollector CR')}
           </Button>
         )}
-        <Button
-          variant="link"
-          component={(props: React.FunctionComponent) => (
-            <Link
-              {...props}
-              target="_blank"
-              to={{ pathname: '/monitoring/dashboards/grafana-dashboard-netobserv-health' }}
-            />
-          )}
-        >
-          {t('Show health dashboard')}
-        </Button>
+        {!isStandalone && (
+          <Button
+            variant="link"
+            component={(props: React.FunctionComponent) => (
+              <Link
+                {...props}
+                target="_blank"
+                to={{ pathname: '/monitoring/dashboards/grafana-dashboard-netobserv-health' }}
+              />
+            )}
+          >
+            {t('Show health dashboard')}
+          </Button>
+        )}
         {clearFilters && (
           <Button id="clear-all-filters" onClick={() => clearFilters()} variant="link">
             {t('Clear all filters')}
