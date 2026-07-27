@@ -8,13 +8,17 @@ import { formatActiveSince } from '../../utils/datetime';
 import { valueFormat } from '../../utils/format';
 import { HealthColorSquare } from './health-color-square';
 import {
+  apportionToOneDecimal,
+  computeHealthItemScore,
+  computeResourceScore,
   getAllHealthItems,
   getItemFilteredLabels,
   getLinks,
   getSeverityColor,
   HealthItem,
   HealthStat,
-  HealthSuperKind
+  HealthSuperKind,
+  ScoreDetail
 } from './health-helper';
 import './rule-details.css';
 
@@ -30,7 +34,7 @@ const getDirection = (ruleName?: string): 'src' | 'dst' | undefined => {
 };
 
 // Helper: Vertical label/value column
-const VerticalField: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
+const VerticalField: React.FC<{ label: React.ReactNode; children: React.ReactNode }> = ({ label, children }) => (
   <FlexItem>
     <Flex direction={{ default: 'column' }} gap={{ default: 'gapXs' }}>
       <FlexItem>
@@ -48,13 +52,21 @@ const VerticalField: React.FC<{ label: string; children: React.ReactNode }> = ({
   </FlexItem>
 );
 
+// Helper: Format a rule's impact. Values below 0.05 round to 0.0 but are still real contributions,
+// so show "< 0.1" instead of a misleading "0" (only a truly-zero impact renders as "0").
+const formatImpact = (impact: number, rawImpact: number): string =>
+  impact === 0 && rawImpact > 0 ? '< 0.1' : valueFormat(impact, 1);
+
 // Helper: Render table row (used for Global table view)
 const RuleTableRow: React.FC<{
   item: HealthItem;
   resourceName: string;
   kind: HealthSuperKind;
   t: TFunction;
-}> = ({ item, resourceName, kind, t }) => {
+  scoreDetail: ScoreDetail;
+  impact: number;
+  rawImpact: number;
+}> = ({ item, resourceName, kind, t, scoreDetail, impact, rawImpact }) => {
   const isAlert = item.state !== 'recording';
   const labels = React.useMemo(() => getItemFilteredLabels(item, resourceName), [item, resourceName]);
   const links = React.useMemo(() => getLinks(t, kind, item, resourceName), [item, kind, resourceName, t]);
@@ -84,6 +96,12 @@ const RuleTableRow: React.FC<{
         <Label isCompact color={getSeverityColor(item.severity)}>
           {item.severity}
         </Label>
+      </Td>
+      <Td dataLabel={t('Score')} className="no-wrap">
+        {valueFormat(scoreDetail.rawScore, 1)}
+      </Td>
+      <Td dataLabel={t('Impact')} className="no-wrap">
+        {formatImpact(impact, rawImpact)}
       </Td>
       <Td dataLabel={t('Active since')}>{item.activeAt ? formatActiveSince(t, item.activeAt) : ''}</Td>
       <Td dataLabel={t('Labels')}>
@@ -118,7 +136,9 @@ const RuleCard: React.FC<{
   resourceName: string;
   kind: HealthSuperKind;
   t: TFunction;
-}> = ({ item, resourceName, kind, t }) => {
+  impact: number;
+  rawImpact: number;
+}> = ({ item, resourceName, kind, t, impact, rawImpact }) => {
   const isAlert = item.state !== 'recording';
   const labels = React.useMemo(() => getItemFilteredLabels(item, resourceName), [item, resourceName]);
   const links = React.useMemo(() => getLinks(t, kind, item, resourceName), [item, kind, resourceName, t]);
@@ -132,7 +152,7 @@ const RuleCard: React.FC<{
           justifyContent={{ default: 'justifyContentSpaceBetween' }}
           alignItems={{ default: 'alignItemsFlexStart' }}
         >
-          <Flex gap={{ default: 'gapXs' }} alignItems={{ default: 'alignItemsFlexStart' }} flex={{ default: 'flex_1' }}>
+          <Flex gap={{ default: 'gapXs' }} alignItems={{ default: 'alignItemsCenter' }} flex={{ default: 'flex_1' }}>
             <FlexItem>
               <HealthColorSquare item={item} />
             </FlexItem>
@@ -183,6 +203,24 @@ const RuleCard: React.FC<{
             <VerticalField label={t('Active since')}>{formatActiveSince(t, item.activeAt)}</VerticalField>
           )}
           {direction && <VerticalField label={t('Direction')}>{direction}</VerticalField>}
+          <VerticalField
+            label={
+              <Flex
+                gap={{ default: 'gapXs' }}
+                alignItems={{ default: 'alignItemsCenter' }}
+                flexWrap={{ default: 'nowrap' }}
+              >
+                <FlexItem>{t('Impact')}</FlexItem>
+                <FlexItem>
+                  <Tooltip content={t('Points subtracted from the perfect score (10) by this rule')}>
+                    <InfoCircleIcon style={{ color: 'var(--pf-t--global--text--color--subtle)' }} />
+                  </Tooltip>
+                </FlexItem>
+              </Flex>
+            }
+          >
+            {formatImpact(impact, rawImpact)}
+          </VerticalField>
         </Flex>
 
         {/* Labels */}
@@ -205,23 +243,53 @@ export const RuleDetails: React.FC<RuleDetailsProps> = ({ kind, resourceHealth }
 
   const resourceName = resourceHealth.name || 'Global';
   const isGlobal = kind === 'Global';
-  const allItems = getAllHealthItems(resourceHealth);
+
+  // Build one score breakdown for the resource and derive each rule's "points lost": how many points it
+  // subtracts from the perfect score of 10. Using the same denominator (sum of all weights, inactive rules
+  // included) as computeResourceScore guarantees the listed rows add up to (10 - total score) shown in the
+  // drawer header. Rules are sorted by impact so the biggest offenders surface first.
+  const rows = React.useMemo(() => {
+    const breakdown = computeResourceScore(resourceHealth);
+    const totalWeight = breakdown.details.reduce((sum, d) => sum + d.weight, 0);
+    const base = getAllHealthItems(resourceHealth)
+      .map(item => {
+        const detail = computeHealthItemScore(item);
+        const pointsLost = totalWeight > 0 ? ((10 - detail.rawScore) * detail.weight) / totalWeight : 0;
+        return { item, detail, pointsLost };
+      })
+      .sort((a, b) => b.pointsLost - a.pointsLost);
+    // Round the per-rule impacts so that, once rounded to 1 decimal, they still add up EXACTLY to the
+    // total impact shown in the drawer header. This way a manual sum of the displayed values reconciles.
+    const displayImpacts = apportionToOneDecimal(base.map(r => r.pointsLost));
+    return base.map((r, i) => ({ ...r, impact: displayImpacts[i] }));
+  }, [resourceHealth]);
 
   // Global view: render table
   if (isGlobal) {
     return (
-      <Table
-        className="rule-details"
-        data-test-rows-count={allItems.length}
-        aria-label="Rule details"
-        variant="compact"
-      >
+      <Table className="rule-details" data-test-rows-count={rows.length} aria-label="Rule details" variant="compact">
         <Thead>
           <Tr>
             <Th>{t('Summary')}</Th>
             <Th>{t('Mode')}</Th>
             <Th>{t('State')}</Th>
             <Th>{t('Severity')}</Th>
+            <Th className="no-wrap">{t('Score')}</Th>
+            <Th className="no-wrap">
+              <Flex
+                gap={{ default: 'gapXs' }}
+                alignItems={{ default: 'alignItemsCenter' }}
+                flexWrap={{ default: 'nowrap' }}
+                display={{ default: 'inlineFlex' }}
+              >
+                <FlexItem>{t('Impact')}</FlexItem>
+                <FlexItem>
+                  <Tooltip content={t('Points subtracted from the perfect score (10) by this rule')}>
+                    <InfoCircleIcon style={{ color: 'var(--pf-t--global--text--color--subtle)' }} />
+                  </Tooltip>
+                </FlexItem>
+              </Flex>
+            </Th>
             <Th className="no-wrap">{t('Active since')}</Th>
             <Th>{t('Labels')}</Th>
             <Th>{t('Value')}</Th>
@@ -232,8 +300,17 @@ export const RuleDetails: React.FC<RuleDetailsProps> = ({ kind, resourceHealth }
           </Tr>
         </Thead>
         <Tbody>
-          {allItems.map((item, i) => (
-            <RuleTableRow key={`rule-row-${i}`} item={item} resourceName={resourceName} kind={kind} t={t} />
+          {rows.map((r, i) => (
+            <RuleTableRow
+              key={`rule-row-${i}`}
+              item={r.item}
+              scoreDetail={r.detail}
+              impact={r.impact}
+              rawImpact={r.pointsLost}
+              resourceName={resourceName}
+              kind={kind}
+              t={t}
+            />
           ))}
         </Tbody>
       </Table>
@@ -243,8 +320,16 @@ export const RuleDetails: React.FC<RuleDetailsProps> = ({ kind, resourceHealth }
   // Node/Namespace view: render cards
   return (
     <Flex direction={{ default: 'column' }} gap={{ default: 'gapMd' }}>
-      {allItems.map((item, i) => (
-        <RuleCard key={`rule-card-${i}`} item={item} resourceName={resourceName} kind={kind} t={t} />
+      {rows.map((r, i) => (
+        <RuleCard
+          key={`rule-card-${i}`}
+          item={r.item}
+          resourceName={resourceName}
+          kind={kind}
+          t={t}
+          impact={r.impact}
+          rawImpact={r.pointsLost}
+        />
       ))}
     </Flex>
   );

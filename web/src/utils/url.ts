@@ -101,7 +101,14 @@ export enum URLParam {
   DataSource = 'dataSource',
   ShowDuplicates = 'showDup',
   MetricFunction = 'function',
-  MetricType = 'type'
+  MetricType = 'type',
+  // Network Health filters (prefixed to avoid mixing with the Traffic params above,
+  // which have LogQL-specific encoding)
+  HealthSeverity = 'healthSeverity',
+  HealthStatus = 'healthStatus',
+  HealthMode = 'healthMode',
+  HealthNamespace = 'healthNamespace',
+  HealthName = 'healthName'
 }
 export type URLParams = { [k in URLParam]?: unknown };
 

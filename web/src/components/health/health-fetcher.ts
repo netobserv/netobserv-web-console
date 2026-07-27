@@ -4,7 +4,7 @@ import { murmur3 } from 'murmurhash-js';
 import { SilenceMatcher } from '../../api/alert';
 import { getAlerts, getRecordingRules, getSilencedAlerts, queryPrometheusMetric } from '../../api/routes';
 import { RecordingAnnotations } from '../../model/config';
-import { buildStats, isSilenced, RecordingRuleMetric, rulesToHealthItems } from './health-helper';
+import { HealthItem, isSilenced, RecordingRuleMetric, rulesToHealthItems } from './health-helper';
 
 export const fetchNetworkHealth = (recordingAnnotations: RecordingAnnotations) => {
   // matching netobserv="true" catches all alerts designed for netobserv (not necessarily owned by it)
@@ -86,9 +86,9 @@ export const fetchNetworkHealth = (recordingAnnotations: RecordingAnnotations) =
       });
       return { ...r, alerts: alerts };
     });
-    const healthItems = rulesToHealthItems(alertRules, recordingAnnotations || {}, recording);
+    const healthItems: HealthItem[] = rulesToHealthItems(alertRules, recordingAnnotations || {}, recording);
     return {
-      stats: buildStats(healthItems),
+      healthItems,
       alertRules: alertRules
     };
   });

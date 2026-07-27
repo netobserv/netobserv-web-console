@@ -105,7 +105,7 @@ export const NetflowTopology = React.forwardRef<NetflowTopologyHandle, NetflowTo
     try {
       // matching netobserv="true" catches all alerts designed for netobserv (not necessarily owned by it)
       const res = await fetchNetworkHealth(config.recordingAnnotations || {});
-      setHealth(res.stats);
+      setHealth(buildStats(res.healthItems));
       setLastStatsUpdateTime(Date.now());
     } catch (err) {
       console.log('Could not fetch topology alerts:', err);

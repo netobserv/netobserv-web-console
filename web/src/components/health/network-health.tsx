@@ -26,8 +26,11 @@ import FlowCollectorStatusIndicator from '../status/flowcollector-status-indicat
 import { HealthDrawerContainer } from './health-drawer-container';
 import HealthError from './health-error';
 import { fetchNetworkHealth } from './health-fetcher';
+import { buildHealthPredicate } from './health-filters';
+import { useHealthFilters } from './health-filters-hook';
+import { HealthFiltersToolbar } from './health-filters-toolbar';
 import { HealthGlobal } from './health-global';
-import { buildStats, HealthStats } from './health-helper';
+import { buildStats, collectAvailableNamespaces, HealthItem } from './health-helper';
 import { HealthScoringDrawer } from './health-scoring-drawer';
 import { HealthSummary } from './health-summary';
 import { HealthTabTitle } from './tab-title';
@@ -41,7 +44,8 @@ export const NetworkHealth: React.FC<{}> = ({}) => {
   const [error, setError] = React.useState<string | undefined>();
   const [interval, setInterval] = useLocalStorage<number | undefined>(localStorageHealthRefreshKey, undefined);
   const [rules, setRules] = React.useState<Rule[]>([]);
-  const [health, setHealth] = React.useState<HealthStats>(buildStats([]));
+  const [healthItems, setHealthItems] = React.useState<HealthItem[]>([]);
+  const [filters, setFilters] = useHealthFilters();
   const [activeTabKey, setActiveTabKey] = React.useState<string>('global');
   const [config, setConfig] = React.useState<Config>(defaultConfig);
   const [configLoaded, setConfigLoaded] = React.useState(false);
@@ -64,7 +68,7 @@ export const NetworkHealth: React.FC<{}> = ({}) => {
 
     fetchNetworkHealth(config.recordingAnnotations || {})
       .then(res => {
-        setHealth(res.stats);
+        setHealthItems(res.healthItems);
         setRules(res.alertRules);
       })
       .catch(err => {
@@ -75,6 +79,13 @@ export const NetworkHealth: React.FC<{}> = ({}) => {
         setLoading(false);
       });
   }, [config]);
+
+  // Summary keeps showing the whole-cluster status (unfiltered): it already mixes raw `rules` (for alert counts)
+  // with `stats` (for recording-rule counts, see health-summary.tsx), so feeding it filtered stats would make it
+  // partially reflect filters (recording rules only) - an inconsistency rather than a deliberate behavior.
+  const unfilteredHealth = React.useMemo(() => buildStats(healthItems), [healthItems]);
+  const health = React.useMemo(() => buildStats(healthItems, buildHealthPredicate(filters)), [healthItems, filters]);
+  const availableNamespaces = React.useMemo(() => collectAvailableNamespaces(healthItems), [healthItems]);
 
   usePoll(fetch, interval);
   // Run first fetch only after config is loaded so recordingAnnotations (including third-party rules without template label) is available
@@ -98,6 +109,7 @@ export const NetworkHealth: React.FC<{}> = ({}) => {
           <HealthError title={t('Error')} body={error} />
         ) : (
           <>
+            <HealthFiltersToolbar filters={filters} setFilters={setFilters} availableNamespaces={availableNamespaces} />
             <Flex className={`health-tabs-container ${isDarkTheme ? 'dark' : ''}`}>
               <FlexItem flex={{ default: 'flex_1' }}>
                 <Tabs
@@ -192,7 +204,7 @@ export const NetworkHealth: React.FC<{}> = ({}) => {
                         </Flex>
                       </FlexItem>
                       <FlexItem>
-                        <HealthSummary rules={rules} stats={health} forceCollapsed={isScoringDrawerOpen} />
+                        <HealthSummary rules={rules} stats={unfilteredHealth} forceCollapsed={isScoringDrawerOpen} />
                       </FlexItem>
                     </Flex>
                   </FlexItem>

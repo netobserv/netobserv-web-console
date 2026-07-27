@@ -95,7 +95,7 @@
 }
 
 /* For simple content without drawers (HealthGlobal, HealthError) */
-.health-main-content > div:not(.pf-v6-c-drawer):not(.health-tabs-container) {
+.health-main-content > div:not(.pf-v6-c-drawer):not(.health-tabs-container):not(.health-filters-toolbar) {
     overflow-y: auto;
     flex: 0 1 auto;
 }

@@ -8,6 +8,9 @@ import { ContextSingleton } from '../../utils/context';
 export type Severity = 'critical' | 'warning' | 'info';
 export type AlertState = 'firing' | 'pending' | 'silenced' | 'recording' | 'inactive';
 export type HealthSuperKind = 'Global' | 'Node' | 'Namespace' | 'Owner';
+export type HealthMode = 'alert' | 'recording';
+
+export const getItemMode = (item: HealthItem): HealthMode => (item.state === 'recording' ? 'recording' : 'alert');
 
 // HealthItem can be either based on an Alert or based on a RecordingRule metric
 export type HealthItem = {
@@ -87,9 +90,18 @@ type TrafficLink = {
   filterDestination: boolean;
 };
 
-type ScoreDetail = {
+export type ScoreDetail = {
+  name: string;
+  severity: Severity;
+  state: AlertState | 'inactive';
   rawScore: number;
   weight: number;
+  resource?: string; // The affected resource (namespace, node, or workload)
+};
+
+export type ScoreBreakdown = {
+  score: number;
+  details: ScoreDetail[];
 };
 
 /* Replaces {{ $value }} and {{ $labels.<key> }} in recording rule templates.
@@ -258,9 +270,12 @@ export const rulesToHealthItems = (
   return [...alertItems, ...recordingItems];
 };
 
-export const buildStats = (items: HealthItem[]): HealthStats => {
+export const buildStats = (items: HealthItem[], predicate?: (item: NamedItem) => boolean): HealthStats => {
   // Filter-out undefined
-  const namedItems = items.map(toNamedItem).filter((i?: NamedItem): i is NamedItem => !!i);
+  const namedItems = items
+    .map(toNamedItem)
+    .filter((i?: NamedItem): i is NamedItem => !!i)
+    .filter(i => !predicate || predicate(i));
   // First group by superKind
   const bySuperKind = _.groupBy(namedItems, i => i.superKind);
   // For each superKind except Global, group by name
@@ -270,7 +285,7 @@ export const buildStats = (items: HealthItem[]): HealthStats => {
     byNamespace: groupAndSortByResource(bySuperKind['Namespace']),
     byOwner: groupAndSortByResource(bySuperKind['Owner'])
   };
-  stats.global.score = computeResourceScore(stats.global);
+  stats.global.score = computeResourceScore(stats.global).score;
   return stats;
 };
 
@@ -283,7 +298,7 @@ const groupAndSortByResource = (items: NamedItem[]): HealthStat[] => {
       // Ignore if all are inactive
       const countInactive = stat.critical.inactive.length + stat.warning.inactive.length + stat.other.inactive.length;
       if (countInactive !== items.length) {
-        stat.score = computeResourceScore(stat);
+        stat.score = computeResourceScore(stat).score;
         stats.push(stat);
       }
     }
@@ -303,8 +318,8 @@ export const emptyStat = (name: string, namespace?: string, k8sKind?: string): H
   };
 };
 
-type NamedItem = HealthItem & { name: string; superKind: HealthSuperKind; k8sKind: string; namespace?: string };
-const toNamedItem = (item: HealthItem): NamedItem | undefined => {
+export type NamedItem = HealthItem & { name: string; superKind: HealthSuperKind; k8sKind: string; namespace?: string };
+export const toNamedItem = (item: HealthItem): NamedItem | undefined => {
   if (item.metadata.workloadLabels && item.metadata.namespaceLabels && item.metadata.kindLabels) {
     const name = getLabelValue(item, item.metadata.workloadLabels);
     const namespace = getLabelValue(item, item.metadata.namespaceLabels);
@@ -334,6 +349,18 @@ const toNamedItem = (item: HealthItem): NamedItem | undefined => {
 const getLabelValue = (item: HealthItem, keys: string[]): string | undefined => {
   const kv = Object.entries(item.labels).find(l => keys.includes(l[0]));
   return kv ? kv[1] : undefined;
+};
+
+// Distinct namespace values present in the (unfiltered) dataset, used to populate the namespace filter options.
+export const collectAvailableNamespaces = (items: HealthItem[]): string[] => {
+  const named = items
+    .map(toNamedItem)
+    .filter((i): i is NamedItem => !!i)
+    .filter(i => i.state !== 'inactive');
+  const namespaces = named
+    .map(i => (i.superKind === 'Namespace' ? i.name : i.superKind === 'Owner' ? i.namespace : undefined))
+    .filter((n): n is string => !!n);
+  return _.uniq(namespaces).sort();
 };
 
 const statsFromGrouped = (grouped: NamedItem[]): HealthStat | undefined => {
@@ -571,14 +598,57 @@ const computeWeightedScore = (scores: ScoreDetail[]): number => {
 };
 
 // Score [0,10]; higher is better
-export const computeResourceScore = (r: HealthStat): number => {
+export const computeResourceScore = (r: HealthStat): ScoreBreakdown => {
   const allAlerts = getAllHealthItems(r);
-  const allScores = allAlerts
+  const details: ScoreDetail[] = allAlerts
     .map(computeHealthItemScore)
-    .concat(r.critical.inactive.map(name => ({ alertName: name, rawScore: 10, weight: criticalWeight })))
-    .concat(r.warning.inactive.map(name => ({ alertName: name, rawScore: 10, weight: warningWeight })))
-    .concat(r.other.inactive.map(name => ({ alertName: name, rawScore: 10, weight: minorWeight })));
-  return computeWeightedScore(allScores);
+    .concat(
+      r.critical.inactive.map(name => ({
+        name,
+        severity: 'critical' as Severity,
+        state: 'inactive' as const,
+        rawScore: 10,
+        weight: criticalWeight
+      }))
+    )
+    .concat(
+      r.warning.inactive.map(name => ({
+        name,
+        severity: 'warning' as Severity,
+        state: 'inactive' as const,
+        rawScore: 10,
+        weight: warningWeight
+      }))
+    )
+    .concat(
+      r.other.inactive.map(name => ({
+        name,
+        severity: 'info' as Severity,
+        state: 'inactive' as const,
+        rawScore: 10,
+        weight: minorWeight
+      }))
+    );
+  return { score: computeWeightedScore(details), details };
+};
+
+// Round a list of values to 1 decimal so that the rounded values still add up EXACTLY to the rounded
+// total (largest-remainder / Hamilton apportionment). Naive per-value rounding can drift, so a manual
+// sum of the displayed per-rule impacts would not reconcile with the displayed total. Working in tenths
+// (integers) keeps the arithmetic exact.
+export const apportionToOneDecimal = (values: number[]): number[] => {
+  const tenths = values.map(v => v * 10);
+  const target = Math.round(tenths.reduce((sum, v) => sum + v, 0));
+  const floored = tenths.map(v => Math.floor(v));
+  let remainder = target - floored.reduce((sum, v) => sum + v, 0);
+  // Hand out the leftover tenths to the values with the largest fractional parts first.
+  const order = tenths.map((v, i) => ({ i, frac: v - Math.floor(v) })).sort((a, b) => b.frac - a.frac);
+  const result = floored.slice();
+  for (let k = 0; k < order.length && remainder > 0; k++) {
+    result[order[k].i] += 1;
+    remainder--;
+  }
+  return result.map(v => v / 10);
 };
 
 // Score [0,1]; lower is better
@@ -603,9 +673,28 @@ export const computeHealthItemScore = (item: HealthItem): ScoreDetail => {
   const scoreRange = range.max - range.min;
   const rawScore = range.min + scoreRange * (1 - excessRatio);
 
+  // Extract resource name from labels (namespace, node, or workload)
+  let resource: string | undefined;
+  if (item.metadata.workloadLabels && item.metadata.namespaceLabels && item.metadata.kindLabels) {
+    const workloadName = getLabelValue(item, item.metadata.workloadLabels);
+    const namespace = getLabelValue(item, item.metadata.namespaceLabels);
+    const kind = getLabelValue(item, item.metadata.kindLabels);
+    if (workloadName && namespace && kind) {
+      resource = `${kind}/${namespace}/${workloadName}`;
+    }
+  } else if (item.metadata.namespaceLabels) {
+    resource = getLabelValue(item, item.metadata.namespaceLabels);
+  } else if (item.metadata.nodeLabels) {
+    resource = getLabelValue(item, item.metadata.nodeLabels);
+  }
+
   return {
+    name: item.ruleName,
+    severity: item.severity,
+    state: item.state,
     rawScore: rawScore,
-    weight: getSeverityWeight(item.severity) * getStateWeight(item.state)
+    weight: getSeverityWeight(item.severity) * getStateWeight(item.state),
+    resource
   };
 };
 

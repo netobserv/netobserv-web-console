@@ -7,6 +7,20 @@ export namespace networkHealthSelectors {
     export const sidePanel = '[data-test="health-drawer-content"]'
 }
 
+// Selectors for the Network Health filters toolbar (see health-filters-toolbar.tsx / health-multi-select-filter.tsx)
+export namespace networkHealthFiltersSelectors {
+    export const toolbar = '[data-test="health-filters-toolbar"]'
+    export const severityToggle = '[data-test="health-severity-filter-toggle"]'
+    export const statusToggle = '[data-test="health-status-filter-toggle"]'
+    export const modeToggle = '[data-test="health-mode-filter-toggle"]'
+    export const namespaceToggle = '[data-test="health-namespace-filter-toggle"]'
+    // SearchInput is a composite PatternFly component; `data-test` lands on its wrapper, so the actual
+    // focusable element is the nested <input>.
+    export const nameInput = '[data-test="health-name-filter"] input'
+    export const clearAll = '[data-test="health-filters-clear-all"]'
+    export const option = (filterId: string, value: string) => `[data-test="${filterId}-option-${value}"]`
+}
+
 
 export const networkHealth = {
     clickOnAlert: (name: string) => {
