@@ -14,6 +14,7 @@ import {
 } from '@patternfly/react-topology';
 import { action } from 'mobx';
 import * as React from 'react';
+import { AggregateEdgeSnapContext } from '../aggregate-edge-snap-context';
 import DefaultEdge from '../components/edge';
 import StyleEdge from './styleEdge';
 
@@ -31,9 +32,16 @@ const HULL_SNAP_THRESHOLD = 2;
 const HULL_SETTLE_MS = 100;
 
 const findRelatedBridge = (stub: Edge): Edge | undefined => {
+  if (!stub.hasController()) {
+    return undefined;
+  }
   const bridgeId = stub.getData()?.bridgeId as string | undefined;
   if (bridgeId) {
-    return stub.getController().getEdgeById(bridgeId);
+    try {
+      return stub.getController().getEdgeById(bridgeId);
+    } catch {
+      return undefined;
+    }
   }
   const bridgeKey = stub.getData()?.bridgeKey as string | undefined;
   if (!bridgeKey) {
@@ -297,50 +305,70 @@ const computeSnapPlan = (edge: Edge, role: string | undefined, precise: boolean)
 };
 
 const StyleAggregateEdge: React.FC<StyleAggregateEdgeProps> = ({ element, selected, onSelect: _onSelect, ...rest }) => {
+  const snapGeneration = React.useContext(AggregateEdgeSnapContext);
   const edge = element;
   const data = edge.getData() || {};
   const role = data.role as string | undefined;
+  const settleTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const rafRef = React.useRef(0);
+  const lastSnapGenerationRef = React.useRef(snapGeneration);
+  const hasController = edge.hasController();
 
   // Observe geometry only — do NOT sample SVG hulls during render (Cola tick hot path).
-  const sourceNode = edge.getSource();
-  const targetNode = edge.getTarget();
-  let geoKey = `${boundsKey(sourceNode)}|${boundsKey(targetNode)}`;
-  if (role === 'exit' || role === 'entry') {
-    const bridge = findRelatedBridge(edge);
-    if (bridge) {
-      geoKey += `|${boundsKey(bridge.getSource())}|${boundsKey(bridge.getTarget())}`;
+  let geoKey = '';
+  let sourceNode: Node | undefined;
+  let targetNode: Node | undefined;
+  if (hasController) {
+    sourceNode = edge.getSource() as Node;
+    targetNode = edge.getTarget() as Node;
+    geoKey = `${boundsKey(sourceNode)}|${boundsKey(targetNode)}`;
+    if (role === 'exit' || role === 'entry') {
+      const bridge = findRelatedBridge(edge);
+      if (bridge) {
+        geoKey += `|${boundsKey(bridge.getSource() as Node)}|${boundsKey(bridge.getTarget() as Node)}`;
+      }
     }
   }
 
-  const settleTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-  const rafRef = React.useRef(0);
-
   React.useEffect(() => {
-    if (role !== 'bridge' && role !== 'exit' && role !== 'entry') {
+    if (!hasController || (role !== 'bridge' && role !== 'exit' && role !== 'entry')) {
       return undefined;
     }
 
-    // Fast path while moving: O(1) AABB snaps, coalesced to one write per frame.
+    // Force snap after layout end / collapse; soft threshold while dragging.
+    const forceSnap = lastSnapGenerationRef.current !== snapGeneration;
+    lastSnapGenerationRef.current = snapGeneration;
+    const moveThreshold = forceSnap ? 0 : MOVE_SNAP_THRESHOLD;
+    const settleThreshold = forceSnap ? 0 : HULL_SNAP_THRESHOLD;
+
     if (rafRef.current) {
       cancelAnimationFrame(rafRef.current);
     }
     rafRef.current = requestAnimationFrame(() => {
+      if (!edge.hasController()) {
+        return;
+      }
       const plan = computeSnapPlan(edge, role, false);
       if (plan) {
-        applySnapPlan(edge, plan, MOVE_SNAP_THRESHOLD, true);
+        applySnapPlan(edge, plan, moveThreshold, true);
       }
     });
 
-    // Precise path after settle: expensive hull sampling once geometry stops.
     if (settleTimerRef.current) {
       clearTimeout(settleTimerRef.current);
     }
-    settleTimerRef.current = setTimeout(() => {
-      const plan = computeSnapPlan(edge, role, true);
-      if (plan) {
-        applySnapPlan(edge, plan, HULL_SNAP_THRESHOLD, true);
-      }
-    }, HULL_SETTLE_MS);
+    settleTimerRef.current = setTimeout(
+      () => {
+        if (!edge.hasController()) {
+          return;
+        }
+        const plan = computeSnapPlan(edge, role, true);
+        if (plan) {
+          applySnapPlan(edge, plan, settleThreshold, true);
+        }
+      },
+      forceSnap ? 0 : HULL_SETTLE_MS
+    );
 
     return () => {
       if (rafRef.current) {
@@ -350,10 +378,17 @@ const StyleAggregateEdge: React.FC<StyleAggregateEdgeProps> = ({ element, select
         clearTimeout(settleTimerRef.current);
       }
     };
-  }, [edge, role, geoKey]);
+  }, [edge, role, geoKey, snapGeneration, hasController]);
+
+  if (!hasController || !sourceNode || !targetNode) {
+    return null;
+  }
 
   const handleSelect = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!edge.hasController()) {
+      return;
+    }
     const relatedIds = getRelatedSegmentIds(edge);
     const ordered = [edge.getId(), ...relatedIds.filter(id => id !== edge.getId())];
     const state = edge.getController().getState<{ [selectionState]?: string[] }>();

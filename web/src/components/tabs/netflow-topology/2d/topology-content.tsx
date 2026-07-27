@@ -46,6 +46,7 @@ import {
 import { usePrevious } from '../../../../utils/previous-hook';
 import { Empty } from '../../../messages/empty';
 import { SearchEvent, SearchHandle } from '../../../search/search';
+import { AggregateEdgeSnapContext } from './aggregate-edge-snap-context';
 import { filterEvent, stepIntoEvent } from './styles/styleDecorators';
 import './topology-content.css';
 
@@ -126,6 +127,7 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
 
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
   const [hoveredId, setHoveredId] = React.useState<string>('');
+  const [snapGeneration, setSnapGeneration] = React.useState(0);
   // Refs so hover/select highlight can update in place without rebuilding the aggregated model.
   const hoveredIdRef = React.useRef(hoveredId);
   hoveredIdRef.current = hoveredId;
@@ -270,7 +272,29 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
     }
   }, [controller]);
 
+  const clearAggregateEdgeEndpoints = React.useCallback(() => {
+    if (!controller?.hasGraph()) {
+      return;
+    }
+    action(() => {
+      controller.getElements().forEach(e => {
+        if (e.getType() === AGGREGATE_EDGE_TYPE && isEdge(e)) {
+          e.setStartPoint();
+          e.setEndPoint();
+        }
+      });
+    })();
+  }, [controller]);
+
+  const bumpSnapGeneration = React.useCallback(() => {
+    setSnapGeneration(g => g + 1);
+  }, []);
+
   const onLayoutEnd = React.useCallback(() => {
+    // Drop stale fixed endpoints from mid-layout snaps, then force-resnap.
+    clearAggregateEdgeEndpoints();
+    bumpSnapGeneration();
+
     //fit view to new loaded elements
     if (requestFit) {
       requestFit = false;
@@ -290,7 +314,7 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
         requestAnimationFrame(fitOnFrame);
       }
     }
-  }, [fitView, options.layout]);
+  }, [bumpSnapGeneration, clearAggregateEdgeEndpoints, fitView, options.layout]);
 
   const onLayoutPositionChange = React.useCallback(() => {
     if (controller && controller.hasGraph()) {
@@ -453,6 +477,14 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
     resourceStats
   ]);
 
+  const onCollapseChange = React.useCallback(() => {
+    // Rebuild aggregates from live Node.collapsed. Clear + resnap only here (and
+    // on layout end) — not on routine metric/tag updateModel refreshes.
+    updateModel();
+    clearAggregateEdgeEndpoints();
+    bumpSnapGeneration();
+  }, [bumpSnapGeneration, clearAggregateEdgeEndpoints, updateModel]);
+
   // Hover / selection highlight only — avoid regenerating + re-aggregating the whole model.
   React.useEffect(() => {
     if (!controller?.hasGraph()) {
@@ -605,7 +637,7 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
   useEventListener(graphLayoutEndEvent, onLayoutEnd);
   useEventListener(graphPositionChangeEvent, onLayoutPositionChange);
   // Rebuild aggregate edges when groups are collapsed/expanded interactively.
-  useEventListener(nodeCollapseChangeEvent, updateModel);
+  useEventListener(nodeCollapseChangeEvent, onCollapseChange);
 
   if (_.isEmpty(metrics) && _.isEmpty(droppedMetrics) && _.isEmpty(expectedNodes)) {
     return (
@@ -616,40 +648,42 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
   }
 
   return (
-    <TopologyView
-      data-test="topology-view"
-      id="topology-view"
-      controlBar={
-        <TopologyControlBar
-          data-test="topology-control-bar"
-          controlButtons={createTopologyControlButtons({
-            ...defaultControlButtonsOptions,
-            fitToScreen: false,
-            zoomInCallback: () => {
-              if (controller) {
-                controller.getGraph().scaleBy(zoomIn);
-              }
-            },
-            zoomOutCallback: () => {
-              if (controller) {
-                controller.getGraph().scaleBy(zoomOut);
-              }
-            },
-            resetViewCallback: () => {
-              if (controller) {
-                requestFit = true;
-                controller.getGraph().reset();
-                controller.getGraph().layout();
-              }
-            },
-            //TODO: enable legend with display icons and colors
-            legend: false
-          })}
-        />
-      }
-    >
-      <VisualizationSurface data-test="visualization-surface" state={{ selectedIds }} />
-    </TopologyView>
+    <AggregateEdgeSnapContext.Provider value={snapGeneration}>
+      <TopologyView
+        data-test="topology-view"
+        id="topology-view"
+        controlBar={
+          <TopologyControlBar
+            data-test="topology-control-bar"
+            controlButtons={createTopologyControlButtons({
+              ...defaultControlButtonsOptions,
+              fitToScreen: false,
+              zoomInCallback: () => {
+                if (controller) {
+                  controller.getGraph().scaleBy(zoomIn);
+                }
+              },
+              zoomOutCallback: () => {
+                if (controller) {
+                  controller.getGraph().scaleBy(zoomOut);
+                }
+              },
+              resetViewCallback: () => {
+                if (controller) {
+                  requestFit = true;
+                  controller.getGraph().reset();
+                  controller.getGraph().layout();
+                }
+              },
+              //TODO: enable legend with display icons and colors
+              legend: false
+            })}
+          />
+        }
+      >
+        <VisualizationSurface data-test="visualization-surface" state={{ selectedIds }} />
+      </TopologyView>
+    </AggregateEdgeSnapContext.Provider>
   );
 };
 
