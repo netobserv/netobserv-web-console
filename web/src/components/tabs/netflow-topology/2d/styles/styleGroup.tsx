@@ -9,7 +9,7 @@ import {
   WithSelectionProps
 } from '@patternfly/react-topology';
 import useDetailsLevel from '@patternfly/react-topology/dist/esm/hooks/useDetailsLevel';
-import { action } from 'mobx';
+import { runInAction } from 'mobx';
 import * as React from 'react';
 import { TopologyGroupIcon } from '../../../../icons';
 
@@ -41,10 +41,10 @@ const useMobxSafeCollapseMutations = (element: Node): void => {
     const setCollapsedOrig = element.setCollapsed.bind(element);
     const setDimensionsOrig = element.setDimensions.bind(element);
     element.setCollapsed = ((collapsed: boolean) => {
-      action(() => setCollapsedOrig(collapsed))();
+      runInAction(() => setCollapsedOrig(collapsed));
     }) as Node['setCollapsed'];
     element.setDimensions = ((dimensions: Dimensions) => {
-      action(() => setDimensionsOrig(dimensions))();
+      runInAction(() => setDimensionsOrig(dimensions));
     }) as Node['setDimensions'];
     return () => {
       element.setCollapsed = setCollapsedOrig;

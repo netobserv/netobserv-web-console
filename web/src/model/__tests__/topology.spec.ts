@@ -135,7 +135,9 @@ describe('maybeAggregateEdges', () => {
     // Hidden leaves are dropped after metrics are copied onto aggregates.
     expect(result.every(e => e.visible !== false)).toBe(true);
     expect(result.filter(e => e.type === 'edge')).toHaveLength(0);
-    expect(result.filter(e => e.type === AGGREGATE_EDGE_TYPE).length).toBeGreaterThanOrEqual(3);
+    expect(result.filter(e => e.type === AGGREGATE_EDGE_TYPE && e.data?.role === 'exit')).toHaveLength(2);
+    expect(result.filter(e => e.type === AGGREGATE_EDGE_TYPE && e.data?.role === 'bridge')).toHaveLength(1);
+    expect(result.filter(e => e.type === AGGREGATE_EDGE_TYPE && e.data?.role === 'entry')).toHaveLength(1);
   });
 
   it('bridges at outermost differing groups when nested', () => {

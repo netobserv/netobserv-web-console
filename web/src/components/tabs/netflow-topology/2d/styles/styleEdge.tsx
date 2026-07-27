@@ -5,6 +5,7 @@ import DefaultEdge from '../components/edge';
 
 type StyleEdgeProps = {
   element: Edge;
+  'data-test'?: string;
 } & WithSelectionProps;
 
 const StyleEdge: React.FC<StyleEdgeProps> = ({ element, ...rest }) => {

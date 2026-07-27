@@ -61,4 +61,32 @@ describe('collectLayoutLinks', () => {
     expect(initBendpoints).toHaveBeenCalledTimes(1);
     expect(initBendpoints).toHaveBeenCalledWith(edges[4]);
   });
+
+  it('skips distinct layout nodes that share the same id', () => {
+    const initBendpoints = jest.fn();
+    const createLink = jest.fn();
+    const dupA = { id: 'same' } as LayoutNode;
+    const dupB = { id: 'same' } as LayoutNode;
+    const getLayoutNode = jest.fn((_nodes: LayoutNode[], node: Node | null) => {
+      if (node === sourceNode) {
+        return dupA;
+      }
+      if (node === targetNode) {
+        return dupB;
+      }
+      return undefined;
+    });
+
+    const links = collectLayoutLinks(
+      [edgeWith({ role: 'bridge', source: sourceNode, target: targetNode })],
+      [dupA, dupB],
+      getLayoutNode,
+      createLink,
+      initBendpoints
+    );
+
+    expect(links).toHaveLength(0);
+    expect(createLink).not.toHaveBeenCalled();
+    expect(initBendpoints).not.toHaveBeenCalled();
+  });
 });
