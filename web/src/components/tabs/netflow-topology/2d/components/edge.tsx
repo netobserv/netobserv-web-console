@@ -84,6 +84,8 @@ interface DefaultEdgeProps {
   onContextMenu?: (e: React.MouseEvent) => void;
   /** Flag indicating that the context menu for the edge is currently open  */
   contextMenuOpen?: boolean;
+  /** Test id for Cypress / RTL targeting */
+  'data-test'?: string;
   /** custom netobserv props */
   shadowed?: boolean;
   filtered?: boolean;
@@ -130,7 +132,8 @@ const DefaultEdgeInner: React.FunctionComponent<DefaultEdgeInnerProps> = observe
     filtered,
     drops,
     highlighted,
-    isDark
+    isDark,
+    'data-test': dataTest
   }) => {
     const [hover, hoverRef] = useHover();
     const startPoint = element.getStartPoint();
@@ -204,6 +207,7 @@ const DefaultEdgeInner: React.FunctionComponent<DefaultEdgeInnerProps> = observe
         <g
           ref={hoverRef as React.LegacyRef<SVGGElement> | undefined}
           data-test-id="edge-handler"
+          data-test={dataTest}
           className={groupClassName}
           onClick={onSelect}
           onContextMenu={onContextMenu}

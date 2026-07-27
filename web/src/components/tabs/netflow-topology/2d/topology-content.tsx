@@ -6,8 +6,8 @@ import {
   GRAPH_LAYOUT_END_EVENT as graphLayoutEndEvent,
   GRAPH_POSITION_CHANGE_EVENT as graphPositionChangeEvent,
   isEdge,
+  isNode,
   Model,
-  Node,
   NODE_COLLAPSE_CHANGE_EVENT as nodeCollapseChangeEvent,
   SELECTION_EVENT as selectionEvent,
   SelectionEventListener,
@@ -18,7 +18,7 @@ import {
   VisualizationSurface
 } from '@patternfly/react-topology';
 import _ from 'lodash';
-import { action } from 'mobx';
+import { runInAction } from 'mobx';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { TopologyMetrics } from '../../../../api/query-response';
@@ -276,14 +276,14 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
     if (!controller?.hasGraph()) {
       return;
     }
-    action(() => {
+    runInAction(() => {
       controller.getElements().forEach(e => {
         if (e.getType() === AGGREGATE_EDGE_TYPE && isEdge(e)) {
           e.setStartPoint();
           e.setEndPoint();
         }
       });
-    })();
+    });
   }, [controller]);
 
   const bumpSnapGeneration = React.useCallback(() => {
@@ -417,10 +417,10 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
 
     // Preserve interactive collapse before aggregating (collapsedGroups remapping).
     controller.getElements().forEach(e => {
-      if (e.getType() === 'group') {
+      if (e.getType() === 'group' && isNode(e)) {
         const updatedGroup = updatedModel.nodes?.find(n => n.id === e.getId());
         if (updatedGroup) {
-          updatedGroup.collapsed = (e as Node).isCollapsed();
+          updatedGroup.collapsed = e.isCollapsed();
         }
       }
     });
@@ -495,7 +495,7 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
       highlightedId = selectedIds[0];
     }
 
-    action(() => {
+    runInAction(() => {
       controller.getElements().forEach(el => {
         if (el.getType() === 'graph') {
           return;
@@ -535,7 +535,7 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
           el.setData({ ...data, highlighted });
         }
       });
-    })();
+    });
   }, [controller, hoveredId, selectedIds]);
 
   //update model on layout / metrics / filters change

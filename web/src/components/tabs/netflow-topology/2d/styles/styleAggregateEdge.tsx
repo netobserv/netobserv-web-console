@@ -12,7 +12,7 @@ import {
   SELECTION_STATE as selectionState,
   WithSelectionProps
 } from '@patternfly/react-topology';
-import { action } from 'mobx';
+import { runInAction } from 'mobx';
 import * as React from 'react';
 import { AggregateEdgeSnapContext } from '../aggregate-edge-snap-context';
 import DefaultEdge from '../components/edge';
@@ -31,6 +31,10 @@ const HULL_SNAP_THRESHOLD = 2;
 /** After geometry stops changing, refine approx → real hull outline. */
 const HULL_SETTLE_MS = 100;
 
+/** One-shot diagnostics so path/bridge failures are visible without per-frame spam. */
+let loggedHullPathError = false;
+let loggedBridgeLookupError = false;
+
 const findRelatedBridge = (stub: Edge): Edge | undefined => {
   if (!stub.hasController()) {
     return undefined;
@@ -39,8 +43,13 @@ const findRelatedBridge = (stub: Edge): Edge | undefined => {
   if (bridgeId) {
     try {
       return stub.getController().getEdgeById(bridgeId);
-    } catch {
-      return undefined;
+    } catch (err) {
+      if (!loggedBridgeLookupError) {
+        loggedBridgeLookupError = true;
+        // eslint-disable-next-line no-console
+        console.debug('aggregate-edge: bridgeId lookup failed, falling back to bridgeKey', err);
+      }
+      // Fall through to bridgeKey resolution.
     }
   }
   const bridgeKey = stub.getData()?.bridgeKey as string | undefined;
@@ -158,7 +167,12 @@ const approxBorderFacing = (group: Node, toward: Node, end: AnchorEnd = AnchorEn
           return { x: pt.x, y: pt.y };
         }
       }
-    } catch {
+    } catch (err) {
+      if (!loggedHullPathError) {
+        loggedHullPathError = true;
+        // eslint-disable-next-line no-console
+        console.debug('aggregate-edge: hull path sample failed, using ellipse fallback', err);
+      }
       // Path not ready / detached — fall through.
     }
   }
@@ -238,30 +252,39 @@ type SnapPlan = {
 };
 
 const applySnapPlan = (edge: Edge, plan: SnapPlan, threshold: number, clearUnset: boolean) => {
-  action(() => {
+  runInAction(() => {
     const startFixed = plan.start != null;
     const endFixed = plan.end != null;
     if (!startFixed && !endFixed) {
+      if (clearUnset) {
+        edge.setStartPoint();
+        edge.setEndPoint();
+      }
       return;
     }
     const startMoved = startFixed
       ? significantlyMoved(edge.getStartPoint(), plan.start!.x, plan.start!.y, threshold)
       : false;
     const endMoved = endFixed ? significantlyMoved(edge.getEndPoint(), plan.end!.x, plan.end!.y, threshold) : false;
+
+    // Clear unset endpoints even when the fixed side has not moved.
+    if (!startFixed && clearUnset) {
+      edge.setStartPoint();
+    }
+    if (!endFixed && clearUnset) {
+      edge.setEndPoint();
+    }
+
     if (!startMoved && !endMoved) {
       return;
     }
-    if (startFixed) {
+    if (startFixed && startMoved) {
       edge.setStartPoint(Math.round(plan.start!.x), Math.round(plan.start!.y));
-    } else if (clearUnset) {
-      edge.setStartPoint();
     }
-    if (endFixed) {
+    if (endFixed && endMoved) {
       edge.setEndPoint(Math.round(plan.end!.x), Math.round(plan.end!.y));
-    } else if (clearUnset) {
-      edge.setEndPoint();
     }
-  })();
+  });
 };
 
 const computeSnapPlan = (edge: Edge, role: string | undefined, precise: boolean): SnapPlan | undefined => {
@@ -384,6 +407,9 @@ const StyleAggregateEdge: React.FC<StyleAggregateEdgeProps> = ({ element, select
     return null;
   }
 
+  // Replaces withSelection's onSelect so clicking any path segment selects the
+  // full exit/bridge/entry set. Mirrors PF Ctrl/Meta multi-select semantics on
+  // that related set (cannot delegate to _onSelect — it only toggles one id).
   const handleSelect = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!edge.hasController()) {
@@ -392,16 +418,28 @@ const StyleAggregateEdge: React.FC<StyleAggregateEdgeProps> = ({ element, select
     const relatedIds = getRelatedSegmentIds(edge);
     const ordered = [edge.getId(), ...relatedIds.filter(id => id !== edge.getId())];
     const state = edge.getController().getState<{ [selectionState]?: string[] }>();
-    const allSelected = ordered.every(id => state[selectionState]?.includes(id));
-    const selectedIds = allSelected ? [] : ordered;
-    action(() => {
-      state[selectionState] = selectedIds;
-    })();
-    edge.getController().fireEvent(selectionEvent, selectedIds);
+    const current = state[selectionState] ?? [];
+    const multi = e.ctrlKey || e.metaKey;
+
+    let nextSelected: string[];
+    if (multi) {
+      const allSelected = ordered.every(id => current.includes(id));
+      nextSelected = allSelected ? current.filter(id => !ordered.includes(id)) : [...new Set([...current, ...ordered])];
+    } else {
+      const allSelected = ordered.every(id => current.includes(id)) && current.length === ordered.length;
+      nextSelected = allSelected ? [] : ordered;
+    }
+
+    runInAction(() => {
+      state[selectionState] = nextSelected;
+    });
+    edge.getController().fireEvent(selectionEvent, nextSelected);
   };
 
+  const dataTest = `aggregate-edge-${role || 'unknown'}`;
+
   if (role === 'bridge' || !role) {
-    return <StyleEdge element={element} {...rest} selected={selected} onSelect={handleSelect} />;
+    return <StyleEdge element={element} {...rest} selected={selected} onSelect={handleSelect} data-test={dataTest} />;
   }
 
   const passedData = { ...data };
@@ -420,6 +458,7 @@ const StyleAggregateEdge: React.FC<StyleAggregateEdgeProps> = ({ element, select
       element={element}
       {...rest}
       {...passedData}
+      data-test={dataTest}
       selected={selected}
       onSelect={handleSelect}
       startTerminalType={EdgeTerminalType.none}
