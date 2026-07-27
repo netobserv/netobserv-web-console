@@ -1,5 +1,6 @@
 import {
   DefaultGroup,
+  Dimensions,
   Node,
   observer,
   ScaleDetailsLevel,
@@ -8,6 +9,7 @@ import {
   WithSelectionProps
 } from '@patternfly/react-topology';
 import useDetailsLevel from '@patternfly/react-topology/dist/esm/hooks/useDetailsLevel';
+import { action } from 'mobx';
 import * as React from 'react';
 import { TopologyGroupIcon } from '../../../../icons';
 
@@ -28,6 +30,29 @@ type StyleGroupProps = {
 } & WithDragNodeProps &
   WithSelectionProps;
 
+/**
+ * Wraps node setCollapsed/setDimensions in MobX action so Console's DefaultGroup
+ * (which may not batch them yet) stays strict-mode safe. Do not deep-import
+ * DefaultGroupCollapsed/Expanded — that duplicates ElementContext vs the shared
+ * Console vendors copy and breaks useDragNode.
+ */
+const useMobxSafeCollapseMutations = (element: Node): void => {
+  React.useLayoutEffect(() => {
+    const setCollapsedOrig = element.setCollapsed.bind(element);
+    const setDimensionsOrig = element.setDimensions.bind(element);
+    element.setCollapsed = ((collapsed: boolean) => {
+      action(() => setCollapsedOrig(collapsed))();
+    }) as Node['setCollapsed'];
+    element.setDimensions = ((dimensions: Dimensions) => {
+      action(() => setDimensionsOrig(dimensions))();
+    }) as Node['setDimensions'];
+    return () => {
+      element.setCollapsed = setCollapsedOrig;
+      element.setDimensions = setDimensionsOrig;
+    };
+  }, [element]);
+};
+
 const StyleGroup: React.FunctionComponent<StyleGroupProps> = ({
   element,
   collapsedWidth = 75,
@@ -36,6 +61,7 @@ const StyleGroup: React.FunctionComponent<StyleGroupProps> = ({
 }) => {
   const data = element.getData();
   const detailsLevel = useDetailsLevel();
+  useMobxSafeCollapseMutations(element);
 
   const renderIcon = (): React.ReactNode => {
     const iconSize = Math.min(collapsedWidth, collapsedHeight) - iconPadding * 2;
