@@ -1,6 +1,4 @@
 import {
-  BreadthFirstLayout,
-  ColaGroupsLayout,
   ConcentricLayout,
   DagreGroupsLayout,
   DagreLayout,
@@ -11,6 +9,8 @@ import {
   LayoutFactory
 } from '@patternfly/react-topology';
 import { LayoutName } from '../../../../../model/topology';
+import { BreadthFirstLayout } from './breadthFirstLayout';
+import { ColaGroupsLayout } from './colaGroupsLayout';
 import { ColaLayout } from './colaLayout';
 
 const layoutFactory: LayoutFactory = (type: LayoutName, graph: Graph): Layout | undefined => {

@@ -29,6 +29,7 @@ import {
   findFromFilters
 } from '../model/filters';
 import { ContextSingleton } from '../utils/context';
+import { createAggregateEdges } from '../utils/create-aggregate-edges';
 import { findFilter } from '../utils/filter-definitions';
 import { getTopologyEdgeId } from '../utils/ids';
 import { createPeer, getFormattedValue } from '../utils/metrics';
@@ -67,6 +68,11 @@ export interface TopologyOptions {
   nodeBadges?: boolean;
   edges?: boolean;
   edgeTags?: boolean;
+  /**
+   * When true (default), cross-group leaf edges are split into exit / bridge / entry
+   * segments and parallel bridges between the same parent groups are merged.
+   */
+  groupEdges?: boolean;
   startCollapsed?: boolean;
   truncateLength: TruncateLength;
   layout: LayoutName;
@@ -86,6 +92,7 @@ export const DefaultOptions: TopologyOptions = {
   nodeBadges: true,
   edges: true,
   edgeTags: true,
+  groupEdges: true,
   maxEdgeStat: 0,
   startCollapsed: false,
   truncateLength: TruncateLength.M,
@@ -98,6 +105,8 @@ export const DefaultOptions: TopologyOptions = {
   showEmpty: false,
   showCleartextEdgeLock: false
 };
+
+export const AGGREGATE_EDGE_TYPE = 'aggregate-edge';
 
 export type GraphElementPeer = GraphElement<ElementModel, NodeData>;
 export type ElementData = Partial<NodeData>;
@@ -454,6 +463,138 @@ const getEdgeTag = (value: number, options: TopologyOptions, t: TFunction) => {
     return getFormattedValue(value, options.metricType, metricFunction, t);
   }
   return undefined;
+};
+
+/**
+ * After structural aggregation, copy/sum leaf NetObserv metrics onto aggregate segments.
+ * Metric tags and TLS hints go on the bridge (or sole segment); stubs keep visual flags only.
+ */
+export const applyAggregateEdgeData = (
+  edges: EdgeModel[],
+  options: TopologyOptions,
+  highlightedId: string,
+  t: TFunction
+): EdgeModel[] => {
+  const byId = new Map(edges.map(e => [e.id, e]));
+
+  edges.forEach(edge => {
+    const role = edge.data?.role as string | undefined;
+    const leafIds: string[] = edge.data?.aggregatedEdgeIds || [];
+    if (!leafIds.length) {
+      return;
+    }
+
+    const leaves = leafIds.map(id => byId.get(id)).filter((e): e is EdgeModel => !!e);
+    if (!leaves.length) {
+      return;
+    }
+
+    const shadowed = leaves.some(l => l.data?.shadowed);
+    const filtered = leaves.some(l => l.data?.filtered);
+    const isDark = leaves.some(l => l.data?.isDark);
+    const highlighted =
+      !shadowed &&
+      !_.isEmpty(highlightedId) &&
+      (edge.id.includes(highlightedId) ||
+        edge.source === highlightedId ||
+        edge.target === highlightedId ||
+        leaves.some(
+          l =>
+            l.id.includes(highlightedId) ||
+            l.data?.sourceId === highlightedId ||
+            l.data?.targetId === highlightedId ||
+            l.source === highlightedId ||
+            l.target === highlightedId
+        ));
+
+    // Stubs: no metric tag; directional arrow only on entry.
+    if (role === 'exit' || role === 'entry') {
+      edge.edgeStyle = EdgeStyle.dashed;
+      edge.data = {
+        ...edge.data,
+        shadowed,
+        filtered,
+        highlighted,
+        isDark,
+        tag: undefined,
+        tagStatus: NodeStatus.default,
+        tagTlsSecure: undefined,
+        tagTlsLockSeverity: undefined,
+        tagTlsCleartext: undefined,
+        startTerminalType: EdgeTerminalType.none,
+        startTerminalStatus: NodeStatus.default,
+        endTerminalType: role === 'entry' ? EdgeTerminalType.directional : EdgeTerminalType.none,
+        endTerminalStatus: NodeStatus.default
+      };
+      return;
+    }
+
+    // Bridge (or collapse-only aggregate): sum metrics and TLS from leaves.
+    const bps = leaves.reduce((sum, l) => sum + (l.data?.bps || 0), 0);
+    const drops = leaves.reduce((sum, l) => sum + (l.data?.drops || 0), 0);
+    const tls = tlsPanelFromLabelArrays(
+      leaves.flatMap(l => l.data?.tlsVersionLabels || []),
+      leaves.flatMap(l => l.data?.tlsGroupLabels || [])
+    );
+    const tagTlsCleartext =
+      Boolean(options.isTLSTracking) &&
+      Boolean(options.showCleartextEdgeLock) &&
+      showTLSHints(options.metricType) &&
+      !tls?.tagTlsSecure &&
+      bps > 0 &&
+      leaves.some(l => l.data?.tagTlsCleartext);
+    const bidirectional = Boolean(edge.data?.bidirectional);
+
+    edge.edgeStyle = getEdgeStyle(bps);
+    edge.animationSpeed = getAnimationSpeed(bps, options.maxEdgeStat);
+    edge.data = {
+      ...edge.data,
+      shadowed,
+      filtered,
+      highlighted,
+      isDark,
+      bps,
+      drops,
+      tag: getEdgeTag(bps, options, t),
+      tagStatus: getTagStatus(bps, options.maxEdgeStat),
+      startTerminalType: bidirectional ? EdgeTerminalType.directional : EdgeTerminalType.none,
+      startTerminalStatus: NodeStatus.default,
+      endTerminalType: bps > 0 ? EdgeTerminalType.directional : EdgeTerminalType.none,
+      endTerminalStatus: NodeStatus.default,
+      ...(tls || { tagTlsSecure: false, tagTlsLockSeverity: undefined }),
+      tagTlsCleartext: tagTlsCleartext ? true : undefined
+    };
+    if (!tls) {
+      delete edge.data.tlsVersionLabels;
+      delete edge.data.tlsGroupLabels;
+    }
+  });
+
+  return edges;
+};
+
+/** Aggregate cross-group edges when groupEdges is enabled; no-op otherwise. */
+export const maybeAggregateEdges = (
+  nodes: NodeModel[] | undefined,
+  edges: EdgeModel[] | undefined,
+  options: TopologyOptions,
+  highlightedId: string,
+  t: TFunction
+): EdgeModel[] => {
+  if (!edges?.length) {
+    return [];
+  }
+  if (options.edges === false || options.groupEdges === false || options.groupTypes === 'none' || !nodes?.length) {
+    return edges;
+  }
+  const aggregated = createAggregateEdges(AGGREGATE_EDGE_TYPE, edges, nodes, {
+    groupEdges: true,
+    collapsedGroups: true
+  });
+  const withData = applyAggregateEdgeData(aggregated, options, highlightedId, t);
+  // Drop hidden leaf edges after metrics are copied onto aggregates. Leaving them in the
+  // model forces Cola layout to simulate every invisible link and inflates element count.
+  return withData.filter(e => e.visible !== false);
 };
 
 const generateEdge = (
@@ -813,5 +954,6 @@ export const generateDataModel = (
     });
   }
 
+  // Aggregation runs after collapse state is synced in TopologyContent.updateModel.
   return { nodes, edges };
 };

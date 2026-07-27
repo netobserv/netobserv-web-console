@@ -180,6 +180,29 @@ export const TopologyDisplayOptions: React.FC<TopologyDisplayOptionsProps> = ({
               })
             }
           />
+          <Tooltip
+            content={t(
+              'Merge parallel connections between groups into shared bridges with exit and entry stubs. Reduces edge clutter when nodes are grouped.'
+            )}
+          >
+            <Checkbox
+              id="group-edges-switch"
+              data-test="group-edges-switch"
+              label={t('Group edges')}
+              isDisabled={!topologyOptions.edges || topologyOptions.groupTypes === 'none'}
+              isChecked={
+                Boolean(topologyOptions.edges) &&
+                topologyOptions.groupTypes !== 'none' &&
+                topologyOptions.groupEdges !== false
+              }
+              onChange={() =>
+                setTopologyOptions({
+                  ...topologyOptions,
+                  groupEdges: topologyOptions.groupEdges === false
+                })
+              }
+            />
+          </Tooltip>
           {isTLSTracking && (
             <Tooltip
               content={t(

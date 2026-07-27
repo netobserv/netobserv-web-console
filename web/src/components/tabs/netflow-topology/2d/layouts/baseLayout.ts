@@ -31,6 +31,7 @@ import {
 } from '@patternfly/react-topology';
 import { ForceSimulation } from '@patternfly/react-topology/dist/esm/layouts/ForceSimulation';
 import { action, makeObservable } from 'mobx';
+import { collectLayoutLinks } from './layout-edges';
 
 export const layoutDefaults: LayoutOptions = {
   linkDistance: 60,
@@ -325,17 +326,13 @@ export class BaseLayout implements Layout {
   protected getGroupNodes = (): Node[] => groupNodeElements(this.graph.getNodes()).filter(g => g.isVisible());
 
   protected getLinks(edges: Edge[]): LayoutLink[] {
-    const links: LayoutLink[] = [];
-    edges.forEach(e => {
-      const source = this.getLayoutNode(this.nodes, e.getSource());
-      const target = this.getLayoutNode(this.nodes, e.getTarget());
-      if (source && target) {
-        this.initializeEdgeBendpoints(e);
-        links.push(this.createLayoutLink(e, source, target));
-      }
-    });
-
-    return links;
+    return collectLayoutLinks(
+      edges,
+      this.nodes,
+      (nodes, node) => this.getLayoutNode(nodes, node),
+      (edge, source, target) => this.createLayoutLink(edge, source, target),
+      this.initializeEdgeBendpoints
+    );
   }
 
   protected hasVisibleChildren = (group: Node): boolean => !!group.getNodes().find(c => isNode(c) && c.isVisible());
