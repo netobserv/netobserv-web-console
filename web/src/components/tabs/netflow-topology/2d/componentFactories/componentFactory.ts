@@ -7,7 +7,7 @@ import {
   ModelKind
 } from '@patternfly/react-topology';
 import { ComponentType } from 'react';
-import { GraphElementPeer } from '../../../../../model/topology';
+import { AGGREGATE_EDGE_TYPE, GraphElementPeer } from '../../../../../model/topology';
 
 export const componentFactory: ComponentFactory = (
   kind: ModelKind,
@@ -16,7 +16,7 @@ export const componentFactory: ComponentFactory = (
   switch (type) {
     case 'group':
       return DefaultGroup;
-    case 'aggregate-edge':
+    case AGGREGATE_EDGE_TYPE:
       return DefaultEdge;
     default:
       switch (kind) {

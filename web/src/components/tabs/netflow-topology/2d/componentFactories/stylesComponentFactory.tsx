@@ -12,7 +12,7 @@ import {
   withSelection
 } from '@patternfly/react-topology';
 import * as React from 'react';
-import { GraphElementPeer } from '../../../../../model/topology';
+import { AGGREGATE_EDGE_TYPE, GraphElementPeer } from '../../../../../model/topology';
 
 //keep default import here to use observers
 import StyleAggregateEdge from '../styles/styleAggregateEdge';
@@ -34,7 +34,7 @@ export const stylesComponentFactory: ComponentFactory = (
       return withDndDrop(groupDropTargetSpec)(withDragNode(nodeDragSourceSpec('group'))(withSelection()(StyleGroup)));
     case 'edge':
       return withSelection()(StyleEdge);
-    case 'aggregate-edge':
+    case AGGREGATE_EDGE_TYPE:
       return withSelection()(StyleAggregateEdge);
     default:
       return undefined;
