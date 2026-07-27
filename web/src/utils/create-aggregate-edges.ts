@@ -303,7 +303,6 @@ const aggregateByCollapsedGroups = (
   parentOf: ParentIndex,
   collapsedIds: Set<string>
 ): EdgeModel[] => {
-  const pendingAggregates: EdgeModel[] = [];
   const segmentIndex = new Map<string, EdgeModel>();
 
   return edges.reduce((newEdges: EdgeModel[], edge: EdgeModel) => {
@@ -339,9 +338,6 @@ const aggregateByCollapsedGroups = (
       // Keep children for backward compatibility with prior collapse aggregation.
       existing.children = existing.data.aggregatedEdgeIds;
       edge.visible = false;
-      if (!newEdges.includes(existing)) {
-        newEdges.push(existing);
-      }
     } else {
       const aggregate = createSegmentEdge(
         aggregateEdgeType,
@@ -353,8 +349,9 @@ const aggregateByCollapsedGroups = (
         true
       );
       aggregate.children = [edge.id];
-      pendingAggregates.push(aggregate);
       segmentIndex.set(key, aggregate);
+      newEdges.push(aggregate);
+      edge.visible = false;
     }
 
     newEdges.push(edge);

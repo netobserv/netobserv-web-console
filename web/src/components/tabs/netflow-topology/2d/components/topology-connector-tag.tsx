@@ -8,29 +8,12 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TlsLockSeverity } from '../../../../../utils/tls-lock-severity';
 
-/** PF icons ≤6.4 use flat svgPath/width/height; ≥6.6 nest under `.icon` with svgPathData. */
-type IconConfigShape = {
-  svgPath?: string;
-  width?: number;
-  height?: number;
-  icon?: { svgPathData: string; width: number; height: number };
-};
-
-const iconMetrics = (cfg: IconConfigShape) => {
-  if (cfg.icon) {
-    return { path: cfg.icon.svgPathData, width: cfg.icon.width, height: cfg.icon.height };
-  }
-  return { path: cfg.svgPath!, width: cfg.width!, height: cfg.height! };
-};
-
-const LOCK = iconMetrics(LockIconConfig as IconConfigShape);
-const OPEN_LOCK = iconMetrics(LockOpenIconConfig as IconConfigShape);
-const LOCK_PATH = LOCK.path;
-const LOCK_ICON_W = LOCK.width;
-const LOCK_ICON_H = LOCK.height;
+const LOCK_PATH = LockIconConfig.svgPath;
+const LOCK_ICON_W = LockIconConfig.width;
+const LOCK_ICON_H = LockIconConfig.height;
 const LOCK_SCALE = 0.022;
 /** Match open-lock width to closed lock (PatternFly `LockOpenIcon` viewBox). */
-const OPEN_LOCK_SCALE = (LOCK_ICON_W * LOCK_SCALE) / OPEN_LOCK.width;
+const OPEN_LOCK_SCALE = (LOCK_ICON_W * LOCK_SCALE) / LockOpenIconConfig.width;
 const LOCK_GAP = 5;
 
 export type TopologyConnectorTagProps = {
@@ -91,8 +74,8 @@ const TopologyConnectorTag: React.FunctionComponent<TopologyConnectorTagProps> =
 
   const scaledLockW = LOCK_ICON_W * LOCK_SCALE;
   const scaledLockH = LOCK_ICON_H * LOCK_SCALE;
-  const scaledOpenW = OPEN_LOCK.width * OPEN_LOCK_SCALE;
-  const scaledOpenH = OPEN_LOCK.height * OPEN_LOCK_SCALE;
+  const scaledOpenW = LockOpenIconConfig.width * OPEN_LOCK_SCALE;
+  const scaledOpenH = LockOpenIconConfig.height * OPEN_LOCK_SCALE;
   const lockSlotW = showClosedLock ? scaledLockW : showOpenLock ? scaledOpenW : 0;
   const lockSlotH = showClosedLock ? scaledLockH : showOpenLock ? scaledOpenH : 0;
   const lockSlot = showAnyLock ? lockSlotW + LOCK_GAP : 0;
@@ -110,7 +93,7 @@ const TopologyConnectorTag: React.FunctionComponent<TopologyConnectorTagProps> =
         lockTranslateX: -width / 2 + paddingX,
         lockTranslateY: -lockSlotH / 2,
         lockScale: showClosedLock ? LOCK_SCALE : OPEN_LOCK_SCALE,
-        lockPath: showClosedLock ? LOCK_PATH : OPEN_LOCK.path
+        lockPath: showClosedLock ? LOCK_PATH : LockOpenIconConfig.svgPath
       };
     }
     if (!textSize) {
@@ -131,7 +114,7 @@ const TopologyConnectorTag: React.FunctionComponent<TopologyConnectorTagProps> =
       lockTranslateX: startX + paddingX,
       lockTranslateY: -lockSlotH / 2,
       lockScale: showClosedLock ? LOCK_SCALE : OPEN_LOCK_SCALE,
-      lockPath: showClosedLock ? LOCK_PATH : OPEN_LOCK.path
+      lockPath: showClosedLock ? LOCK_PATH : LockOpenIconConfig.svgPath
     };
   }, [tag, showAnyLock, showClosedLock, textSize, paddingX, paddingY, lockSlot, lockSlotH, lockSlotW]);
 

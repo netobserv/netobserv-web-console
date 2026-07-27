@@ -30,6 +30,7 @@ import { getStat } from '../../../../model/metrics';
 import { useNetflowContext } from '../../../../model/netflow-context';
 import { getStepInto, resolveGroupTypes, ScopeConfigDef } from '../../../../model/scope';
 import {
+  AGGREGATE_EDGE_TYPE,
   Decorated,
   ElementData,
   FilterDir,
@@ -372,10 +373,11 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
       highlightedId = selectedIdsRef.current[0];
     }
 
+    const currentOptions = getOptions();
     const updatedModel = generateDataModel(
       metrics,
       droppedMetrics,
-      getOptions(),
+      currentOptions,
       metricScope,
       scopes,
       searchEvent?.searchValue || '',
@@ -399,13 +401,13 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
       }
     });
 
-    updatedModel.edges = maybeAggregateEdges(updatedModel.nodes, updatedModel.edges, getOptions(), highlightedId, t);
+    updatedModel.edges = maybeAggregateEdges(updatedModel.nodes, updatedModel.edges, currentOptions, highlightedId, t);
 
     // Highlight all selected aggregate path segments (selection can be multi-id).
-    const selected = selectedIdsRef.current;
-    if (selected.length > 1) {
+    const selectedIdsForHighlight = selectedIdsRef.current;
+    if (selectedIdsForHighlight.length > 1) {
       updatedModel.edges?.forEach(e => {
-        if (selected.includes(e.id)) {
+        if (selectedIdsForHighlight.includes(e.id)) {
           e.data = { ...e.data, highlighted: true };
         }
       });
@@ -512,7 +514,7 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
       prevOptions?.layout !== options.layout ||
       prevOptions?.groupTypes !== options.groupTypes ||
       prevResolvedGroupTypes !== resolvedGroupTypes ||
-      prevOptions.startCollapsed !== options.startCollapsed ||
+      prevOptions?.startCollapsed !== options.startCollapsed ||
       prevOptions?.groupEdges !== options.groupEdges
     ) {
       resetGraph();
@@ -551,7 +553,7 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
       if (prevMetricFunction !== metricFunction || prevMetricType !== metricType) {
         //remove edge tags on metrics change
         controller.getElements().forEach(e => {
-          if (e.getType() === 'edge' || e.getType() === 'aggregate-edge') {
+          if (e.getType() === 'edge' || e.getType() === AGGREGATE_EDGE_TYPE) {
             e.setData({
               ...e.getData(),
               tag: undefined,

@@ -110,12 +110,24 @@ describe('maybeAggregateEdges', () => {
     data: { sourceId: source, targetId: target, bps, drops: 0 }
   });
 
-  const nodes: NodeModel[] = [leaf('a1'), leaf('a2'), leaf('b1'), group('ns-a', ['a1', 'a2']), group('ns-b', ['b1'])];
+  const baseNodes = (): NodeModel[] => [
+    leaf('a1'),
+    leaf('a2'),
+    leaf('b1'),
+    group('ns-a', ['a1', 'a2']),
+    group('ns-b', ['b1'])
+  ];
 
-  const edges: EdgeModel[] = [edge('a1', 'b1', 100), edge('a2', 'b1', 50)];
+  const baseEdges = (): EdgeModel[] => [edge('a1', 'b1', 100), edge('a2', 'b1', 50)];
 
   it('defaults to grouping edges (groupEdges true)', () => {
-    const result = maybeAggregateEdges(nodes, edges, { ...DefaultOptions, groupTypes: 'namespaces' }, '', t);
+    const result = maybeAggregateEdges(
+      baseNodes(),
+      baseEdges(),
+      { ...DefaultOptions, groupTypes: 'namespaces' },
+      '',
+      t
+    );
     const bridges = result.filter(e => e.type === AGGREGATE_EDGE_TYPE && e.data?.role === 'bridge');
     expect(bridges).toHaveLength(1);
     expect(bridges[0].data.bps).toBe(150);
@@ -188,19 +200,25 @@ describe('maybeAggregateEdges', () => {
   });
 
   it('skips aggregation when groupEdges is false', () => {
+    const input = baseEdges();
+    const expected = input.map(e => ({ ...e, data: { ...e.data } }));
     const result = maybeAggregateEdges(
-      nodes,
-      edges,
+      baseNodes(),
+      input,
       { ...DefaultOptions, groupTypes: 'namespaces', groupEdges: false },
       '',
       t
     );
-    expect(result).toEqual(edges);
+    expect(result).toBe(input);
+    expect(result).toEqual(expected);
     expect(result.every(e => e.type === 'edge')).toBe(true);
   });
 
   it('skips aggregation when groupTypes is none', () => {
-    const result = maybeAggregateEdges(nodes, edges, { ...DefaultOptions, groupTypes: 'none' }, '', t);
-    expect(result).toEqual(edges);
+    const input = baseEdges();
+    const expected = input.map(e => ({ ...e, data: { ...e.data } }));
+    const result = maybeAggregateEdges(baseNodes(), input, { ...DefaultOptions, groupTypes: 'none' }, '', t);
+    expect(result).toBe(input);
+    expect(result).toEqual(expected);
   });
 });

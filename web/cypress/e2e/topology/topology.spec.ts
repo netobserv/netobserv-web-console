@@ -84,14 +84,16 @@ describe('netflow-topology', () => {
     cy.dropdownSelect('group-dropdown', 'owners');
     cy.wait(c.waitTime);
 
-    //toggle switches
+    //toggle switches — exercise group-edges while a group type is still selected
+    cy.get('#group-edges-switch').should('not.be.disabled');
+    cy.get('#group-edges-switch').click();
+
     cy.get('#group-collapsed-switch').click();
     cy.dropdownSelect('group-dropdown', 'none');
     cy.get('#group-collapsed-switch').should('be.disabled');
+    cy.get('#group-edges-switch').should('be.disabled');
 
     cy.get('#edges-tag-switch').should('not.be.disabled');
-    cy.get('#group-edges-switch').should('not.be.disabled');
-    cy.get('#group-edges-switch').click();
     cy.get('#edges-tag-switch').click();
     cy.get('#edges-switch').click();
     cy.get('#edges-tag-switch').should('be.disabled');
