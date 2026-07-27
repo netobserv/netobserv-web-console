@@ -164,6 +164,8 @@
   "Show": "Show",
   "Edges": "Edges",
   "Edges label": "Edges label",
+  "Merge parallel connections between groups into shared bridges with exit and entry stubs. Reduces edge clutter when nodes are grouped.": "Merge parallel connections between groups into shared bridges with exit and entry stubs. Reduces edge clutter when nodes are grouped.",
+  "Group edges": "Group edges",
   "Marks volume edges as cleartext when aggregated logs show no TLS signals, using an open-lock icon. Can add many icons; use for focused troubleshooting.": "Marks volume edges as cleartext when aggregated logs show no TLS signals, using an open-lock icon. Can add many icons; use for focused troubleshooting.",
   "Cleartext traffic": "Cleartext traffic",
   "Badges": "Badges",

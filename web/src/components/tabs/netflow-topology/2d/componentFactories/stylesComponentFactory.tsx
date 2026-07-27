@@ -15,6 +15,7 @@ import * as React from 'react';
 import { GraphElementPeer } from '../../../../../model/topology';
 
 //keep default import here to use observers
+import StyleAggregateEdge from '../styles/styleAggregateEdge';
 import StyleEdge from '../styles/styleEdge';
 import StyleGroup from '../styles/styleGroup';
 import StyleNode from '../styles/styleNode';
@@ -33,6 +34,8 @@ export const stylesComponentFactory: ComponentFactory = (
       return withDndDrop(groupDropTargetSpec)(withDragNode(nodeDragSourceSpec('group'))(withSelection()(StyleGroup)));
     case 'edge':
       return withSelection()(StyleEdge);
+    case 'aggregate-edge':
+      return withSelection()(StyleAggregateEdge);
     default:
       return undefined;
   }

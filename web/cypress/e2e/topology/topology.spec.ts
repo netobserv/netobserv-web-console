@@ -90,9 +90,12 @@ describe('netflow-topology', () => {
     cy.get('#group-collapsed-switch').should('be.disabled');
 
     cy.get('#edges-tag-switch').should('not.be.disabled');
+    cy.get('#group-edges-switch').should('not.be.disabled');
+    cy.get('#group-edges-switch').click();
     cy.get('#edges-tag-switch').click();
     cy.get('#edges-switch').click();
     cy.get('#edges-tag-switch').should('be.disabled');
+    cy.get('#group-edges-switch').should('be.disabled');
 
     cy.get('#badge-switch').click();
 

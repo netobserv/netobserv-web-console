@@ -16,6 +16,8 @@ export const componentFactory: ComponentFactory = (
   switch (type) {
     case 'group':
       return DefaultGroup;
+    case 'aggregate-edge':
+      return DefaultEdge;
     default:
       switch (kind) {
         case ModelKind.graph:
