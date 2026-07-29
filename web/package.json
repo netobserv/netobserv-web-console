@@ -33,7 +33,7 @@
     "@babel/core": "^7.29.6",
     "@babel/plugin-transform-typescript": "^7.17.12",
     "@babel/preset-env": "^7.29.0",
-    "@babel/preset-react": "^7.28.5",
+    "@babel/preset-react": "^8.0.1",
     "@babel/preset-typescript": "^7.28.5",
     "@cypress/grep": "^4.1.1",
     "@openshift-console/dynamic-plugin-sdk": "1.0.0",
