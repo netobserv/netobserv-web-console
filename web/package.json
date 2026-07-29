@@ -103,7 +103,7 @@
   "dependencies": {
     "@jpinsonneau/html-to-image": "^1.11.13",
     "@patternfly/patternfly": "^5.4.0",
-    "@patternfly/react-charts": "^7.4.0",
+    "@patternfly/react-charts": "^8.6.0",
     "@patternfly/react-code-editor": "^5.4.0",
     "@patternfly/react-core": "^5.4.0",
     "@patternfly/react-icons": "^5.4.0",
