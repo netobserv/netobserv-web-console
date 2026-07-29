@@ -111,7 +111,7 @@
     "@patternfly/react-table": "^5.4.0",
     "@patternfly/react-tokens": "^5.4.0",
     "@patternfly/react-topology": "^5.4.0",
-    "@rjsf/core": "^5.24.12",
+    "@rjsf/core": "^6.7.1",
     "@rjsf/utils": "^5.24.13",
     "@rjsf/validator-ajv8": "^5.24.12",
     "@types/classnames": "^2.3.0",
