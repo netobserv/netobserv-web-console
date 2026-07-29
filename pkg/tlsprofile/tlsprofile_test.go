@@ -173,8 +173,14 @@ func TestApply_MalformedCipherSuiteLeavesConfigUntouched(t *testing.T) {
 // by openshift/library-go, even though Go's crypto/tls never reads them from
 // CipherSuites). This must not fail the whole profile application.
 func TestApply_OpenShiftModernProfile(t *testing.T) {
+	var buf bytes.Buffer
+	orig := logrus.StandardLogger().Out
+	logrus.SetOutput(&buf)
+	t.Cleanup(func() { logrus.SetOutput(orig) })
+
 	t.Setenv(EnvMinVersion, "772")
 	t.Setenv(EnvCipherSuites, "4865,4866,4867")
+	t.Setenv(EnvCurvePreferences, "")
 
 	c := &tls.Config{}
 	err := Apply(c)
@@ -182,6 +188,7 @@ func TestApply_OpenShiftModernProfile(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, uint16(tls.VersionTLS13), c.MinVersion)
 	assert.Empty(t, c.CipherSuites, "an all-TLS-1.3 cipher list has nothing to apply")
+	assert.Contains(t, buf.String(), EnvCipherSuites, "the (harmless) TLS_CIPHER_SUITES override should still be noted")
 }
 
 // TestApply_OpenShiftIntermediateProfile reproduces OpenShift's "Intermediate"
@@ -191,6 +198,7 @@ func TestApply_OpenShiftModernProfile(t *testing.T) {
 func TestApply_OpenShiftIntermediateProfile(t *testing.T) {
 	t.Setenv(EnvMinVersion, "771")
 	t.Setenv(EnvCipherSuites, "4865,4866,4867,49199,49200")
+	t.Setenv(EnvCurvePreferences, "")
 
 	c := &tls.Config{}
 	err := Apply(c)
@@ -206,13 +214,15 @@ func TestApply_WarnsWhenCipherSuitesInertUnderTLS13(t *testing.T) {
 	logrus.SetOutput(&buf)
 	t.Cleanup(func() { logrus.SetOutput(orig) })
 
+	t.Setenv(EnvMinVersion, "")
 	t.Setenv(EnvCipherSuites, "49199,49200")
+	t.Setenv(EnvCurvePreferences, "")
 
 	c := &tls.Config{MinVersion: tls.VersionTLS13}
 	err := Apply(c)
 
 	assert.NoError(t, err)
-	assert.Equal(t, []uint16{49199, 49200}, c.CipherSuites, "the override is still applied even though it has no effect")
+	assert.Empty(t, c.CipherSuites, "cipher suites are not applied at all when the effective TLS version is already 1.3")
 	assert.Contains(t, buf.String(), EnvCipherSuites)
 	assert.Contains(t, buf.String(), "no effect")
 }
@@ -225,6 +235,7 @@ func TestApply_NoWarningWhenEffectiveVersionAllowsTLS12(t *testing.T) {
 
 	t.Setenv(EnvMinVersion, "771") // TLS 1.2: cipher suites remain meaningful
 	t.Setenv(EnvCipherSuites, "49199")
+	t.Setenv(EnvCurvePreferences, "")
 
 	c := &tls.Config{MinVersion: tls.VersionTLS13}
 	err := Apply(c)
