@@ -105,7 +105,7 @@
     "@patternfly/patternfly": "^5.4.0",
     "@patternfly/react-charts": "^7.4.0",
     "@patternfly/react-code-editor": "^5.4.0",
-    "@patternfly/react-core": "^5.4.0",
+    "@patternfly/react-core": "^6.6.0",
     "@patternfly/react-icons": "^5.4.0",
     "@patternfly/react-styles": "^5.4.0",
     "@patternfly/react-table": "^5.4.0",
