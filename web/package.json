@@ -30,7 +30,7 @@
     "clean:all": "npm run clean && npm run clean:cache"
   },
   "devDependencies": {
-    "@babel/core": "^7.29.6",
+    "@babel/core": "^8.0.1",
     "@babel/plugin-transform-typescript": "^7.17.12",
     "@babel/preset-env": "^7.29.0",
     "@babel/preset-react": "^7.28.5",
