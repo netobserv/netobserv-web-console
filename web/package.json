@@ -30,7 +30,6 @@
     "clean:all": "npm run clean && npm run clean:cache"
   },
   "devDependencies": {
-    "ajv": "^8.17.0",
     "@babel/core": "^7.29.6",
     "@babel/plugin-transform-typescript": "^7.17.12",
     "@babel/preset-env": "^7.29.0",
@@ -56,6 +55,7 @@
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "@typescript-eslint/typescript-estree": "^8.0.0",
+    "ajv": "^8.17.0",
     "babel-loader": "^10.0.0",
     "babel-preset-react": "^6.24.1",
     "copy-webpack-plugin": "14.0.0",
@@ -90,7 +90,7 @@
     "typescript": "^5.9.3",
     "webpack": "^5.100.0",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.2.5",
+    "webpack-dev-server": "^5.2.6",
     "webpack-node-externals": "3.0.0"
   },
   "consolePlugin": {
@@ -114,11 +114,11 @@
     "@rjsf/utils": "^5.24.13",
     "@rjsf/validator-ajv8": "^5.24.12",
     "@types/classnames": "^2.3.0",
-    "axios": "^1.16.0",
+    "axios": "^1.18.0",
     "classnames": "^2.5.1",
     "i18next": "~25.6.2",
     "i18next-http-backend": "^4.0.0",
-    "js-yaml": "^4.2.0",
+    "js-yaml": "^4.3.0",
     "murmurhash-js": "^1.0.0",
     "percentile": "^1.6.0",
     "port-numbers": "^6.0.1",
