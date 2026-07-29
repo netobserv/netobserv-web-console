@@ -35,7 +35,7 @@
     "@babel/preset-env": "^7.29.0",
     "@babel/preset-react": "^7.28.5",
     "@babel/preset-typescript": "^7.28.5",
-    "@cypress/grep": "^4.1.1",
+    "@cypress/grep": "^6.0.2",
     "@openshift-console/dynamic-plugin-sdk": "1.0.0",
     "@openshift-console/dynamic-plugin-sdk-webpack": "1.0.2",
     "@testing-library/jest-dom": "^6.9.1",
