@@ -38,7 +38,7 @@
     "@cypress/grep": "^4.1.1",
     "@openshift-console/dynamic-plugin-sdk": "1.0.0",
     "@openshift-console/dynamic-plugin-sdk-webpack": "1.0.2",
-    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^12.1.5",
     "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/user-event": "^14.6.1",
