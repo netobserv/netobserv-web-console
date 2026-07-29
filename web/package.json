@@ -46,7 +46,7 @@
     "@types/jest": "30.0.0",
     "@types/js-yaml": "^4.0.9",
     "@types/jsdom": "^16.2.13",
-    "@types/lodash": "^4.17.20",
+    "@types/lodash": "^4.17.24",
     "@types/murmurhash-js": "^1.0.3",
     "@types/port-numbers": "^5.0.0",
     "@types/react": "^17.0.1",
