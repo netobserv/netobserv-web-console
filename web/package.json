@@ -102,7 +102,7 @@
     "@jpinsonneau/html-to-image": "^1.11.13",
     "@patternfly/patternfly": "^6.4.0",
     "@patternfly/react-charts": "^8.4.1",
-    "@patternfly/react-code-editor": "^6.4.2",
+    "@patternfly/react-code-editor": "^6.6.0",
     "@patternfly/react-core": "^6.4.2",
     "@patternfly/react-drag-drop": "^6.4.0",
     "@patternfly/react-icons": "^6.4.0",
