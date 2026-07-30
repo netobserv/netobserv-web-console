@@ -21,11 +21,7 @@ const FlowCollectorLink: React.FC<ButtonLinkProps> = props => {
 };
 
 const HealthDashboardLink: React.FC<ButtonLinkProps> = props => (
-  <Link
-    {...props}
-    target="_blank"
-    to={{ pathname: '/monitoring/dashboards/grafana-dashboard-netobserv-health' }}
-  />
+  <Link {...props} target="_blank" to={{ pathname: '/monitoring/dashboards/grafana-dashboard-netobserv-health' }} />
 );
 
 export interface EmptyProps {

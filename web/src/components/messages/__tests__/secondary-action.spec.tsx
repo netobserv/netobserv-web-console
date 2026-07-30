@@ -32,10 +32,7 @@ describe('<SecondaryAction />', () => {
     const { rerender } = render(<SecondaryAction />);
 
     const flowCollectorLink = screen.getByRole('link', { name: 'Show FlowCollector CR' });
-    expect(flowCollectorLink).toHaveAttribute(
-      'href',
-      '/k8s/cluster/flows.netobserv.io~v1beta2~FlowCollector/cluster'
-    );
+    expect(flowCollectorLink).toHaveAttribute('href', '/k8s/cluster/flows.netobserv.io~v1beta2~FlowCollector/cluster');
     expect(flowCollectorLink).toHaveAttribute('target', '_blank');
     expect(flowCollectorLink).toHaveAttribute('data-test', 'flowcollector-link');
 
