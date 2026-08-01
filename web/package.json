@@ -130,7 +130,7 @@
     "react-icons": "^5.5.0",
     "react-modal": "^3.14.4",
     "react-router": "5.3.x",
-    "react-router-dom": "5.3.x",
+    "react-router-dom": "7.18.x",
     "react-router-dom-v5-compat": "6.11.2"
   },
   "overrides": {
