@@ -16,20 +16,23 @@ export type QuickFilter = {
 export const parseQuickFilters = (filterDefinitions: FilterDefinition[], raw: RawQuickFilter[]): QuickFilter[] => {
   const ret: QuickFilter[] = [];
   raw.forEach(qf => {
-    const filters: (Filter | undefined)[] = Object.entries(qf.filter).map(([key, values]) => {
+    const filters: (Filter | undefined)[] = Object.entries(qf.filter).map(([key, valuesStr]) => {
       const { id, not, moreThan } = fromFilterKey(key);
       const def = findFilter(filterDefinitions, id);
       if (!def) {
         console.warn(`Configured quick filter "${qf.name}" contains unknown filter id ${id}.`);
         return undefined;
       }
-      const filter: Filter = {
-        def: def,
-        // rely on match here since it allows to use quotes for exact match
-        compare: moreThan ? FilterCompare.moreThanOrEqual : not ? FilterCompare.notMatch : FilterCompare.match,
-        values: values.split(',').map(v => ({ v: v }))
-      };
-      return filter;
+      let compare = moreThan ? FilterCompare.moreThanOrEqual : not ? FilterCompare.notMatch : FilterCompare.match;
+      let values = valuesStr.split(',').map(v => ({ v: v }));
+      if (!moreThan) {
+        // If all values are enclosed in double quotes, it's an exact match
+        if (values.every(v => v.v.length >= 2 && v.v.startsWith('"') && v.v.endsWith('"'))) {
+          compare = not ? FilterCompare.notEqual : FilterCompare.equal;
+          values = values.map(v => ({ v: v.v.substring(1, v.v.length - 1) }));
+        }
+      }
+      return { def, compare, values };
     });
     if (!filters.some(f => f === undefined)) {
       ret.push({

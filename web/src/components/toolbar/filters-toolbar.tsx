@@ -10,7 +10,7 @@ import { CompressIcon, ExpandIcon } from '@patternfly/react-icons';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Filter, FilterCompare, FilterDefinition, Filters } from '../../model/filters';
+import { Filter, FilterCompare, FilterDefinition, Filters, summarizeFilters } from '../../model/filters';
 import { useNetflowContext } from '../../model/netflow-context';
 import { autoCompleteCache } from '../../utils/autocomplete-cache';
 import { findFilter, matcher } from '../../utils/filter-definitions';
@@ -191,6 +191,24 @@ export const FiltersToolbar: React.FC<FiltersToolbarProps> = ({
   } else if (defaultFilters.length > 0) {
     showHideText = showFilters ? t('Hide filters') : t('Show filters');
   }
+  const showHideItem = (
+    <ToolbarItem className="flex-start">
+      <ExpandableSectionToggle
+        data-test="show-filters-button"
+        id="show-filters-button"
+        className="overflow-button"
+        isExpanded={showFilters}
+        onToggle={isExpanded => setShowFilters(isExpanded)}
+      >
+        {showHideText}
+      </ExpandableSectionToggle>
+    </ToolbarItem>
+  );
+  const showHideTooltip = showFilters ? (
+    showHideItem
+  ) : (
+    <Tooltip content={summarizeFilters(filtersOrForced)}>{showHideItem}</Tooltip>
+  );
   return (
     <>
       <Toolbar data-test={id} id={id}>
@@ -208,19 +226,7 @@ export const FiltersToolbar: React.FC<FiltersToolbarProps> = ({
             </ToolbarItem>
           )}
           {!isForced && getFilterToolbar()}
-          {showHideText && countActiveFilters > 0 && (
-            <ToolbarItem className="flex-start">
-              <ExpandableSectionToggle
-                data-test="show-filters-button"
-                id="show-filters-button"
-                className="overflow-button"
-                isExpanded={showFilters}
-                onToggle={isExpanded => setShowFilters(isExpanded)}
-              >
-                {showHideText}
-              </ExpandableSectionToggle>
-            </ToolbarItem>
-          )}
+          {showHideText && countActiveFilters > 0 && <>{showHideTooltip}</>}
           <ToolbarItem className="flex-start">
             <LinksOverflow
               id={'filters-more-options'}

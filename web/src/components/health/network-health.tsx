@@ -1,7 +1,6 @@
 import { Rule } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
-  Content,
   ContentVariants,
   Drawer,
   DrawerContent,
@@ -199,20 +198,13 @@ export const NetworkHealth: React.FC<{}> = ({}) => {
                   </FlexItem>
                   <FlexItem>
                     <Flex direction={{ default: 'row' }}>
-                      <FlexItem className="netobserv-refresh-interval-container">
-                        <Flex direction={{ default: 'column' }}>
-                          <FlexItem className="netobserv-action-title">
-                            <Content component={ContentVariants.h4}>{t('Refresh interval')}</Content>
-                          </FlexItem>
-                          <FlexItem flex={{ default: 'flex_1' }}>
-                            <RefreshDropdown
-                              data-test="refresh-dropdown"
-                              id="refresh-dropdown"
-                              interval={interval}
-                              setInterval={setInterval}
-                            />
-                          </FlexItem>
-                        </Flex>
+                      <FlexItem flex={{ default: 'flex_1' }}>
+                        <RefreshDropdown
+                          data-test="refresh-dropdown"
+                          id="refresh-dropdown"
+                          interval={interval}
+                          setInterval={setInterval}
+                        />
                       </FlexItem>
                       <FlexItem className="netobserv-refresh-container">
                         <Button

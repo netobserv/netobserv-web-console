@@ -1,5 +1,5 @@
 import { isModelFeatureFlag, ModelFeatureFlag, useResolvedExtensions } from '@openshift-console/dynamic-plugin-sdk';
-import { Button, Content, ContentVariants, Flex, FlexItem, PageSection, Title } from '@patternfly/react-core';
+import { Button, ContentVariants, Flex, FlexItem, PageSection, Title } from '@patternfly/react-core';
 import { SyncAltIcon } from '@patternfly/react-icons';
 import * as _ from 'lodash';
 import * as React from 'react';
@@ -404,37 +404,23 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
   const actions = () => {
     return (
       <Flex direction={{ default: 'row' }}>
-        <FlexItem>
-          <Flex direction={{ default: 'column' }}>
-            <FlexItem className="netobserv-action-title">
-              <Content component={ContentVariants.h4}>{t('Time range')}</Content>
-            </FlexItem>
-            <FlexItem flex={{ default: 'flex_1' }}>
-              <TimeRangeDropdown
-                data-test="time-range-dropdown"
-                id="time-range-dropdown"
-                range={range}
-                setRange={setRange}
-                openCustomModal={() => setTRModalOpen(true)}
-              />
-            </FlexItem>
-          </Flex>
+        <FlexItem flex={{ default: 'flex_1' }}>
+          <TimeRangeDropdown
+            data-test="time-range-dropdown"
+            id="time-range-dropdown"
+            range={range}
+            setRange={setRange}
+            openCustomModal={() => setTRModalOpen(true)}
+          />
         </FlexItem>
-        <FlexItem className="netobserv-refresh-interval-container">
-          <Flex direction={{ default: 'column' }}>
-            <FlexItem className="netobserv-action-title">
-              <Content component={ContentVariants.h4}>{t('Refresh interval')}</Content>
-            </FlexItem>
-            <FlexItem flex={{ default: 'flex_1' }}>
-              <RefreshDropdown
-                data-test="refresh-dropdown"
-                id="refresh-dropdown"
-                disabled={showHistogram || typeof range !== 'number'}
-                interval={interval}
-                setInterval={setInterval}
-              />
-            </FlexItem>
-          </Flex>
+        <FlexItem flex={{ default: 'flex_1' }}>
+          <RefreshDropdown
+            data-test="refresh-dropdown"
+            id="refresh-dropdown"
+            disabled={showHistogram || typeof range !== 'number'}
+            interval={interval}
+            setInterval={setInterval}
+          />
         </FlexItem>
         <FlexItem className="netobserv-refresh-container">
           <Button
