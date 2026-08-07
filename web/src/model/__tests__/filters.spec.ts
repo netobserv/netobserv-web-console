@@ -168,7 +168,7 @@ describe('Filters summary', () => {
   const anyNamespace = findFilter(FilterDefinitionSample, 'namespace')!;
   const protocol = findFilter(FilterDefinitionSample, 'protocol')!;
 
-  it('should summarize with source and destination', () => {
+  it('should summarize with source and destination, ignoring disabled protocol', () => {
     const summary = summarizeFilters({
       list: [
         {
@@ -185,6 +185,11 @@ describe('Filters summary', () => {
           def: dstPort,
           compare: FilterCompare.equal,
           values: [{ v: '443' }]
+        },
+        {
+          def: protocol,
+          compare: FilterCompare.equal,
+          values: [{ v: 'TCP', disabled: true }]
         }
       ],
       match: 'all'
