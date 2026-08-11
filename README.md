@@ -159,7 +159,7 @@ You can run the cypress tests either with the OpenShift Console + NetObserv as a
 
 1. Start the [standalone mode](#standalone-console) as documented above. You should have the console accessible and working on http://localhost:9001
 
-2. Edit [consts.js](./web/cypress/support/const.js) to set the URL to "http://localhost:9001".
+2. Edit [const.ts](./web/cypress/support/const.ts) to set the URL to "http://localhost:9001".
 
 3. Start cypress:
 
