@@ -36,18 +36,61 @@ describe("(OCP-53591) Netflow Topology edges,labels, badges features", { tags: [
         })
     })
 
+    it("(OCP-53591, aramesha) should verify group edges default and disabled states", function () {
+        topologyPage.selectScopeGroup("resource", "owners")
+        cy.contains('Display options').should('exist').click()
+
+        // group edges should be present and checked by default when groups are enabled
+        cy.get(topologySelectors.groupEdgesToggle).should('exist')
+        cy.get(topologySelectors.groupEdgesToggle).should('be.checked')
+        cy.get(topologySelectors.groupEdgesToggle).should('not.be.disabled')
+
+        // group edges should be disabled when group is set to none
+        cy.byTestID("group-dropdown").click().byTestID("none").click()
+        cy.get(topologySelectors.groupEdgesToggle).should('be.disabled')
+
+        // group edges should be disabled when edges are toggled off
+        cy.byTestID("group-dropdown").click().byTestID("owners").click()
+        cy.get(topologySelectors.edgeToggle).uncheck()
+        cy.get(topologySelectors.groupEdgesToggle).should('be.disabled')
+        cy.get(topologySelectors.edgeToggle).check()
+        cy.get(topologySelectors.groupEdgesToggle).should('not.be.disabled')
+    })
+
+    it("(OCP-53591, aramesha) should verify group edges toggle on/off", function () {
+        topologyPage.selectScopeGroup("resource", "owners")
+        cy.contains('Display options').should('exist').click()
+        cy.get(topologySelectors.groupEdgesToggle).should('be.checked')
+
+        // record edge count with group edges on
+        cy.get('#drawer ' + topologySelectors.edge).its('length').then(aggregatedCount => {
+            // toggle group edges off
+            cy.get(topologySelectors.groupEdgesToggle).uncheck()
+            cy.get('#drawer ' + topologySelectors.edge).its('length').then(leafCount => {
+                // counts should differ between aggregated and leaf views
+                expect(leafCount).to.not.eq(aggregatedCount)
+            })
+
+            // toggle group edges back on
+            cy.get(topologySelectors.groupEdgesToggle).check()
+            cy.get('#drawer ' + topologySelectors.edge).its('length').should('eq', aggregatedCount)
+        })
+    })
+
     it("(OCP-53591, memodi) should verify edges display/hidden", function () {
         topologyPage.selectScopeGroup("resource", "owners")
         cy.contains('Display options').should('exist').click()
         cy.get(topologySelectors.edgeToggle).uncheck()
 
-        // verify labels are also hidden
+        // verify labels and group edges are also disabled
         cy.get('#edges-tag-switch').should('be.disabled')
+        cy.get(topologySelectors.groupEdgesToggle).should('be.disabled')
         cy.get(topologySelectors.defaultLayer).each((node, index) => {
             cy.wrap(node).should('not.have.descendants', '' + topologySelectors.edge)
         })
         cy.get(topologySelectors.edgeToggle).check()
         cy.get('#edges-tag-switch').should('be.enabled')
+        cy.get(topologySelectors.groupEdgesToggle).should('not.be.disabled')
         cy.get(topologySelectors.defaultLayer).each((node, index) => {
             cy.wrap(node).should('have.descendants', '' + topologySelectors.edge)
         })

@@ -71,6 +71,7 @@ export const netflowPage = {
     }
 }
 
+
 export const topologyPage = {
     isViewRendered: () => {
         cy.get('[data-surface="true"]').should('exist')
@@ -258,6 +259,7 @@ export namespace topologySelectors {
     export const edgeToggle = topoToggle('edges')
     export const labelToggle = topoToggle('edges-tag')
     export const badgeToggle = topoToggle('badge')
+    export const groupEdgesToggle = topoToggle('group-edges')
     export const emptyToggle = topoToggle('empty')
 }
 

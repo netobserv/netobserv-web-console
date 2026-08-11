@@ -70,6 +70,7 @@ describe("(OCP-53591) Netflow Topology view features", { tags: ['Network_Observa
             expect(settings['netflow-traffic-view-id']).to.be.equal('topology')
             expect(topologySettings['edgeTags']).to.be.true
             expect(topologySettings['edges']).to.be.true
+            expect(topologySettings['groupEdges']).to.be.true
             expect(topologySettings['groupTypes']).to.be.equal('auto')
             // expect(topologySettings['layout']).to.be.equal('Grid')
             expect(topologySettings['metricFunction']).to.be.equal('last')

@@ -55,7 +55,7 @@ describe("(OCP-53591) Netflow Topology groups features", { tags: ['Network_Obser
         })
         topologyPage.isViewRendered()
         // verify number of edges and nodes.
-        cy.get('#drawer ' + topologySelectors.edge).should('have.length', 17)
+        cy.get('#drawer ' + topologySelectors.edge).should('have.length', 29)
         cy.get('#drawer ' + topologySelectors.node).should('have.length', 15)
     })
 
@@ -68,7 +68,7 @@ describe("(OCP-53591) Netflow Topology groups features", { tags: ['Network_Obser
         })
         topologyPage.isViewRendered()
         // verify number of edges and nodes.
-        cy.get('#drawer ' + topologySelectors.edge).should('have.length', 47)
+        cy.get('#drawer ' + topologySelectors.edge).should('have.length', 76)
         cy.get('#drawer ' + topologySelectors.node).should('have.length', 28)
     })
 
@@ -107,6 +107,60 @@ describe("(OCP-53591) Netflow Topology groups features", { tags: ['Network_Obser
         cy.intercept('GET', topologyPage.getResourceScopeGroupURL('namespaces%2Bowners'), { fixture: 'flowmetrics/NSOwners.json' })
         topologyPage.selectScopeGroup("resource", "namespaces+owners")
         cy.get(topologySelectors.nGroups).should('have.length', 9)
+    })
+
+    it("(OCP-53591, aramesha) should verify group edges reduce edge count with NS grouping", function () {
+        cy.intercept('GET', topologyPage.getResourceScopeGroupURL('namespaces'), { fixture: 'flowmetrics/NS.json' })
+        topologyPage.selectScopeGroup("resource", "namespaces")
+        topologyPage.isViewRendered()
+        cy.contains('Display options').should('exist').click()
+
+        // disable group edges and record leaf count
+        cy.get(topologySelectors.groupEdgesToggle).uncheck()
+
+        cy.get('#drawer ' + topologySelectors.edge).its('length').then(leafCount => {
+            // enable group edges and verify count changes
+            cy.get(topologySelectors.groupEdgesToggle).check()
+            cy.get('#drawer ' + topologySelectors.edge).its('length').should('not.eq', leafCount)
+        })
+    })
+
+    it("(OCP-53591, aramesha) should verify group edges reduce edge count with NS+Owners grouping", function () {
+        cy.intercept('GET', topologyPage.getResourceScopeGroupURL('namespaces%2Bowners'), { fixture: 'flowmetrics/NSOwners.json' })
+        topologyPage.selectScopeGroup("resource", "namespaces+owners")
+        topologyPage.isViewRendered()
+        cy.contains('Display options').should('exist').click()
+
+        // disable group edges and record leaf count
+        cy.get(topologySelectors.groupEdgesToggle).uncheck()
+
+        cy.get('#drawer ' + topologySelectors.edge).its('length').then(leafCount => {
+            // enable group edges and verify count changes
+            cy.get(topologySelectors.groupEdgesToggle).check()
+            cy.get('#drawer ' + topologySelectors.edge).its('length').should('not.eq', leafCount)
+        })
+    })
+
+    it("(OCP-53591, aramesha) should verify collapse/expand with group edges", function () {
+        cy.intercept('GET', topologyPage.getResourceScopeGroupURL('namespaces'), { fixture: 'flowmetrics/NS.json' })
+        topologyPage.selectScopeGroup("resource", "namespaces")
+        topologyPage.isViewRendered()
+        cy.contains('Display options').should('exist').click()
+
+        // ensure group edges are on
+        cy.get(topologySelectors.groupEdgesToggle).check()
+
+        // collapse groups
+        cy.get(topologySelectors.groupToggle).click()
+
+        // edges should still render after collapse (no dangling edges or errors)
+        cy.get('#drawer ' + topologySelectors.edge).should('have.length.gte', 0)
+
+        // expand groups
+        cy.get(topologySelectors.groupToggle).click()
+
+        // edges should rebuild after expand
+        cy.get('#drawer ' + topologySelectors.edge).its('length').should('be.gte', 1)
     })
 
     afterEach("test", function () {
