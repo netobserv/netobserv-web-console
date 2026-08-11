@@ -25,10 +25,6 @@
     height: 33px !important;
 }
 
-.netobserv-refresh-interval-container {
-    margin: 0 !important;
-}
-
 .netobserv-refresh-container {
     align-self: end;
     padding-left: 1em;

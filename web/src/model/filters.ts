@@ -249,3 +249,62 @@ export const doesIncludeFilter = (activeFilters: Filter[], search: FilterKey, va
 export const addFilters = (current: Filters, newFilters: Filter[]): Filters => {
   return { ...current, list: _.concat(current.list, newFilters) };
 };
+
+export const summarizeFilters = (input?: Filters): string => {
+  const from: Filter[] = [];
+  const to: Filter[] = [];
+  const both: Filter[] = [];
+  const other: Filter[] = [];
+
+  // Remove disabled filters
+  const filters = input?.list
+    ?.map(f => ({ ...f, values: f.values.filter(v => !v.disabled) }))
+    .filter(f => f.values.length > 0);
+
+  if (!filters || filters.length === 0) {
+    return 'no filters';
+  }
+  filters.forEach(f => {
+    if (f.def.id.startsWith('src_')) {
+      from.push(f);
+    } else if (f.def.id.startsWith('dst_')) {
+      to.push(f);
+    } else if (f.def.category === 'endpoint') {
+      both.push(f);
+    } else {
+      other.push(f);
+    }
+  });
+  const values = (fz: Filter[]): string => {
+    return fz
+      .map(f => {
+        const prefix = f.compare === FilterCompare.equal ? '' : f.compare;
+        return f.values.map(v => prefix + (v.display || v.v)).join(',');
+      })
+      .join(',');
+  };
+  const parts: string[] = [];
+  if (other.length > 0) {
+    const comma = other.length !== filters.length ? ',' : '';
+    parts.push(values(other) + comma);
+  }
+  if (input!.match === 'bidirectional') {
+    if (from.length > 0 && to.length > 0) {
+      parts.push('between ' + values(from));
+      parts.push('and ' + values(to));
+    } else if (from.length > 0 || to.length > 0) {
+      parts.push('from/to ' + values(from.concat(...to)));
+    }
+  } else {
+    if (from.length > 0) {
+      parts.push('from ' + values(from));
+    }
+    if (to.length > 0) {
+      parts.push('to ' + values(to));
+    }
+    if (both.length > 0) {
+      parts.push('from/to ' + values(both));
+    }
+  }
+  return parts.join(input!.match === 'any' ? ' or ' : ' ');
+};

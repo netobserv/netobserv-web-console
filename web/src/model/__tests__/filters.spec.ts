@@ -1,6 +1,6 @@
 import { FilterDefinitionSample } from '../../components/__tests-data__/filters';
 import { findFilter } from '../../utils/filter-definitions';
-import { doesIncludeFilter, Filter, FilterCompare, filtersEqual } from '../filters';
+import { doesIncludeFilter, Filter, FilterCompare, filtersEqual, summarizeFilters } from '../filters';
 import { filtersToString } from '../flow-query';
 
 describe('doesIncludeFilter', () => {
@@ -158,5 +158,208 @@ describe('filtersEqual', () => {
     ];
     expect(filtersEqual(list1, list2)).toBe(false);
     expect(filtersEqual(list2, list1)).toBe(false);
+  });
+});
+
+describe('Filters summary', () => {
+  const srcNamespace = findFilter(FilterDefinitionSample, 'src_namespace')!;
+  const dstName = findFilter(FilterDefinitionSample, 'dst_name')!;
+  const dstPort = findFilter(FilterDefinitionSample, 'dst_port')!;
+  const anyNamespace = findFilter(FilterDefinitionSample, 'namespace')!;
+  const protocol = findFilter(FilterDefinitionSample, 'protocol')!;
+
+  it('should summarize with source and destination, ignoring disabled protocol', () => {
+    const summary = summarizeFilters({
+      list: [
+        {
+          def: srcNamespace,
+          compare: FilterCompare.equal,
+          values: [{ v: 'my-namespace' }]
+        },
+        {
+          def: dstName,
+          compare: FilterCompare.equal,
+          values: [{ v: 'their-pod' }]
+        },
+        {
+          def: dstPort,
+          compare: FilterCompare.equal,
+          values: [{ v: '443' }]
+        },
+        {
+          def: protocol,
+          compare: FilterCompare.equal,
+          values: [{ v: 'TCP', disabled: true }]
+        }
+      ],
+      match: 'all'
+    });
+    expect(summary).toEqual('from my-namespace to their-pod,443');
+  });
+
+  it('should summarize with source alone', () => {
+    const summary = summarizeFilters({
+      list: [
+        {
+          def: srcNamespace,
+          compare: FilterCompare.equal,
+          values: [{ v: 'my-namespace' }]
+        }
+      ],
+      match: 'all'
+    });
+    expect(summary).toEqual('from my-namespace');
+  });
+
+  it('should summarize with destination alone', () => {
+    const summary = summarizeFilters({
+      list: [
+        {
+          def: dstName,
+          compare: FilterCompare.equal,
+          values: [{ v: 'their-pod' }]
+        },
+        {
+          def: dstPort,
+          compare: FilterCompare.equal,
+          values: [{ v: '443' }]
+        }
+      ],
+      match: 'all'
+    });
+    expect(summary).toEqual('to their-pod,443');
+  });
+
+  it('should summarize with source OR destination', () => {
+    const summary = summarizeFilters({
+      list: [
+        {
+          def: srcNamespace,
+          compare: FilterCompare.equal,
+          values: [{ v: 'my-namespace' }]
+        },
+        {
+          def: dstName,
+          compare: FilterCompare.equal,
+          values: [{ v: 'their-pod' }]
+        },
+        {
+          def: dstPort,
+          compare: FilterCompare.equal,
+          values: [{ v: '443' }]
+        }
+      ],
+      match: 'any'
+    });
+    expect(summary).toEqual('from my-namespace or to their-pod,443');
+  });
+
+  it('should summarize with source and destination, two ways', () => {
+    const summary = summarizeFilters({
+      list: [
+        {
+          def: srcNamespace,
+          compare: FilterCompare.equal,
+          values: [{ v: 'my-namespace' }]
+        },
+        {
+          def: dstName,
+          compare: FilterCompare.equal,
+          values: [{ v: 'their-pod' }]
+        },
+        {
+          def: dstPort,
+          compare: FilterCompare.equal,
+          values: [{ v: '443' }]
+        }
+      ],
+      match: 'bidirectional'
+    });
+    expect(summary).toEqual('between my-namespace and their-pod,443');
+  });
+
+  it('should summarize with source alone, two ways', () => {
+    const summary = summarizeFilters({
+      list: [
+        {
+          def: srcNamespace,
+          compare: FilterCompare.equal,
+          values: [{ v: 'my-namespace' }]
+        }
+      ],
+      match: 'bidirectional'
+    });
+    expect(summary).toEqual('from/to my-namespace');
+  });
+
+  it('should summarize with any-side namespace', () => {
+    const summary = summarizeFilters({
+      list: [
+        {
+          def: anyNamespace,
+          compare: FilterCompare.equal,
+          values: [{ v: 'my-namespace' }]
+        }
+      ],
+      match: 'all'
+    });
+    expect(summary).toEqual('from/to my-namespace');
+  });
+
+  it('should summarize with protocol alone', () => {
+    const summary = summarizeFilters({
+      list: [
+        {
+          def: protocol,
+          compare: FilterCompare.equal,
+          values: [{ v: 'TCP' }]
+        }
+      ],
+      match: 'all'
+    });
+    expect(summary).toEqual('TCP');
+  });
+
+  it('should summarize with source and protocol', () => {
+    const summary = summarizeFilters({
+      list: [
+        {
+          def: srcNamespace,
+          compare: FilterCompare.equal,
+          values: [{ v: 'my-namespace' }]
+        },
+        {
+          def: protocol,
+          compare: FilterCompare.equal,
+          values: [{ v: 'TCP' }]
+        }
+      ],
+      match: 'all'
+    });
+    expect(summary).toEqual('TCP, from my-namespace');
+  });
+
+  it('should summarize with source regexp, destination not regexp and not protocol', () => {
+    const summary = summarizeFilters({
+      list: [
+        {
+          def: srcNamespace,
+          compare: FilterCompare.match,
+          values: [{ v: 'my-namespace' }]
+        },
+        {
+          def: dstName,
+          compare: FilterCompare.notMatch,
+          values: [{ v: 'their-pod' }]
+        },
+        {
+          def: protocol,
+          compare: FilterCompare.notEqual,
+          values: [{ v: 'TCP' }]
+        }
+      ],
+      match: 'all'
+    });
+    expect(summary).toEqual('!=TCP, from ~my-namespace to !~their-pod');
   });
 });

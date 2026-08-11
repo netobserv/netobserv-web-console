@@ -58,13 +58,6 @@
     max-width: 100%;
 }
 
-/* Ensure refresh controls stay on same row */
-.netobserv-refresh-interval-container {
-    margin: 0 !important;
-    flex-shrink: 0;
-    white-space: nowrap;
-}
-
 .netobserv-refresh-container {
     align-self: flex-end;
     flex-shrink: 0;

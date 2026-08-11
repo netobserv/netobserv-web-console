@@ -9,7 +9,6 @@ import {
   PageSection,
   Tab,
   Tabs,
-  Text,
   TextVariants,
   Title
 } from '@patternfly/react-core';
@@ -199,20 +198,13 @@ export const NetworkHealth: React.FC<{}> = ({}) => {
                   </FlexItem>
                   <FlexItem>
                     <Flex direction={{ default: 'row' }}>
-                      <FlexItem className="netobserv-refresh-interval-container">
-                        <Flex direction={{ default: 'column' }}>
-                          <FlexItem className="netobserv-action-title">
-                            <Text component={TextVariants.h4}>{t('Refresh interval')}</Text>
-                          </FlexItem>
-                          <FlexItem flex={{ default: 'flex_1' }}>
-                            <RefreshDropdown
-                              data-test="refresh-dropdown"
-                              id="refresh-dropdown"
-                              interval={interval}
-                              setInterval={setInterval}
-                            />
-                          </FlexItem>
-                        </Flex>
+                      <FlexItem flex={{ default: 'flex_1' }}>
+                        <RefreshDropdown
+                          data-test="refresh-dropdown"
+                          id="refresh-dropdown"
+                          interval={interval}
+                          setInterval={setInterval}
+                        />
                       </FlexItem>
                       <FlexItem className="netobserv-refresh-container">
                         <Button
