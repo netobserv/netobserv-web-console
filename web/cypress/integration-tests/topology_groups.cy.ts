@@ -117,10 +117,12 @@ describe("(OCP-53591) Netflow Topology groups features", { tags: ['Network_Obser
 
         // disable group edges and record leaf count
         cy.get(topologySelectors.groupEdgesToggle).uncheck()
+        cy.get('[data-test^="aggregate-edge-"]').should('not.exist')
 
         cy.get('#drawer ' + topologySelectors.edge).its('length').then(leafCount => {
-            // enable group edges and verify count changes
+            // enable group edges and verify aggregated count is less than leaf count
             cy.get(topologySelectors.groupEdgesToggle).check()
+            cy.get('[data-test^="aggregate-edge-"]').should('exist')
             cy.get('#drawer ' + topologySelectors.edge).its('length').should('not.eq', leafCount)
         })
     })
@@ -133,10 +135,12 @@ describe("(OCP-53591) Netflow Topology groups features", { tags: ['Network_Obser
 
         // disable group edges and record leaf count
         cy.get(topologySelectors.groupEdgesToggle).uncheck()
+        cy.get('[data-test^="aggregate-edge-"]').should('not.exist')
 
         cy.get('#drawer ' + topologySelectors.edge).its('length').then(leafCount => {
-            // enable group edges and verify count changes
+            // enable group edges and verify aggregated count is less than leaf count
             cy.get(topologySelectors.groupEdgesToggle).check()
+            cy.get('[data-test^="aggregate-edge-"]').should('exist')
             cy.get('#drawer ' + topologySelectors.edge).its('length').should('not.eq', leafCount)
         })
     })
@@ -152,12 +156,14 @@ describe("(OCP-53591) Netflow Topology groups features", { tags: ['Network_Obser
 
         // collapse groups
         cy.get(topologySelectors.groupToggle).click()
+        topologyPage.isViewRendered()
 
-        // edges should still render after collapse (no dangling edges or errors)
-        cy.get('#drawer ' + topologySelectors.edge).should('have.length.gte', 0)
+        // edges should still render after collapse
+        cy.get('#drawer ' + topologySelectors.edge).should('have.length.gte', 1)
 
         // expand groups
         cy.get(topologySelectors.groupToggle).click()
+        topologyPage.isViewRendered()
 
         // edges should rebuild after expand
         cy.get('#drawer ' + topologySelectors.edge).its('length').should('be.gte', 1)

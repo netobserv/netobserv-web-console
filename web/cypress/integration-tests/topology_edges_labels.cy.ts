@@ -66,13 +66,14 @@ describe("(OCP-53591) Netflow Topology edges,labels, badges features", { tags: [
         cy.get('#drawer ' + topologySelectors.edge).its('length').then(aggregatedCount => {
             // toggle group edges off
             cy.get(topologySelectors.groupEdgesToggle).uncheck()
+            cy.get('[data-test^="aggregate-edge-"]').should('not.exist')
             cy.get('#drawer ' + topologySelectors.edge).its('length').then(leafCount => {
-                // counts should differ between aggregated and leaf views
                 expect(leafCount).to.not.eq(aggregatedCount)
             })
 
             // toggle group edges back on
             cy.get(topologySelectors.groupEdgesToggle).check()
+            cy.get('[data-test^="aggregate-edge-"]').should('exist')
             cy.get('#drawer ' + topologySelectors.edge).its('length').should('eq', aggregatedCount)
         })
     })
