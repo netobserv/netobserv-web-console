@@ -2,6 +2,9 @@ FROM docker.io/library/node:24-alpine AS web-builder
 
 USER node
 
+# CI image builds are memory-constrained; without this webpack is SIGKILL'd (OOM).
+ENV NODE_OPTIONS="--max-old-space-size=6144"
+
 ARG BUILDSCRIPT
 ARG FLAVOR
 WORKDIR /opt/app-root
