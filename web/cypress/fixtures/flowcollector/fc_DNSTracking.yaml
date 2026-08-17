@@ -21,3 +21,6 @@ spec:
         - namespace_dns_latency_seconds
         - node_dns_latency_seconds
         - workload_dns_latency_seconds
+        - namespace_dns_flows_total
+        - node_dns_flows_total
+        - workload_dns_flows_total

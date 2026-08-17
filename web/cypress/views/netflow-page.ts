@@ -278,7 +278,7 @@ export namespace overviewSelectors {
     export const manageTLSTrackingPanelsList = ['TLS usage (donut or lines)', 'TLS usage per version (donut or lines)', 'TLS usage per group (donut or lines)', 'TLS usage per cipher suite (donut or lines)']
     export const defaultPanels = ['Top 5 average bytes rates', 'Top 5 bytes rates stacked with total']
     export const defaultPacketDropPanels = ['Top 5 packet dropped state stacked with total', 'Top 5 packet dropped cause stacked with total', 'Top 5 average dropped packets rates', 'Top 5 dropped packets rates stacked with total']
-    export const defaultDNSTrackingPanels = ['Top 5 DNS response code', 'Top 5 average DNS latencies with overall', 'Top 5 90th percentile DNS latencies']
+    export const defaultDNSTrackingPanels = ['Top 5 DNS name', 'Top 5 DNS response code', 'Top 5 average DNS latencies with overall', 'Top 5 90th percentile DNS latencies']
     export const defaultFlowRTTPanels = ['Top 5 average TCP smoothed Round Trip Time with overall', 'Bottom 5 minimum TCP smoothed Round Trip Time', 'Top 5 90th percentile TCP smoothed Round Trip Time']
     export const defaultTLSTrackingPanels = ['TLS usage (network flows per second)', 'TLS per version (network flows per second)']
     export const allPanels = defaultPanels.concat(['Top 5 average packets rates', 'Top 5 packets rates'])

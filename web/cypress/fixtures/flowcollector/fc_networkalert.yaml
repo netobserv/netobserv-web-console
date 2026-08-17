@@ -28,6 +28,7 @@ spec:
       includeList:
       - workload_dns_latency_seconds
       - node_dns_latency_seconds
+      - namespace_dns_latency_seconds
       - node_egress_bytes_total
       - namespace_egress_bytes_total
       - workload_egress_bytes_total
