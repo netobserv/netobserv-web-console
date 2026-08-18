@@ -39,17 +39,25 @@ describe('(OCP-72610 Network_Observability) Export automation', { tags: ['Networ
         cy.byTestID("table-composable").should('exist')
         cy.byTestID('show-view-options-button').should('exist').click()
         cy.get(exportSelectors.tableExport).should('exist').click()
+        cy.exec("rm -f cypress/downloads/*.csv", { failOnNonZeroExit: false })
         cy.get('#export-modal').find(exportSelectors.exportButton).should('exist').then((exportbtn) => {
             cy.wrap(exportbtn).click()
-            // wait for download to complete
-            cy.wait(3000)
-            // get the CSV file name
-            cy.exec("ls cypress/downloads").then((response) => {
-                // rename CSV file to export_table.csv
-                cy.wrap(response.stdout).should('not.be.empty')
-                cy.exec(`mv cypress/downloads/${response.stdout} cypress/downloads/export_table.csv`)
-                cy.readFile('cypress/downloads/export_table.csv')
-            })
+            const waitForCsv = (retries = 5): void => {
+                cy.exec("ls cypress/downloads", { failOnNonZeroExit: false }).then((response) => {
+                    const files = (response.stdout || '').trim().split('\n').filter(f => f.endsWith('.csv'))
+                    if (files.length === 0 && retries > 0) {
+                        cy.wait(2000)
+                        waitForCsv(retries - 1)
+                        return
+                    }
+                    expect(files.length).to.be.greaterThan(0)
+                    const csvFile = files[0]
+                    expect(csvFile).to.match(/^[\w.-]+$/)
+                    cy.exec(`mv "cypress/downloads/${csvFile}" "cypress/downloads/export_table.csv"`)
+                    cy.readFile('cypress/downloads/export_table.csv', { timeout: 10000 })
+                })
+            }
+            waitForCsv()
             cy.exec('rm cypress/downloads/export_table.csv')
         })
     })

@@ -12,12 +12,7 @@ describe("(OCP-67725, memodi) Network_Observability Client Performances", { brow
     })
 
     beforeEach("test", function () {
-        cy.clearLocalStorage()
-        cy.visit('/netflow-traffic')
-        // wait for page to be fully loaded
-        cy.get('#overview-container', { timeout: 60000 }).should('exist')
-        cy.byTestID('no-results-found').should('not.exist')
-
+        netflowPage.visit()
     })
 
     it("(OCP-67725, memodi, Network_Observability) should measure overview page load times", function () {

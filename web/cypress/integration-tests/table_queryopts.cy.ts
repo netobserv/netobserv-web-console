@@ -1,8 +1,8 @@
 import { Operator } from "@views/netobserv"
 import { netflowPage, colSelectors, querySumSelectors } from "@views/netflow-page"
 
-function getTableLimitURL(limit: string): string {
-    return `**/netflow-traffic**limit=${limit}`
+function getTableLimitURL(limit: string): RegExp {
+    return new RegExp(`loki/flow/records.*limit=${limit}(?:&|$)`)
 }
 
 describe('(OCP-50532, OCP-50531, OCP-50530, OCP-59408 Network_Observability) Netflow Table Query Options', { tags: ['Network_Observability'] }, function () {
@@ -24,23 +24,23 @@ describe('(OCP-50532, OCP-50531, OCP-50530, OCP-59408 Network_Observability) Net
 
     it("(OCP-50532, aramesha, Network_Observability) should verify Query Options dropdown", function () {
         // toggle between the page limits
-        cy.changeQueryOption('500')
-        netflowPage.waitForLokiQuery()
         cy.intercept('GET', getTableLimitURL('500'), {
             fixture: 'flowmetrics/table_500.json'
-        }).as('matchedUrl')
+        }).as('limit500')
+        cy.changeQueryOption('500')
+        cy.wait('@limit500', { timeout: 30000 })
 
-        cy.changeQueryOption('100')
-        netflowPage.waitForLokiQuery()
         cy.intercept('GET', getTableLimitURL('100'), {
             fixture: 'flowmetrics/table_100.json'
-        }).as('matchedUrl')
+        }).as('limit100')
+        cy.changeQueryOption('100')
+        cy.wait('@limit100', { timeout: 30000 })
 
-        cy.changeQueryOption('50')
-        netflowPage.waitForLokiQuery()
         cy.intercept('GET', getTableLimitURL('50'), {
             fixture: 'flowmetrics/table_50.json'
-        }).as('matchedUrl')
+        }).as('limit50')
+        cy.changeQueryOption('50')
+        cy.wait('@limit50', { timeout: 30000 })
     })
 
     it("(OCP-50532, memodi, Network_Observability) should validate query summary panel", function () {

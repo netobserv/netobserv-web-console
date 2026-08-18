@@ -38,8 +38,18 @@ export const graphSelector = {
 
 Cypress.Commands.add('checkDashboards', (names) => {
     for (let i = 0; i < names.length; i++) {
-        cy.byTestID(names[i]).should('exist', { timeout: 120000 })
-            .find(graphSelector.graphBody).should('not.have.class', 'graph-empty-state', { timeout: 120000 })
+        // Wait for panel to exist
+        cy.byTestID(names[i], { timeout: 120000 }).should('exist').first().scrollIntoView()
+
+        // Add wait to allow metrics to populate
+        cy.wait(2000)
+
+        // Check that graph body doesn't have empty state
+        cy.byTestID(names[i]).first({ timeout: 120000 }).should($panel => {
+            const $region = $panel.find(graphSelector.graphBody)
+            expect($region.length, `${names[i]} graph region should exist`).to.be.greaterThan(0)
+            expect($region.hasClass('graph-empty-state'), `${names[i]} should not be empty`).to.be.false
+        })
     }
 })
 

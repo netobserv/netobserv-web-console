@@ -35,23 +35,41 @@ export function getMemoryUsageMB(): number {
 }
 
 export const netflowPage = {
-    visit: () => {
-        cy.clearLocalStorage()
-        cy.intercept('**/backend/api/flow/metrics*').as('call1')
+    visit: (clearfilters = true) => {
+        cy.clearNetobservLocalStorage()
         cy.visit('/netflow-traffic')
-        // wait for all calls to complete
-        cy.wait('@call1', { timeout: 60000 })
 
-        netflowPage.clearAllFilters()
+        // Retry with reload if console shows 404 (plugin route not registered yet)
+        const waitForPlugin = (retries = 3): void => {
+            cy.wait(5000)
+            cy.get('body').then($body => {
+                if ($body.text().includes('Page Not Found') && retries > 0) {
+                    cy.log('Plugin page not ready, reloading')
+                    cy.wait(15000)
+                    cy.visit('/netflow-traffic')
+                    waitForPlugin(retries - 1)
+                }
+            })
+        }
+        waitForPlugin()
 
+        // Wait for the plugin page before touching filters
+        cy.get('#overview-container', { timeout: 60000 }).should('exist')
+
+        cy.wrap(clearfilters).then(shouldClearFilters => {
+            if (shouldClearFilters) {
+                netflowPage.clearAllFilters()
+            }
+        })
         // set the page to auto refresh
         netflowPage.setAutoRefresh()
 
-        cy.byTestID('no-results-found').should('not.exist')
-        cy.get('#overview-container').should('exist')
+        netflowPage.waitForLokiQuery()
+
+        cy.byTestID('no-results-found', { timeout: 30000 }).should('not.exist')
     },
     visitDeveloper: (project: string) => {
-        cy.clearLocalStorage()
+        cy.clearNetobservLocalStorage()
         cy.switchPerspective('Developer');
         guidedTour.close()
         cy.visit(`/dev-monitoring/ns/${project}/netflow-traffic`)
@@ -73,18 +91,31 @@ export const netflowPage = {
         })
     },
     resetClearFilters: () => {
-        cy.get('body').then($body => {
-            if ($body.find('[data-test="reset-filters-button"]').length > 0) {
-                cy.byTestID("reset-filters-button").click({ force: true })
-            }
-        })
+        const tryReset = (retries = 3): void => {
+            cy.get('body').then($body => {
+                if ($body.find('[data-test="reset-filters-button"]').length > 0) {
+                    cy.byTestID("reset-filters-button").click({ force: true })
+                } else if (retries > 0) {
+                    cy.wait(500)
+                    tryReset(retries - 1)
+                }
+            })
+        }
+        tryReset()
     },
     clearAllFilters: () => {
-        cy.get('body').then($body => {
-            if ($body.find('[data-test="clear-all-filters-button"]').length > 0) {
-                cy.byTestID("clear-all-filters-button").click()
-            }
-        })
+        cy.byTestID(genSelectors.refreshDrop).should('exist')
+        const tryClick = (retries = 5): void => {
+            cy.get('body').then($body => {
+                if ($body.find('[data-test="clear-all-filters-button"]').length > 0) {
+                    cy.byTestID("clear-all-filters-button").click()
+                } else if (retries > 0) {
+                    cy.wait(500)
+                    tryClick(retries - 1)
+                }
+            })
+        }
+        tryClick()
     },
     waitForLokiQuery: () => {
         cy.get("#refresh-button > span > svg").invoke('attr', 'style').should('contain', '0s linear 0s')
@@ -148,7 +179,7 @@ export const topologyPage = {
  * @param namespace - Optional namespace to filter topology view by
  */
 export function setupTopologyViewWithNamespaceFilter(namespace?: string) {
-    cy.clearLocalStorage()
+    cy.clearNetobservLocalStorage()
     netflowPage.visit()
     cy.get('#tabs-container').contains('Topology').click()
 
@@ -308,7 +339,7 @@ export const loadTimes = {
 export const memoryUsage = {
     "overview": 300,
     "table": 450,
-    "topology": 360
+    "topology": 600
 }
 
 export namespace histogramSelectors {

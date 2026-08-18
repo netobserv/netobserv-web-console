@@ -41,10 +41,16 @@
 import * as c from './const';
 import { guidedTour } from '@views/tour';
 
+Cypress.Commands.add('clearNetobservLocalStorage', () => {
+  cy.window().then(win => {
+    win.localStorage.removeItem('netobserv-plugin-settings')
+  })
+})
+
 Cypress.Commands.add('openNetflowTrafficPage', (clearCache = true) => {
   if (clearCache) {
     //clear local storage to ensure to be in default view = overview
-    cy.clearLocalStorage();
+    cy.clearNetobservLocalStorage();
   }
   cy.visit(c.url);
   cy.get("#netflow-traffic-nav-item-link").click();
@@ -196,6 +202,7 @@ Cypress.Commands.add('checkRecordField', (field, name, values) => {
 declare global {
   namespace Cypress {
     interface Chainable {
+      clearNetobservLocalStorage(): Chainable<void>
       openNetflowTrafficPage(clearCache?: boolean): Chainable<void>
       showAdvancedOptions(): Chainable<Element>
       showDisplayOptions(): Chainable<Element>
