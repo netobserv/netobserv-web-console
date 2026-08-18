@@ -26,15 +26,10 @@ func NewInventory(cfg *config.Prometheus) *Inventory {
 		if cfg.Metrics[i].Direction == "" {
 			cfg.Metrics[i].Direction = config.AnyDirection
 		}
-		// Add DNS counter(s)
-		if strings.Contains(cfg.Metrics[i].Name, "_dns_latency_seconds") {
-			cpy := cfg.Metrics[i]
-			cpy.Name += "_count"
-			cpy.ValueField = constants.MetricTypeDNSFlows
-			toAppend = append(toAppend, cpy)
-		}
-		// Simulate Flows and TLSFlows value fields
-		if strings.Contains(cfg.Metrics[i].Name, "_tls_flows") {
+		// Simulate Flows, DNSFlows and TLSFlows value fields
+		if strings.Contains(cfg.Metrics[i].Name, "_dns_flows") {
+			cfg.Metrics[i].ValueField = constants.MetricTypeDNSFlows
+		} else if strings.Contains(cfg.Metrics[i].Name, "_tls_flows") {
 			cfg.Metrics[i].ValueField = constants.MetricTypeTLSFlows
 		} else if strings.Contains(cfg.Metrics[i].Name, "_flows") {
 			cfg.Metrics[i].ValueField = constants.MetricTypeFlows

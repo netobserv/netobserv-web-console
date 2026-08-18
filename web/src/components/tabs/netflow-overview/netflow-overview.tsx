@@ -36,7 +36,7 @@ import { localStorageOverviewKebabKey, useLocalStorage } from '../../../utils/lo
 import { observeDOMRect, toNamedMetric } from '../../../utils/metrics-helper';
 import {
   customPanelMatcher,
-  dnsIdMatcher,
+  dnsMatcher,
   droppedIdMatcher,
   getFunctionFromId,
   getOverviewPanelInfo,
@@ -253,59 +253,52 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
         });
       }
 
-      const dnsPanels = props.panels.filter(p => p.id.includes(dnsIdMatcher));
-      if (features.includes('dnsTracking') && !_.isEmpty(dnsPanels)) {
-        //set dns metrics
-        const dnsLatencyMetrics = initFunctionMetricKeys(dnsPanels.map(p => p.id)) as FunctionMetrics;
-        (Object.keys(dnsLatencyMetrics) as (keyof typeof dnsLatencyMetrics)[]).map(fn => {
-          const fq: StructuredFlowQuery = { ...baseQuery, function: fn, type: 'DnsLatencyMs' };
-          promises.push(
-            Result.fromPromise(getMetrics(fq, range)).then(res => {
-              const dnsLatency = res
-                .map(success => {
-                  dnsLatencyMetrics[fn] = success.metrics;
-                  return dnsLatencyMetrics;
-                })
-                .mapError(err => getStructuredHTTPError(err, `DNS Latency`));
-              currentMetrics = { ...currentMetrics, dnsLatency };
-              setMetrics(currentMetrics);
-              return res.map(r => r.stats).or(emptyStats);
-            })
-          );
-        });
+      if (features.includes('dnsTracking')) {
+        const dnsPanels = props.panels.filter(p => p.id.includes(dnsMatcher));
+        if (!_.isEmpty(dnsPanels)) {
+          //set dns metrics
+          const dnsLatencyMetrics = initFunctionMetricKeys(dnsPanels.map(p => p.id)) as FunctionMetrics;
+          (Object.keys(dnsLatencyMetrics) as (keyof typeof dnsLatencyMetrics)[]).map(fn => {
+            const fq: StructuredFlowQuery = { ...baseQuery, function: fn, type: 'DnsLatencyMs' };
+            promises.push(
+              Result.fromPromise(getMetrics(fq, range)).then(res => {
+                const dnsLatency = res
+                  .map(success => {
+                    dnsLatencyMetrics[fn] = success.metrics;
+                    return dnsLatencyMetrics;
+                  })
+                  .mapError(err => getStructuredHTTPError(err, `DNS Latency`));
+                currentMetrics = { ...currentMetrics, dnsLatency };
+                setMetrics(currentMetrics);
+                return res.map(r => r.stats).or(emptyStats);
+              })
+            );
+          });
 
-        const totalDnsLatencyMetric = initFunctionMetricKeys(dnsPanels.map(p => p.id)) as TotalFunctionMetrics;
-        (Object.keys(totalDnsLatencyMetric) as (keyof typeof totalDnsLatencyMetric)[]).map(fn => {
-          const fq: StructuredFlowQuery = { ...baseQuery, function: fn, aggregateBy: 'app', type: 'DnsLatencyMs' };
-          promises.push(
-            Result.fromPromise(getMetrics(fq, range)).then(res => {
-              const totalDnsLatency = res
-                .map(success => {
-                  totalDnsLatencyMetric[fn] = success.metrics[0];
-                  return totalDnsLatencyMetric;
-                })
-                .mapError(err => getStructuredHTTPError(err, `Total DNS Latency`));
-              currentMetrics = { ...currentMetrics, totalDnsLatency };
-              setMetrics(currentMetrics);
-              return res.map(r => r.stats).or(emptyStats);
-            })
-          );
-        });
+          const totalDnsLatencyMetric = initFunctionMetricKeys(dnsPanels.map(p => p.id)) as TotalFunctionMetrics;
+          (Object.keys(totalDnsLatencyMetric) as (keyof typeof totalDnsLatencyMetric)[]).map(fn => {
+            const fq: StructuredFlowQuery = { ...baseQuery, function: fn, aggregateBy: 'app', type: 'DnsLatencyMs' };
+            promises.push(
+              Result.fromPromise(getMetrics(fq, range)).then(res => {
+                const totalDnsLatency = res
+                  .map(success => {
+                    totalDnsLatencyMetric[fn] = success.metrics[0];
+                    return totalDnsLatencyMetric;
+                  })
+                  .mapError(err => getStructuredHTTPError(err, `Total DNS Latency`));
+                currentMetrics = { ...currentMetrics, totalDnsLatency };
+                setMetrics(currentMetrics);
+                return res.map(r => r.stats).or(emptyStats);
+              })
+            );
+          });
+        }
 
-        //set rcode metrics
-        if (dnsPanels.some(p => p.id.includes('rcode_dns_latency_flows'))) {
-          const fqNames: StructuredFlowQuery = {
-            ...baseQuery,
-            aggregateBy: 'DnsName',
-            function: 'count',
-            type: 'DnsFlows'
-          };
-          const fqCodes: StructuredFlowQuery = {
-            ...baseQuery,
-            aggregateBy: 'DnsFlagsResponseCode',
-            function: 'count',
-            type: 'DnsFlows'
-          };
+        // DNS name & rcode
+        const hasRCode = dnsPanels.some(p => p.id === 'dns_rcode_flows');
+        const hasName = dnsPanels.some(p => p.id === 'dns_name_flows');
+        if (hasRCode || hasName) {
+          // Total
           const fqTotal: StructuredFlowQuery = {
             ...baseQuery,
             aggregateBy: 'app',
@@ -313,17 +306,25 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
             type: 'DnsFlows'
           };
           promises.push(
-            ...[
-              //get dns names
-              Result.fromPromise(getFlowGenericMetrics(fqNames, range)).then(res => {
-                const dnsName = res
-                  .map(success => success.metrics)
-                  .mapError(err => getStructuredHTTPError(err, `DNS Names`));
-                currentMetrics = { ...currentMetrics, dnsName };
-                setMetrics(currentMetrics);
-                return res.map(r => r.stats).or(emptyStats);
-              }),
-              //get dns response codes
+            Result.fromPromise(getFlowGenericMetrics(fqTotal, range)).then(res => {
+              const totalDnsCount = res
+                .map(success => success.metrics[0])
+                .mapError(err => getStructuredHTTPError(err, `DNS Total`));
+              currentMetrics = { ...currentMetrics, totalDnsCount };
+              setMetrics(currentMetrics);
+              return res.map(r => r.stats).or(emptyStats);
+            })
+          );
+
+          if (hasRCode) {
+            // Get dns response codes
+            const fqCodes: StructuredFlowQuery = {
+              ...baseQuery,
+              aggregateBy: 'DnsFlagsResponseCode',
+              function: 'count',
+              type: 'DnsFlows'
+            };
+            promises.push(
               Result.fromPromise(getFlowGenericMetrics(fqCodes, range)).then(res => {
                 const dnsRCode = res
                   .map(success => success.metrics)
@@ -331,17 +332,28 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
                 currentMetrics = { ...currentMetrics, dnsRCode };
                 setMetrics(currentMetrics);
                 return res.map(r => r.stats).or(emptyStats);
-              }),
-              Result.fromPromise(getFlowGenericMetrics(fqTotal, range)).then(res => {
-                const totalDnsCount = res
-                  .map(success => success.metrics[0])
-                  .mapError(err => getStructuredHTTPError(err, `DNS Total`));
-                currentMetrics = { ...currentMetrics, totalDnsCount };
+              })
+            );
+          }
+          if (hasName) {
+            // Get dns names
+            const fqNames: StructuredFlowQuery = {
+              ...baseQuery,
+              aggregateBy: 'DnsName',
+              function: 'count',
+              type: 'DnsFlows'
+            };
+            promises.push(
+              Result.fromPromise(getFlowGenericMetrics(fqNames, range)).then(res => {
+                const dnsName = res
+                  .map(success => success.metrics)
+                  .mapError(err => getStructuredHTTPError(err, `DNS Names`));
+                currentMetrics = { ...currentMetrics, dnsName };
                 setMetrics(currentMetrics);
                 return res.map(r => r.stats).or(emptyStats);
               })
-            ]
-          );
+            );
+          }
         }
       } else {
         setMetrics({
@@ -1076,19 +1088,19 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
             doubleWidth: options.graph!.type !== 'donut'
           };
         }
-        case 'name_dns_latency_flows':
-        case 'rcode_dns_latency_flows': {
-          const metricType = id === 'name_dns_latency_flows' ? 'DnsName' : 'DnsFlows'; // TODO: consider adding packets graphs here
+        case 'dns_name_flows':
+        case 'dns_rcode_flows': {
+          const metricType = id === 'dns_name_flows' ? 'DnsName' : 'DnsFlows'; // TODO: consider adding packets graphs here
           const topKMetrics =
-            id === 'name_dns_latency_flows' ? sortMetrics(props.metrics.dnsName) : sortMetrics(props.metrics.dnsRCode);
+            id === 'dns_name_flows' ? sortMetrics(props.metrics.dnsName) : sortMetrics(props.metrics.dnsRCode);
           const namedTotalMetric = props.metrics.totalDnsCount;
           const options = getKebabOptions(id, {
-            showNoError: id === 'rcode_dns_latency_flows' ? true : undefined,
+            showNoError: id === 'dns_rcode_flows' ? true : undefined,
             showTop: true,
             showApp: { text: t('Show total'), value: true },
             graph: { options: ['bar_line', 'donut'], type: 'donut' }
           });
-          const othersName = id === 'rcode_dns_latency_flows' ? 'NoError' : undefined;
+          const othersName = id === 'dns_rcode_flows' ? 'NoError' : undefined;
           const isDonut = options!.graph!.type === 'donut';
           const showTopOnly = isDonut || (options.showTop && !options.showApp!.value);
           const showTotalOnly = !options.showTop && options.showApp!.value;

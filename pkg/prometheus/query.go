@@ -106,14 +106,14 @@ func (q *QueryBuilder) Build() Query {
 		if isHisto {
 			if quantile == "" {
 				// histogram average: sum / count
-				appendRate(&sb, metric+"_sum", q.filters, q.in.RateInterval)
+				appendRateOrIncrease(&sb, false, metric+"_sum", q.filters, q.in.RateInterval)
 				sb.WriteRune('/')
-				appendRate(&sb, metric+"_count", q.filters, q.in.RateInterval)
+				appendRateOrIncrease(&sb, false, metric+"_count", q.filters, q.in.RateInterval)
 			} else {
-				appendRate(&sb, metric+"_bucket", q.filters, q.in.RateInterval)
+				appendRateOrIncrease(&sb, false, metric+"_bucket", q.filters, q.in.RateInterval)
 			}
 		} else {
-			appendRate(&sb, metric, q.filters, q.in.RateInterval)
+			appendRateOrIncrease(&sb, q.in.MetricFunction == constants.MetricFunctionCount, metric, q.filters, q.in.RateInterval)
 		}
 		sb.WriteRune(')') // closes sum(...
 		if isHisto && quantile != "" {
@@ -135,8 +135,12 @@ func (q *QueryBuilder) Build() Query {
 	}
 }
 
-func appendRate(sb *strings.Builder, metric string, filters filters.SingleQuery, interval string) {
-	sb.WriteString("rate(")
+func appendRateOrIncrease(sb *strings.Builder, isIncrease bool, metric string, filters filters.SingleQuery, interval string) {
+	if isIncrease {
+		sb.WriteString("increase(")
+	} else {
+		sb.WriteString("rate(")
+	}
 	appendFilteredMetric(sb, metric, filters)
 	sb.WriteRune('[')
 	sb.WriteString(interval)

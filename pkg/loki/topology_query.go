@@ -134,11 +134,11 @@ func (q *TopologyQueryBuilder) Build() string {
 	case constants.MetricTypeDNSLatency:
 		q.appendDNSLatencyFilter(sb)
 	case constants.MetricTypeDNSFlows:
-		q.appendDNSFilter(sb)
+		q.appendFilter(sb, "DnsId")
 	case constants.MetricTypeTLSFlows:
 		q.appendTLSFilter(sb)
 	case constants.MetricTypeFlowRTT:
-		q.appendRTTFilter(sb)
+		q.appendFilter(sb, "TimeFlowRttNs")
 	}
 
 	q.appendJSON(sb, true)

@@ -92,10 +92,8 @@ describe('<NetflowTraffic />', () => {
       { ...defaultQuery, function: 'avg', aggregateBy: 'app', type: 'DnsLatencyMs' },
       { ...defaultQuery, function: 'p90', aggregateBy: 'app', type: 'DnsLatencyMs' },
       { ...defaultQuery, function: 'avg', type: 'TimeFlowRttNs' },
-      { ...defaultQuery, function: 'min', type: 'TimeFlowRttNs' },
       { ...defaultQuery, function: 'p90', type: 'TimeFlowRttNs' },
       { ...defaultQuery, function: 'avg', aggregateBy: 'app', type: 'TimeFlowRttNs' },
-      { ...defaultQuery, function: 'min', aggregateBy: 'app', type: 'TimeFlowRttNs' },
       { ...defaultQuery, function: 'p90', aggregateBy: 'app', type: 'TimeFlowRttNs' }
     ];
     const expectedGenericMetricsQueries: FlowQuery[] = [

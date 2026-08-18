@@ -10,7 +10,7 @@ import {
   localStorageOverviewIdsKey
 } from './local-storage-hook';
 import { ConfigCapabilities } from './netflow-capabilities-hook';
-import { getDefaultOverviewPanels, OverviewPanel } from './overview-panels';
+import { getAvailablePanels, OverviewPanel } from './overview-panels';
 import { defaultMetricScope, defaultMetricType, setURLFilters } from './router';
 
 type InitState = React.MutableRefObject<string[]>;
@@ -124,11 +124,7 @@ export function useConfigValidation(params: {
         )
       );
       setPanels(
-        getLocalStorage(
-          localStorageOverviewIdsKey,
-          getDefaultOverviewPanels(config.panels),
-          defaultArraySelectionOptions
-        )
+        getLocalStorage(localStorageOverviewIdsKey, getAvailablePanels(config.panels), defaultArraySelectionOptions)
       );
       setFiltersFromURL();
     }

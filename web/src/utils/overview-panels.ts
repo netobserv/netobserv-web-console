@@ -2,7 +2,7 @@ import { TFunction } from 'i18next';
 import { AggregateBy, MetricFunction, MetricType, StatFunction } from '../model/flow-query';
 import { Feature, isAllowed } from './features-gate';
 
-export const dnsIdMatcher = 'dns_latency';
+export const dnsMatcher = 'dns_';
 export const rttIdMatcher = 'rtt';
 export const droppedIdMatcher = 'dropped';
 export const tlsIdMatcher = 'tls_';
@@ -24,12 +24,10 @@ export const getFunctionFromId = (id: string) => {
     : 'avg';
 };
 
-export type OverviewPanelRateMetric = 'byte_rates' | 'packet_rates' | 'dropped_byte_rates' | 'dropped_packet_rates';
-export type OverviewPanelLatencyMetric = 'dns_latency' | 'rtt';
-export type OverviewPanelTopLatencyFunction = 'avg' | 'max' | 'p90' | 'p99';
-export type OverviewPanelBottomLatencyFunction = 'min';
-export type OverviewPanelFunction = OverviewPanelTopLatencyFunction | OverviewPanelBottomLatencyFunction;
-export type OverviewPanelMetric = OverviewPanelRateMetric | OverviewPanelLatencyMetric;
+type OverviewPanelRateMetric = 'byte_rates' | 'packet_rates' | 'dropped_byte_rates' | 'dropped_packet_rates';
+type OverviewPanelLatencyMetric = 'dns_latency' | 'rtt';
+type OverviewPanelTopLatencyFunction = 'avg' | 'max' | 'p90' | 'p99';
+type OverviewPanelBottomLatencyFunction = 'min';
 
 export type OverviewPanelId =
   | 'overview'
@@ -41,8 +39,8 @@ export type OverviewPanelId =
   | `${OverviewPanelRateMetric}`
   | `state_dropped_packet_rates`
   | `cause_dropped_packet_rates`
-  | 'name_dns_latency_flows'
-  | 'rcode_dns_latency_flows'
+  | 'dns_name_flows'
+  | 'dns_rcode_flows'
   | 'tls_usage_global'
   | 'tls_per_cipher_suite'
   | 'tls_per_version'
@@ -65,7 +63,7 @@ export type OverviewPanelInfo = {
   tooltip?: string;
 };
 
-export const defaultPanelIds: OverviewPanelId[] = [
+const defaultPanelIds: Set<OverviewPanelId> = new Set([
   'overview',
   'top_sankey',
   'inbound_region',
@@ -77,67 +75,45 @@ export const defaultPanelIds: OverviewPanelId[] = [
   'cause_dropped_packet_rates',
   'top_avg_dns_latency',
   'top_p90_dns_latency',
-  'name_dns_latency_flows',
-  'rcode_dns_latency_flows',
-  'bottom_min_rtt', // should remove from defaults?
+  'dns_name_flows',
+  'dns_rcode_flows',
   'top_avg_rtt',
   'top_p90_rtt',
   'tls_usage_global',
   'tls_per_version'
-];
+]);
 
-export const getDefaultOverviewPanels = (customIds?: string[]): OverviewPanel[] => {
-  let ids: OverviewPanelId[] = ['tls_usage_global', 'tls_per_version', 'tls_per_group', 'tls_per_cipher_suite'];
+// List of available panels with their default selection behavior
+// isSelected can safely be used on feature related panels
+// as these will be filtered on top anyways
+export const getAvailablePanels = (customIds?: string[]): OverviewPanel[] => {
+  const ratesPanels = (m: OverviewPanelRateMetric): OverviewPanelId[] => [`top_avg_${m}`, m];
+  const histogramPanels = (m: OverviewPanelLatencyMetric): OverviewPanelId[] => {
+    return ['avg', 'max', 'p90', 'p99'].map(s => `top_${s}_${m}` as OverviewPanelId).concat([`bottom_min_${m}`]);
+  };
 
-  /* list of panels and default selection behavior
-   *  isSelected can safely be used on feature related panels
-   *  as these will be filtered on top anyways
-   */
-  if (isAllowed(Feature.Overview)) {
-    ids = ids.concat(['overview', 'top_sankey', 'inbound_region']);
-  }
-
-  const metrics: OverviewPanelMetric[] = [
-    'byte_rates',
-    'packet_rates',
-    'dropped_byte_rates',
-    'dropped_packet_rates',
-    'dns_latency',
-    'rtt'
+  // The order here determines the display order
+  const ids: OverviewPanelId[] = [
+    ...(isAllowed(Feature.Overview) ? (['overview', 'top_sankey', 'inbound_region'] as OverviewPanelId[]) : []),
+    ...ratesPanels('byte_rates'),
+    ...ratesPanels('packet_rates'),
+    'tls_usage_global',
+    'tls_per_version',
+    'tls_per_group',
+    'tls_per_cipher_suite',
+    'state_dropped_packet_rates',
+    'cause_dropped_packet_rates',
+    ...ratesPanels('dropped_byte_rates'),
+    ...ratesPanels('dropped_packet_rates'),
+    'dns_name_flows',
+    'dns_rcode_flows',
+    ...histogramPanels('dns_latency'),
+    ...histogramPanels('rtt'),
+    ...(customIds ? customIds.map(id => `${customPanelMatcher}_${id}` as OverviewPanelId) : [])
   ];
-  const functions: OverviewPanelFunction[] = ['avg', 'min', 'max', 'p90', 'p99'];
-  metrics.forEach((m: OverviewPanelMetric) => {
-    // specific graph per feature
-    switch (m) {
-      case 'dropped_byte_rates':
-        ids = ids.concat(['state_dropped_packet_rates', 'cause_dropped_packet_rates']);
-        break;
-      case 'dns_latency':
-        ids = ids.concat(['name_dns_latency_flows', 'rcode_dns_latency_flows']);
-        break;
-    }
-
-    if (['byte_rates', 'packet_rates', 'dropped_byte_rates', 'dropped_packet_rates'].includes(m)) {
-      // rates
-      ids.push(`top_avg_${m as OverviewPanelRateMetric}`);
-      ids.push(m as OverviewPanelRateMetric);
-    } else if (['dns_latency', 'rtt'].includes(m))
-      // latency metrics functions
-      functions.forEach((fn: OverviewPanelFunction) => {
-        if (['avg', 'max', 'p90', 'p99'].includes(fn)) {
-          ids.push(`top_${fn as OverviewPanelTopLatencyFunction}_${m as OverviewPanelLatencyMetric}`);
-        } else {
-          ids.push(`bottom_${fn as OverviewPanelBottomLatencyFunction}_${m as OverviewPanelLatencyMetric}`);
-        }
-      });
-  });
-
-  if (customIds) {
-    ids = ids.concat(customIds.map(id => `${customPanelMatcher}_${id}` as OverviewPanelId));
-  }
 
   return ids.map(id => {
-    return { id, isSelected: defaultPanelIds.includes(id) };
+    return { id, isSelected: defaultPanelIds.has(id) };
   });
 };
 
@@ -313,7 +289,7 @@ export const getOverviewPanelInfo = (
         })
       };
     }
-    case 'name_dns_latency_flows':
+    case 'dns_name_flows':
       return {
         title: t('Top {{limit}} DNS name with total', { limit }),
         topTitle: t('Top {{limit}} DNS name', { limit }),
@@ -322,7 +298,7 @@ export const getOverviewPanelInfo = (
         subtitle: t('Total DNS flow count'),
         tooltip: t('The top DNS name extracted from DNS headers compared to total over the selected interval')
       };
-    case 'rcode_dns_latency_flows':
+    case 'dns_rcode_flows':
       return {
         title: t('Top {{limit}} DNS response code with total', { limit }),
         topTitle: t('Top {{limit}} DNS response code', { limit }),

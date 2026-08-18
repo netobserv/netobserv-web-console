@@ -207,23 +207,6 @@ func (q *FlowQueryBuilder) appendFilter(sb *strings.Builder, field string) {
 	sb.WriteString("\"`")
 }
 
-func (q *FlowQueryBuilder) appendDNSFilter(sb *strings.Builder) {
-	// ensure at least one Dns field is specified except DnsErrno
-	// |~`"DnsId`|~`"DnsName`|~`"DnsLatencyMs`|~`"DnsFlagsResponseCode"`
-	sb.WriteString("|~`")
-	sb.WriteString(`"DnsId`)
-	sb.WriteString("`")
-	sb.WriteString("|~`")
-	sb.WriteString(`"DnsName`)
-	sb.WriteString("`")
-	sb.WriteString("|~`")
-	sb.WriteString(`"DnsLatencyMs`)
-	sb.WriteString("`")
-	sb.WriteString("|~`")
-	sb.WriteString(`"DnsFlagsResponseCode"`)
-	sb.WriteString("`")
-}
-
 func (q *FlowQueryBuilder) appendTLSFilter(sb *strings.Builder) {
 	sb.WriteString(`|="TLSTypes"`)
 }
@@ -236,14 +219,6 @@ func (q *FlowQueryBuilder) appendDNSLatencyFilter(sb *strings.Builder) {
 	sb.WriteString("`")
 	sb.WriteString("!~`")
 	sb.WriteString(`"DnsLatencyMs":0[,}]`)
-	sb.WriteString("`")
-}
-
-func (q *FlowQueryBuilder) appendRTTFilter(sb *strings.Builder) {
-	// ensure at TimeFlowRttNs field is specified
-	// |~`"TimeFlowRttNs"`
-	sb.WriteString("|~`")
-	sb.WriteString(`"TimeFlowRttNs"`)
 	sb.WriteString("`")
 }
 

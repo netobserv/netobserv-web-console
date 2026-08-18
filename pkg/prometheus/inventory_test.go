@@ -11,6 +11,13 @@ import (
 var configuredMetrics = []config.MetricInfo{
 	{
 		Enabled:   true,
+		Name:      "netobserv_metric_dns_flows_total",
+		Type:      "Counter",
+		Direction: config.AnyDirection,
+		Labels:    []string{"SrcK8S_Namespace", "DstK8S_Namespace"},
+	},
+	{
+		Enabled:   true,
 		Name:      "netobserv_metric_tls_flows_total",
 		Type:      "Counter",
 		Direction: config.AnyDirection,
@@ -108,6 +115,11 @@ func TestInventory_Search(t *testing.T) {
 	// Search TLS flows metrics
 	search = inv.Search([]string{"SrcK8S_Namespace", "DstK8S_Namespace"}, constants.MetricTypeTLSFlows)
 	assert.Equal(t, []string{"netobserv_metric_tls_flows_total"}, search.Found)
+	assert.Empty(t, search.Candidates)
+
+	// Search DNS flows metrics
+	search = inv.Search([]string{"SrcK8S_Namespace", "DstK8S_Namespace"}, constants.MetricTypeDNSFlows)
+	assert.Equal(t, []string{"netobserv_metric_dns_flows_total"}, search.Found)
 	assert.Empty(t, search.Candidates)
 }
 

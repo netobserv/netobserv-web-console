@@ -23,7 +23,7 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Feature } from '../../model/config';
 import { RecordType } from '../../model/flow-query';
-import { getDefaultOverviewPanels, getOverviewPanelInfo, OverviewPanel } from '../../utils/overview-panels';
+import { getAvailablePanels, getOverviewPanelInfo, OverviewPanel } from '../../utils/overview-panels';
 import Modal from './modal';
 import './overview-panels-modal.css';
 
@@ -164,7 +164,7 @@ export const OverviewPanelsModal: React.FC<OverviewPanelsModalProps> = ({
   );
 
   const onReset = React.useCallback(() => {
-    setUpdatedPanels(getDefaultOverviewPanels(customIds).filter(p => panels.some(existing => existing.id === p.id)));
+    setUpdatedPanels(getAvailablePanels(customIds).filter(p => panels.some(existing => existing.id === p.id)));
   }, [customIds, panels]);
 
   const isSaveDisabled = React.useCallback(() => {

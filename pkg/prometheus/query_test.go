@@ -172,18 +172,18 @@ func TestBuildQuery_PromQLByDNSResponseCode(t *testing.T) {
 	in := queryparams.TopologyInput{
 		Top:            "5",
 		RateInterval:   "1m",
-		DataField:      "DnsFlows",
+		DataField:      constants.MetricTypeDNSFlows,
 		MetricFunction: constants.MetricFunctionCount,
 		RecordType:     constants.RecordTypeLog,
 		DataSource:     constants.DataSourceAuto,
 		Aggregate:      "DnsFlagsResponseCode",
 	}
 	f := filters.SingleQuery{}
-	q := NewQuery(kl, &in, &qr, f, []string{"netobserv_namespace_dns_latency_seconds_count"})
+	q := NewQuery(kl, &in, &qr, f, []string{"netobserv_namespace_dns_flows_total"})
 	result := q.Build()
 	assert.Equal(
 		t,
-		`topk(5,sum by(DnsFlagsResponseCode)(rate(netobserv_namespace_dns_latency_seconds_count{DnsFlagsResponseCode!=""}[1m])))`,
+		`topk(5,sum by(DnsFlagsResponseCode)(increase(netobserv_namespace_dns_flows_total{DnsFlagsResponseCode!=""}[1m])))`,
 		result.PromQL,
 	)
 }

@@ -13,7 +13,7 @@ import { Column, ColumnsId } from './columns';
 import { ContextSingleton } from './context';
 import { computeStepInterval, TimeRange } from './datetime';
 import { checkFilterAvailable, getFilterDefinitions } from './filter-definitions';
-import { dnsIdMatcher, droppedIdMatcher, OverviewPanel, rttIdMatcher, tlsIdMatcher } from './overview-panels';
+import { dnsMatcher, droppedIdMatcher, OverviewPanel, rttIdMatcher, tlsIdMatcher } from './overview-panels';
 
 export interface ConfigCapabilities {
   allowLoki: boolean;
@@ -140,7 +140,7 @@ export function useConfigCapabilities(params: {
       panels.filter(
         panel =>
           (isPktDrop || !panel.id.includes(droppedIdMatcher)) &&
-          (isDNSTracking || !panel.id.includes(dnsIdMatcher)) &&
+          (isDNSTracking || !panel.id.includes(dnsMatcher)) &&
           (isFlowRTT || !panel.id.includes(rttIdMatcher)) &&
           (isTLSTracking || !panel.id.includes(tlsIdMatcher))
       ),

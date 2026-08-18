@@ -45,6 +45,7 @@ func simpleProxy(toURLStr string, timeout time.Duration, skipTLS bool, caPath st
 			URL:           &backendURL,
 			Body:          r.Body,
 			ContentLength: r.ContentLength,
+			Header:        http.Header{},
 		}
 		resp, err := roundTripper.RoundTrip(&rq)
 		if err != nil {
