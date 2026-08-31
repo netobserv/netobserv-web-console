@@ -1,4 +1,4 @@
-import { getURLParam, removeURLParam, setURLParam, URLParam } from '../../utils/url';
+import { getURLParam, syncURLParams, URLParam } from '../../utils/url';
 import { AlertState, getItemMode, HealthMode, NamedItem, Severity } from './health-helper';
 
 export type HealthFilterState = {
@@ -81,17 +81,17 @@ export const getHealthFiltersFromURL = (): HealthFilterState => ({
   searchText: getURLParam(URLParam.HealthName) ?? ''
 });
 
+// Serializes the whole filter state into the URL in a single history entry. syncURLParams compares
+// the resulting query string against the current URL and skips the write when they already match,
+// so the initial mount (state read back from the URL) doesn't push a duplicate entry, and a change
+// touching several params still costs a single Back step.
 export const setURLHealthFilters = (f: HealthFilterState, replace?: boolean): void => {
-  const setOrRemove = (param: URLParam, value: string) => {
-    if (value) {
-      setURLParam(param, value, replace);
-    } else {
-      removeURLParam(param, replace);
-    }
-  };
-  setOrRemove(URLParam.HealthSeverity, f.severities.join(','));
-  setOrRemove(URLParam.HealthStatus, f.statuses.join(','));
-  setOrRemove(URLParam.HealthMode, f.modes.join(','));
-  setOrRemove(URLParam.HealthNamespace, f.namespaces.join(','));
-  setOrRemove(URLParam.HealthName, f.searchText.trim());
+  const params = new Map<URLParam, string>([
+    [URLParam.HealthSeverity, f.severities.join(',')],
+    [URLParam.HealthStatus, f.statuses.join(',')],
+    [URLParam.HealthMode, f.modes.join(',')],
+    [URLParam.HealthNamespace, f.namespaces.join(',')],
+    [URLParam.HealthName, f.searchText.trim()]
+  ]);
+  syncURLParams(params, replace);
 };

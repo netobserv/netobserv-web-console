@@ -159,4 +159,30 @@ describe('Health filters URL codec', () => {
     setURLHealthFilters(emptyHealthFilters, true);
     expect(window.location.search).not.toContain('healthSeverity');
   });
+
+  it('writes a single history entry when several params change at once', () => {
+    const pushSpy = jest.spyOn(window.history, 'pushState');
+    setURLHealthFilters({
+      severities: ['critical', 'warning'],
+      statuses: ['firing'],
+      modes: ['alert'],
+      namespaces: ['ns-a'],
+      searchText: 'drop'
+    });
+    expect(pushSpy).toHaveBeenCalledTimes(1);
+    pushSpy.mockRestore();
+  });
+
+  it('does not touch history when the serialized filters already match the URL', () => {
+    const f: HealthFilterState = { ...emptyHealthFilters, severities: ['critical'], searchText: 'drop' };
+    setURLHealthFilters(f, true);
+    const pushSpy = jest.spyOn(window.history, 'pushState');
+    const replaceSpy = jest.spyOn(window.history, 'replaceState');
+    // Re-applying the same state (as happens on mount, when it is read back from the URL) is a no-op.
+    setURLHealthFilters(f);
+    expect(pushSpy).not.toHaveBeenCalled();
+    expect(replaceSpy).not.toHaveBeenCalled();
+    pushSpy.mockRestore();
+    replaceSpy.mockRestore();
+  });
 });

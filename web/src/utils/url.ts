@@ -168,6 +168,33 @@ export const setSomeURLParams = (params: Map<URLParam, string>, replace?: boolea
   }
 };
 
+// Applies a batch of params in a single history entry: keys with a non-empty value are set,
+// keys with an empty value are removed. Skips the history write entirely when the resulting query
+// string already matches the current URL, which avoids polluting history with a duplicate entry
+// on mount and collapses a multi-param change into a single Back step.
+export const syncURLParams = (params: Map<URLParam, string>, replace?: boolean) => {
+  const current = new URLSearchParams(window.location.search);
+  const next = new URLSearchParams(window.location.search);
+  params.forEach((v, k) => {
+    if (v) {
+      next.set(k, v);
+    } else {
+      next.delete(k);
+    }
+  });
+  if (next.toString() === current.toString()) {
+    return;
+  }
+  const url = new URL(window.location.href);
+  const search = next.toString();
+  const target = `${url.pathname}${search ? `?${search}` : ''}${url.hash}`;
+  if (replace) {
+    window.history.replaceState({}, '', target);
+  } else {
+    window.history.pushState({}, '', target);
+  }
+};
+
 export const removeURLParam = (param: URLParam, replace?: boolean) => {
   const params = new URLSearchParams(window.location.search);
   if (params.has(param)) {
