@@ -37,6 +37,37 @@ export const countActiveHealthFilters = (f: HealthFilterState): number => {
   );
 };
 
+// Client-side match mirroring the semantics the Network Traffic namespace filter delegates to Loki:
+//  - unquoted  -> substring ("contains") match
+//  - "quoted"  -> exact (anchored) match
+//  - `*`       -> wildcard, usable anywhere (e.g. openshift-*, *-registry, c*-*-r*y)
+//  - case-sensitive only when the pattern itself has an upper-case letter (k8s names are lower-case,
+//    so a lower-case pattern stays case-insensitive, while e.g. "Deployment" is matched exactly).
+// This lets the Namespace filter store patterns as values (type `openshift-*` + Enter) instead of
+// forcing the user to tick a checkbox per matching namespace.
+export const matchesNamespacePattern = (pattern: string, value: string): boolean => {
+  let query = pattern.trim();
+  if (!query) {
+    return true;
+  }
+  const quoted = query.length >= 2 && query.startsWith('"') && query.endsWith('"');
+  if (quoted) {
+    query = query.slice(1, -1);
+  }
+  if (!query) {
+    return true;
+  }
+  const flags = /[A-Z]/.test(query) ? '' : 'i';
+  const regex = query.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
+  const body = quoted ? `^${regex}$` : regex;
+  try {
+    return new RegExp(body, flags).test(value);
+  } catch {
+    // Defensive fallback: if the derived regex somehow fails to compile, fall back to a plain contains.
+    return value.toLowerCase().includes(pattern.trim().toLowerCase());
+  }
+};
+
 export const matchesHealthFilters = (item: NamedItem, filters: HealthFilterState): boolean => {
   if (filters.severities.length && !filters.severities.includes(item.severity)) {
     return false;
@@ -50,7 +81,8 @@ export const matchesHealthFilters = (item: NamedItem, filters: HealthFilterState
   if (filters.namespaces.length) {
     const ns = item.superKind === 'Namespace' ? item.name : item.superKind === 'Owner' ? item.namespace : undefined;
     // Global / Node items have no namespace dimension: let them through rather than hiding them silently.
-    if (ns !== undefined && !filters.namespaces.includes(ns)) {
+    // Each stored value is a pattern (partial / "exact" / `*` wildcard); the item passes if it matches any.
+    if (ns !== undefined && !filters.namespaces.some(pattern => matchesNamespacePattern(pattern, ns))) {
       return false;
     }
   }

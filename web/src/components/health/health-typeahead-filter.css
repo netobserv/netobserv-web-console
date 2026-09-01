@@ -1,0 +1,32 @@
+/* Make the placeholder prompt + matching-rules hints (rendered inside the disabled option) readable:
+ * a disabled PatternFly option is greyed out and its text is small/muted, which is hard to scan, so
+ * we restore the regular text color and lay the rules out as a dashed list like the Network Traffic
+ * filter tooltip. */
+.health-typeahead-hints {
+  color: var(--pf-t--global--text--color--regular);
+  font-size: var(--pf-t--global--font--size--sm);
+  line-height: 1.6;
+}
+
+.health-typeahead-hints__title {
+  color: var(--pf-t--global--text--color--regular);
+  font-weight: var(--pf-t--global--font--weight--body--bold);
+  margin-block-end: var(--pf-t--global--spacer--xs);
+}
+
+.health-typeahead-hints > div:not(.health-typeahead-hints__title) {
+  color: var(--pf-t--global--text--color--subtle);
+  padding-inline-start: var(--pf-t--global--spacer--sm);
+  text-indent: calc(-1 * var(--pf-t--global--spacer--sm));
+}
+
+.health-typeahead-hints > div:not(.health-typeahead-hints__title)::before {
+  content: '\2013\00a0'; /* en dash + non-breaking space */
+}
+
+/* Single-line instruction shown under the suggestions ("press Enter to filter..."): readable, no bullet. */
+.health-typeahead-note {
+  color: var(--pf-t--global--text--color--subtle);
+  font-size: var(--pf-t--global--font--size--sm);
+  font-style: italic;
+}

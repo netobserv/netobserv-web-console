@@ -75,7 +75,8 @@ Cypress.Commands.add('openNetflowTrafficPage', (clearCache = true) => {
 
 Cypress.Commands.add('openNetworkHealthPage', (clearCache = true) => {
   if (clearCache) {
-    cy.clearLocalStorage();
+    // Reset plugin view prefs to defaults without clearing Console session
+    cy.clearNetobservLocalStorage();
   }
   cy.visit(c.url);
   cy.get('#network-health-nav-item-link').click();

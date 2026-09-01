@@ -6,6 +6,7 @@ import { HealthFilterState, isHealthFilterEmpty } from './health-filters';
 import './health-filters-toolbar.css';
 import { AlertState, HealthMode, Severity } from './health-helper';
 import { HealthMultiSelectFilter } from './health-multi-select-filter';
+import { HealthTypeaheadFilter } from './health-typeahead-filter';
 
 export interface HealthFiltersToolbarProps {
   filters: HealthFilterState;
@@ -184,7 +185,7 @@ export const HealthFiltersToolbar: React.FC<HealthFiltersToolbarProps> = ({
         </ToolbarItem>
         {namespaceOptions.length > 0 && (
           <ToolbarItem>
-            <HealthMultiSelectFilter
+            <HealthTypeaheadFilter
               id="health-namespace-filter"
               toggleLabel={t('Namespace')}
               options={namespaceOptions}

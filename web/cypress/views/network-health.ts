@@ -13,7 +13,9 @@ export namespace networkHealthFiltersSelectors {
     export const severityToggle = '[data-test="health-severity-filter-toggle"]'
     export const statusToggle = '[data-test="health-status-filter-toggle"]'
     export const modeToggle = '[data-test="health-mode-filter-toggle"]'
-    export const namespaceToggle = '[data-test="health-namespace-filter-toggle"]'
+    // The Namespace filter is a free-text typeahead (type a name/pattern + Enter, or pick a suggestion),
+    // not a checkbox toggle: the focusable element is the nested search <input>.
+    export const namespaceInput = '[data-test="health-namespace-filter-input"]'
     // SearchInput is a composite PatternFly component; `data-test` lands on its wrapper, so the actual
     // focusable element is the nested <input>.
     export const nameInput = '[data-test="health-name-filter"] input'

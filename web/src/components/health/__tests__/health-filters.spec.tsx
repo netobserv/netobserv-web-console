@@ -6,6 +6,7 @@ import {
   HealthFilterState,
   isHealthFilterEmpty,
   matchesHealthFilters,
+  matchesNamespacePattern,
   setURLHealthFilters
 } from '../health-filters';
 import { NamedItem } from '../health-helper';
@@ -76,6 +77,32 @@ describe('matchesHealthFilters', () => {
     expect(matchesHealthFilters(ownerItem, filters)).toBe(false);
   });
 
+  it('matches on namespace patterns (partial / quoted-exact / wildcard) and any-of semantics', () => {
+    const dns = mockNamedItem({ superKind: 'Namespace', name: 'openshift-dns' });
+    const monitoring = mockNamedItem({ superKind: 'Namespace', name: 'openshift-monitoring' });
+    const myApp = mockNamedItem({ superKind: 'Namespace', name: 'my-app' });
+
+    // Partial (unquoted) contains match.
+    expect(matchesHealthFilters(dns, { ...emptyHealthFilters, namespaces: ['dns'] })).toBe(true);
+    expect(matchesHealthFilters(myApp, { ...emptyHealthFilters, namespaces: ['dns'] })).toBe(false);
+
+    // `*` wildcard: starts-with filters every matching namespace in one value.
+    const startsWith = { ...emptyHealthFilters, namespaces: ['openshift-*'] };
+    expect(matchesHealthFilters(dns, startsWith)).toBe(true);
+    expect(matchesHealthFilters(monitoring, startsWith)).toBe(true);
+    expect(matchesHealthFilters(myApp, startsWith)).toBe(false);
+
+    // Quoted value is an exact (anchored) match.
+    expect(matchesHealthFilters(myApp, { ...emptyHealthFilters, namespaces: ['"my-app"'] })).toBe(true);
+    expect(matchesHealthFilters(myApp, { ...emptyHealthFilters, namespaces: ['"my"'] })).toBe(false);
+
+    // Several values -> item passes if it matches ANY of them.
+    const anyOf = { ...emptyHealthFilters, namespaces: ['*-dns', '"my-app"'] };
+    expect(matchesHealthFilters(dns, anyOf)).toBe(true);
+    expect(matchesHealthFilters(myApp, anyOf)).toBe(true);
+    expect(matchesHealthFilters(monitoring, anyOf)).toBe(false);
+  });
+
   it('lets Global and Node items pass through namespace filters (no namespace dimension)', () => {
     const globalItem = mockNamedItem({ superKind: 'Global', name: '' });
     const nodeItem = mockNamedItem({ superKind: 'Node', name: 'node-1' });
@@ -116,6 +143,36 @@ describe('matchesHealthFilters', () => {
   it('treats special regex characters as literal text', () => {
     const item = mockNamedItem({ ruleName: 'Test[Rule]' });
     expect(matchesHealthFilters(item, { ...emptyHealthFilters, searchText: '[Rule]' })).toBe(true);
+  });
+});
+
+describe('matchesNamespacePattern', () => {
+  it('does a case-insensitive substring match for a lower-case pattern', () => {
+    expect(matchesNamespacePattern('dns', 'openshift-dns')).toBe(true);
+    expect(matchesNamespacePattern('DNS', 'openshift-dns')).toBe(false); // upper-case -> case-sensitive
+    expect(matchesNamespacePattern('nope', 'openshift-dns')).toBe(false);
+  });
+
+  it('anchors quoted patterns to an exact match', () => {
+    expect(matchesNamespacePattern('"openshift-dns"', 'openshift-dns')).toBe(true);
+    expect(matchesNamespacePattern('"dns"', 'openshift-dns')).toBe(false);
+  });
+
+  it('supports `*` wildcards anywhere', () => {
+    expect(matchesNamespacePattern('openshift-*', 'openshift-dns')).toBe(true);
+    expect(matchesNamespacePattern('*-dns', 'openshift-dns')).toBe(true);
+    expect(matchesNamespacePattern('openshift-*-operator', 'openshift-dns-operator')).toBe(true);
+    expect(matchesNamespacePattern('openshift-*', 'my-app')).toBe(false);
+  });
+
+  it('treats special regex characters in the value/pattern literally', () => {
+    expect(matchesNamespacePattern('a.b', 'a.b')).toBe(true);
+    expect(matchesNamespacePattern('a.b', 'axb')).toBe(false);
+  });
+
+  it('matches everything for an empty pattern', () => {
+    expect(matchesNamespacePattern('', 'anything')).toBe(true);
+    expect(matchesNamespacePattern('   ', 'anything')).toBe(true);
   });
 });
 
