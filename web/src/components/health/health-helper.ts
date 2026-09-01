@@ -599,36 +599,13 @@ const computeWeightedScore = (scores: ScoreDetail[]): number => {
 
 // Score [0,10]; higher is better
 export const computeResourceScore = (r: HealthStat): ScoreBreakdown => {
-  const allAlerts = getAllHealthItems(r);
-  const details: ScoreDetail[] = allAlerts
-    .map(computeHealthItemScore)
-    .concat(
-      r.critical.inactive.map(name => ({
-        name,
-        severity: 'critical' as Severity,
-        state: 'inactive' as const,
-        rawScore: 10,
-        weight: criticalWeight
-      }))
-    )
-    .concat(
-      r.warning.inactive.map(name => ({
-        name,
-        severity: 'warning' as Severity,
-        state: 'inactive' as const,
-        rawScore: 10,
-        weight: warningWeight
-      }))
-    )
-    .concat(
-      r.other.inactive.map(name => ({
-        name,
-        severity: 'info' as Severity,
-        state: 'inactive' as const,
-        rawScore: 10,
-        weight: minorWeight
-      }))
-    );
+  // Inactive rules are intentionally left out of the score: a rule that isn't firing means "no problem
+  // detected", so it should neither help nor hurt. Counting them (with a perfect 10 and full severity
+  // weight) diluted the average toward 10 and masked real issues — e.g. one firing critical among 20
+  // inactive rules barely dented the score. Excluding them makes the score reflect only what is actually
+  // happening. This also matches getStateWeight('inactive') === 0. When nothing is active the average is
+  // over an empty set, which computeWeightedScore maps to a perfect 10.
+  const details: ScoreDetail[] = getAllHealthItems(r).map(computeHealthItemScore);
   return { score: computeWeightedScore(details), details };
 };
 

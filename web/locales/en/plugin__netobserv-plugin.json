@@ -325,7 +325,7 @@
   "Examples: traffic increases, minor anomalies": "Examples: traffic increases, minor anomalies",
   "Alert States": "Alert States",
   "Inactive": "Inactive",
-  "No problem detected - contributes best possible score for its severity": "No problem detected - contributes best possible score for its severity",
+  "No problem detected - not counted in the score": "No problem detected - not counted in the score",
   "Problem detected, awaiting confirmation - reduced impact (30% of full impact)": "Problem detected, awaiting confirmation - reduced impact (30% of full impact)",
   "Active problem - full impact on score": "Active problem - full impact on score",
   "Known issue, temporarily ignored - minimal impact (10% of full impact)": "Known issue, temporarily ignored - minimal impact (10% of full impact)",

@@ -109,21 +109,24 @@ describe('health helpers, score', () => {
     };
     expect(computeResourceScore(r).score).toEqual(10);
 
-    // Add 3 inactive alerts => still max score
+    // Add 3 inactive alerts => still max score (inactive rules are excluded from the score, so with
+    // nothing active the resource stays at a perfect 10)
     r.critical.inactive.push('test-critical');
     r.warning.inactive.push('test-warning');
     r.other.inactive.push('test-info');
     expect(computeResourceScore(r).score).toEqual(10);
 
-    // Turn the inactive info into pending => slightly decreasing score
+    // Turn the inactive info into pending => score reflects ONLY the active (pending info) rule; the two
+    // remaining inactive rules no longer prop the score up toward 10.
     r.other.inactive = [];
     r.other.pending = [mockAlert('test-info', 'info', 'pending', 10, 20)];
-    expect(computeResourceScore(r).score).toBeCloseTo(9.98, 2);
+    expect(computeResourceScore(r).score).toBeCloseTo(9.56, 2);
 
-    // Turn the inactive warning into firing => more decreasing score
+    // Turn the inactive warning into firing => averaged over the two active rules (still ignoring the
+    // inactive critical), so the firing warning drags the score down further.
     r.warning.inactive = [];
     r.warning.firing = [mockAlert('test-warning', 'warning', 'firing', 10, 40)];
-    expect(computeResourceScore(r).score).toBeCloseTo(8.92, 2);
+    expect(computeResourceScore(r).score).toBeCloseTo(7.04, 2);
 
     // Turn the inactive critical into firing => more decrease
     r.critical.inactive = [];

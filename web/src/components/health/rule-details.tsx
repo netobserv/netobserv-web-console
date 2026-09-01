@@ -245,9 +245,10 @@ export const RuleDetails: React.FC<RuleDetailsProps> = ({ kind, resourceHealth }
   const isGlobal = kind === 'Global';
 
   // Build one score breakdown for the resource and derive each rule's "points lost": how many points it
-  // subtracts from the perfect score of 10. Using the same denominator (sum of all weights, inactive rules
-  // included) as computeResourceScore guarantees the listed rows add up to (10 - total score) shown in the
-  // drawer header. Rules are sorted by impact so the biggest offenders surface first.
+  // subtracts from the perfect score of 10. Using the same denominator (sum of the active rules' weights,
+  // inactive rules excluded, matching computeResourceScore) guarantees the listed rows add up to
+  // (10 - total score) shown in the drawer header. Rules are sorted by impact so the biggest offenders
+  // surface first.
   const rows = React.useMemo(() => {
     const breakdown = computeResourceScore(resourceHealth);
     const totalWeight = breakdown.details.reduce((sum, d) => sum + d.weight, 0);
