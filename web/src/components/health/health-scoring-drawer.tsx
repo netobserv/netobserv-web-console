@@ -100,8 +100,7 @@ export const HealthScoringDrawer: React.FC<HealthScoringDrawerProps> = ({ isOpen
 
           <Content component={ContentVariants.h3}>{t('Alert States')}</Content>
           <Content component="p" className="health-scoring-list-item">
-            <strong>{t('Inactive')}</strong>:{' '}
-            {t('No problem detected - not counted in the score')}
+            <strong>{t('Inactive')}</strong>: {t('No problem detected - not counted in the score')}
           </Content>
           <Content component="p" className="health-scoring-list-item">
             <strong>{t('Pending')}</strong>:{' '}

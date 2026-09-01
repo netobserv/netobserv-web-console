@@ -1,12 +1,4 @@
-import {
-  Menu,
-  MenuContent,
-  MenuItem,
-  MenuList,
-  Popper,
-  TextInput,
-  ValidatedOptions
-} from '@patternfly/react-core';
+import { Menu, MenuContent, MenuItem, MenuList, Popper, TextInput, ValidatedOptions } from '@patternfly/react-core';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { validateK8SName } from '../../utils/label';
