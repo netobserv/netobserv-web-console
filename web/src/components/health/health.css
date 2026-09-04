@@ -39,16 +39,8 @@
 }
 
 #health-page .health-header {
-    padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+    padding: 1.5rem 1.5rem 0.75rem 1.5rem;
     width: 100%;
-}
-
-/* Health summary in header - no extra margins */
-#health-page .health-header .health-summary-dashboard {
-    margin-top: 0.5rem;
-    margin-bottom: 0;
-    width: 100%;
-    max-width: 100%;
 }
 
 .netobserv-refresh-container {
@@ -56,9 +48,73 @@
     flex-shrink: 0;
 }
 
+/* Context summary sits directly above tabs in the content area */
+.health-context-summary {
+    flex-shrink: 0;
+    margin-bottom: var(--pf-t--global--spacer--md);
+    animation: health-context-summary-fade 0.2s ease-out;
+    overflow: visible;
+    min-height: auto;
+    height: auto;
+}
+
+/* Title + status on one row; wrap text in place instead of truncating */
+.health-context-summary .health-section-summary {
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.health-context-summary .health-section-summary-heading {
+    max-width: min(22rem, 45%);
+}
+
+.health-context-summary .health-summary-section-title,
+.health-context-summary .health-summary-section-description {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+.health-context-summary .health-section-summary-body,
+.health-context-summary .health-section-summary-cards-container,
+.health-context-summary .health-summary-dashboard {
+    overflow: visible;
+}
+
+.health-context-summary .health-section-summary-compact-row .health-summary-compact-text {
+    white-space: normal;
+}
+
+.health-context-summary .health-section-summary .health-summary-status-card {
+    max-width: none;
+}
+
+@keyframes health-context-summary-fade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .health-context-summary {
+        animation: none;
+    }
+}
+
+#health-page .health-main-content .health-summary-dashboard {
+    margin-top: 0;
+    margin-bottom: 0;
+    width: 100%;
+    max-width: 100%;
+}
+
 /* Content container - no scroll, contains main content */
 #health-content-container {
-    padding: 0 1.5rem 1.5rem 1.5rem;
+    padding: 0.5rem 1.5rem 1.5rem 1.5rem;
     display: flex !important;
     overflow: hidden !important;
 }
@@ -75,6 +131,7 @@
 .health-main-content .health-tabs-container {
     flex-shrink: 0;
     overflow: visible;
+    margin-bottom: var(--pf-t--global--spacer--sm);
 }
 
 /* For content with drawers (HealthDrawerContainer) */
@@ -94,8 +151,32 @@
     min-height: 0;
 }
 
-/* For simple content without drawers (HealthGlobal, HealthError) */
-.health-main-content > div:not(.pf-v6-c-drawer):not(.health-tabs-container) {
+/* Tab panel content — single scroll region per view */
+.health-main-content .health-tab-panel {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--pf-t--global--spacer--md);
+    margin-top: var(--pf-t--global--spacer--sm);
+}
+
+.health-main-content > .pf-v6-c-tabs,
+.health-main-content > .health-subtabs-container,
+.health-main-content > .health-context-summary,
+.health-main-content > .health-tabs-container {
+    flex-shrink: 0;
+}
+
+.health-main-content > .pf-v6-c-drawer,
+.health-main-content > .health-tab-panel {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+/* For simple content without drawers (HealthGlobal, HealthError) — legacy fallback */
+.health-main-content > div:not(.pf-v6-c-drawer):not(.health-tabs-container):not(.health-context-summary):not(.health-tab-panel):not(.health-subtabs-container) {
     overflow-y: auto;
     flex: 0 1 auto;
 }
@@ -453,4 +534,138 @@
     display: block;
     margin-bottom: 0.25rem;
     margin-left: 0.5rem;
+}
+
+/* Health summary section labels */
+.health-summary-section-title {
+    margin: 0;
+    padding: 0;
+    font-size: var(--pf-t--global--font--size--md);
+    font-weight: var(--pf-t--global--font--weight--heading--default);
+}
+
+.health-summary-section-description {
+    margin: 0.25rem 0 0;
+    color: var(--pf-t--global--text--color--subtle);
+    font-size: var(--pf-t--global--font--size--body--sm);
+}
+
+/* Health summary section: title and dashboard on one row */
+.health-section-summary {
+    width: 100%;
+}
+
+.health-section-summary-heading {
+    flex: 0 0 auto;
+    min-width: 0;
+    max-width: min(22rem, 45%);
+}
+
+.health-section-summary-heading .health-summary-section-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.health-section-summary-body {
+    flex: 1 1 auto;
+    min-width: 0;
+    align-self: center;
+}
+
+.health-section-summary .health-summary-dashboard {
+    margin-top: 0;
+    width: 100%;
+    max-width: 100%;
+}
+
+.health-section-summary-cards-container {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.health-section-summary-compact-row {
+    flex-wrap: nowrap;
+}
+
+.health-section-summary-compact-row .health-summary-compact-item.status {
+    min-width: 0;
+    flex-shrink: 1;
+}
+
+.health-section-summary-compact-row .health-summary-compact-text {
+    white-space: nowrap;
+}
+
+.health-section-summary .health-summary-cards {
+    flex-wrap: nowrap;
+}
+
+.health-section-summary .health-summary-status-card {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 14rem;
+}
+
+.health-section-summary .health-summary-metric-card {
+    flex: 0 0 auto;
+    min-width: 6.5rem;
+}
+
+@media (max-width: 992px) {
+    .health-section-summary .health-summary-cards {
+        flex-wrap: wrap;
+    }
+}
+
+/* Legacy aliases kept for tests and targeted overrides */
+.health-ovn-summary {
+    width: 100%;
+}
+
+.health-ovn-summary-cards {
+    flex-wrap: nowrap;
+    width: 100%;
+}
+
+.health-ovn-summary-compact-row {
+    flex-wrap: nowrap;
+}
+
+.health-ovn-summary-compact-row .health-summary-compact-item.status {
+    min-width: 0;
+    flex-shrink: 1;
+}
+
+.health-ovn-summary-compact-row .health-summary-compact-text {
+    white-space: nowrap;
+}
+
+@media (max-width: 992px) {
+    .health-ovn-summary-cards {
+        flex-wrap: wrap;
+    }
+}
+
+/* Context tabs (NetObserv | Platform) and subtabs */
+.health-context-tabs-row {
+    margin-bottom: 0;
+}
+
+.health-subtabs-container {
+    flex-shrink: 0;
+    margin-bottom: var(--pf-t--global--spacer--sm);
+}
+
+.health-subtabs-container .health-subtabs {
+    width: 100%;
+}
+
+.health-ovn-description {
+    margin-bottom: var(--pf-t--global--spacer--md);
+    color: var(--pf-t--global--text--color--subtle);
+}
+
+.health-ovn-content .health-drawer-container {
+    margin-top: var(--pf-t--global--spacer--lg);
 }

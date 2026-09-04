@@ -6,6 +6,7 @@ import {
   computeResourceScore,
   HealthItem,
   HealthStat,
+  isSilenced,
   Severity
 } from '../health-helper';
 
@@ -153,5 +154,18 @@ describe('health helpers, grouping', () => {
     expect(s.byOwner[0].name).toEqual('w');
     expect(s.byOwner[0].score).toBeCloseTo(7.5, 2);
     expect(s.byOwner[0].warning.firing.length).toEqual(1);
+  });
+});
+
+describe('isSilenced', () => {
+  it('matches positive equality matchers', () => {
+    expect(isSilenced([{ name: 'alertname', value: 'Foo' }], { alertname: 'Foo' })).toBe(true);
+    expect(isSilenced([{ name: 'alertname', value: 'Foo' }], { alertname: 'Bar' })).toBe(false);
+  });
+
+  it('honors negative and regex matchers', () => {
+    expect(isSilenced([{ name: 'severity', value: 'info', isEqual: false }], { severity: 'warning' })).toBe(true);
+    expect(isSilenced([{ name: 'alertname', value: 'Foo.*', isRegex: true }], { alertname: 'FooBar' })).toBe(true);
+    expect(isSilenced([{ name: 'alertname', value: 'Foo.*', isRegex: true }], { alertname: 'Bar' })).toBe(false);
   });
 });

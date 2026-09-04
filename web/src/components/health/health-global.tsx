@@ -16,10 +16,8 @@ export const HealthGlobal: React.FC<HealthGlobalProps> = ({ info, isDark }) => {
   const all = getAllHealthItems(info);
 
   return (
-    <>
-      <Content>
-        <Content component={ContentVariants.h3}>{t('Global rule violations')}</Content>
-      </Content>
+    <div className="health-tab-panel health-global-content">
+      <Content component={ContentVariants.h3}>{t('Global rule violations')}</Content>
       {all.length === 0 ? (
         <Bullseye>
           <EmptyState
@@ -39,6 +37,6 @@ export const HealthGlobal: React.FC<HealthGlobalProps> = ({ info, isDark }) => {
           </GridItem>
         </Grid>
       )}
-    </>
+    </div>
   );
 };

@@ -626,17 +626,12 @@ export const getSeverityColor = (severity: string | undefined): 'red' | 'orange'
   return 'blue'; // default for info/undefined
 };
 
-export const isSilenced = (silence: SilenceMatcher[], labels: PrometheusLabels): boolean => {
-  for (const matcher of silence) {
-    if (!(matcher.name in labels)) {
-      return false;
-    }
-    if (matcher.value !== labels[matcher.name]) {
-      return false;
-    }
-  }
-  return true;
-};
+export const isSilenced = (silence: SilenceMatcher[], labels: PrometheusLabels): boolean =>
+  silence.every(m => {
+    const labelValue = labels[m.name] ?? '';
+    const isMatch = m.isRegex ? new RegExp(`^${m.value}$`).test(labelValue) : labelValue === m.value;
+    return m.isEqual === false && labelValue ? !isMatch : isMatch;
+  });
 
 export const getResourceSeverity = (s: HealthStat): Severity | undefined => {
   if (s.critical.firing.length > 0 || s.critical.pending.length > 0 || s.critical.recording.length > 0) {
