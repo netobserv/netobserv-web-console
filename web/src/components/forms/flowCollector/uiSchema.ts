@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import { UiSchema } from '@rjsf/utils';
 
-// Keep the UISchemas ordered for form display
+// Keep the UISchema ordered for form display
 
 export const flowCollectorUISchema: UiSchema = {
   'ui:title': 'FlowCollector',
@@ -616,7 +616,72 @@ export const flowCollectorUISchema: UiSchema = {
         disableAlerts: {
           'ui:title': 'Disable alerts'
         },
-        'ui:order': ['server', 'includeList', 'additionalIncludeList', 'alerts', 'disableAlerts', '*']
+        healthRules: {
+          'ui:title': 'Health rules',
+          'ui:description':
+            'Overrides for built-in Network Health templates. Prefer the guided wizard so you do not lose unsaved FlowCollector edits — it opens in a new tab.',
+          'ui:options': {
+            externalLink: {
+              href: '__health_rule_wizard__',
+              text: 'Open Network Health rule wizard'
+            }
+          },
+          items: {
+            'ui:title': 'Health rule',
+            template: {
+              'ui:title': 'Template'
+            },
+            mode: {
+              'ui:title': 'Mode'
+            },
+            variants: {
+              'ui:title': 'Variants',
+              'ui:description':
+                'Leave empty to keep template defaults. Placeholders show common defaults (exact values depend on the template).',
+              items: {
+                'ui:title': 'Variant',
+                groupBy: {
+                  'ui:title': 'Group by'
+                },
+                thresholds: {
+                  'ui:title': 'Severity thresholds',
+                  'ui:flat': 'true',
+                  critical: {
+                    'ui:title': 'Critical threshold',
+                    'ui:placeholder': '10'
+                  },
+                  warning: {
+                    'ui:title': 'Warning threshold',
+                    'ui:placeholder': '10'
+                  },
+                  info: {
+                    'ui:title': 'Info threshold',
+                    'ui:placeholder': '5'
+                  },
+                  'ui:order': ['critical', 'warning', 'info', '*']
+                },
+                lowVolumeThreshold: {
+                  'ui:title': 'Low volume threshold',
+                  'ui:placeholder': '5'
+                },
+                trendOffset: {
+                  'ui:title': 'Trend offset',
+                  'ui:placeholder': '24h'
+                },
+                trendDuration: {
+                  'ui:title': 'Trend duration',
+                  'ui:placeholder': '1h'
+                },
+                mode: {
+                  'ui:title': 'Variant mode override'
+                },
+                'ui:order': ['groupBy', 'thresholds', 'lowVolumeThreshold', 'mode', 'trendOffset', 'trendDuration', '*']
+              }
+            },
+            'ui:order': ['template', 'mode', 'variants', '*']
+          }
+        },
+        'ui:order': ['server', 'includeList', 'additionalIncludeList', 'healthRules', 'alerts', 'disableAlerts', '*']
       },
       resources: {
         'ui:title': 'Resource Requirements',
@@ -1567,163 +1632,6 @@ export const flowCollectorUISchema: UiSchema = {
       'execution',
       '*'
     ]
-  },
-  'ui:order': ['metadata', 'spec', '*']
-};
-
-export const flowMetricUISchema: UiSchema = {
-  'ui:title': 'FlowMetric',
-  'ui:flat': 'true',
-  metadata: {
-    'ui:title': 'Metadata',
-    'ui:flat': 'true',
-    name: {
-      'ui:title': 'Name'
-    },
-    namespace: {
-      'ui:title': 'Namespace',
-      'ui:description': 'It must match the one configured in FlowCollector.'
-    },
-    labels: {
-      'ui:widget': 'hidden'
-    },
-    'ui:order': ['name', 'namespace', 'labels', '*']
-  },
-  spec: {
-    metricName: {
-      'ui:title': 'Metric name'
-    },
-    type: {
-      'ui:title': 'Type'
-    },
-    help: {
-      'ui:title': 'Help'
-    },
-    buckets: {
-      'ui:title': 'Buckets',
-      'ui:dependency': {
-        controlFieldPath: ['type'],
-        controlFieldValue: 'Histogram',
-        controlFieldName: 'type'
-      }
-    },
-    valueField: {
-      'ui:title': 'Value field'
-    },
-    divider: {
-      'ui:title': 'Divider'
-    },
-    labels: {
-      'ui:title': 'Labels'
-    },
-    flatten: {
-      'ui:title': 'Flatten'
-    },
-    remap: {
-      'ui:title': 'Remap',
-      'ui:widget': 'map'
-    },
-    direction: {
-      'ui:title': 'Direction'
-    },
-    filters: {
-      'ui:title': 'Filters',
-      items: {
-        field: {
-          'ui:title': 'Field'
-        },
-        matchType: {
-          'ui:title': 'Match type'
-        },
-        value: {
-          'ui:title': 'Value'
-        },
-        'ui:order': ['field', 'matchType', 'value', '*']
-      }
-    },
-    charts: {
-      'ui:title': 'Charts',
-      items: {
-        dashboardName: {
-          'ui:title': 'Dashboard name'
-        },
-        sectionName: {
-          'ui:title': 'Section name'
-        },
-        title: {
-          'ui:title': 'Title'
-        },
-        unit: {
-          'ui:title': 'Unit'
-        },
-        type: {
-          'ui:title': 'Type'
-        },
-        queries: {
-          'ui:title': 'Queries',
-          items: {
-            promQL: {
-              'ui:title': 'Query'
-            },
-            legend: {
-              'ui:title': 'Legend'
-            },
-            top: {
-              'ui:title': 'Top'
-            },
-            'ui:order': ['promQL', 'legend', 'top', '*']
-          }
-        },
-        'ui:order': ['dashboardName', 'sectionName', 'title', 'unit', 'type', 'queries', '*']
-      }
-    },
-    'ui:order': [
-      'metricName',
-      'type',
-      'help',
-      'buckets',
-      'valueField',
-      'divider',
-      'flatten',
-      'remap',
-      'direction',
-      'labels',
-      'filters',
-      'charts',
-      '*'
-    ]
-  },
-  'ui:order': ['metadata', 'spec', '*']
-};
-
-export const flowCollectorSliceUISchema: UiSchema = {
-  'ui:title': 'FlowCollectorSlice',
-  'ui:flat': 'true',
-  metadata: {
-    'ui:title': 'Metadata',
-    'ui:flat': 'true',
-    name: {
-      'ui:title': 'Name'
-    },
-    namespace: {
-      'ui:title': 'Namespace'
-    },
-    labels: {
-      'ui:widget': 'hidden'
-    },
-    'ui:order': ['name', 'namespace', 'labels', '*']
-  },
-  spec: {
-    subnetLabels: {
-      'ui:title': 'Subnet labels',
-      items: {
-        'ui:order': ['cidrs', 'name', '*']
-      }
-    },
-    sampling: {
-      'ui:title': 'Sampling'
-    },
-    'ui:order': ['subnetLabels', 'sampling', '*']
   },
   'ui:order': ['metadata', 'spec', '*']
 };

@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
 
-import { useNavigate, useParams } from '../../utils/url';
-import { flowCollectorSliceUISchema } from './config/uiSchema';
-import { ResourceForm } from './resource-form';
-import { ResourceWatcher } from './resource-watcher';
+import { useNavigate, useParams } from '../../../utils/url';
+import { ResourceForm } from '../resource-form';
+import { ResourceWatcher } from '../resource-watcher';
+import { flowCollectorSliceUISchema } from './uiSchema';
 
 export type FlowCollectorSliceFormProps = {
   name?: string;

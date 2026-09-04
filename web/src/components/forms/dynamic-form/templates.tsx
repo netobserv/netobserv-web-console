@@ -96,14 +96,29 @@ export const FieldTemplate: React.FC<FieldTemplateProps> = props => {
 };
 
 export const ObjectFieldTemplate: React.FC<ObjectFieldTemplateProps> = props => {
-  const { idSchema, properties, required, schema, title, uiSchema } = props;
+  const { idSchema, formData, properties, required, schema, title, uiSchema } = props;
   const { flat } = getUiOptions(uiSchema ?? {});
   if (flat === 'true') {
     return <>{_.map(properties || [], p => p.content)}</>;
   }
 
+  let labelOverride: string | undefined;
+  if (title && formData && typeof formData === 'object') {
+    const identifier = formData.name || formData.groupBy || formData.alert || formData.record;
+    if (identifier && typeof identifier === 'string' && identifier.trim()) {
+      labelOverride = `${title}: ${identifier}`;
+    }
+  }
+
   return (
-    <FieldSet defaultLabel={title} idSchema={idSchema} required={required} schema={schema} uiSchema={uiSchema}>
+    <FieldSet
+      defaultLabel={title}
+      labelOverride={labelOverride}
+      idSchema={idSchema}
+      required={required}
+      schema={schema}
+      uiSchema={uiSchema}
+    >
       <div className="co-dynamic-form__field-group-content">
         {properties?.length > 0 && _.map(properties, p => p.content)}
       </div>
@@ -111,9 +126,21 @@ export const ObjectFieldTemplate: React.FC<ObjectFieldTemplateProps> = props => 
   );
 };
 
+/** Extract a short identifier from an array item's form data. */
+const itemIdentifier = (item: unknown): string | undefined => {
+  if (!item || typeof item !== 'object') {
+    return undefined;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const obj = item as any;
+  const id = obj.name || obj.groupBy || obj.alert || obj.record;
+  return typeof id === 'string' && id.trim() ? id.trim() : undefined;
+};
+
 export const ArrayFieldTemplate: React.FC<ArrayFieldTemplateProps> = ({
   idSchema,
   items,
+  formData,
   onAddClick,
   required,
   schema,
@@ -124,6 +151,14 @@ export const ArrayFieldTemplate: React.FC<ArrayFieldTemplateProps> = ({
   const { t } = useTranslation('plugin__netobserv-plugin');
   const [, label] = useSchemaLabel(schema, uiSchema || {}, title ?? 'Items');
   const { addDisabledTooltip, dependency } = getUiOptions(uiSchema ?? {}) as UiSchemaOptionsWithDependency;
+
+  const arrayLabelOverride = React.useMemo(() => {
+    if (!Array.isArray(formData) || formData.length === 0) {
+      return undefined;
+    }
+    const names = formData.map(itemIdentifier).filter(Boolean);
+    return names.length > 0 ? `${label}: ${names.join(', ')}` : undefined;
+  }, [formData, label]);
   const spec = _.get(formContext?.formData, 'spec');
   const pauseArrayEdit =
     dependency?.matchMode === 'controlUnset' &&
@@ -159,6 +194,7 @@ export const ArrayFieldTemplate: React.FC<ArrayFieldTemplateProps> = ({
   return (
     <FieldSet
       defaultLabel={label}
+      labelOverride={arrayLabelOverride}
       idSchema={idSchema}
       required={required}
       schema={schema}

@@ -14,13 +14,15 @@ import {
   getSeverityColor,
   HealthItem,
   HealthStat,
-  HealthSuperKind
+  HealthSuperKind,
+  Severity
 } from './health-helper';
 import './rule-details.css';
 
 export interface RuleDetailsProps {
   kind: HealthSuperKind;
   resourceHealth: HealthStat;
+  severityFilter?: Severity;
 }
 
 // Helper: Get direction from recording rule name
@@ -200,12 +202,18 @@ const RuleCard: React.FC<{
   );
 };
 
-export const RuleDetails: React.FC<RuleDetailsProps> = ({ kind, resourceHealth }) => {
+export const RuleDetails: React.FC<RuleDetailsProps> = ({ kind, resourceHealth, severityFilter }) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
 
   const resourceName = resourceHealth.name || 'Global';
   const isGlobal = kind === 'Global';
-  const allItems = getAllHealthItems(resourceHealth);
+  const allItems = React.useMemo(() => {
+    const items = getAllHealthItems(resourceHealth);
+    if (!severityFilter) {
+      return items;
+    }
+    return items.filter(item => item.severity === severityFilter);
+  }, [resourceHealth, severityFilter]);
 
   // Global view: render table
   if (isGlobal) {

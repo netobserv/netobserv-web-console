@@ -22,7 +22,7 @@ import { safeJSToYAML } from '../src/utils/yaml';
 import { k8sModels } from './k8s-models';
 import { Config } from '../src/model/config';
 import { loadConfig } from '../src/utils/config';
-import { mockK8SResource } from './mock/mock';
+import { mockK8SResource, mockCustomPrometheusRule } from './mock/mock';
 import { getFlowCollector } from '../src/api/routes';
 
 // This Mapper is used to resolve @Console imports from @openshift-console for JEST / Standalone
@@ -79,6 +79,9 @@ export function getK8sModel(k8s: any, _k8sGroupVersionKind?: K8sResourceKindRefe
 
 export function k8sGet(k8s: any): Promise<any> {
   console.debug("k8sGet", k8s);
+  if (k8s?.model?.kind === 'PrometheusRule') {
+    return Promise.resolve(mockCustomPrometheusRule(k8s.name, k8s.ns));
+  }
   return Promise.resolve(k8s);
 }
 

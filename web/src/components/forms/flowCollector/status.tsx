@@ -14,14 +14,14 @@ import {
   Tooltip
 } from '@patternfly/react-core';
 import { useTranslation } from 'react-i18next';
-import { flowCollectorEditPath, flowCollectorSetupPath, netflowTrafficPath, useNavigate } from '../../utils/url';
-import FlowCollectorStatusIndicator from '../status/flowcollector-status-indicator';
-import './forms.css';
-import { Pipeline } from './pipeline';
-import { ResourceDeleteModal } from './resource-delete-modal';
-import { ResourceStatus } from './resource-status';
-import { Consumer, ResourceWatcher } from './resource-watcher';
-import { getFlowCollectorOverallStatus, isK8sNotFoundError, k8sErrorMessage } from './utils';
+import { flowCollectorEditPath, flowCollectorSetupPath, netflowTrafficPath, useNavigate } from '../../../utils/url';
+import FlowCollectorStatusIndicator from '../../status/flowcollector-status-indicator';
+import '../forms.css';
+import { Pipeline } from '../pipeline';
+import { ResourceDeleteModal } from '../resource-delete-modal';
+import { ResourceStatus } from '../resource-status';
+import { Consumer, ResourceWatcher } from '../resource-watcher';
+import { getFlowCollectorOverallStatus, isK8sNotFoundError, k8sErrorMessage } from '../utils';
 
 export type FlowCollectorStatusProps = {};
 

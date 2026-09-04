@@ -18,7 +18,23 @@
 .wizard-editor-container>div {
   display: flex;
   flex-direction: column;
-  flex: 1
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.wizard-editor-container > .pf-v6-c-alert {
+  flex-shrink: 0;
+}
+
+.wizard-yaml-preview {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  margin: 0;
+  overflow: auto;
+  white-space: pre-wrap;
 }
 
 .editor-toggle-container {
@@ -55,7 +71,27 @@
 }
 
 #wizard-container {
-  flex: 1; 
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#wizard-container > .pf-v6-c-wizard {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+/* Review step: keep YAML scrolling inside the preview, not the wizard main */
+#healthRuleWizard.pf-v6-c-wizard .pf-v6-c-wizard__main:has(.wizard-editor-container) {
+  overflow: hidden;
+}
+
+/* ResourceYAMLEditor Save/Reload/Cancel — wizard footer owns those actions */
+#healthRuleWizard .yaml-editor__buttons {
+  display: none !important;
 }
 
 .no-padding {

@@ -10,6 +10,7 @@ import {
   DrawerPanelContent,
   EmptyState,
   Gallery,
+  Spinner,
   Title
 } from '@patternfly/react-core';
 import { CheckCircleIcon } from '@patternfly/react-icons';
@@ -24,9 +25,16 @@ export interface HealthDrawerContainerProps {
   stats: HealthStat[];
   kind: HealthSuperKind;
   isDark: boolean;
+  isLoading?: boolean;
 }
 
-export const HealthDrawerContainer: React.FC<HealthDrawerContainerProps> = ({ title, stats, kind, isDark }) => {
+export const HealthDrawerContainer: React.FC<HealthDrawerContainerProps> = ({
+  title,
+  stats,
+  kind,
+  isDark,
+  isLoading
+}) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
   const [selectedItemName, setSelectedItemName] = React.useState<string | undefined>(undefined);
   const drawerRef = React.useRef<HTMLDivElement>(null);
@@ -72,15 +80,18 @@ export const HealthDrawerContainer: React.FC<HealthDrawerContainerProps> = ({ ti
             <Content>
               <Content component={ContentVariants.h3}>{title}</Content>
             </Content>
-            {!hasAnyViolations && (
+            {isLoading ? (
+              <Bullseye data-test="health-drawer-loading">
+                <Spinner size="lg" aria-label={t('Loading network health')} />
+              </Bullseye>
+            ) : !hasAnyViolations ? (
               <Bullseye>
                 <EmptyState
                   titleText={<Title headingLevel="h2">{t('No violations found')}</Title>}
                   icon={CheckCircleIcon}
                 ></EmptyState>
               </Bullseye>
-            )}
-            {hasAnyViolations && (
+            ) : (
               <Gallery hasGutter minWidths={{ default: '300px' }} style={{ marginRight: '1.5rem' }}>
                 {stats.map(item => (
                   <HealthCard

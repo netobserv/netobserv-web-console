@@ -6,15 +6,16 @@ import validator from '@rjsf/validator-ajv8';
 import _ from 'lodash';
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ContextSingleton } from '../../utils/context';
-import { flowMetricNewPath, navigateTo, useNavigate, useParams } from '../../utils/url';
-import { safeYAMLToJS } from '../../utils/yaml';
-import { flowMetricUISchema } from './config/uiSchema';
-import { DynamicForm } from './dynamic-form/dynamic-form';
-import { ErrorTemplate } from './dynamic-form/templates';
-import './forms.css';
-import ResourceWatcher, { Consumer } from './resource-watcher';
-import { getFilteredUISchema } from './utils';
+import { ContextSingleton } from '../../../utils/context';
+import { useDiscardGuard } from '../../../utils/discard-guard-hook';
+import { flowMetricNewPath, navigateTo, useNavigate, useParams } from '../../../utils/url';
+import { safeYAMLToJS } from '../../../utils/yaml';
+import { DynamicForm } from '../dynamic-form/dynamic-form';
+import { ErrorTemplate } from '../dynamic-form/templates';
+import '../forms.css';
+import ResourceWatcher, { Consumer } from '../resource-watcher';
+import { getFilteredUISchema } from '../utils';
+import { flowMetricUISchema } from './uiSchema';
 
 export type FlowMetricWizardProps = {
   name?: string;
@@ -26,6 +27,7 @@ export const FlowMetricWizard: FC<FlowMetricWizardProps> = props => {
   const { t } = useTranslation('plugin__netobserv-plugin');
   const params = useParams<{ name?: string; namespace?: string }>();
   const navigate = useNavigate();
+  const [discard, discardModal] = useDiscardGuard();
   const [schema, setSchema] = React.useState<RJSFSchema | null>(null);
 
   const [data, setData] = React.useState<any>(null);
@@ -45,13 +47,14 @@ export const FlowMetricWizard: FC<FlowMetricWizardProps> = props => {
           validator={validator}
           onChange={event => {
             setData(event.formData);
+            discard.markDirty();
           }}
           errors={errors}
           skipDefaults
         />
       );
     },
-    [data, paths, schema]
+    [data, discard, paths, schema]
   );
 
   const onStepChange = React.useCallback((_event: React.MouseEvent<HTMLButtonElement>, step: WizardStepType) => {
@@ -102,8 +105,11 @@ export const FlowMetricWizard: FC<FlowMetricWizardProps> = props => {
                 <Wizard
                   id="flowMetricWizard"
                   onStepChange={onStepChange}
-                  onSave={() => ctx.onSubmit(data)}
-                  onClose={() => navigateTo('/')}
+                  onSave={() => {
+                    discard.clearDirty();
+                    ctx.onSubmit(data);
+                  }}
+                  onClose={() => discard.requestClose(() => navigateTo('/'))}
                 >
                   <WizardStep name={t('Overview')} id="overview">
                     <span className="co-pre-line">
@@ -149,6 +155,7 @@ export const FlowMetricWizard: FC<FlowMetricWizardProps> = props => {
                       onSave={content => {
                         const updatedData = safeYAMLToJS(content);
                         setData(updatedData);
+                        discard.clearDirty();
                         ctx.onSubmit(updatedData);
                       }}
                     />
@@ -156,6 +163,7 @@ export const FlowMetricWizard: FC<FlowMetricWizardProps> = props => {
                   </WizardStep>
                 </Wizard>
               </div>
+              {discardModal}
             </PageSection>
           );
         }}

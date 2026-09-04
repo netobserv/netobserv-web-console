@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import { SilenceMatcher } from '../../api/alert';
 import { RecordingAnnotations } from '../../model/config';
 import { ContextSingleton } from '../../utils/context';
+import { buildMonitoringQueryBrowserPath } from '../forms/dynamic-form/promql-query-browser';
 
 export type Severity = 'critical' | 'warning' | 'info';
 export type AlertState = 'firing' | 'pending' | 'silenced' | 'recording' | 'inactive';
@@ -468,7 +469,7 @@ const getRecordingRuleMetricLink = (item: HealthItem, resourceName?: string): st
     // TODO: Health: workloads
   }
 
-  return `/monitoring/query-browser?query0=${encodeURIComponent(query)}`;
+  return buildMonitoringQueryBrowserPath(query);
 };
 
 const getTrafficLink = (

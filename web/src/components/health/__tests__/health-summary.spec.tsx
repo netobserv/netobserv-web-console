@@ -185,6 +185,23 @@ describe('HealthSummary', () => {
     expect(screen.getAllByText('0').length).toBeGreaterThan(0);
   });
 
+  it('should suppress summary and empty-state content while loading', () => {
+    const stats = createMockStats();
+
+    const { container, rerender } = render(<HealthSummary rules={[]} stats={stats} isLoading />);
+
+    expect(container.querySelector('[data-test="health-summary-loading"]')).toBeTruthy();
+    expect(screen.queryByText('No rules found, health cannot be determined')).not.toBeInTheDocument();
+    expect(screen.queryByText('The network looks healthy')).not.toBeInTheDocument();
+    expect(screen.queryByText('There are critical network issues')).not.toBeInTheDocument();
+
+    rerender(<HealthSummary rules={[createMockRule('critical', 1, 'firing')]} stats={stats} isLoading />);
+
+    expect(container.querySelector('[data-test="health-summary-loading"]')).toBeTruthy();
+    expect(screen.queryByText('There are critical network issues')).not.toBeInTheDocument();
+    expect(screen.queryByText('2')).not.toBeInTheDocument();
+  });
+
   it('should handle mixed severities with firing and pending alerts', () => {
     const rules: Rule[] = [
       createMockRule('critical', 1, 'firing'),

@@ -181,12 +181,13 @@ fmt-backend: ## Run backend go fmt
 .PHONY: lint-backend
 lint-backend: prereqs ## Lint backend code
 	@echo "### Linting backend code"
-	./bin/golangci-lint-${GOLANGCI_LINT_VERSION} run ./...
+	./bin/golangci-lint-${GOLANGCI_LINT_VERSION} run ./cmd/... ./pkg/...
 
 .PHONY: test-backend
 test-backend: ## Test backend using go test
 	@echo "### Testing backend"
-	go test ./... -coverpkg=./... -coverprofile cover.out
+	# Limit to cmd/pkg — scripts/ (e.g. gen-health-rule-defaults) and web/node_modules are not backend packages.
+	go test ./cmd/... ./pkg/... -coverpkg=./cmd/...,./pkg/... -coverprofile cover.out
 
 ##@ Performance Testing
 

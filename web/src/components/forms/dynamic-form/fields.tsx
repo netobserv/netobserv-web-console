@@ -7,13 +7,25 @@ import {
   FlexItem,
   Popover
 } from '@patternfly/react-core';
-import { FieldProps, UiSchema } from '@rjsf/utils';
+import { FieldProps, getUiOptions, UiSchema } from '@rjsf/utils';
 import classnames from 'classnames';
 import { JSONSchema7 } from 'json-schema';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
+import { ContextSingleton } from '../../../utils/context';
 import { useTheme } from '../../../utils/theme-hook';
+import { UiSchemaOptionsWithDependency } from './types';
 import { useSchemaDescription, useSchemaLabel } from './utils';
+
+/** Token resolved at render time so FlowCollector form can deep-link without circular imports. */
+export const HEALTH_RULE_WIZARD_HREF_TOKEN = '__health_rule_wizard__';
+
+const resolveExternalHref = (href: string): string => {
+  if (href === HEALTH_RULE_WIZARD_HREF_TOKEN) {
+    return ContextSingleton.isStandalone() ? '/console-health-rule-wizard' : '/network-health/rules/setup';
+  }
+  return href;
+};
 
 export const Description: React.FC<{
   id?: string;
@@ -21,7 +33,8 @@ export const Description: React.FC<{
   description?: string;
   border?: boolean;
   padding?: boolean;
-}> = ({ id, label, description, border, padding }) => {
+  externalLink?: { href: string; text: string };
+}> = ({ id, label, description, border, padding, externalLink }) => {
   const isDarkTheme = useTheme();
   const { t } = useTranslation('plugin__netobserv-plugin');
 
@@ -40,13 +53,13 @@ export const Description: React.FC<{
     });
   }, []);
 
-  if (!description) {
+  if (!description && !externalLink) {
     return null;
   }
 
-  const desc = description.replaceAll('<br>', '');
-  const parts = desc.split('\n');
-  let content = <>{formatText(desc)}</>;
+  const desc = (description || '').replaceAll('<br>', '');
+  const parts = desc ? desc.split('\n') : [];
+  let content = desc ? <>{formatText(desc)}</> : null;
   if (parts.length > 1) {
     content = (
       <Popover
@@ -78,6 +91,22 @@ export const Description: React.FC<{
         }`}
       >
         {content}
+        {externalLink?.href && externalLink?.text && (
+          <>
+            {content ? ' ' : null}
+            <Button
+              component="a"
+              href={resolveExternalHref(externalLink.href)}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="link"
+              isInline
+              data-test="health-rules-wizard-external-link"
+            >
+              {externalLink.text}
+            </Button>
+          </>
+        )}
       </div>
     </span>
   );
@@ -95,7 +124,11 @@ export const DescriptionField: React.FC<DescriptionFieldProps> = ({
   uiSchema
 }) => {
   const [, label] = useSchemaLabel(schema, uiSchema || {}, defaultLabel);
-  return <Description id={id} label={label} description={description} />;
+  const resolved = useSchemaDescription(schema, uiSchema || {}, description);
+  const options = getUiOptions(uiSchema || {}) as UiSchemaOptionsWithDependency & {
+    externalLink?: { href: string; text: string };
+  };
+  return <Description id={id} label={label} description={resolved} externalLink={options.externalLink} />;
 };
 
 export type FormFieldProps = {
@@ -132,14 +165,27 @@ export const FormField: React.FC<FormFieldProps> = ({ children, id, defaultLabel
 export type FieldSetProps = Pick<FieldProps, 'idSchema' | 'required' | 'schema' | 'uiSchema'> & {
   children?: React.ReactNode;
   defaultLabel?: string;
+  /** Takes priority over schema/uiSchema title (e.g. array items with data-derived names). */
+  labelOverride?: string;
   /** When true, the schema description block under the accordion title is omitted (e.g. full text only in a tooltip). */
   suppressDescription?: boolean;
 };
 
 export const FieldSet: React.FC<FieldSetProps> = props => {
-  const { children, defaultLabel, idSchema, required = false, schema, suppressDescription, uiSchema } = props;
-  const [expanded, setExpanded] = React.useState(idSchema['$id'] === 'root'); // root is expanded by default
-  const [showLabel, label] = useSchemaLabel(schema, uiSchema || {}, defaultLabel);
+  const {
+    children,
+    defaultLabel,
+    labelOverride,
+    idSchema,
+    required = false,
+    schema,
+    suppressDescription,
+    uiSchema
+  } = props;
+  const { defaultExpanded } = getUiOptions(uiSchema ?? {}) as UiSchemaOptionsWithDependency;
+  const [expanded, setExpanded] = React.useState(idSchema['$id'] === 'root' || Boolean(defaultExpanded));
+  const [showLabel, schemaLabel] = useSchemaLabel(schema, uiSchema || {}, defaultLabel);
+  const label = labelOverride || schemaLabel;
   const schemaDescription = useSchemaDescription(schema, uiSchema || {});
   const description = suppressDescription ? '' : schemaDescription;
   return showLabel && label ? (

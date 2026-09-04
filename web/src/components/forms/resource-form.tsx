@@ -5,10 +5,11 @@ import { UiSchema } from '@rjsf/utils';
 import _ from 'lodash';
 import React, { FC, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDiscardGuard } from '../../utils/discard-guard-hook';
 import { safeYAMLToJS } from '../../utils/yaml';
-import { SchemaValidator } from './config/validator';
 import { DynamicForm } from './dynamic-form/dynamic-form';
 import { ErrorTemplate } from './dynamic-form/templates';
+import { SchemaValidator } from './dynamic-form/validator';
 import { EditorToggle, EditorType } from './editor-toggle';
 import './forms.css';
 import { ResourceDeleteModal } from './resource-delete-modal';
@@ -23,6 +24,7 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
   const [viewType, setViewType] = React.useState(EditorType.CUSTOM);
   const [data, setData] = React.useState<any>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = React.useState(false);
+  const [discard, discardModal] = useDiscardGuard();
 
   const hasChanged = React.useCallback(
     (existing: any) => {
@@ -57,8 +59,11 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
                 isUpdate={ctx.isUpdate}
                 onReload={() => setData(ctx.data)}
                 onChange={setViewType}
-                onSubmit={() => ctx.onSubmit(data)}
-                onCancel={() => window.history.back()}
+                onSubmit={() => {
+                  discard.clearDirty();
+                  ctx.onSubmit(data);
+                }}
+                onCancel={() => discard.requestClose(() => window.history.back())}
                 onDelete={() => setDeleteModalOpen(true)}
                 customChild={
                   ctx.schema ? (
@@ -66,11 +71,14 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
                       showAlert
                       formData={data}
                       schema={ctx.schema}
-                      uiSchema={uiSchema} // see if we can regenerate this from CSV
+                      uiSchema={uiSchema}
                       validator={SchemaValidator}
                       errors={ctx.errors}
                       onError={errs => ctx.setErrors(_.map(errs, error => error.stack))}
-                      onChange={event => setData(event.formData)}
+                      onChange={event => {
+                        setData(event.formData);
+                        discard.markDirty();
+                      }}
                       skipDefaults={ctx.skipDefaults}
                     />
                   ) : (
@@ -84,6 +92,7 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
                       onSave={content => {
                         const updatedData = safeYAMLToJS(content);
                         setData(updatedData);
+                        discard.clearDirty();
                         ctx.onSubmit(updatedData);
                       }}
                     />
@@ -100,6 +109,7 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
                 onCancel={() => setDeleteModalOpen(false)}
               />
             )}
+            {discardModal}
           </PageSection>
         );
       }}

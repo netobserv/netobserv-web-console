@@ -34,6 +34,10 @@
   margin-right: 0.5rem;
 }
 
+.form-group.spaced .pf-v6-c-form-control {
+  width: 100%;
+}
+
 .checkboxes-container {
   padding: 1rem;
 }
@@ -51,4 +55,13 @@ pre.backticks {
    instead of hidden. Force-hide content of non-expanded items to fix this. */
 .co-dynamic-form__accordion .pf-v6-c-accordion__item:not(.pf-m-expanded) > .pf-v6-c-accordion__expandable-content {
   display: none;
+}
+
+/* Required-field asterisk (OpenShift Console co-required pattern; needed in standalone too) */
+.co-required:after {
+  color: var(--pf-t--global--text--color--status--danger--default, var(--pf-v5-global--danger-color--100, #c9190b));
+  content: '*';
+  font-size: var(--pf-t--global--font--size--sm, 0.875rem);
+  padding-left: 0.2em;
+  vertical-align: top;
 }

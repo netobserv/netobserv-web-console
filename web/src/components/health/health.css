@@ -43,12 +43,13 @@
     width: 100%;
 }
 
-/* Health summary in header - no extra margins */
+/* Health summary in header - size to content, wrap when needed */
 #health-page .health-header .health-summary-dashboard {
     margin-top: 0.5rem;
     margin-bottom: 0;
-    width: 100%;
+    width: fit-content;
     max-width: 100%;
+    min-width: 0;
 }
 
 .netobserv-refresh-container {
@@ -142,12 +143,32 @@
     padding-bottom: 0.6rem;
 }
 
+/* Global tab: compact score + counts strip beside the heading */
+.health-global-header {
+    margin-bottom: 0.75rem;
+}
+
+.health-global-header .pf-v6-c-content--h3,
+.health-global-header h3 {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin: 0;
+}
+
+.health-global-strip-label {
+    color: var(--pf-t--global--text--color--subtle);
+    margin: 0;
+    line-height: 1;
+}
+
 /* Health summary dashboard - clickable */
 .health-summary-dashboard {
     margin-top: 0.5rem;
     margin-bottom: 0;
     display: flex;
     align-items: center;
+    width: fit-content;
+    max-width: 100%;
     cursor: pointer;
     transition: background-color 0.2s ease;
     padding: 0.5rem;
@@ -180,6 +201,27 @@
     outline: none;
 }
 
+/* Expanded summary cards - intrinsic widths, wrap on small screens */
+.health-summary-cards {
+    max-width: 100%;
+}
+
+.health-summary-status-card {
+    flex: 1 1 18rem;
+    max-width: 28rem;
+    min-width: min(18rem, 100%);
+}
+
+.health-summary-metric-card {
+    flex: 0 1 8rem;
+    min-width: min(7rem, 100%);
+}
+
+.health-summary-status-card .health-metric-card,
+.health-summary-metric-card .health-metric-card {
+    height: 100%;
+}
+
 /* Health summary toggle icon */
 .health-summary-toggle-icon {
     display: flex;
@@ -208,6 +250,39 @@
 
 .health-summary-compact-item.info {
     background-color: rgba(154, 216, 216, 0.1);
+}
+
+.health-global-filter-chip {
+    appearance: none;
+    border: 1px solid transparent;
+    background: inherit;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    margin: 0;
+}
+
+.health-global-filter-chip.critical {
+    background-color: rgba(201, 25, 11, 0.1);
+}
+
+.health-global-filter-chip.warning {
+    background-color: rgba(240, 171, 0, 0.1);
+}
+
+.health-global-filter-chip.info {
+    background-color: rgba(154, 216, 216, 0.1);
+}
+
+.health-global-filter-chip:hover,
+.health-global-filter-chip:focus-visible {
+    outline: 2px solid var(--pf-t--global--color--brand--default);
+    outline-offset: 1px;
+}
+
+.health-global-filter-chip.is-selected {
+    border-color: var(--pf-t--global--border--color--brand--default);
+    box-shadow: inset 0 0 0 1px var(--pf-t--global--border--color--brand--default);
 }
 
 .health-summary-compact-icon {
@@ -375,6 +450,18 @@
     height: 2em;
     padding: 0 !important;
     margin: 0 !important;
+}
+
+/* Keep button leading icons optically centered with the label */
+#health-page .pf-v6-c-button__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+#health-page .pf-v6-c-button__icon > svg {
+    flex-shrink: 0;
 }
 
 /*hack to keep refresh button size while loading*/

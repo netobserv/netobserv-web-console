@@ -101,11 +101,12 @@ Add new API endpoint for zone filtering:
 ```text
 FlowCollector CRD field changed in operator:
 1. Follow instructions in README.md#updating-schemas
-2. Update web/src/components/forms/config/uiSchema.ts with new field display rules
+2. Update web/src/components/forms/flowCollector/uiSchema.ts with new field display rules
 3. Update web/src/model/flow-query.ts if query params change
 4. Update web/src/components/tabs/netflow-overview/ if overview UI changes
 5. Regenerate schemas using scripts/generate-schemas.sh (requires running cluster)
-6. Test with both old and new FlowCollector versions
+6. After operator DefaultHealthRules changes, run scripts/generate-health-rule-defaults.sh
+7. Test with both old and new FlowCollector versions
 ```
 
 ## Repository-Specific Context
@@ -184,7 +185,7 @@ make image-build image-push     # Build and push image
 - Backend routes: [pkg/server/routes.go](pkg/server/routes.go)
 - Backend handlers: [pkg/handler/handlers.go](pkg/handler/handlers.go)
 - Table columns: [web/src/utils/columns.ts](web/src/utils/columns.ts)
-- UI schema: [web/src/components/forms/config/uiSchema.ts](web/src/components/forms/config/uiSchema.ts)
+- UI schema: [web/src/components/forms/flowCollector/uiSchema.ts](web/src/components/forms/flowCollector/uiSchema.ts)
 - Sample config: [config/sample-config.yaml](config/sample-config.yaml)
 
 ## AI Workflow Example

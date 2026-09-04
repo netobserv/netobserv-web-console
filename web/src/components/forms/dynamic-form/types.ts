@@ -13,6 +13,8 @@ export type UiSchemaOptionsWithDependency = {
   dependency?: DynamicFormFieldDependency;
   /** When `matchMode: 'controlUnset'` pauses the array, tooltip for the disabled Add action. */
   addDisabledTooltip?: string;
+  /** When true, FieldSet accordion starts expanded (root always does). */
+  defaultExpanded?: boolean;
 };
 
 export type DynamicFormSchemaError = {

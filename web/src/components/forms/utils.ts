@@ -50,6 +50,21 @@ export const isK8sNotFoundError = (error: unknown): boolean => {
   return /not found/i.test(k8sErrorMessage(error));
 };
 
+/** A 409 means the caller held a stale resourceVersion — re-fetch and retry the write. */
+export const isK8sConflictError = (error: unknown): boolean => {
+  if (!error) {
+    return false;
+  }
+  const e = error as K8sErrorLike;
+  if (e.code === 409 || e.json?.code === 409 || e.response?.status === 409 || e.status === 409) {
+    return true;
+  }
+  if (e.json?.reason === 'Conflict') {
+    return true;
+  }
+  return /conflict|the object has been modified/i.test(k8sErrorMessage(error));
+};
+
 export const getFlowCollectorOverallStatus = (
   cr: K8sResourceKind | undefined,
   loadError: unknown
