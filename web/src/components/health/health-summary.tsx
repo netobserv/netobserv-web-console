@@ -1,15 +1,5 @@
 import { Rule } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Alert,
-  Card,
-  CardBody,
-  Content,
-  ContentVariants,
-  Flex,
-  FlexItem,
-  Grid,
-  GridItem
-} from '@patternfly/react-core';
+import { Alert, Card, CardBody, Content, ContentVariants, Flex, FlexItem, Spinner } from '@patternfly/react-core';
 import { AngleDownIcon, AngleRightIcon } from '@patternfly/react-icons';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,18 +9,67 @@ import { HealthMetricCard } from './health-metric-card';
 
 type StatusClass = 'success' | 'critical' | 'warning' | 'info';
 
+const sectionSummaryLayout = {
+  direction: { default: 'row' as const },
+  alignItems: { default: 'alignItemsCenter' as const },
+  justifyContent: { default: 'justifyContentSpaceBetween' as const },
+  gap: { default: 'gapMd' as const }
+};
+
 export interface HealthSummaryProps {
   rules: Rule[];
   stats: HealthStats;
   forceCollapsed?: boolean;
+  isLoading?: boolean;
+  activeViewLabel?: string;
 }
 
-export const HealthSummary: React.FC<HealthSummaryProps> = ({ rules, stats, forceCollapsed }) => {
+export const HealthSummary: React.FC<HealthSummaryProps> = ({
+  rules,
+  stats,
+  forceCollapsed,
+  isLoading,
+  activeViewLabel
+}) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
   const [isExpanded, setIsExpanded] = useLocalStorage<boolean>(localStorageHealthSummaryExpandedKey, false);
 
   // Determine the actual display state: forced collapsed or user's preference
   const displayExpanded = forceCollapsed ? false : isExpanded;
+  const sectionDetails = t('Score and status from NetObserv alert and recording rules configured on this cluster.');
+  const sectionDescription = activeViewLabel
+    ? t('{{view}} view · {{details}}', { view: activeViewLabel, details: sectionDetails })
+    : sectionDetails;
+
+  if (isLoading) {
+    return (
+      <Flex className="health-section-summary health-netobserv-summary" {...sectionSummaryLayout}>
+        <FlexItem className="health-section-summary-heading">
+          <Content
+            component={ContentVariants.h3}
+            className="health-summary-section-title"
+            data-test="health-summary-netobserv-label"
+          >
+            {t('NetObserv health rules')}
+          </Content>
+          <Content component={ContentVariants.p} className="health-summary-section-description">
+            {sectionDescription}
+          </Content>
+        </FlexItem>
+        <FlexItem className="health-section-summary-body">
+          <Flex
+            className="health-summary-dashboard"
+            alignItems={{ default: 'alignItemsCenter' }}
+            data-test="health-summary-loading"
+          >
+            <FlexItem>
+              <Spinner size="lg" aria-label={t('Loading network health')} />
+            </FlexItem>
+          </Flex>
+        </FlexItem>
+      </Flex>
+    );
+  }
 
   // Helper function to format metric details
   const formatMetricDetail = (firingAlerts: number, pendingAlerts: number, recordingRules: number): string => {
@@ -82,17 +121,33 @@ export const HealthSummary: React.FC<HealthSummaryProps> = ({ rules, stats, forc
   const totalRecordingRules = recordingRulesCritical + recordingRulesWarning + recordingRulesInfo;
   if (rules.length === 0 && totalRecordingRules === 0) {
     return (
-      <div className="health-summary-dashboard">
-        <Alert title={t('No rules found, health cannot be determined')} variant="info">
-          <>
-            {t(
-              'Check alert definitions in FlowCollector "spec.processor.metrics.alertGroups" and "spec.processor.metrics.disableAlerts".'
-            )}
-            <br />
-            {t('Make sure that Prometheus and AlertManager are running.')}
-          </>
-        </Alert>
-      </div>
+      <Flex className="health-section-summary health-netobserv-summary" {...sectionSummaryLayout}>
+        <FlexItem className="health-section-summary-heading">
+          <Content
+            component={ContentVariants.h3}
+            className="health-summary-section-title"
+            data-test="health-summary-netobserv-label"
+          >
+            {t('NetObserv health rules')}
+          </Content>
+          <Content component={ContentVariants.p} className="health-summary-section-description">
+            {sectionDescription}
+          </Content>
+        </FlexItem>
+        <FlexItem className="health-section-summary-body">
+          <div className="health-summary-dashboard">
+            <Alert title={t('No rules found, health cannot be determined')} variant="info">
+              <>
+                {t(
+                  'Check alert definitions in FlowCollector "spec.processor.metrics.alertGroups" and "spec.processor.metrics.disableAlerts".'
+                )}
+                <br />
+                {t('Make sure that Prometheus and AlertManager are running.')}
+              </>
+            </Alert>
+          </div>
+        </FlexItem>
+      </Flex>
     );
   }
 
@@ -248,155 +303,177 @@ export const HealthSummary: React.FC<HealthSummaryProps> = ({ rules, stats, forc
   };
 
   return (
-    <Flex
-      gap={{ default: 'gapMd' }}
-      alignItems={{ default: 'alignItemsCenter' }}
-      className={`health-summary-dashboard ${forceCollapsed ? 'force-collapsed' : ''}`}
-      onClick={handleToggle}
-      onKeyDown={handleKeyDown}
-      tabIndex={forceCollapsed ? -1 : 0}
-      role="button"
-      aria-label={displayExpanded ? t('Collapse health summary') : t('Expand health summary')}
-      aria-expanded={displayExpanded}
-      aria-disabled={forceCollapsed}
-      style={{ cursor: forceCollapsed ? 'default' : 'pointer' }}
-    >
-      {!forceCollapsed && (
-        <FlexItem className="health-summary-toggle-icon">
-          {displayExpanded ? <AngleDownIcon /> : <AngleRightIcon />}
-        </FlexItem>
-      )}
-      <FlexItem flex={{ default: 'flex_1' }}>
-        {displayExpanded ? (
-          <Grid hasGutter>
-            {/* Status card */}
-            <GridItem lg={6} md={6} sm={12}>
-              <Card className={`health-metric-card status ${statusClass}`}>
-                <CardBody>
-                  <Flex direction={{ default: 'column' }} spaceItems={{ default: 'spaceItemsNone' }}>
+    <Flex className="health-section-summary health-netobserv-summary" {...sectionSummaryLayout}>
+      <FlexItem className="health-section-summary-heading">
+        <Content
+          component={ContentVariants.h3}
+          className="health-summary-section-title"
+          data-test="health-summary-netobserv-label"
+        >
+          {t('NetObserv health rules')}
+        </Content>
+        <Content component={ContentVariants.p} className="health-summary-section-description">
+          {sectionDescription}
+        </Content>
+      </FlexItem>
+      <FlexItem className="health-section-summary-body">
+        <Flex
+          data-test="health-netobserv-summary-dashboard"
+          gap={{ default: 'gapMd' }}
+          alignItems={{ default: 'alignItemsCenter' }}
+          className={`health-summary-dashboard ${forceCollapsed ? 'force-collapsed' : ''}`}
+          onClick={handleToggle}
+          onKeyDown={handleKeyDown}
+          tabIndex={forceCollapsed ? -1 : 0}
+          role="button"
+          aria-label={displayExpanded ? t('Collapse health summary') : t('Expand health summary')}
+          aria-expanded={displayExpanded}
+          aria-disabled={forceCollapsed}
+          style={{ cursor: forceCollapsed ? 'default' : 'pointer' }}
+        >
+          {!forceCollapsed && (
+            <FlexItem className="health-summary-toggle-icon">
+              {displayExpanded ? <AngleDownIcon /> : <AngleRightIcon />}
+            </FlexItem>
+          )}
+          <FlexItem className="health-section-summary-cards-container">
+            {displayExpanded ? (
+              <Flex
+                className="health-summary-cards"
+                gap={{ default: 'gapMd' }}
+                alignItems={{ default: 'alignItemsStretch' }}
+                flexWrap={{ default: 'nowrap' }}
+              >
+                <FlexItem className="health-summary-status-card">
+                  <Card className={`health-metric-card status ${statusClass}`}>
+                    <CardBody>
+                      <Flex direction={{ default: 'column' }} spaceItems={{ default: 'spaceItemsNone' }}>
+                        <FlexItem>
+                          <Content component={ContentVariants.small} className="metric-label">
+                            {t('Status')}
+                          </Content>
+                        </FlexItem>
+                        <FlexItem>
+                          <Content component={ContentVariants.p} className="metric-status">
+                            {title}
+                          </Content>
+                        </FlexItem>
+                        {details.length > 0 && (
+                          <FlexItem className="status-details">
+                            <ul>
+                              {details.map((text, i) => (
+                                <li key={'li_' + i}>{text}</li>
+                              ))}
+                            </ul>
+                          </FlexItem>
+                        )}
+                      </Flex>
+                    </CardBody>
+                  </Card>
+                </FlexItem>
+
+                <FlexItem className="health-summary-metric-card">
+                  <HealthMetricCard
+                    severity="critical"
+                    label={t('Critical')}
+                    total={criticalTotal}
+                    detail={
+                      criticalTotal > 0
+                        ? formatMetricDetail(
+                            summaryStats.critical.firingAlerts,
+                            summaryStats.critical.pendingAlerts,
+                            summaryStats.critical.recordingRules
+                          )
+                        : undefined
+                    }
+                  />
+                </FlexItem>
+
+                <FlexItem className="health-summary-metric-card">
+                  <HealthMetricCard
+                    severity="warning"
+                    label={t('Warning')}
+                    total={warningTotal}
+                    detail={
+                      warningTotal > 0
+                        ? formatMetricDetail(
+                            summaryStats.warning.firingAlerts,
+                            summaryStats.warning.pendingAlerts,
+                            summaryStats.warning.recordingRules
+                          )
+                        : undefined
+                    }
+                  />
+                </FlexItem>
+
+                <FlexItem className="health-summary-metric-card">
+                  <HealthMetricCard
+                    severity="info"
+                    label={t('Info')}
+                    total={infoTotal}
+                    detail={
+                      infoTotal > 0
+                        ? formatMetricDetail(
+                            summaryStats.info.firingAlerts,
+                            summaryStats.info.pendingAlerts,
+                            summaryStats.info.recordingRules
+                          )
+                        : undefined
+                    }
+                  />
+                </FlexItem>
+              </Flex>
+            ) : (
+              <Flex
+                className="health-summary-compact-row health-section-summary-compact-row"
+                gap={{ default: 'gapSm' }}
+                alignItems={{ default: 'alignItemsCenter' }}
+                flexWrap={{ default: 'nowrap' }}
+              >
+                <FlexItem className={`health-summary-compact-item ${statusClass}`}>
+                  <Flex gap={{ default: 'gapXs' }} alignItems={{ default: 'alignItemsCenter' }}>
+                    <FlexItem className="health-summary-compact-icon status" />
                     <FlexItem>
-                      <Content component={ContentVariants.small} className="metric-label">
-                        {t('Status')}
-                      </Content>
-                    </FlexItem>
-                    <FlexItem>
-                      <Content component={ContentVariants.p} className="metric-status">
+                      <Content component={ContentVariants.p} className="health-summary-compact-text">
                         {title}
                       </Content>
                     </FlexItem>
-                    {details.length > 0 && (
-                      <FlexItem className="status-details">
-                        <ul>
-                          {details.map((text, i) => (
-                            <li key={'li_' + i}>{text}</li>
-                          ))}
-                        </ul>
-                      </FlexItem>
-                    )}
                   </Flex>
-                </CardBody>
-              </Card>
-            </GridItem>
-
-            {/* Critical card */}
-            <GridItem lg={2} md={6} sm={12}>
-              <HealthMetricCard
-                severity="critical"
-                label={t('Critical')}
-                total={criticalTotal}
-                detail={
-                  criticalTotal > 0
-                    ? formatMetricDetail(
-                        summaryStats.critical.firingAlerts,
-                        summaryStats.critical.pendingAlerts,
-                        summaryStats.critical.recordingRules
-                      )
-                    : undefined
-                }
-              />
-            </GridItem>
-
-            {/* Warning card */}
-            <GridItem lg={2} md={6} sm={12}>
-              <HealthMetricCard
-                severity="warning"
-                label={t('Warning')}
-                total={warningTotal}
-                detail={
-                  warningTotal > 0
-                    ? formatMetricDetail(
-                        summaryStats.warning.firingAlerts,
-                        summaryStats.warning.pendingAlerts,
-                        summaryStats.warning.recordingRules
-                      )
-                    : undefined
-                }
-              />
-            </GridItem>
-
-            {/* Info card */}
-            <GridItem lg={2} md={6} sm={12}>
-              <HealthMetricCard
-                severity="info"
-                label={t('Info')}
-                total={infoTotal}
-                detail={
-                  infoTotal > 0
-                    ? formatMetricDetail(
-                        summaryStats.info.firingAlerts,
-                        summaryStats.info.pendingAlerts,
-                        summaryStats.info.recordingRules
-                      )
-                    : undefined
-                }
-              />
-            </GridItem>
-          </Grid>
-        ) : (
-          <Flex gap={{ default: 'gapSm' }} alignItems={{ default: 'alignItemsCenter' }}>
-            {/* Collapsed view - just counters with icons */}
-            <FlexItem className={`health-summary-compact-item ${statusClass}`}>
-              <Flex gap={{ default: 'gapXs' }} alignItems={{ default: 'alignItemsCenter' }}>
-                <FlexItem className="health-summary-compact-icon status" />
-                <FlexItem>
-                  <Content component={ContentVariants.p} className="health-summary-compact-text">
-                    {title}
-                  </Content>
+                </FlexItem>
+                <FlexItem className="health-summary-compact-item critical">
+                  <Flex gap={{ default: 'gapXs' }} alignItems={{ default: 'alignItemsCenter' }}>
+                    <FlexItem className="health-summary-compact-icon critical" />
+                    <FlexItem>
+                      <Content component={ContentVariants.p} className="health-summary-compact-text">
+                        {criticalTotal}
+                      </Content>
+                    </FlexItem>
+                  </Flex>
+                </FlexItem>
+                <FlexItem className="health-summary-compact-item warning">
+                  <Flex gap={{ default: 'gapXs' }} alignItems={{ default: 'alignItemsCenter' }}>
+                    <FlexItem className="health-summary-compact-icon warning" />
+                    <FlexItem>
+                      <Content component={ContentVariants.p} className="health-summary-compact-text">
+                        {warningTotal}
+                      </Content>
+                    </FlexItem>
+                  </Flex>
+                </FlexItem>
+                <FlexItem className="health-summary-compact-item info">
+                  <Flex gap={{ default: 'gapXs' }} alignItems={{ default: 'alignItemsCenter' }}>
+                    <FlexItem className="health-summary-compact-icon info" />
+                    <FlexItem>
+                      <Content component={ContentVariants.p} className="health-summary-compact-text">
+                        {infoTotal}
+                      </Content>
+                    </FlexItem>
+                  </Flex>
                 </FlexItem>
               </Flex>
-            </FlexItem>
-            <FlexItem className="health-summary-compact-item critical">
-              <Flex gap={{ default: 'gapXs' }} alignItems={{ default: 'alignItemsCenter' }}>
-                <FlexItem className="health-summary-compact-icon critical" />
-                <FlexItem>
-                  <Content component={ContentVariants.p} className="health-summary-compact-text">
-                    {criticalTotal}
-                  </Content>
-                </FlexItem>
-              </Flex>
-            </FlexItem>
-            <FlexItem className="health-summary-compact-item warning">
-              <Flex gap={{ default: 'gapXs' }} alignItems={{ default: 'alignItemsCenter' }}>
-                <FlexItem className="health-summary-compact-icon warning" />
-                <FlexItem>
-                  <Content component={ContentVariants.p} className="health-summary-compact-text">
-                    {warningTotal}
-                  </Content>
-                </FlexItem>
-              </Flex>
-            </FlexItem>
-            <FlexItem className="health-summary-compact-item info">
-              <Flex gap={{ default: 'gapXs' }} alignItems={{ default: 'alignItemsCenter' }}>
-                <FlexItem className="health-summary-compact-icon info" />
-                <FlexItem>
-                  <Content component={ContentVariants.p} className="health-summary-compact-text">
-                    {infoTotal}
-                  </Content>
-                </FlexItem>
-              </Flex>
-            </FlexItem>
-          </Flex>
-        )}
+            )}
+          </FlexItem>
+        </Flex>
       </FlexItem>
     </Flex>
   );

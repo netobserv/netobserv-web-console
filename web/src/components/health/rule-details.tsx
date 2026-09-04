@@ -102,11 +102,12 @@ const RuleTableRow: React.FC<{
       <Td dataLabel={t('Direction')}>{direction || ''}</Td>
       <Td dataLabel={t('Description')}>{item.description}</Td>
       <Td noPadding>
-        <ActionsColumn
-          data-test="rule-details-actions"
-          isDisabled={links.length === 0}
-          items={links.map(l => ({ title: <a href={l.url}>{l.name}</a> }))}
-        />
+        <span data-test="rule-details-actions">
+          <ActionsColumn
+            isDisabled={links.length === 0}
+            items={links.map(l => ({ title: <a href={l.url}>{l.name}</a> }))}
+          />
+        </span>
       </Td>
     </Tr>
   );
@@ -153,11 +154,12 @@ const RuleCard: React.FC<{
               </Flex>
             </FlexItem>
             <FlexItem>
-              <ActionsColumn
-                data-test="rule-details-actions"
-                isDisabled={links.length === 0}
-                items={links.map(l => ({ title: <a href={l.url}>{l.name}</a> }))}
-              />
+              <span data-test="rule-details-actions">
+                <ActionsColumn
+                  isDisabled={links.length === 0}
+                  items={links.map(l => ({ title: <a href={l.url}>{l.name}</a> }))}
+                />
+              </span>
             </FlexItem>
           </Flex>
         </Flex>

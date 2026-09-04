@@ -7,7 +7,7 @@ import { ContextSingleton } from '../../utils/context';
 
 export type Severity = 'critical' | 'warning' | 'info';
 export type AlertState = 'firing' | 'pending' | 'silenced' | 'recording' | 'inactive';
-export type HealthSuperKind = 'Global' | 'Node' | 'Namespace' | 'Owner';
+export type HealthSuperKind = 'Global' | 'Node' | 'Namespace' | 'Owner' | 'Peer';
 
 // HealthItem can be either based on an Alert or based on a RecordingRule metric
 export type HealthItem = {

@@ -86,7 +86,9 @@ const endpointDualFieldFallback: Partial<Record<FilterId, [Field, Field]>> = {
   mac: ['SrcMac', 'DstMac'],
   host_address: ['SrcK8S_HostIP', 'DstK8S_HostIP'],
   host_name: ['SrcK8S_HostName', 'DstK8S_HostName'],
-  zone: ['SrcK8S_Zone', 'DstK8S_Zone']
+  zone: ['SrcK8S_Zone', 'DstK8S_Zone'],
+  subnet_label: ['SrcSubnetLabel', 'DstSubnetLabel'],
+  asn: ['SrcASN', 'DstASN']
 };
 
 const encodedFilterLabelKeys = (encoded: string): string[] =>

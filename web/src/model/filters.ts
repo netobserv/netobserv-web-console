@@ -47,7 +47,8 @@ export type TargetedFilterId =
   | 'port'
   | 'host_address'
   | 'host_name'
-  | 'subnet_label';
+  | 'subnet_label'
+  | 'asn';
 
 export type FilterId =
   | 'cluster_name'

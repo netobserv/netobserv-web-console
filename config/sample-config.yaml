@@ -419,6 +419,15 @@ frontend:
       default: false
       width: 10
       feature: subnetLabels
+    - id: SrcASN
+      group: Source
+      name: ASN
+      tooltip: Source Autonomous System Number from BGP advertised prefixes.
+      field: SrcASN
+      filter: src_asn
+      default: false
+      width: 10
+      feature: bgpEnrichment
     - id: SrcNetworkName
       group: Source
       name: Network Name
@@ -560,6 +569,15 @@ frontend:
       default: false
       width: 10
       feature: subnetLabels
+    - id: DstASN
+      group: Destination
+      name: ASN
+      tooltip: Destination Autonomous System Number from BGP advertised prefixes.
+      field: DstASN
+      filter: dst_asn
+      default: false
+      width: 10
+      feature: bgpEnrichment
     - id: DstNetworkName
       group: Destination
       name: Network Name
@@ -1176,6 +1194,27 @@ frontend:
       placeholder: 'E.g: Pods, Services, ExternalIP'
       hint: Add destination subnet label filter, or an empty string to get unmatched destinations.
       feature: subnetLabels
+    - id: asn
+      name: ASN
+      component: autocomplete
+      category: endpoint
+      placeholder: 'E.g: 65001, 64512'
+      hint: Add Autonomous System Number filter.
+      feature: bgpEnrichment
+    - id: src_asn
+      name: ASN
+      component: autocomplete
+      category: source
+      placeholder: 'E.g: 65001, 64512'
+      hint: Add source Autonomous System Number filter.
+      feature: bgpEnrichment
+    - id: dst_asn
+      name: ASN
+      component: autocomplete
+      category: destination
+      placeholder: 'E.g: 65001, 64512'
+      hint: Add destination Autonomous System Number filter.
+      feature: bgpEnrichment
     - id: resource
       name: Resource
       component: autocomplete
@@ -1622,6 +1661,7 @@ frontend:
         - SrcK8S_HostName
         - DstK8S_HostName
       groups:
+        - asns
         - networks
         - zones
         - clusters
@@ -1640,6 +1680,7 @@ frontend:
         - SrcK8S_Namespace
         - DstK8S_Namespace
       groups:
+        - asns
         - clusters
         - clusters+zones
         - clusters+hosts
@@ -1666,7 +1707,10 @@ frontend:
         - DstK8S_Namespace
         - SrcSubnetLabel
         - DstSubnetLabel
+        - SrcASN
+        - DstASN
       groups:
+        - asns
         - clusters
         - clusters+zones
         - clusters+hosts
@@ -1698,6 +1742,7 @@ frontend:
         - SrcAddr
         - SrcK8S_HostName
         - SrcSubnetLabel
+        - SrcASN
         - DstK8S_Name
         - DstK8S_Type
         - DstK8S_OwnerName
@@ -1706,7 +1751,9 @@ frontend:
         - DstAddr
         - DstK8S_HostName
         - DstSubnetLabel
+        - DstASN
       groups:
+        - asns
         - clusters
         - clusters+zones
         - clusters+hosts
@@ -1778,6 +1825,9 @@ frontend:
     - name: SrcSubnetLabel
       type: string
       description: Source subnet label
+    - name: SrcASN
+      type: string
+      description: Source Autonomous System Number from BGP advertised prefixes
     - name: SrcK8S_NetworkName
       type: string
       description: Source network name
@@ -1819,6 +1869,9 @@ frontend:
     - name: DstSubnetLabel
       type: string
       description: Destination subnet label
+    - name: DstASN
+      type: string
+      description: Destination Autonomous System Number from BGP advertised prefixes
     - name: DstK8S_NetworkName
       type: string
       description: Destination network name

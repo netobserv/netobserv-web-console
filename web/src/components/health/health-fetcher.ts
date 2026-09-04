@@ -1,33 +1,13 @@
 import { AlertStates, PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
-import * as _ from 'lodash';
-import { murmur3 } from 'murmurhash-js';
 import { SilenceMatcher } from '../../api/alert';
 import { getAlerts, getRecordingRules, getSilencedAlerts, queryPrometheusMetric } from '../../api/routes';
 import { RecordingAnnotations } from '../../model/config';
 import { buildStats, isSilenced, RecordingRuleMetric, rulesToHealthItems } from './health-helper';
+import { injectAlertRuleIds } from './ovn-health-fetcher';
 
 export const fetchNetworkHealth = (recordingAnnotations: RecordingAnnotations) => {
   // matching netobserv="true" catches all alerts designed for netobserv (not necessarily owned by it)
-  const alertsP = getAlerts('netobserv="true"').then(res => {
-    return res.data.groups.flatMap(group => {
-      // Inject rule id, for links to the alerting page
-      // Warning: ID generation may in theory differ with openshift version (in practice, this has been stable across versions since 4.12 at least)
-      // See https://github.com/openshift/console/blob/29374f38308c4ebe9ea461a5d69eb3e4956c7086/frontend/public/components/monitoring/utils.ts#L47-L56
-      group.rules.forEach(r => {
-        const key = [
-          group.file,
-          group.name,
-          r.name,
-          r.duration,
-          r.query,
-          ..._.map(r.labels, (k, v) => `${k}=${v}`)
-        ].join(',');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        r.id = String(murmur3(key, 'monitoring-salt' as any));
-      });
-      return group.rules;
-    });
-  });
+  const alertsP = getAlerts('netobserv="true"').then(res => injectAlertRuleIds(res.data.groups));
 
   const silencedP = getSilencedAlerts('netobserv=true')
     .then(res => {

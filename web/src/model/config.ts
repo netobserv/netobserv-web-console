@@ -15,7 +15,10 @@ export type Feature =
   | 'packetTranslation'
   | 'networkEvents'
   | 'ipsec'
-  | 'tlsTracking';
+  | 'tlsTracking'
+  | 'subnetLabels'
+  | 'multiNetworks'
+  | 'bgpEnrichment';
 
 export type RecordingAnnotations = { [recordName: string]: { [key: string]: string } };
 
