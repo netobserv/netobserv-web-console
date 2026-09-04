@@ -52,7 +52,11 @@ export const HealthMultiSelectFilter = <T extends string>({
           >
             <>
               {toggleLabel}
-              {selected.length > 0 && <Badge isRead>{selected.length}</Badge>}
+              {selected.length > 0 && (
+                <Badge isRead style={{ marginInlineStart: 'var(--pf-t--global--spacer--sm)' }}>
+                  {selected.length}
+                </Badge>
+              )}
             </>
           </MenuToggle>
         )}

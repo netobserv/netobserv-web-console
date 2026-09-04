@@ -8,6 +8,7 @@ export const localStorageExportColsKey = 'netflow-traffic-export-columns';
 export const localStorageRefreshKey = 'netflow-traffic-refresh';
 export const localStorageHealthRefreshKey = 'network-health-refresh';
 export const localStorageHealthSummaryExpandedKey = 'network-health-summary-expanded';
+export const localStorageHealthFiltersKey = 'network-health-filters';
 export const localStorageSizeKey = 'netflow-traffic-size-size';
 export const localStorageViewIdKey = 'netflow-traffic-view-id';
 export const localStorageOverviewTruncateKey = 'netflow-traffic-overview-truncate';
@@ -111,6 +112,18 @@ export function getLocalStorage<T>(key: string, initialValue?: T, opts?: ArraySe
     console.error(error);
     clearLocalStorage();
     return initialValue;
+  }
+}
+
+export function setLocalStorage<T>(key: string, value: T) {
+  try {
+    const item = window.localStorage.getItem(localStoragePluginKey);
+    const parsedItem = item ? JSON.parse(item) : {};
+    parsedItem[key] = value;
+    window.localStorage.setItem(localStoragePluginKey, JSON.stringify(parsedItem));
+  } catch (error) {
+    console.error(error);
+    clearLocalStorage();
   }
 }
 

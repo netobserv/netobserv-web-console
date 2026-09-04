@@ -38,9 +38,11 @@ export const countActiveHealthFilters = (f: HealthFilterState): number => {
 };
 
 // Client-side match mirroring the semantics the Network Traffic namespace filter delegates to Loki:
-//  - unquoted  -> substring ("contains") match
-//  - "quoted"  -> exact (anchored) match
-//  - `*`       -> wildcard, usable anywhere (e.g. openshift-*, *-registry, c*-*-r*y)
+//  - plain text -> substring ("contains") match (e.g. `dns` matches `openshift-dns`)
+//  - "quoted"   -> exact (anchored) match
+//  - `*`        -> wildcard; a pattern containing `*` is anchored to the whole name so the `*` marks
+//                  the only wildcards. This makes `dns*` mean "starts with dns" (not "contains dns"),
+//                  `*-registry` "ends with", and `openshift-*-operator` a positional pattern.
 //  - case-sensitive only when the pattern itself has an upper-case letter (k8s names are lower-case,
 //    so a lower-case pattern stays case-insensitive, while e.g. "Deployment" is matched exactly).
 // This lets the Namespace filter store patterns as values (type `openshift-*` + Enter) instead of
@@ -58,8 +60,11 @@ export const matchesNamespacePattern = (pattern: string, value: string): boolean
     return true;
   }
   const flags = /[A-Z]/.test(query) ? '' : 'i';
+  const hasWildcard = query.includes('*');
   const regex = query.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
-  const body = quoted ? `^${regex}$` : regex;
+  // Anchor exact ("quoted") matches and any pattern that uses `*`, so the wildcards are the only
+  // loose spots. Plain text stays an unanchored substring match.
+  const body = quoted || hasWildcard ? `^${regex}$` : regex;
   try {
     return new RegExp(body, flags).test(value);
   } catch {

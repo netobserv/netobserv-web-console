@@ -55,6 +55,9 @@ jest.mock('../../../api/routes', () => ({
 describe('<NetworkHealth /> filters', () => {
   beforeEach(() => {
     window.history.replaceState({}, '', '/network-health');
+    // Filters are also mirrored to localStorage (so they survive sidebar navigation); reset it too,
+    // otherwise one test's filters leak into the next through the persisted state.
+    window.localStorage.clear();
   });
 
   it('should seed the toolbar from URL filters on mount', async () => {
@@ -95,5 +98,36 @@ describe('<NetworkHealth /> filters', () => {
 
     expect(window.location.search).toContain('healthSeverity=critical');
     expect(screen.getByText('Clear all filters')).toBeInTheDocument();
+  });
+
+  it('restores filters from storage on a fresh mount with a clean URL (sidebar navigation)', async () => {
+    // First visit: apply a filter, which persists it to localStorage.
+    const first = render(<NetworkHealth />);
+    await waitFor(() => {
+      expect(document.querySelector('#health-severity-filter-toggle')).toBeTruthy();
+    });
+    await act(async () => {
+      fireEvent.click(document.querySelector('#health-severity-filter-toggle')!);
+    });
+    await waitFor(() => {
+      expect(document.querySelector('#health-severity-filter-option-critical')).toBeTruthy();
+    });
+    await act(async () => {
+      fireEvent.click(document.querySelector('#health-severity-filter-option-critical')!);
+    });
+    await waitFor(() => {
+      expect(window.location.search).toContain('healthSeverity=critical');
+    });
+
+    // Leaving through the sidebar is a fresh navigation that drops the query string.
+    first.unmount();
+    window.history.replaceState({}, '', '/network-health');
+
+    // Coming back: the filter is restored from storage (and written back to the URL).
+    render(<NetworkHealth />);
+    await waitFor(() => {
+      expect(screen.getByText('Clear all filters')).toBeInTheDocument();
+    });
+    expect(window.location.search).toContain('healthSeverity=critical');
   });
 });

@@ -165,6 +165,14 @@ describe('matchesNamespacePattern', () => {
     expect(matchesNamespacePattern('openshift-*', 'my-app')).toBe(false);
   });
 
+  it('anchors wildcard patterns so `*` marks the only loose spots', () => {
+    // `dns*` means "starts with dns" — it must not match a namespace that merely ends with dns.
+    expect(matchesNamespacePattern('dns*', 'dns-operator')).toBe(true);
+    expect(matchesNamespacePattern('dns*', 'openshift-dns')).toBe(false);
+    // `*-dns` means "ends with -dns" — it must not match one that starts with dns.
+    expect(matchesNamespacePattern('*-dns', 'dns-operator')).toBe(false);
+  });
+
   it('treats special regex characters in the value/pattern literally', () => {
     expect(matchesNamespacePattern('a.b', 'a.b')).toBe(true);
     expect(matchesNamespacePattern('a.b', 'axb')).toBe(false);

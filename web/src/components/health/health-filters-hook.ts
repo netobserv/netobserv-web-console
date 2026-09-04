@@ -1,12 +1,34 @@
 import * as React from 'react';
-import { getHealthFiltersFromURL, HealthFilterState, setURLHealthFilters } from './health-filters';
+import { getLocalStorage, localStorageHealthFiltersKey, setLocalStorage } from '../../utils/local-storage-hook';
+import {
+  emptyHealthFilters,
+  getHealthFiltersFromURL,
+  HealthFilterState,
+  isHealthFilterEmpty,
+  setURLHealthFilters
+} from './health-filters';
 
-// Syncs HealthFilterState with the URL so filters persist across tab switches, page reloads and deep links.
+// Reads the initial filter state, preferring the URL (deep links, reload, Back/Forward) and falling
+// back to localStorage. Leaving and re-entering the page through the sidebar is a fresh navigation
+// that drops the query string, so without the fallback the filters would be lost; persisting them
+// lets them survive that round-trip (the URL is rewritten from the restored state on mount).
+const readInitialFilters = (): HealthFilterState => {
+  const fromURL = getHealthFiltersFromURL();
+  if (!isHealthFilterEmpty(fromURL)) {
+    return fromURL;
+  }
+  const stored = getLocalStorage<HealthFilterState>(localStorageHealthFiltersKey, emptyHealthFilters);
+  return { ...emptyHealthFilters, ...stored };
+};
+
+// Syncs HealthFilterState with the URL (and mirrors it to localStorage) so filters persist across tab
+// switches, sidebar navigation, page reloads and deep links.
 // Simpler than Traffic's useURLSync: Health filters don't depend on any config loaded asynchronously after mount,
-// so the initial state can be read from the URL synchronously.
+// so the initial state can be read synchronously.
 export const useHealthFilters = (): [HealthFilterState, React.Dispatch<React.SetStateAction<HealthFilterState>>] => {
-  const [filters, setFilters] = React.useState<HealthFilterState>(() => getHealthFiltersFromURL());
+  const [filters, setFilters] = React.useState<HealthFilterState>(readInitialFilters);
   const prevFiltersRef = React.useRef(filters);
+  const initializedRef = React.useRef(false);
 
   React.useEffect(() => {
     const prev = prevFiltersRef.current;
@@ -19,7 +41,12 @@ export const useHealthFilters = (): [HealthFilterState, React.Dispatch<React.Set
       prev.modes === filters.modes &&
       prev.namespaces === filters.namespaces &&
       prev.searchText !== filters.searchText;
-    setURLHealthFilters(filters, onlySearchChanged);
+    // On mount we may have restored filters from storage into a URL that doesn't carry them yet:
+    // replace rather than push so we don't add a spurious history entry.
+    const replace = !initializedRef.current || onlySearchChanged;
+    initializedRef.current = true;
+    setURLHealthFilters(filters, replace);
+    setLocalStorage(localStorageHealthFiltersKey, filters);
   }, [filters]);
 
   React.useEffect(() => {
