@@ -2,6 +2,7 @@ import * as React from 'react';
 import { ViewId } from '../components/netflow-traffic';
 import { Filters } from '../model/filters';
 import { DataSource, MetricType, PacketLoss, RecordType, StatFunction } from '../model/flow-query';
+import { ViewPresetId } from '../model/views';
 import { TimeRange } from './datetime';
 import {
   setURLDatasource,
@@ -12,7 +13,8 @@ import {
   setURLPacketLoss,
   setURLRange,
   setURLRecortType,
-  setURLShowDup
+  setURLShowDup,
+  setURLView
 } from './router';
 import { getURLParams } from './url';
 
@@ -31,6 +33,7 @@ export function useURLSync(params: {
   packetLoss: PacketLoss;
   recordType: RecordType;
   dataSource: DataSource;
+  activeView: ViewPresetId;
   setQueryParams: React.Dispatch<React.SetStateAction<string>>;
   setTRModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }): void {
@@ -47,6 +50,7 @@ export function useURLSync(params: {
     packetLoss,
     recordType,
     dataSource,
+    activeView,
     setQueryParams,
     setTRModalOpen
   } = params;
@@ -97,6 +101,10 @@ export function useURLSync(params: {
   }, [dataSource, initState]);
 
   React.useEffect(() => {
+    setURLView(activeView, !initState.current.includes('configLoaded'));
+  }, [activeView, initState]);
+
+  React.useEffect(() => {
     if (!forcedFilters) {
       setQueryParams(getURLParams().toString());
     }
@@ -108,6 +116,7 @@ export function useURLSync(params: {
     showDuplicates,
     topologyMetricFunction,
     topologyMetricType,
+    activeView,
     setQueryParams,
     forcedFilters
   ]);

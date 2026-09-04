@@ -40,7 +40,8 @@ const defaultCaps: ConfigCapabilities = {
   quickFilters: [],
   defaultFilters: [],
   flowQuery: {} as ConfigCapabilities['flowQuery'],
-  fetchFunctions: {} as ConfigCapabilities['fetchFunctions']
+  fetchFunctions: {} as ConfigCapabilities['fetchFunctions'],
+  availableViews: []
 };
 
 const defaultFetchCallbacks: FetchCallbacks = {

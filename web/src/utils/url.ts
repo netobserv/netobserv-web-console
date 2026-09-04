@@ -109,6 +109,7 @@ export enum URLParam {
   ShowDuplicates = 'showDup',
   MetricFunction = 'function',
   MetricType = 'type',
+  View = 'view',
   // Network Health filters (prefixed to avoid mixing with the Traffic params above,
   // which have LogQL-specific encoding)
   HealthSeverity = 'healthSeverity',

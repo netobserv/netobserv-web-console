@@ -8,6 +8,16 @@ export const droppedIdMatcher = 'dropped';
 export const tlsIdMatcher = 'tls_';
 export const customPanelMatcher = 'custom';
 
+export type PanelFeature = 'pktDrop' | 'dnsTracking' | 'flowRTT' | 'tlsTracking';
+
+export const getPanelFeature = (panelId: string): PanelFeature | undefined => {
+  if (panelId.includes(droppedIdMatcher)) return 'pktDrop';
+  if (panelId.includes(dnsMatcher)) return 'dnsTracking';
+  if (panelId.includes(rttIdMatcher)) return 'flowRTT';
+  if (panelId.includes(tlsIdMatcher)) return 'tlsTracking';
+  return undefined;
+};
+
 export const getRateFunctionFromId = (id: string) => {
   return id.endsWith('byte_rates') ? 'bytes' : 'packets';
 };

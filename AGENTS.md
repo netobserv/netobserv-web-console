@@ -6,12 +6,15 @@ Best practices for AI coding agents on NetObserv Web Console.
 
 ## Project Context
 
-**NetObserv Web Console** - OpenShift Console dynamic plugin for network observability visualization (also deployable as standalone app).
+**NetObserv Web Console** - OpenShift Console dynamic plugin for network
+observability visualization (also deployable as standalone app).
 
 **Stack:**
 - **Frontend**: TypeScript, React 18, PatternFly 6, React Router 7, i18next 25
-- **Plugin SDK**: `@openshift-console/dynamic-plugin-sdk` 4.22+ (plugin mode only)
-- **Backend**: Go HTTP server for Loki queries, Kubernetes resources, Prometheus metrics
+- **Plugin SDK**: `@openshift-console/dynamic-plugin-sdk` 4.22+ (plugin mode
+  only)
+- **Backend**: Go HTTP server for Loki queries, Kubernetes resources, Prometheus
+  metrics
 
 **Deployment Modes:**
 - **Plugin**: Integrated into OpenShift Console (OCP 4.22+)
@@ -25,7 +28,9 @@ Best practices for AI coding agents on NetObserv Web Console.
 | 4.15-4.18 | `main-pf5` | PF5 |
 | ≤ 4.14 | `main-pf4` | PF4 |
 
-See [OpenShift Console PatternFly documentation](https://github.com/openshift/console/tree/main/frontend/packages/console-dynamic-plugin-sdk#patternfly) for plugin compatibility details.
+See
+[OpenShift Console PatternFly documentation](https://github.com/openshift/console/tree/main/frontend/packages/console-dynamic-plugin-sdk#patternfly)
+for plugin compatibility details.
 
 **Key Directories:**
 - `web/src/components/`: React components (forms, tables, topology, etc.)
@@ -44,7 +49,8 @@ See [OpenShift Console PatternFly documentation](https://github.com/openshift/co
 
 ### 🚨 OpenShift Console Plugin SDK
 - Plugin mode must use `@openshift-console/dynamic-plugin-sdk` APIs
-- Plugin mode must follow OpenShift Console conventions for navigation, extensions, theming
+- Plugin mode must follow OpenShift Console conventions for navigation,
+  extensions, theming
 - Standalone mode uses the same codebase but without Console integration
 - Test both plugin and standalone modes
 
@@ -69,7 +75,9 @@ See [OpenShift Console PatternFly documentation](https://github.com/openshift/co
 
 Be specific about file paths, existing patterns, and testing requirements.
 
-**Good**: "Add dnslatency to ColumnsId enum in web/src/utils/columns.ts. Define in config/sample-config.yaml. Update Loki query in pkg/loki/flow_query.go. Test both modes."
+**Good**: "Add dnslatency to ColumnsId enum in web/src/utils/columns.ts. Define
+in config/sample-config.yaml. Update Loki query in pkg/loki/flow_query.go. Test
+both modes."
 
 **Bad**: "Add DNS latency column"
 
@@ -78,7 +86,8 @@ Be specific about file paths, existing patterns, and testing requirements.
 2. Reference existing patterns (columns, filters, Loki queries)
 3. i18n for UI strings, dual-mode testing
 4. Check package.json before adding dependencies
-5. Column workflow: columns.ts enum → sample-config.yaml → optional RecordField rendering
+5. Column workflow: columns.ts enum → sample-config.yaml → optional RecordField
+   rendering
 
 ## Common Task Templates
 
@@ -111,13 +120,18 @@ FlowCollector CRD field changed in operator:
 ## Repository-Specific Context
 
 ### Frontend Architecture
-- **Custom Hooks**: Logic extracted into focused hooks in `web/src/utils/*-hook.ts` (capabilities, URL sync, fetching, theme, storage, etc.)
-- **Context**: `NetflowContext` in `web/src/model/netflow-context.ts` shares config/capabilities across components
+- **Custom Hooks**: Logic extracted into focused hooks in
+  `web/src/utils/*-hook.ts` (capabilities, URL sync, fetching, theme, storage,
+  etc.)
+- **Context**: `NetflowContext` in `web/src/model/netflow-context.ts` shares
+  config/capabilities across components
 - **React Router**: v7, centralized in `web/src/utils/url.ts`
 
 ### Plugin vs Standalone Modes
-- **Plugin mode**: Console integration (localhost:9001), requires Console clone for dev
-- **Standalone mode**: Independent app (`make start-standalone` or `make start-standalone-mock`), build with `STANDALONE=true make images`
+- **Plugin mode**: Console integration (localhost:9001), requires Console clone
+  for dev
+- **Standalone mode**: Independent app (`make start-standalone` or
+  `make start-standalone-mock`), build with `STANDALONE=true make images`
 - FLAVOR=`enduser` limits production standalone to Network Traffic/Health tabs
 
 ### Loki Query Optimization
@@ -126,9 +140,13 @@ FlowCollector CRD field changed in operator:
 - Mock mode: `make start-standalone-mock` or `make serve-mock`
 
 ### Frontend Configuration
-- **Operator-Generated (Production)**: ConfigMap from FlowCollector CR, fetched via `/api/frontend-config`
-  - Source: [static-frontend-config.yaml](https://github.com/netobserv/netobserv-operator/blob/main/internal/controller/consoleplugin/config/static-frontend-config.yaml) (operator repo) + FlowCollector spec
-  - **Critical**: Changes to `config/sample-config.yaml` frontend section MUST be synced to operator's `static-frontend-config.yaml`
+- **Operator-Generated (Production)**: ConfigMap from FlowCollector CR, fetched
+  via `/api/frontend-config`
+  - Source:
+    [static-frontend-config.yaml](https://github.com/netobserv/netobserv-operator/blob/main/internal/controller/consoleplugin/config/static-frontend-config.yaml)
+    (operator repo) + FlowCollector spec
+  - **Critical**: Changes to `config/sample-config.yaml` frontend section MUST
+    be synced to operator's `static-frontend-config.yaml`
 - **Development**: `config/sample-config.yaml` for local testing only
 
 ### PatternFly Components
@@ -158,10 +176,35 @@ Review for:
 
 ## Testing
 
-- **Unit**: Jest 30 + React Testing Library 16 (`web/src/**/__tests__/`), Go tests (`pkg/*_test.go`)
+- **Unit**: Jest 30 + React Testing Library 16 (`web/src/**/__tests__/`), Go
+  tests (`pkg/*_test.go`)
 - **E2E**: `web/cypress/e2e/` - runs on mock data
-- **Integration**: `web/cypress/integration-tests/` - requires OpenShift cluster (main branch: OCP 4.19+)
+- **Integration**: `web/cypress/integration-tests/` - requires OpenShift cluster
+  (main branch: OCP 4.19+)
 - **Run Cypress**: `make cypress` or `cd web && npm run cypress:open`
+
+## Views Feature
+
+Pre-configured view presets that auto-select relevant panels, columns, and
+topology metrics for a specific feature in one click.
+
+**Adding a new view preset:**
+1. Add new `ViewPresetId` to the union type in `views.ts`
+2. Add `ViewPreset` entry to `viewPresets[]` array with `requiredFeature`,
+   `panels`, `columns`, `topologyMetricType`
+3. Add i18n extraction hint comment in `view-selector.tsx`
+4. Run `make i18n`
+5. Add unit tests in `web/src/model/__tests__/views.spec.ts`
+
+**Column IDs in presets:**
+- Use `ColumnsId` enum values for standard columns
+- Use raw string IDs (e.g. `'XlatSrcAddr'`) for columns not in the enum (dynamic
+  config-only columns like Xlat* for packetTranslation)
+- `ViewPreset.columns` is typed as `string[]` for this reason
+
+**Local dev with features enabled:**
+- Enable features in `config/sample-config.yaml` under `frontend.features`
+- Restart `make start-standalone-mock` to regenerate `config/config.yaml`
 
 ## Quick Reference
 
@@ -180,12 +223,17 @@ make image-build image-push     # Build and push image
 **Key Files:**
 - Frontend config: [web/src/model/config.ts](web/src/model/config.ts)
 - API routes: [web/src/api/routes.ts](web/src/api/routes.ts)
-- Loki queries: [pkg/loki/flow_query.go](pkg/loki/flow_query.go), [pkg/loki/topology_query.go](pkg/loki/topology_query.go)
+- Loki queries: [pkg/loki/flow_query.go](pkg/loki/flow_query.go),
+  [pkg/loki/topology_query.go](pkg/loki/topology_query.go)
 - Backend routes: [pkg/server/routes.go](pkg/server/routes.go)
 - Backend handlers: [pkg/handler/handlers.go](pkg/handler/handlers.go)
 - Table columns: [web/src/utils/columns.ts](web/src/utils/columns.ts)
-- UI schema: [web/src/components/forms/config/uiSchema.ts](web/src/components/forms/config/uiSchema.ts)
+- UI schema:
+  [web/src/components/forms/config/uiSchema.ts](web/src/components/forms/config/uiSchema.ts)
 - Sample config: [config/sample-config.yaml](config/sample-config.yaml)
+- Views presets: [web/src/model/views.ts](web/src/model/views.ts)
+- Views selector:
+  [web/src/components/dropdowns/view-selector.tsx](web/src/components/dropdowns/view-selector.tsx)
 
 ## AI Workflow Example
 
@@ -215,5 +263,6 @@ Before commit:
 - [README.md](README.md) - Setup, build, test, deploy, run locally
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
 
-**Remember**: AI agents need clear context. Always review generated code, test thoroughly in both plugin and standalone modes, and follow project conventions.
+**Remember**: AI agents need clear context. Always review generated code, test
+thoroughly in both plugin and standalone modes, and follow project conventions.
 

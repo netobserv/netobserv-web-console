@@ -265,9 +265,14 @@ export const NetflowTrafficDrawer = React.forwardRef<NetflowTrafficDrawerHandle,
                 size={props.size}
                 onSelect={onRecordSelect}
                 columns={caps.selectedColumns}
-                setColumns={(v: Column[]) =>
-                  props.setColumns(v.concat(caps.availableColumns.filter(col => !col.isSelected)))
-                }
+                setColumns={(v: Column[]) => {
+                  const selectedIds = new Set(v.map(c => c.id));
+                  const selected = v.map(c => ({ ...c, isSelected: true }));
+                  const unselected = caps.availableColumns
+                    .filter(col => !selectedIds.has(col.id))
+                    .map(c => ({ ...c, isSelected: false }));
+                  props.setColumns(selected.concat(unselected));
+                }}
                 columnSizes={props.columnSizes}
                 setColumnSizes={props.setColumnSizes}
                 resetDefaultFilters={getResetDefaultFiltersProp()}

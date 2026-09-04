@@ -14,6 +14,9 @@ describe('<OverviewPanelsModal />', () => {
     setPanels: jest.fn(),
     customIds: [],
     features: [],
+    activeView: 'all' as const,
+    genericPrefs: { added: [], removed: [] },
+    setGenericPrefs: jest.fn(),
     id: 'panels-modal'
   };
 
