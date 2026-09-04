@@ -9,6 +9,8 @@ import {
   EmptyState,
   EmptyStateHeader,
   EmptyStateIcon,
+  Flex,
+  FlexItem,
   Gallery,
   Text,
   TextContent,
@@ -17,8 +19,9 @@ import {
 import { CheckCircleIcon } from '@patternfly/react-icons';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
+import { valueFormat } from '../../utils/format';
 import { HealthCard } from './health-card';
-import { HealthStat, HealthSuperKind } from './health-helper';
+import { computeResourceScore, getAllHealthItems, HealthStat, HealthSuperKind } from './health-helper';
 import { RuleDetails } from './rule-details';
 
 export interface HealthDrawerContainerProps {
@@ -43,6 +46,12 @@ export const HealthDrawerContainer: React.FC<HealthDrawerContainerProps> = ({ ti
     return selectedItemName ? stats.find(item => item.name === selectedItemName) : undefined;
   }, [selectedItemName, stats]);
 
+  const breakdown = React.useMemo(
+    () => (selectedItem ? computeResourceScore(selectedItem) : undefined),
+    [selectedItem]
+  );
+  const activeCount = React.useMemo(() => (selectedItem ? getAllHealthItems(selectedItem).length : 0), [selectedItem]);
+
   const isExpanded = selectedItem !== undefined;
   const hasAnyViolations = stats.length > 0;
 
@@ -61,6 +70,62 @@ export const HealthDrawerContainer: React.FC<HealthDrawerContainerProps> = ({ ti
                 <span tabIndex={isExpanded ? 0 : -1} ref={drawerRef}>
                   {selectedItem && <ResourceLink inline={true} kind={selectedItem.k8sKind} name={selectedItem.name} />}
                 </span>
+                {selectedItem && breakdown && (
+                  <Flex
+                    direction={{ default: 'column' }}
+                    gap={{ default: 'gapXs' }}
+                    className="health-drawer-score"
+                    data-test="health-drawer-score"
+                    style={{ marginTop: '0.5rem' }}
+                  >
+                    <Flex gap={{ default: 'gapMd' }} alignItems={{ default: 'alignItemsCenter' }}>
+                      <FlexItem>
+                        <TextContent>
+                          <Text component={TextVariants.h1} style={{ margin: 0 }}>
+                            {isNaN(breakdown.score) || !isFinite(breakdown.score)
+                              ? '-'
+                              : valueFormat(breakdown.score, 1)}
+                          </Text>
+                        </TextContent>
+                      </FlexItem>
+                      <FlexItem flex={{ default: 'flex_1' }}>
+                        <div
+                          style={{
+                            height: '8px',
+                            background: 'var(--pf-t--global--border--color--default)',
+                            borderRadius: '4px'
+                          }}
+                        >
+                          <div
+                            style={{
+                              height: '100%',
+                              width: `${Math.max(0, Math.min(10, breakdown.score)) * 10}%`,
+                              borderRadius: '4px',
+                              background:
+                                breakdown.score < 5
+                                  ? 'var(--pf-t--global--color--status--danger--default)'
+                                  : breakdown.score < 7
+                                  ? 'var(--pf-t--global--color--status--warning--default)'
+                                  : breakdown.score < 9
+                                  ? 'var(--pf-t--global--color--status--info--default)'
+                                  : 'var(--pf-t--global--color--status--success--default)'
+                            }}
+                          />
+                        </div>
+                      </FlexItem>
+                    </Flex>
+                    <FlexItem>
+                      <TextContent>
+                        <Text
+                          component={TextVariants.small}
+                          style={{ color: 'var(--pf-t--global--text--color--subtle)' }}
+                        >
+                          {t('Weighted average across {{count}} active rules', { count: activeCount })}
+                        </Text>
+                      </TextContent>
+                    </FlexItem>
+                  </Flex>
+                )}
               </DrawerHead>
               {selectedItem && (
                 <div className="health-gallery-drawer-content" data-test="health-drawer-content">

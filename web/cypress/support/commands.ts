@@ -73,6 +73,15 @@ Cypress.Commands.add('openNetflowTrafficPage', (clearCache = true) => {
   cy.get("#netflow-traffic-nav-item-link").click();
 });
 
+Cypress.Commands.add('openNetworkHealthPage', (clearCache = true) => {
+  if (clearCache) {
+    // Reset plugin view prefs to defaults without clearing Console session
+    cy.clearNetobservLocalStorage();
+  }
+  cy.visit(c.url);
+  cy.get('#network-health-nav-item-link').click();
+});
+
 Cypress.Commands.add('showAdvancedOptions', () => {
   cy.get('#show-view-options-button')
     .then(function ($button) {
@@ -409,6 +418,7 @@ declare global {
   namespace Cypress {
     interface Chainable {
       openNetflowTrafficPage(clearCache?: boolean): Chainable<void>
+      openNetworkHealthPage(clearCache?: boolean): Chainable<void>
       showAdvancedOptions(): Chainable<void>
       showDisplayOptions(): Chainable<void>
       checkPanels(panels?: number): Chainable<void>

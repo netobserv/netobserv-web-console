@@ -1,0 +1,8 @@
+.health-filters-toolbar {
+    padding-bottom: var(--pf-t--global--spacer--sm);
+}
+
+.health-filters-toolbar-name-item {
+    position: relative;
+    flex: 1 1 auto;
+}

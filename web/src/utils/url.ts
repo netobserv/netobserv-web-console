@@ -115,7 +115,14 @@ export enum URLParam {
   DataSource = 'dataSource',
   ShowDuplicates = 'showDup',
   MetricFunction = 'function',
-  MetricType = 'type'
+  MetricType = 'type',
+  // Network Health filters (prefixed to avoid mixing with the Traffic params above,
+  // which have LogQL-specific encoding)
+  HealthSeverity = 'healthSeverity',
+  HealthStatus = 'healthStatus',
+  HealthMode = 'healthMode',
+  HealthNamespace = 'healthNamespace',
+  HealthName = 'healthName'
 }
 export type URLParams = { [k in URLParam]?: unknown };
 
@@ -172,6 +179,33 @@ export const setSomeURLParams = (params: Map<URLParam, string>, replace?: boolea
     window.history.replaceState({}, '', `${url.pathname}?${sp.toString()}${url.hash}`);
   } else {
     window.history.pushState({}, '', `${url.pathname}?${sp.toString()}${url.hash}`);
+  }
+};
+
+// Applies a batch of params in a single history entry: keys with a non-empty value are set,
+// keys with an empty value are removed. Skips the history write entirely when the resulting query
+// string already matches the current URL, which avoids polluting history with a duplicate entry
+// on mount and collapses a multi-param change into a single Back step.
+export const syncURLParams = (params: Map<URLParam, string>, replace?: boolean) => {
+  const current = new URLSearchParams(window.location.search);
+  const next = new URLSearchParams(window.location.search);
+  params.forEach((v, k) => {
+    if (v) {
+      next.set(k, v);
+    } else {
+      next.delete(k);
+    }
+  });
+  if (next.toString() === current.toString()) {
+    return;
+  }
+  const url = new URL(window.location.href);
+  const search = next.toString();
+  const target = `${url.pathname}${search ? `?${search}` : ''}${url.hash}`;
+  if (replace) {
+    window.history.replaceState({}, '', target);
+  } else {
+    window.history.pushState({}, '', target);
   }
 };
 
