@@ -1,10 +1,21 @@
 export const dashboard = {
-    visit: () => {
-        cy.visit('/monitoring/dashboards')
-        cy.byTestID('dashboard-dropdown', { timeout: 120000 }).should('exist').click()
-    },
     visitDashboard: (dashboardName: string) => {
-        cy.visit(`/monitoring/dashboards/${dashboardName}`)
+        // The Console falls back to the default dashboard if the requested
+        // ConfigMap hasn't been picked up yet. Retry until the URL stays on
+        // the expected dashboard (the Console redirects away when it's unknown).
+        const ensureDashboard = (retries = 5): void => {
+            cy.visit(`/monitoring/dashboards/${dashboardName}`)
+            cy.byTestID('dashboard-dropdown', { timeout: 60000 }).should('exist')
+            cy.url().then(url => {
+                if (!url.includes(dashboardName) && retries > 0) {
+                    cy.log(`Redirected away from ${dashboardName}, dashboard not registered yet (${retries} retries left)`)
+                    cy.wait(10000)
+                    ensureDashboard(retries - 1)
+                }
+            })
+        }
+        ensureDashboard()
+        cy.url({ timeout: 10000 }).should('include', dashboardName)
 
         cy.contains('label', 'Refresh interval').parent().siblings().find('button').first().click()
         cy.contains('15 seconds').should('exist').click()
@@ -12,10 +23,7 @@ export const dashboard = {
         cy.contains('label', 'Time range').parent().siblings().find('button').first().click()
         cy.contains('Last 5 minutes').should('exist').click()
 
-        // to load all the graphs on the dashboard
-        cy.wait(1000)
         cy.get('#content-scrollable').scrollTo('bottom')
-        cy.wait(1000)
     }
 }
 
@@ -35,17 +43,17 @@ export const graphSelector = {
 
 Cypress.Commands.add('checkDashboards', (names) => {
     for (let i = 0; i < names.length; i++) {
-        // Wait for panel to exist
-        cy.byTestID(names[i], { timeout: 120000 }).should('exist').first().scrollIntoView()
-
-        // Add wait to allow metrics to populate
-        cy.wait(2000)
-
-        // Check that graph body doesn't have empty state - use a custom retry mechanism
-        cy.byTestID(names[i]).first({ timeout: 120000 }).should($panel => {
-            const $region = $panel.find(graphSelector.graphBody)
-            expect($region.length, `${names[i]} graph region should exist`).to.be.greaterThan(0)
-            expect($region.find('[data-test="empty-state"]').length, `${names[i]} should not be empty`).to.equal(0)
+        const name = names[i]
+        // Re-query from data-test on every retry — chaining .first() detaches when Console
+        // re-renders dashboards (auth recovery, poll refresh, accordion expand).
+        cy.get(`[data-test="${name}"]`, { timeout: 120000 }).should($panels => {
+            expect($panels.length, `${name} should exist`).to.be.greaterThan(0)
+            const $region = Cypress.$($panels[0]).find(graphSelector.graphBody)
+            expect($region.length, `${name} graph region should exist`).to.be.greaterThan(0)
+            expect(
+                $region.find('[data-test="empty-state"]').length,
+                `${name} should not be empty`
+            ).to.equal(0)
         })
     }
 })

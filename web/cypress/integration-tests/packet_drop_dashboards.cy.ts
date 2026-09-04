@@ -48,16 +48,16 @@ describe('(OCP-66141) PacketDrop dashboards test', { tags: ['Network_Observabili
         cy.get('#PktDropBytes').click()
 
         // verify Query Summary stats for Dropped Bytes metric
-        cy.get(querySumSelectors.droppedBytesCount).should('exist').then(droppedBytesCnt => {
-            cy.checkQuerySummary(droppedBytesCnt)
+        cy.get(querySumSelectors.droppedBytesCount).should($el => {
+            expect(parseFloat($el.text())).to.be.greaterThan(0)
         })
 
-        cy.get(querySumSelectors.droppedBpsCount).should('exist').then(droppedBpsCnt => {
-            cy.checkQuerySummary(droppedBpsCnt)
+        cy.get(querySumSelectors.droppedBpsCount).should($el => {
+            expect(parseFloat($el.text())).to.be.greaterThan(0)
         })
 
-        cy.get(querySumSelectors.droppedPacketsCount).should('exist').then(droppedPacketsCnt => {
-            cy.checkQuerySummary(droppedPacketsCnt)
+        cy.get(querySumSelectors.droppedPacketsCount).should($el => {
+            expect(parseFloat($el.text())).to.be.greaterThan(0)
         })
 
         // update metricType to Dropped packets
@@ -65,23 +65,22 @@ describe('(OCP-66141) PacketDrop dashboards test', { tags: ['Network_Observabili
         cy.get('#PktDropPackets').click()
 
         // verify Query Summary stats for Dropped Bytes metric
-        cy.get(querySumSelectors.droppedBytesCount).should('exist').then(droppedBytesCnt => {
-            cy.checkQuerySummary(droppedBytesCnt)
+        cy.get(querySumSelectors.droppedBytesCount).should($el => {
+            expect(parseFloat($el.text())).to.be.greaterThan(0)
         })
 
-        cy.get(querySumSelectors.droppedBpsCount).should('exist').then(droppedBpsCnt => {
-            cy.checkQuerySummary(droppedBpsCnt)
+        cy.get(querySumSelectors.droppedBpsCount).should($el => {
+            expect(parseFloat($el.text())).to.be.greaterThan(0)
         })
 
-        cy.get(querySumSelectors.droppedPacketsCount).should('exist').then(droppedPacketsCnt => {
-            cy.checkQuerySummary(droppedPacketsCnt)
+        cy.get(querySumSelectors.droppedPacketsCount).should($el => {
+            expect(parseFloat($el.text())).to.be.greaterThan(0)
         })
         netflowPage.resetClearFilters()
     })
 
     it("(OCP-66141, aramesha) Validate packetDrop dashboards", function () {
         // navigate to 'NetObserv / Main' Dashboard page
-        dashboard.visit()
         dashboard.visitDashboard("netobserv-main")
 
         // verify 'Drops' panel

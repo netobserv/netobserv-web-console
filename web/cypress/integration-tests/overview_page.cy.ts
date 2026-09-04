@@ -68,12 +68,12 @@ describe('(OCP-54839) Netflow Overview page tests', { tags: ['Network_Observabil
     })
 
     it("(OCP-54839, aramesha) should validate query summary panel", function () {
-        cy.get(querySumSelectors.bytesCount).should('exist').then(bytesCnt => {
-            cy.checkQuerySummary(bytesCnt)
+        cy.get(querySumSelectors.bytesCount).should($el => {
+            expect(parseFloat($el.text())).to.be.greaterThan(0)
         })
 
-        cy.get(querySumSelectors.bpsCount).should('exist').then(bpsCnt => {
-            cy.checkQuerySummary(bpsCnt)
+        cy.get(querySumSelectors.bpsCount).should($el => {
+            expect(parseFloat($el.text())).to.be.greaterThan(0)
         })
         cy.get('#query-summary-toggle').should('exist').click()
         cy.get('#summaryPanel').should('be.visible')

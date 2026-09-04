@@ -294,7 +294,7 @@ Cypress.Commands.add("switchPerspective", (perspective: string) => {
 Cypress.Commands.add('adminCLI', (command: string, options?: Partial<Cypress.ExecOptions>) => {
   const kubeconfig = Cypress.env('KUBECONFIG_PATH');
   cy.log(`Run admin command: ${command}`);
-  cy.exec(`${command} --kubeconfig ${kubeconfig}`, options);
+  return cy.exec(`${command} --kubeconfig ${kubeconfig}`, options);
 });
 
 // to avoid influence from upstream login change
@@ -423,7 +423,7 @@ declare global {
       changeMetricType(name: string): Chainable<void>
       checkRecordField(field: string, name: string, values: string[]): Chainable<void>
       clickShowDuplicates(): Chainable<void>
-      adminCLI(command: string, options?: Partial<Cypress.ExecOptions>): Chainable<void>
+      adminCLI(command: string, options?: Partial<Cypress.ExecOptions>): Chainable<Cypress.Exec>
       clearNetobservLocalStorage(): Chainable<void>
       uiLogin(provider: string, username: string, password: string): Chainable<void>
       uiLogout(): Chainable<void>

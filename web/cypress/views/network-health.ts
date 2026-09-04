@@ -8,12 +8,35 @@ export namespace networkHealthSelectors {
 }
 
 
+const waitForHealthCard = (name: string, retries = 2): void => {
+    const selector = `[data-test^="health-card-${name}"]`
+    const pollForCard = (attempt = 0, maxAttempts = 12): void => {
+        cy.get('body').then($body => {
+            if ($body.find(selector).length > 0) {
+                return
+            }
+            if (attempt < maxAttempts) {
+                cy.wait(10000)
+                pollForCard(attempt + 1, maxAttempts)
+            } else if (retries > 0) {
+                cy.log(`health-card-${name} not found, reloading (${retries} retries left)`)
+                cy.reload()
+                cy.get('#content-scrollable', { timeout: 30000 }).should('exist')
+                waitForHealthCard(name, retries - 1)
+            }
+        })
+    }
+    pollForCard()
+}
+
 export const networkHealth = {
     clickOnAlert: (name: string) => {
-        cy.get(`[data-test^="health-card-${name}"]`, { timeout: 60000 }).eq(0).should('be.visible').find('button').click()
+        waitForHealthCard(name)
+        cy.get(`[data-test^="health-card-${name}"]`).eq(0).should('be.visible').find('button').click()
     },
     verifyAlert: (name: string, mode: string = "alert", alertText?: string) => {
-        cy.get(`[data-test^="health-card-${name}"]`, { timeout: 120000 }).eq(0).should('be.visible').find('button').click({ force: true }).then(() => {
+        waitForHealthCard(name)
+        cy.get(`[data-test^="health-card-${name}"]`).eq(0).should('be.visible').find('button').click({ force: true }).then(() => {
             cy.get(networkHealthSelectors.sidePanel).should('be.visible')
             cy.contains(mode).should('exist')
             if (alertText) {

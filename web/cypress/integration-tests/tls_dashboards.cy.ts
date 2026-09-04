@@ -20,8 +20,8 @@ describe('(OCP-88966) TLSTracking test', { tags: ['Network_Observability'] }, fu
         // Deploy TLS test server and client
         cy.adminCLI('oc apply -f cypress/fixtures/test-tls-server-client.yaml')
         cy.wait(10000)
-        cy.adminCLI('oc wait --for=condition=Available deployment/tls-server -n test-tls-server --timeout=180s')
-        cy.adminCLI('oc wait --for=condition=Ready pod -n test-tls-client -l app=tls-client --timeout=120s')
+        cy.adminCLI('oc wait --for=condition=Available deployment/tls-server -n test-tls-server --timeout=180s', { timeout: 200000 })
+        cy.adminCLI('oc wait --for=condition=Ready pod -n test-tls-client -l app=tls-client --timeout=120s', { timeout: 140000 })
     })
 
     describe('TLS Topology tests', function () {
@@ -107,7 +107,6 @@ describe('(OCP-88966) TLSTracking test', { tags: ['Network_Observability'] }, fu
         cy.visit('/monitoring')
 
         // navigate to 'NetObserv / Main' Dashboard page
-        dashboard.visit()
         dashboard.visitDashboard("netobserv-main")
 
         // verify 'TLS Traffic' panel

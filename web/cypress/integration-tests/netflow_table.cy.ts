@@ -112,8 +112,9 @@ describe('(OCP-50532, OCP-50531, OCP-50530, OCP-59408) Netflow Table view tests'
             expect(td).to.contain(`${project}`)
         })
 
-        // verify swap button
+        // verify swap button — wait for poppers to fully dismiss
         netflowPage.waitForLokiQuery()
+        netflowPage.dismissPoppers()
         cy.get("#swap-filters-button").should('exist').click()
         cy.get(filterSelectors.filterNames).eq(0).should('contain.text', 'Destination')
 
@@ -141,6 +142,7 @@ describe('(OCP-50532, OCP-50531, OCP-50530, OCP-59408) Netflow Table view tests'
         // verify src port filter and port Naming
         cy.get(filterSelectors.filterInput).type("src_port=3100" + '{enter}')
         cy.get('#src_port-0-toggle').should('contain.text', 'loki')
+        netflowPage.waitForTableRows(1)
 
         // disable filter
         cy.get('#src_port-0-toggle').click().get('#dropdown-item-disable').click()
@@ -156,6 +158,7 @@ describe('(OCP-50532, OCP-50531, OCP-50530, OCP-59408) Netflow Table view tests'
 
         // enable filter
         cy.get('#filters .disabled-group p').eq(0).click()
+        netflowPage.waitForTableRows(1)
 
         // Verify SrcPort has text loki for all rows
         cy.get('[data-test-td-column-id=SrcPort]').each((td) => {

@@ -61,15 +61,14 @@ describe('(OCP-68246) FlowRTT test', { tags: ['Network_Observability'] }, functi
         netflowPage.clearAllFilters()
 
         // verify Query summary panel
-        cy.get(querySumSelectors.avgRTT).should('exist').then(avgRTT => {
-            cy.checkQuerySummary(avgRTT)
+        cy.get(querySumSelectors.avgRTT, { timeout: 120000 }).should($el => {
+            expect(parseFloat($el.text())).to.be.greaterThan(0)
         })
         netflowPage.resetClearFilters()
     })
 
     it("(OCP-68246, aramesha) Validate flowRTT dashboards", function () {
         // navigate to 'NetObserv / Main' Dashboard page
-        dashboard.visit()
         dashboard.visitDashboard("netobserv-main")
 
         // verify 'TCP latency,p99' panel
