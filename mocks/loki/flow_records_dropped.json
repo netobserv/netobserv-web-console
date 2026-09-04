@@ -2,27 +2,78 @@
   "status": "success",
   "data": {
     "resultType": "streams",
-    "result": [],
+    "result": [
+      {
+        "stream": {
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "0",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Type": "Node",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786459568073999872",
+            "{\"SrcSubnetLabel\":\"Machines\",\"Proto\":6,\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"PktDropBytes\":32,\"DstK8S_Name\":\"prometheus-k8s-1\",\"TimeFlowRttNs\":21769000,\"SrcAddr\":\"10.0.1.132\",\"TimeReceived\":1786459582,\"SrcK8S_OwnerType\":\"Node\",\"Interfaces\":[\"unknown\"],\"SrcK8S_NetworkName\":\"primary\",\"TimeFlowStartMs\":1786459567968,\"IfDirections\":[0],\"DstSubnetLabel\":\"Pods\",\"SrcMac\":\"00:00:00:00:00:00\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"DstMac\":\"00:00:00:00:00:00\",\"PktDropLatestFlags\":16,\"DstK8S_NetworkName\":\"primary\",\"PktDropPackets\":1,\"DstPort\":55770,\"DstAddr\":\"10.128.0.41\",\"AgentIP\":\"10.0.1.92\",\"Dscp\":0,\"DstK8S_HostIP\":\"10.0.1.92\",\"SrcK8S_HostIP\":\"10.0.1.132\",\"Etype\":2048,\"SrcPort\":10250,\"SrcK8S_Name\":\"ip-10-0-1-132.ec2.internal\",\"Udns\":[\"\"],\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Flags\":null,\"DstK8S_OwnerType\":\"StatefulSet\",\"TimeFlowEndMs\":1786459568074,\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\"}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "control-plane-metrics-forwarder",
+          "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "0",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "prometheus-k8s",
+          "SrcK8S_Type": "Pod",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786459672523000064",
+            "{\"DstPort\":9443,\"DstSubnetLabel\":\"Pods\",\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"Proto\":6,\"Udns\":[\"\"],\"SrcMac\":\"00:00:00:00:00:00\",\"PktDropBytes\":32,\"DstMac\":\"00:00:00:00:00:00\",\"SrcAddr\":\"10.129.0.21\",\"TimeReceived\":1786459672,\"Interfaces\":[\"unknown\"],\"TimeFlowStartMs\":1786459672523,\"PktDropLatestFlags\":16,\"TimeFlowEndMs\":1786459672523,\"SrcSubnetLabel\":\"Pods\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"IfDirections\":[0],\"SrcK8S_OwnerType\":\"StatefulSet\",\"AgentIP\":\"10.0.1.92\",\"DstK8S_HostIP\":\"10.0.1.92\",\"DstK8S_OwnerType\":\"Deployment\",\"DstK8S_Name\":\"control-plane-metrics-forwarder-58479bb4c9-kmvft\",\"DstAddr\":\"10.128.0.21\",\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"SrcK8S_HostIP\":\"10.0.1.132\",\"Dscp\":0,\"PktDropPackets\":1,\"SrcK8S_Name\":\"prometheus-k8s-0\",\"Flags\":null,\"Etype\":2048,\"SrcPort\":52280,\"TimeFlowRttNs\":13889000,\"DstK8S_NetworkName\":\"primary\",\"SrcK8S_NetworkName\":\"primary\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\"}"
+          ],
+          [
+            "1786459672523000064",
+            "{\"SrcAddr\":\"10.129.0.21\",\"PktDropBytes\":32,\"TimeFlowRttNs\":368000,\"Etype\":2048,\"DstAddr\":\"10.128.0.21\",\"PktDropPackets\":1,\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"PktDropLatestFlags\":16,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DstMac\":\"00:00:00:00:00:00\",\"TimeReceived\":1786459672,\"SrcMac\":\"00:00:00:00:00:00\",\"DstK8S_OwnerType\":\"Deployment\",\"Dscp\":0,\"DstK8S_HostIP\":\"10.0.1.92\",\"SrcK8S_NetworkName\":\"primary\",\"SrcK8S_Name\":\"prometheus-k8s-0\",\"DstK8S_NetworkName\":\"primary\",\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"AgentIP\":\"10.0.1.92\",\"Udns\":[\"\"],\"Proto\":6,\"SrcK8S_OwnerType\":\"StatefulSet\",\"TimeFlowEndMs\":1786459672523,\"DstK8S_Name\":\"control-plane-metrics-forwarder-58479bb4c9-kmvft\",\"Interfaces\":[\"unknown\"],\"DstPort\":9443,\"SrcPort\":52284,\"DstSubnetLabel\":\"Pods\",\"IfDirections\":[0],\"Flags\":null,\"SrcSubnetLabel\":\"Pods\",\"SrcK8S_HostIP\":\"10.0.1.132\",\"TimeFlowStartMs\":1786459672523}"
+          ]
+        ]
+      }
+    ],
     "stats": {
       "summary": {
-        "bytesProcessedPerSecond": 1294870348,
-        "linesProcessedPerSecond": 1943063,
-        "totalBytesProcessed": 1372147586,
-        "totalLinesProcessed": 2059025,
-        "execTime": 1.05968,
-        "queueTime": 21.33511,
+        "bytesProcessedPerSecond": 670631472,
+        "linesProcessedPerSecond": 729661,
+        "totalBytesProcessed": 171257624,
+        "totalLinesProcessed": 186332,
+        "execTime": 0.255368,
+        "queueTime": 8.405474,
         "subqueries": 0,
-        "totalEntriesReturned": 0,
+        "totalEntriesReturned": 3,
         "splits": 61,
-        "shards": 288,
-        "totalPostFilterLines": 0,
-        "totalStructuredMetadataBytesProcessed": 0
+        "shards": 61,
+        "totalPostFilterLines": 10,
+        "totalStructuredMetadataBytesProcessed": 4681712
       },
       "querier": {
         "store": {
           "totalChunksRef": 0,
           "totalChunksDownloaded": 0,
           "chunksDownloadTime": 0,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
             "headChunkBytes": 0,
             "headChunkLines": 0,
@@ -33,29 +84,36 @@
             "postFilterLines": 0,
             "headChunkStructuredMetadataBytes": 0,
             "decompressedStructuredMetadataBytes": 0
-          }
+          },
+          "chunkRefsFetchTime": 0,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "ingester": {
-        "totalReached": 288,
-        "totalChunksMatched": 9254,
-        "totalBatches": 288,
-        "totalLinesSent": 0,
+        "totalReached": 61,
+        "totalChunksMatched": 4018,
+        "totalBatches": 63,
+        "totalLinesSent": 3,
         "store": {
-          "totalChunksRef": 106,
-          "totalChunksDownloaded": 106,
-          "chunksDownloadTime": 74028320,
+          "totalChunksRef": 29,
+          "totalChunksDownloaded": 29,
+          "chunksDownloadTime": 3915072,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
-            "headChunkBytes": 55734714,
-            "headChunkLines": 82507,
-            "decompressedBytes": 1316412872,
-            "decompressedLines": 1976518,
-            "compressedBytes": 280302940,
+            "headChunkBytes": 38464492,
+            "headChunkLines": 41284,
+            "decompressedBytes": 132793132,
+            "decompressedLines": 145048,
+            "compressedBytes": 26378456,
             "totalDuplicates": 0,
-            "postFilterLines": 0,
-            "headChunkStructuredMetadataBytes": 0,
-            "decompressedStructuredMetadataBytes": 0
-          }
+            "postFilterLines": 10,
+            "headChunkStructuredMetadataBytes": 330272,
+            "decompressedStructuredMetadataBytes": 4351440
+          },
+          "chunkRefsFetchTime": 7363290,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "cache": {
@@ -66,7 +124,8 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "index": {
           "entriesFound": 0,
@@ -75,26 +134,75 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "result": {
-          "entriesFound": 43,
+          "entriesFound": 0,
           "entriesRequested": 55,
-          "entriesStored": 12,
-          "bytesReceived": 5590,
+          "entriesStored": 53,
+          "bytesReceived": 0,
           "bytesSent": 0,
-          "requests": 67,
-          "downloadTime": 466026
+          "requests": 108,
+          "downloadTime": 303668,
+          "queryLengthServed": 0
         },
         "statsResult": {
+          "entriesFound": 0,
+          "entriesRequested": 50,
+          "entriesStored": 50,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 100,
+          "downloadTime": 3951593,
+          "queryLengthServed": 0
+        },
+        "volumeResult": {
           "entriesFound": 0,
           "entriesRequested": 0,
           "entriesStored": 0,
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "seriesResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "labelResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "instantMetricResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
         }
+      },
+      "index": {
+        "totalChunks": 0,
+        "postFilterChunks": 0,
+        "shardsDuration": 0,
+        "usedBloomFilters": false
       }
     }
   }

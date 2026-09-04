@@ -5,60 +5,100 @@
     "result": [
       {
         "metric": {
-          "DstAddr": "10.0.1.137",
-          "DstK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "DstK8S_Name": "ip-10-0-1-137.ec2.internal",
-          "DstK8S_OwnerName": "ip-10-0-1-137.ec2.internal",
+          "DstAddr": "10.0.1.132",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
           "DstK8S_OwnerType": "Node",
           "DstK8S_Type": "Node",
-          "SrcAddr": "10.0.1.7",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_OwnerName": "ip-10-0-1-7.ec2.internal",
+          "SrcAddr": "10.0.1.92",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
           "SrcK8S_OwnerType": "Node",
           "SrcK8S_Type": "Node"
         },
         "values": [
           [
-            1708009560,
-            "16.558333333333334"
+            1786459590,
+            "175664.85"
           ],
           [
-            1708009920,
-            "45.81388888888889"
+            1786459620,
+            "380399.88"
           ],
           [
-            1708010280,
-            "58.670833333333334"
+            1786459650,
+            "576776.0633333334"
           ],
           [
-            1708010640,
-            "58.93194444444445"
+            1786459680,
+            "762109.05"
           ],
           [
-            1708011000,
-            "58.525"
+            1786459710,
+            "944229.2266666667"
           ],
           [
-            1708011360,
-            "59.87361111111111"
+            1786459740,
+            "1125332.4066666667"
           ],
           [
-            1708011720,
-            "60.53333333333333"
+            1786459770,
+            "1306494.33"
+          ],
+          [
+            1786459800,
+            "1487989.7066666668"
+          ],
+          [
+            1786459830,
+            "1669351.7633333334"
+          ],
+          [
+            1786459860,
+            "1850579.7166666666"
+          ],
+          [
+            1786459890,
+            "1856050.63"
+          ],
+          [
+            1786459920,
+            "1831962.87"
+          ],
+          [
+            1786459950,
+            "1815853.0766666667"
+          ],
+          [
+            1786459980,
+            "1811078.4666666666"
+          ],
+          [
+            1786460010,
+            "1809088.2633333334"
+          ],
+          [
+            1786460040,
+            "1808640"
+          ],
+          [
+            1786460070,
+            "1809123.9433333334"
           ]
         ]
       },
       {
         "metric": {
-          "DstAddr": "10.0.1.137",
-          "DstK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "DstK8S_Name": "ip-10-0-1-137.ec2.internal",
-          "DstK8S_OwnerName": "ip-10-0-1-137.ec2.internal",
+          "DstAddr": "10.0.1.132",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
           "DstK8S_OwnerType": "Node",
           "DstK8S_Type": "Node",
-          "SrcAddr": "10.128.0.29",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
+          "SrcAddr": "10.128.0.41",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
           "SrcK8S_Name": "prometheus-k8s-1",
           "SrcK8S_Namespace": "openshift-monitoring",
           "SrcK8S_OwnerName": "prometheus-k8s",
@@ -67,173 +107,403 @@
         },
         "values": [
           [
-            1708009560,
-            "2.5708333333333333"
+            1786459680,
+            "315.19"
           ],
           [
-            1708009920,
-            "6.972222222222222"
+            1786459710,
+            "415.52666666666664"
           ],
           [
-            1708010280,
-            "8.808333333333334"
+            1786459740,
+            "522.4633333333334"
           ],
           [
-            1708010640,
-            "8.793055555555556"
+            1786459770,
+            "622.8"
           ],
           [
-            1708011000,
-            "8.791666666666666"
+            1786459800,
+            "724.0166666666667"
           ],
           [
-            1708011360,
-            "8.795833333333333"
+            1786459830,
+            "824.3533333333334"
           ],
           [
-            1708011720,
-            "8.786111111111111"
+            1786459860,
+            "927.55"
+          ],
+          [
+            1786459890,
+            "1013.9666666666667"
+          ],
+          [
+            1786459920,
+            "1016.6866666666666"
+          ],
+          [
+            1786459950,
+            "1021.9066666666666"
+          ],
+          [
+            1786459980,
+            "1018.5466666666666"
+          ],
+          [
+            1786460010,
+            "1024.2666666666667"
+          ],
+          [
+            1786460040,
+            "1023.7666666666667"
+          ],
+          [
+            1786460070,
+            "1021.3466666666667"
           ]
         ]
       },
       {
         "metric": {
-          "DstAddr": "10.0.1.140",
-          "SrcAddr": "10.0.1.137",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_OwnerName": "ip-10-0-1-137.ec2.internal",
+          "DstAddr": "10.0.1.56",
+          "SrcAddr": "10.0.1.132",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
           "SrcK8S_OwnerType": "Node",
           "SrcK8S_Type": "Node"
         },
         "values": [
           [
-            1708009560,
-            "9.719444444444445"
+            1786459590,
+            "3696.133333333333"
           ],
           [
-            1708009920,
-            "23.009722222222223"
+            1786459620,
+            "5573.43"
           ],
           [
-            1708010280,
-            "28.690277777777776"
+            1786459650,
+            "6643.576666666667"
           ],
           [
-            1708010640,
-            "30.9375"
+            1786459680,
+            "7193.5"
           ],
           [
-            1708011000,
-            "28.761111111111113"
+            1786459710,
+            "7467.136666666666"
           ],
           [
-            1708011360,
-            "34.2875"
+            1786459740,
+            "7895.056666666666"
           ],
           [
-            1708011720,
-            "35.19722222222222"
+            1786459770,
+            "8275.88"
+          ],
+          [
+            1786459800,
+            "8733.703333333333"
+          ],
+          [
+            1786459830,
+            "9287.706666666667"
+          ],
+          [
+            1786459860,
+            "9583.9"
+          ],
+          [
+            1786459890,
+            "6356.04"
+          ],
+          [
+            1786459920,
+            "4926.73"
+          ],
+          [
+            1786459950,
+            "4272.486666666667"
+          ],
+          [
+            1786459980,
+            "4095.4"
+          ],
+          [
+            1786460010,
+            "4909.58"
+          ],
+          [
+            1786460040,
+            "4915.933333333333"
+          ],
+          [
+            1786460070,
+            "4903.553333333333"
           ]
         ]
       },
       {
         "metric": {
-          "DstAddr": "10.0.1.140",
-          "SrcAddr": "10.0.1.7",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_OwnerName": "ip-10-0-1-7.ec2.internal",
+          "DstAddr": "10.0.1.56",
+          "SrcAddr": "10.0.1.92",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
           "SrcK8S_OwnerType": "Node",
           "SrcK8S_Type": "Node"
         },
         "values": [
           [
-            1708009560,
-            "20.355555555555554"
+            1786459590,
+            "1757.16"
           ],
           [
-            1708009920,
-            "47.25555555555555"
+            1786459620,
+            "5934.9366666666665"
           ],
           [
-            1708010280,
-            "51.7"
+            1786459650,
+            "8058.843333333333"
           ],
           [
-            1708010640,
-            "56.31666666666667"
+            1786459680,
+            "10691.44"
           ],
           [
-            1708011000,
-            "56.34583333333333"
+            1786459710,
+            "12687.22"
           ],
           [
-            1708011360,
-            "57.395833333333336"
+            1786459740,
+            "14509.67"
           ],
           [
-            1708011720,
-            "58.66388888888889"
+            1786459770,
+            "17552.193333333333"
+          ],
+          [
+            1786459800,
+            "19377.066666666666"
+          ],
+          [
+            1786459830,
+            "21347.123333333333"
+          ],
+          [
+            1786459860,
+            "23296.533333333333"
+          ],
+          [
+            1786459890,
+            "23430.703333333335"
+          ],
+          [
+            1786459920,
+            "21124.37"
+          ],
+          [
+            1786459950,
+            "20705.326666666668"
+          ],
+          [
+            1786459980,
+            "19528.24"
+          ],
+          [
+            1786460010,
+            "19398.113333333335"
+          ],
+          [
+            1786460040,
+            "19638.666666666668"
+          ],
+          [
+            1786460070,
+            "19361.886666666665"
           ]
         ]
       },
       {
         "metric": {
-          "DstAddr": "10.0.1.7",
-          "DstK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "DstK8S_Name": "ip-10-0-1-7.ec2.internal",
-          "DstK8S_OwnerName": "ip-10-0-1-7.ec2.internal",
+          "DstAddr": "10.0.1.56",
+          "SrcAddr": "10.128.0.21",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "control-plane-metrics-forwarder-58479bb4c9-kmvft",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "control-plane-metrics-forwarder",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "1376.96"
+          ],
+          [
+            1786459620,
+            "2864.463333333333"
+          ],
+          [
+            1786459650,
+            "4038.233333333333"
+          ],
+          [
+            1786459680,
+            "5429.69"
+          ],
+          [
+            1786459710,
+            "6979.873333333333"
+          ],
+          [
+            1786459740,
+            "8347.776666666667"
+          ],
+          [
+            1786459770,
+            "9731.993333333334"
+          ],
+          [
+            1786459800,
+            "11103.216666666667"
+          ],
+          [
+            1786459830,
+            "12367.933333333332"
+          ],
+          [
+            1786459860,
+            "13772.43"
+          ],
+          [
+            1786459890,
+            "13828.733333333334"
+          ],
+          [
+            1786459920,
+            "13729.98"
+          ],
+          [
+            1786459950,
+            "13880.066666666668"
+          ],
+          [
+            1786459980,
+            "13392.56"
+          ],
+          [
+            1786460010,
+            "13080.086666666666"
+          ],
+          [
+            1786460040,
+            "13171.873333333333"
+          ],
+          [
+            1786460070,
+            "12898.793333333333"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.0.1.92",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
           "DstK8S_OwnerType": "Node",
           "DstK8S_Type": "Node",
-          "SrcAddr": "10.0.1.137",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_OwnerName": "ip-10-0-1-137.ec2.internal",
+          "SrcAddr": "10.0.1.132",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
           "SrcK8S_OwnerType": "Node",
           "SrcK8S_Type": "Node"
         },
         "values": [
           [
-            1708009560,
-            "17.21527777777778"
+            1786459590,
+            "6155.683333333333"
           ],
           [
-            1708009920,
-            "45.67777777777778"
+            1786459620,
+            "33592.4"
           ],
           [
-            1708010280,
-            "57.30416666666667"
+            1786459650,
+            "43377.38"
           ],
           [
-            1708010640,
-            "57.665277777777774"
+            1786459680,
+            "58731.42"
           ],
           [
-            1708011000,
-            "57.168055555555554"
+            1786459710,
+            "66432.89"
           ],
           [
-            1708011360,
-            "60.03333333333333"
+            1786459740,
+            "77901.21666666666"
           ],
           [
-            1708011720,
-            "60.547222222222224"
+            1786459770,
+            "85961.88666666667"
+          ],
+          [
+            1786459800,
+            "98446.55666666667"
+          ],
+          [
+            1786459830,
+            "105890.27333333333"
+          ],
+          [
+            1786459860,
+            "118232.67333333334"
+          ],
+          [
+            1786459890,
+            "119379.40333333334"
+          ],
+          [
+            1786459920,
+            "104428.28"
+          ],
+          [
+            1786459950,
+            "102019.84"
+          ],
+          [
+            1786459980,
+            "98199.86666666667"
+          ],
+          [
+            1786460010,
+            "97871.84333333334"
+          ],
+          [
+            1786460040,
+            "98571.75333333333"
+          ],
+          [
+            1786460070,
+            "97506.72666666667"
           ]
         ]
       },
       {
         "metric": {
-          "DstAddr": "10.0.1.7",
-          "DstK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "DstK8S_Name": "ip-10-0-1-7.ec2.internal",
-          "DstK8S_OwnerName": "ip-10-0-1-7.ec2.internal",
+          "DstAddr": "10.0.1.92",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
           "DstK8S_OwnerType": "Node",
           "DstK8S_Type": "Node",
-          "SrcAddr": "10.129.0.26",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
+          "SrcAddr": "10.129.0.21",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
           "SrcK8S_Name": "prometheus-k8s-0",
           "SrcK8S_Namespace": "openshift-monitoring",
           "SrcK8S_OwnerName": "prometheus-k8s",
@@ -242,643 +512,82 @@
         },
         "values": [
           [
-            1708009560,
-            "2.725"
+            1786459620,
+            "139.93333333333334"
           ],
           [
-            1708009920,
-            "7.35"
+            1786459650,
+            "261.5466666666667"
           ],
           [
-            1708010280,
-            "9.265277777777778"
+            1786459680,
+            "383.82"
           ],
           [
-            1708010640,
-            "9.280555555555555"
+            1786459710,
+            "503.0133333333333"
           ],
           [
-            1708011000,
-            "9.265277777777778"
+            1786459740,
+            "623.3066666666666"
           ],
           [
-            1708011360,
-            "9.213888888888889"
+            1786459770,
+            "742.5"
           ],
           [
-            1708011720,
-            "9.222222222222221"
+            1786459800,
+            "870.7133333333334"
+          ],
+          [
+            1786459830,
+            "994.1266666666667"
+          ],
+          [
+            1786459860,
+            "1116.18"
+          ],
+          [
+            1786459890,
+            "1225.8133333333333"
+          ],
+          [
+            1786459920,
+            "1217.4933333333333"
+          ],
+          [
+            1786459950,
+            "1220.7933333333333"
+          ],
+          [
+            1786459980,
+            "1222.5533333333333"
+          ],
+          [
+            1786460010,
+            "1224.7533333333333"
+          ],
+          [
+            1786460040,
+            "1224.9133333333334"
+          ],
+          [
+            1786460070,
+            "1226.2333333333333"
           ]
         ]
       },
       {
         "metric": {
-          "DstAddr": "10.0.101.17",
-          "SrcAddr": "10.0.1.137",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_OwnerName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_OwnerType": "Node",
-          "SrcK8S_Type": "Node"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.8916666666666667"
-          ],
-          [
-            1708009920,
-            "2.3916666666666666"
-          ],
-          [
-            1708010280,
-            "3"
-          ],
-          [
-            1708010640,
-            "3"
-          ],
-          [
-            1708011000,
-            "3"
-          ],
-          [
-            1708011360,
-            "2.986111111111111"
-          ],
-          [
-            1708011720,
-            "2.986111111111111"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.0.101.17",
-          "SrcAddr": "10.0.1.7",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_OwnerName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_OwnerType": "Node",
-          "SrcK8S_Type": "Node"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.8555555555555555"
-          ],
-          [
-            1708009920,
-            "2.3555555555555556"
-          ],
-          [
-            1708010280,
-            "3"
-          ],
-          [
-            1708010640,
-            "3"
-          ],
-          [
-            1708011000,
-            "3"
-          ],
-          [
-            1708011360,
-            "2.9652777777777777"
-          ],
-          [
-            1708011720,
-            "2.9652777777777777"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.128.0.2",
-          "DstK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "DstK8S_Name": "ip-10-0-1-7.ec2.internal",
-          "DstK8S_OwnerName": "ip-10-0-1-7.ec2.internal",
-          "DstK8S_OwnerType": "Node",
-          "DstK8S_Type": "Node",
-          "SrcAddr": "10.129.0.30",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "netobserv-controller-manager-54d5d67fdb-pk69f",
-          "SrcK8S_Namespace": "netobserv",
-          "SrcK8S_OwnerName": "netobserv-controller-manager",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.4013888888888889"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.128.0.25",
-          "DstK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "DstK8S_Name": "alertmanager-main-0",
-          "DstK8S_Namespace": "openshift-monitoring",
-          "DstK8S_OwnerName": "alertmanager-main",
-          "DstK8S_OwnerType": "StatefulSet",
-          "DstK8S_Type": "Pod",
-          "SrcAddr": "10.129.0.22",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "alertmanager-main-1",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "alertmanager-main",
-          "SrcK8S_OwnerType": "StatefulSet",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.3763888888888889"
-          ],
-          [
-            1708009920,
-            "1.0319444444444446"
-          ],
-          [
-            1708010280,
-            "1.3097222222222222"
-          ],
-          [
-            1708010640,
-            "1.3138888888888889"
-          ],
-          [
-            1708011000,
-            "1.3166666666666667"
-          ],
-          [
-            1708011360,
-            "1.3083333333333333"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.128.0.27",
-          "DstK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "DstK8S_Name": "thanos-ruler-user-workload-1",
-          "DstK8S_Namespace": "openshift-user-workload-monitoring",
-          "DstK8S_OwnerName": "thanos-ruler-user-workload",
-          "DstK8S_OwnerType": "StatefulSet",
-          "DstK8S_Type": "Pod",
-          "SrcAddr": "10.129.0.23",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "thanos-querier-6dc4476754-gzxlq",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "thanos-querier",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.38472222222222224"
-          ],
-          [
-            1708010280,
-            "1.2277777777777779"
-          ],
-          [
-            1708010640,
-            "1.2555555555555555"
-          ],
-          [
-            1708011000,
-            "1.2777777777777777"
-          ],
-          [
-            1708011360,
-            "1.2777777777777777"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.128.0.28",
-          "DstK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "DstK8S_Name": "prometheus-user-workload-1",
-          "DstK8S_Namespace": "openshift-user-workload-monitoring",
-          "DstK8S_OwnerName": "prometheus-user-workload",
-          "DstK8S_OwnerType": "StatefulSet",
-          "DstK8S_Type": "Pod",
-          "SrcAddr": "10.129.0.23",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "thanos-querier-6dc4476754-gzxlq",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "thanos-querier",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.41944444444444445"
-          ],
-          [
-            1708009920,
-            "1.1333333333333333"
-          ],
-          [
-            1708010280,
-            "1.4055555555555554"
-          ],
-          [
-            1708010640,
-            "1.3972222222222221"
-          ],
-          [
-            1708011000,
-            "1.386111111111111"
-          ],
-          [
-            1708011360,
-            "1.3819444444444444"
-          ],
-          [
-            1708011720,
-            "1.3958333333333333"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.128.0.29",
-          "DstK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "DstK8S_Name": "prometheus-k8s-1",
-          "DstK8S_Namespace": "openshift-monitoring",
-          "DstK8S_OwnerName": "prometheus-k8s",
-          "DstK8S_OwnerType": "StatefulSet",
-          "DstK8S_Type": "Pod",
-          "SrcAddr": "10.129.0.19",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "kube-state-metrics-6595568c75-h47dq",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "kube-state-metrics",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.5722222222222222"
-          ],
-          [
-            1708009920,
-            "1.6916666666666667"
-          ],
-          [
-            1708010280,
-            "2.2583333333333333"
-          ],
-          [
-            1708010640,
-            "2.323611111111111"
-          ],
-          [
-            1708011000,
-            "2.2958333333333334"
-          ],
-          [
-            1708011360,
-            "2.0444444444444443"
-          ],
-          [
-            1708011720,
-            "2.0972222222222223"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.128.0.29",
-          "DstK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "DstK8S_Name": "prometheus-k8s-1",
-          "DstK8S_Namespace": "openshift-monitoring",
-          "DstK8S_OwnerName": "prometheus-k8s",
-          "DstK8S_OwnerType": "StatefulSet",
-          "DstK8S_Type": "Pod",
-          "SrcAddr": "10.129.0.23",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "thanos-querier-6dc4476754-gzxlq",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "thanos-querier",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.8472222222222222"
-          ],
-          [
-            1708009920,
-            "2.265277777777778"
-          ],
-          [
-            1708010280,
-            "2.8027777777777776"
-          ],
-          [
-            1708010640,
-            "2.8055555555555554"
-          ],
-          [
-            1708011000,
-            "2.8333333333333335"
-          ],
-          [
-            1708011360,
-            "2.8444444444444446"
-          ],
-          [
-            1708011720,
-            "2.813888888888889"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.128.0.29",
-          "DstK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "DstK8S_Name": "prometheus-k8s-1",
-          "DstK8S_Namespace": "openshift-monitoring",
-          "DstK8S_OwnerName": "prometheus-k8s",
-          "DstK8S_OwnerType": "StatefulSet",
-          "DstK8S_Type": "Pod",
-          "SrcAddr": "10.129.0.7",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "router-default-759449f6d8-v2f62",
-          "SrcK8S_Namespace": "openshift-ingress",
-          "SrcK8S_OwnerName": "router-default",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.5111111111111111"
-          ],
-          [
-            1708009920,
-            "1.3763888888888889"
-          ],
-          [
-            1708010280,
-            "1.7305555555555556"
-          ],
-          [
-            1708010640,
-            "1.7319444444444445"
-          ],
-          [
-            1708011000,
-            "1.7333333333333334"
-          ],
-          [
-            1708011360,
-            "1.7222222222222223"
-          ],
-          [
-            1708011720,
-            "1.7222222222222223"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.128.0.31",
-          "DstK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "DstK8S_Name": "router-default-759449f6d8-cwcdj",
+          "DstAddr": "10.128.0.15",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "router-default-74c56bd696-qtgxw",
           "DstK8S_Namespace": "openshift-ingress",
           "DstK8S_OwnerName": "router-default",
           "DstK8S_OwnerType": "Deployment",
           "DstK8S_Type": "Pod",
-          "SrcAddr": "10.129.0.26",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "prometheus-k8s-0",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "prometheus-k8s",
-          "SrcK8S_OwnerType": "StatefulSet",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.4013888888888889"
-          ],
-          [
-            1708009920,
-            "1.0847222222222221"
-          ],
-          [
-            1708010280,
-            "1.3666666666666667"
-          ],
-          [
-            1708010640,
-            "1.3666666666666667"
-          ],
-          [
-            1708011000,
-            "1.3666666666666667"
-          ],
-          [
-            1708011360,
-            "1.3583333333333334"
-          ],
-          [
-            1708011720,
-            "1.3583333333333334"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.128.0.31",
-          "DstK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "DstK8S_Name": "router-default-759449f6d8-cwcdj",
-          "DstK8S_Namespace": "openshift-ingress",
-          "DstK8S_OwnerName": "router-default",
-          "DstK8S_OwnerType": "Deployment",
-          "DstK8S_Type": "Pod",
-          "SrcAddr": "10.129.0.34",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "console-6bc7bf6577-mw7zj",
-          "SrcK8S_Namespace": "openshift-console",
-          "SrcK8S_OwnerName": "console",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.6875"
-          ],
-          [
-            1708009920,
-            "2.022222222222222"
-          ],
-          [
-            1708010280,
-            "3.1041666666666665"
-          ],
-          [
-            1708010640,
-            "3.4833333333333334"
-          ],
-          [
-            1708011000,
-            "3.0027777777777778"
-          ],
-          [
-            1708011360,
-            "5.572222222222222"
-          ],
-          [
-            1708011720,
-            "5.761111111111111"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.128.0.34",
-          "DstK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "DstK8S_Name": "loki",
-          "DstK8S_Namespace": "netobserv",
-          "DstK8S_OwnerName": "loki",
-          "DstK8S_OwnerType": "Pod",
-          "DstK8S_Type": "Pod",
-          "SrcAddr": "10.129.0.36",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "flowlogs-pipeline-45pxk",
-          "SrcK8S_Namespace": "netobserv",
-          "SrcK8S_OwnerName": "flowlogs-pipeline",
-          "SrcK8S_OwnerType": "DaemonSet",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.8736111111111111"
-          ],
-          [
-            1708009920,
-            "2.3152777777777778"
-          ],
-          [
-            1708010280,
-            "2.925"
-          ],
-          [
-            1708010640,
-            "2.933333333333333"
-          ],
-          [
-            1708011000,
-            "2.8958333333333335"
-          ],
-          [
-            1708011360,
-            "2.8305555555555557"
-          ],
-          [
-            1708011720,
-            "1.3847222222222222"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.128.0.34",
-          "DstK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "DstK8S_Name": "loki",
-          "DstK8S_Namespace": "netobserv",
-          "DstK8S_OwnerName": "loki",
-          "DstK8S_OwnerType": "Pod",
-          "DstK8S_Type": "Pod",
-          "SrcAddr": "10.129.0.41",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "flowlogs-pipeline-4m5mz",
-          "SrcK8S_Namespace": "netobserv",
-          "SrcK8S_OwnerName": "flowlogs-pipeline",
-          "SrcK8S_OwnerType": "DaemonSet",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708011720,
-            "1.6027777777777779"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.129.0.19",
-          "DstK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "DstK8S_Name": "kube-state-metrics-6595568c75-h47dq",
-          "DstK8S_Namespace": "openshift-monitoring",
-          "DstK8S_OwnerName": "kube-state-metrics",
-          "DstK8S_OwnerType": "Deployment",
-          "DstK8S_Type": "Pod",
-          "SrcAddr": "10.128.0.29",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "prometheus-k8s-1",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "prometheus-k8s",
-          "SrcK8S_OwnerType": "StatefulSet",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.5666666666666667"
-          ],
-          [
-            1708009920,
-            "1.761111111111111"
-          ],
-          [
-            1708010280,
-            "2.3430555555555554"
-          ],
-          [
-            1708010640,
-            "2.352777777777778"
-          ],
-          [
-            1708011000,
-            "2.313888888888889"
-          ],
-          [
-            1708011360,
-            "2"
-          ],
-          [
-            1708011720,
-            "2.0708333333333333"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.129.0.22",
-          "DstK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "DstK8S_Name": "alertmanager-main-1",
-          "DstK8S_Namespace": "openshift-monitoring",
-          "DstK8S_OwnerName": "alertmanager-main",
-          "DstK8S_OwnerType": "StatefulSet",
-          "DstK8S_Type": "Pod",
-          "SrcAddr": "10.128.0.25",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
+          "SrcAddr": "10.129.0.17",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
           "SrcK8S_Name": "alertmanager-main-0",
           "SrcK8S_Namespace": "openshift-monitoring",
           "SrcK8S_OwnerName": "alertmanager-main",
@@ -887,42 +596,1232 @@
         },
         "values": [
           [
-            1708009560,
-            "0.37222222222222223"
+            1786459590,
+            "47.65"
           ],
           [
-            1708009920,
-            "1.0291666666666666"
+            1786459950,
+            "566.9"
           ],
           [
-            1708010280,
-            "1.3125"
+            1786459980,
+            "569"
           ],
           [
-            1708010640,
-            "1.3166666666666667"
+            1786460010,
+            "566.9"
           ],
           [
-            1708011000,
-            "1.3194444444444444"
+            1786460040,
+            "564.8"
           ],
           [
-            1708011360,
-            "1.2902777777777779"
+            1786460070,
+            "564.8"
           ]
         ]
       },
       {
         "metric": {
-          "DstAddr": "10.129.0.23",
-          "DstK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "DstK8S_Name": "thanos-querier-6dc4476754-gzxlq",
+          "DstAddr": "10.128.0.15",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "router-default-74c56bd696-qtgxw",
+          "DstK8S_Namespace": "openshift-ingress",
+          "DstK8S_OwnerName": "router-default",
+          "DstK8S_OwnerType": "Deployment",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.129.0.18",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "thanos-querier-74fb86b44c-cpgqc",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "thanos-querier",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "38.42"
+          ],
+          [
+            1786459920,
+            "573.5"
+          ],
+          [
+            1786459950,
+            "571.4"
+          ],
+          [
+            1786459980,
+            "571.4"
+          ],
+          [
+            1786460010,
+            "570"
+          ],
+          [
+            1786460040,
+            "570"
+          ],
+          [
+            1786460070,
+            "567.9"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.128.0.15",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "router-default-74c56bd696-qtgxw",
+          "DstK8S_Namespace": "openshift-ingress",
+          "DstK8S_OwnerName": "router-default",
+          "DstK8S_OwnerType": "Deployment",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.129.0.21",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "prometheus-k8s-0",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "prometheus-k8s",
+          "SrcK8S_OwnerType": "StatefulSet",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "94.41"
+          ],
+          [
+            1786459620,
+            "208.38"
+          ],
+          [
+            1786459650,
+            "328.63"
+          ],
+          [
+            1786459680,
+            "448.18"
+          ],
+          [
+            1786459710,
+            "568.43"
+          ],
+          [
+            1786459740,
+            "690.08"
+          ],
+          [
+            1786459770,
+            "811.03"
+          ],
+          [
+            1786459800,
+            "933.38"
+          ],
+          [
+            1786459830,
+            "1056.43"
+          ],
+          [
+            1786459860,
+            "1178.78"
+          ],
+          [
+            1786459890,
+            "1206.72"
+          ],
+          [
+            1786459920,
+            "1213"
+          ],
+          [
+            1786459950,
+            "1214.4"
+          ],
+          [
+            1786459980,
+            "1216.5"
+          ],
+          [
+            1786460010,
+            "1218.6"
+          ],
+          [
+            1786460040,
+            "1219.3"
+          ],
+          [
+            1786460070,
+            "1217.9"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.128.0.15",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "router-default-74c56bd696-qtgxw",
+          "DstK8S_Namespace": "openshift-ingress",
+          "DstK8S_OwnerName": "router-default",
+          "DstK8S_OwnerType": "Deployment",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.129.0.31",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "console-56f5d88d88-qn55z",
+          "SrcK8S_Namespace": "openshift-console",
+          "SrcK8S_OwnerName": "console",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "1980.91"
+          ],
+          [
+            1786459620,
+            "12798.503333333334"
+          ],
+          [
+            1786459650,
+            "12798.503333333334"
+          ],
+          [
+            1786459680,
+            "12798.503333333334"
+          ],
+          [
+            1786459710,
+            "12798.503333333334"
+          ],
+          [
+            1786459740,
+            "12798.503333333334"
+          ],
+          [
+            1786459770,
+            "12798.503333333334"
+          ],
+          [
+            1786459800,
+            "12798.503333333334"
+          ],
+          [
+            1786459830,
+            "12798.503333333334"
+          ],
+          [
+            1786459860,
+            "12798.503333333334"
+          ],
+          [
+            1786459890,
+            "10817.593333333334"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.128.0.15",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "router-default-74c56bd696-qtgxw",
+          "DstK8S_Namespace": "openshift-ingress",
+          "DstK8S_OwnerName": "router-default",
+          "DstK8S_OwnerType": "Deployment",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.129.0.36",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "console-68dc8d4f8d-62m87",
+          "SrcK8S_Namespace": "openshift-console",
+          "SrcK8S_OwnerName": "console",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459950,
+            "550.2"
+          ],
+          [
+            1786459980,
+            "550.2"
+          ],
+          [
+            1786460010,
+            "550.2"
+          ],
+          [
+            1786460040,
+            "550.2"
+          ],
+          [
+            1786460070,
+            "550.2"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.128.0.2",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_OwnerType": "Node",
+          "DstK8S_Type": "Node",
+          "SrcAddr": "10.129.0.19",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "metrics-server-98fccfc84-mc598",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "metrics-server",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "47.516666666666666"
+          ],
+          [
+            1786459980,
+            "497.18666666666667"
+          ],
+          [
+            1786460010,
+            "466.06666666666666"
+          ],
+          [
+            1786460070,
+            "519.5733333333334"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.128.0.21",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "control-plane-metrics-forwarder-58479bb4c9-kmvft",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "control-plane-metrics-forwarder",
+          "DstK8S_OwnerType": "Deployment",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.129.0.21",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "prometheus-k8s-0",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "prometheus-k8s",
+          "SrcK8S_OwnerType": "StatefulSet",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "637.17"
+          ],
+          [
+            1786459620,
+            "1302.8866666666668"
+          ],
+          [
+            1786459650,
+            "1712.7233333333334"
+          ],
+          [
+            1786459680,
+            "2493.36"
+          ],
+          [
+            1786459710,
+            "3333.4966666666664"
+          ],
+          [
+            1786459740,
+            "3937.5933333333332"
+          ],
+          [
+            1786459770,
+            "4667.85"
+          ],
+          [
+            1786459800,
+            "5414.1866666666665"
+          ],
+          [
+            1786459830,
+            "6178.843333333333"
+          ],
+          [
+            1786459860,
+            "6915.7"
+          ],
+          [
+            1786459890,
+            "6969.706666666667"
+          ],
+          [
+            1786459920,
+            "7092.506666666667"
+          ],
+          [
+            1786459950,
+            "7359.586666666667"
+          ],
+          [
+            1786459980,
+            "7241.086666666667"
+          ],
+          [
+            1786460010,
+            "7126.886666666666"
+          ],
+          [
+            1786460040,
+            "7124.546666666667"
+          ],
+          [
+            1786460070,
+            "6811.086666666667"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.128.0.35",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "prometheus-operator-admission-webhook-5f8765476f-dg5wh",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-operator-admission-webhook",
+          "DstK8S_OwnerType": "Deployment",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.129.0.2",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_OwnerType": "Node",
+          "SrcK8S_Type": "Node"
+        },
+        "values": [
+          [
+            1786459770,
+            "762.9733333333334"
+          ],
+          [
+            1786459800,
+            "763.5933333333334"
+          ],
+          [
+            1786459830,
+            "763.5933333333334"
+          ],
+          [
+            1786459860,
+            "763.5933333333334"
+          ],
+          [
+            1786459890,
+            "763.5933333333334"
+          ],
+          [
+            1786459920,
+            "763.5933333333334"
+          ],
+          [
+            1786459950,
+            "763.5933333333334"
+          ],
+          [
+            1786459980,
+            "763.5933333333334"
+          ],
+          [
+            1786460010,
+            "763.5933333333334"
+          ],
+          [
+            1786460040,
+            "682.3"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.128.0.38",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "thanos-querier-74fb86b44c-ntx8b",
           "DstK8S_Namespace": "openshift-monitoring",
           "DstK8S_OwnerName": "thanos-querier",
           "DstK8S_OwnerType": "Deployment",
           "DstK8S_Type": "Pod",
-          "SrcAddr": "10.128.0.29",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
+          "SrcAddr": "10.129.0.21",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "prometheus-k8s-0",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "prometheus-k8s",
+          "SrcK8S_OwnerType": "StatefulSet",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "679.2333333333333"
+          ],
+          [
+            1786459620,
+            "3753.25"
+          ],
+          [
+            1786459650,
+            "6290.856666666667"
+          ],
+          [
+            1786459680,
+            "8671.98"
+          ],
+          [
+            1786459710,
+            "10161.323333333334"
+          ],
+          [
+            1786459740,
+            "10912.236666666666"
+          ],
+          [
+            1786459770,
+            "12402.843333333334"
+          ],
+          [
+            1786459800,
+            "13893.45"
+          ],
+          [
+            1786459830,
+            "15391.71"
+          ],
+          [
+            1786459860,
+            "16885.303333333333"
+          ],
+          [
+            1786459890,
+            "17696.503333333334"
+          ],
+          [
+            1786459920,
+            "16111.903333333334"
+          ],
+          [
+            1786459950,
+            "15063.363333333333"
+          ],
+          [
+            1786459980,
+            "13430.12"
+          ],
+          [
+            1786460010,
+            "13424.086666666666"
+          ],
+          [
+            1786460040,
+            "14157.566666666668"
+          ],
+          [
+            1786460070,
+            "14150.84"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.128.0.41",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "prometheus-k8s-1",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_OwnerType": "StatefulSet",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.129.0.14",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "prometheus-operator-86f64bd85d-86qgk",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "prometheus-operator",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "31.85"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.128.0.41",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "prometheus-k8s-1",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_OwnerType": "StatefulSet",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.129.0.16",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "kube-state-metrics-8674ff6589-lcs4s",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "kube-state-metrics",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459620,
+            "4947.173333333333"
+          ],
+          [
+            1786459650,
+            "4960.93"
+          ],
+          [
+            1786459680,
+            "9888.153333333334"
+          ],
+          [
+            1786459710,
+            "9902.143333333333"
+          ],
+          [
+            1786459740,
+            "14825.743333333334"
+          ],
+          [
+            1786459770,
+            "14839.676666666666"
+          ],
+          [
+            1786459800,
+            "19764.376666666667"
+          ],
+          [
+            1786459830,
+            "19778.106666666667"
+          ],
+          [
+            1786459860,
+            "24703.666666666668"
+          ],
+          [
+            1786459890,
+            "24715.846666666668"
+          ],
+          [
+            1786459920,
+            "24691.03"
+          ],
+          [
+            1786459950,
+            "24691.153333333332"
+          ],
+          [
+            1786459980,
+            "24686.633333333335"
+          ],
+          [
+            1786460010,
+            "24686.386666666665"
+          ],
+          [
+            1786460040,
+            "24687.023333333334"
+          ],
+          [
+            1786460070,
+            "24687.4"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.128.0.41",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "prometheus-k8s-1",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_OwnerType": "StatefulSet",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.129.0.17",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "alertmanager-main-0",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "alertmanager-main",
+          "SrcK8S_OwnerType": "StatefulSet",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "41.49333333333333"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.128.0.41",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "prometheus-k8s-1",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_OwnerType": "StatefulSet",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.129.0.18",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "thanos-querier-74fb86b44c-cpgqc",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "thanos-querier",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459650,
+            "283.18"
+          ],
+          [
+            1786459680,
+            "358.9066666666667"
+          ],
+          [
+            1786459710,
+            "420.66"
+          ],
+          [
+            1786459740,
+            "482.8466666666667"
+          ],
+          [
+            1786459830,
+            "667.4033333333333"
+          ],
+          [
+            1786459860,
+            "729.12"
+          ],
+          [
+            1786459890,
+            "785.02"
+          ],
+          [
+            1786459920,
+            "781.05"
+          ],
+          [
+            1786459950,
+            "629.99"
+          ],
+          [
+            1786459980,
+            "616.0266666666666"
+          ],
+          [
+            1786460010,
+            "615.4166666666666"
+          ],
+          [
+            1786460040,
+            "614.8033333333333"
+          ],
+          [
+            1786460070,
+            "615.2266666666667"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.128.0.41",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "prometheus-k8s-1",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_OwnerType": "StatefulSet",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.129.0.19",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "metrics-server-98fccfc84-mc598",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "metrics-server",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "52.373333333333335"
+          ],
+          [
+            1786459920,
+            "582.1133333333333"
+          ],
+          [
+            1786459950,
+            "582.1433333333333"
+          ],
+          [
+            1786459980,
+            "540.5233333333333"
+          ],
+          [
+            1786460010,
+            "540.5966666666667"
+          ],
+          [
+            1786460040,
+            "540.6766666666666"
+          ],
+          [
+            1786460070,
+            "582.3766666666667"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.128.0.41",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "prometheus-k8s-1",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_OwnerType": "StatefulSet",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.129.0.21",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "prometheus-k8s-0",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "prometheus-k8s",
+          "SrcK8S_OwnerType": "StatefulSet",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "130.79"
+          ],
+          [
+            1786459620,
+            "299.41333333333336"
+          ],
+          [
+            1786459650,
+            "468.4766666666667"
+          ],
+          [
+            1786459680,
+            "639.3566666666667"
+          ],
+          [
+            1786459710,
+            "810.8166666666667"
+          ],
+          [
+            1786459740,
+            "982.2"
+          ],
+          [
+            1786459770,
+            "1153.2266666666667"
+          ],
+          [
+            1786459800,
+            "1324.88"
+          ],
+          [
+            1786459830,
+            "1495.8666666666666"
+          ],
+          [
+            1786459860,
+            "1667.8933333333334"
+          ],
+          [
+            1786459890,
+            "1707.5766666666666"
+          ],
+          [
+            1786459920,
+            "1709.2566666666667"
+          ],
+          [
+            1786459950,
+            "1711.43"
+          ],
+          [
+            1786459980,
+            "1711.69"
+          ],
+          [
+            1786460010,
+            "1712.52"
+          ],
+          [
+            1786460040,
+            "1712.8833333333334"
+          ],
+          [
+            1786460070,
+            "1713.2133333333334"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.128.0.41",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "prometheus-k8s-1",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_OwnerType": "StatefulSet",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.129.0.33",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "flowlogs-pipeline-7f6c7b955b-w64rp",
+          "SrcK8S_Namespace": "netobserv",
+          "SrcK8S_OwnerName": "flowlogs-pipeline",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "97.50666666666666"
+          ],
+          [
+            1786459620,
+            "261.6"
+          ],
+          [
+            1786459650,
+            "468.7266666666667"
+          ],
+          [
+            1786459680,
+            "692.64"
+          ],
+          [
+            1786459710,
+            "849.1266666666667"
+          ],
+          [
+            1786459740,
+            "1006.8133333333334"
+          ],
+          [
+            1786459770,
+            "1165.33"
+          ],
+          [
+            1786459800,
+            "1324.7233333333334"
+          ],
+          [
+            1786459830,
+            "1459.8233333333333"
+          ],
+          [
+            1786459860,
+            "1595.41"
+          ],
+          [
+            1786459890,
+            "1633.8033333333333"
+          ],
+          [
+            1786459920,
+            "1652.4733333333334"
+          ],
+          [
+            1786459950,
+            "1692.55"
+          ],
+          [
+            1786459980,
+            "1663.1833333333334"
+          ],
+          [
+            1786460010,
+            "1703.0266666666666"
+          ],
+          [
+            1786460040,
+            "1743.1466666666668"
+          ],
+          [
+            1786460070,
+            "1778.3966666666668"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.128.0.41",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "prometheus-k8s-1",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_OwnerType": "StatefulSet",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.129.0.6",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "router-default-74c56bd696-jtvvt",
+          "SrcK8S_Namespace": "openshift-ingress",
+          "SrcK8S_OwnerName": "router-default",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "55.85"
+          ],
+          [
+            1786459920,
+            "626.2033333333334"
+          ],
+          [
+            1786459950,
+            "628.6333333333333"
+          ],
+          [
+            1786459980,
+            "628.8566666666667"
+          ],
+          [
+            1786460010,
+            "628.8933333333333"
+          ],
+          [
+            1786460040,
+            "628.6166666666667"
+          ],
+          [
+            1786460070,
+            "628.89"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.128.0.51",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "netobserv-plugin-6684f47f6d-8l7cd",
+          "DstK8S_Namespace": "netobserv",
+          "DstK8S_OwnerName": "netobserv-plugin",
+          "DstK8S_OwnerType": "Deployment",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.129.0.18",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "thanos-querier-74fb86b44c-cpgqc",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "thanos-querier",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459620,
+            "471.42"
+          ],
+          [
+            1786459650,
+            "552.9666666666667"
+          ],
+          [
+            1786459680,
+            "641.7066666666667"
+          ],
+          [
+            1786459710,
+            "646.5066666666667"
+          ],
+          [
+            1786459740,
+            "646.5066666666667"
+          ],
+          [
+            1786459770,
+            "646.5066666666667"
+          ],
+          [
+            1786459800,
+            "646.5066666666667"
+          ],
+          [
+            1786459830,
+            "646.5066666666667"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.128.0.51",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "netobserv-plugin-6684f47f6d-8l7cd",
+          "DstK8S_Namespace": "netobserv",
+          "DstK8S_OwnerName": "netobserv-plugin",
+          "DstK8S_OwnerType": "Deployment",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.129.0.35",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "loki-8459d5ccb8-kmqgj",
+          "SrcK8S_Namespace": "netobserv",
+          "SrcK8S_OwnerName": "loki",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459620,
+            "664.5666666666667"
+          ],
+          [
+            1786459650,
+            "848.0533333333333"
+          ],
+          [
+            1786459680,
+            "1344.4133333333334"
+          ],
+          [
+            1786459710,
+            "1410.4133333333334"
+          ],
+          [
+            1786459740,
+            "1410.4133333333334"
+          ],
+          [
+            1786459770,
+            "1410.4133333333334"
+          ],
+          [
+            1786459800,
+            "1410.4133333333334"
+          ],
+          [
+            1786459830,
+            "1410.4133333333334"
+          ],
+          [
+            1786459860,
+            "1410.4133333333334"
+          ],
+          [
+            1786459890,
+            "1410.4133333333334"
+          ],
+          [
+            1786459920,
+            "745.8466666666667"
+          ],
+          [
+            1786459950,
+            "562.36"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.128.0.53",
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Name": "console-68dc8d4f8d-p9nwg",
+          "DstK8S_Namespace": "openshift-console",
+          "DstK8S_OwnerName": "console",
+          "DstK8S_OwnerType": "Deployment",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.129.0.6",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "router-default-74c56bd696-jtvvt",
+          "SrcK8S_Namespace": "openshift-ingress",
+          "SrcK8S_OwnerName": "router-default",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459620,
+            "1480.44"
+          ],
+          [
+            1786459650,
+            "2684.45"
+          ],
+          [
+            1786459680,
+            "3880.2"
+          ],
+          [
+            1786459710,
+            "3973.26"
+          ],
+          [
+            1786459740,
+            "4052.0933333333332"
+          ],
+          [
+            1786459770,
+            "4137.973333333333"
+          ],
+          [
+            1786459800,
+            "4243.993333333333"
+          ],
+          [
+            1786459830,
+            "4289.343333333333"
+          ],
+          [
+            1786459860,
+            "4403.18"
+          ],
+          [
+            1786459890,
+            "4471.9"
+          ],
+          [
+            1786459920,
+            "3092.9066666666668"
+          ],
+          [
+            1786459950,
+            "1926.78"
+          ],
+          [
+            1786459980,
+            "823.3666666666667"
+          ],
+          [
+            1786460010,
+            "758.2566666666667"
+          ],
+          [
+            1786460040,
+            "768.93"
+          ],
+          [
+            1786460070,
+            "711"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.18",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "thanos-querier-74fb86b44c-cpgqc",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "thanos-querier",
+          "DstK8S_OwnerType": "Deployment",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.41",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
           "SrcK8S_Name": "prometheus-k8s-1",
           "SrcK8S_Namespace": "openshift-monitoring",
           "SrcK8S_OwnerName": "prometheus-k8s",
@@ -931,47 +1830,149 @@
         },
         "values": [
           [
-            1708009560,
-            "0.8527777777777777"
+            1786459650,
+            "11127.503333333334"
           ],
           [
-            1708009920,
-            "2.290277777777778"
+            1786459680,
+            "11248.823333333334"
           ],
           [
-            1708010280,
-            "2.8819444444444446"
+            1786459710,
+            "11263.473333333333"
           ],
           [
-            1708010640,
-            "2.938888888888889"
+            1786459740,
+            "11278.123333333333"
           ],
           [
-            1708011000,
-            "2.9277777777777776"
+            1786459770,
+            "11293.073333333334"
           ],
           [
-            1708011360,
-            "2.95"
+            1786459800,
+            "11307.283333333333"
           ],
           [
-            1708011720,
-            "2.9569444444444444"
+            1786459830,
+            "11321.933333333332"
+          ],
+          [
+            1786459860,
+            "11336.803333333333"
+          ],
+          [
+            1786459890,
+            "11344.433333333332"
+          ],
+          [
+            1786459920,
+            "11332.983333333334"
           ]
         ]
       },
       {
         "metric": {
-          "DstAddr": "10.129.0.26",
-          "DstK8S_HostName": "ip-10-0-1-137.ec2.internal",
+          "DstAddr": "10.129.0.18",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "thanos-querier-74fb86b44c-cpgqc",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "thanos-querier",
+          "DstK8S_OwnerType": "Deployment",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.51",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "netobserv-plugin-6684f47f6d-8l7cd",
+          "SrcK8S_Namespace": "netobserv",
+          "SrcK8S_OwnerName": "netobserv-plugin",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459620,
+            "260.0466666666667"
+          ],
+          [
+            1786459650,
+            "330.23333333333335"
+          ],
+          [
+            1786459680,
+            "378.19666666666666"
+          ],
+          [
+            1786459710,
+            "384.7966666666667"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.19",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "metrics-server-98fccfc84-mc598",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "metrics-server",
+          "DstK8S_OwnerType": "Deployment",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.2",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_OwnerType": "Node",
+          "SrcK8S_Type": "Node"
+        },
+        "values": [
+          [
+            1786459590,
+            "36.843333333333334"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.2",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_OwnerType": "Node",
+          "DstK8S_Type": "Node",
+          "SrcAddr": "10.128.0.39",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "metrics-server-98fccfc84-bzkd7",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "metrics-server",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "35.473333333333336"
+          ],
+          [
+            1786459980,
+            "459.25"
+          ],
+          [
+            1786460010,
+            "512.4566666666667"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.21",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
           "DstK8S_Name": "prometheus-k8s-0",
           "DstK8S_Namespace": "openshift-monitoring",
           "DstK8S_OwnerName": "prometheus-k8s",
           "DstK8S_OwnerType": "StatefulSet",
           "DstK8S_Type": "Pod",
-          "SrcAddr": "10.128.0.31",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "router-default-759449f6d8-cwcdj",
+          "SrcAddr": "10.128.0.15",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "router-default-74c56bd696-qtgxw",
           "SrcK8S_Namespace": "openshift-ingress",
           "SrcK8S_OwnerName": "router-default",
           "SrcK8S_OwnerType": "Deployment",
@@ -979,47 +1980,683 @@
         },
         "values": [
           [
-            1708009560,
-            "0.4875"
+            1786459590,
+            "53.43333333333333"
           ],
           [
-            1708009920,
-            "1.3541666666666667"
+            1786459920,
+            "626.47"
           ],
           [
-            1708010280,
-            "1.7333333333333334"
+            1786459950,
+            "626.86"
           ],
           [
-            1708010640,
-            "1.7333333333333334"
+            1786459980,
+            "627.5666666666667"
           ],
           [
-            1708011000,
-            "1.7333333333333334"
+            1786460010,
+            "628.2333333333333"
           ],
           [
-            1708011360,
-            "1.7083333333333333"
+            1786460040,
+            "628.5833333333334"
           ],
           [
-            1708011720,
-            "1.7083333333333333"
+            1786460070,
+            "628.3666666666667"
           ]
         ]
       },
       {
         "metric": {
-          "DstAddr": "10.129.0.34",
-          "DstK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "DstK8S_Name": "console-6bc7bf6577-mw7zj",
+          "DstAddr": "10.129.0.21",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "prometheus-k8s-0",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_OwnerType": "StatefulSet",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.17",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "service-ca-operator-6d4bb6c9-crvqx",
+          "SrcK8S_Namespace": "openshift-service-ca-operator",
+          "SrcK8S_OwnerName": "service-ca-operator",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "51.343333333333334"
+          ],
+          [
+            1786459950,
+            "554.6766666666666"
+          ],
+          [
+            1786459980,
+            "554.5866666666667"
+          ],
+          [
+            1786460010,
+            "554.5533333333333"
+          ],
+          [
+            1786460040,
+            "554.6566666666666"
+          ],
+          [
+            1786460070,
+            "554.68"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.21",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "prometheus-k8s-0",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_OwnerType": "StatefulSet",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.19",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "insights-operator-76896796b6-v96ds",
+          "SrcK8S_Namespace": "openshift-insights",
+          "SrcK8S_OwnerName": "insights-operator",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "50.483333333333334"
+          ],
+          [
+            1786459950,
+            "505.0233333333333"
+          ],
+          [
+            1786459980,
+            "505.11"
+          ],
+          [
+            1786460010,
+            "505.0966666666667"
+          ],
+          [
+            1786460040,
+            "505.1566666666667"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.21",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "prometheus-k8s-0",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_OwnerType": "StatefulSet",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.20",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "network-check-source-5d66fb6458-hjpvk",
+          "SrcK8S_Namespace": "openshift-network-diagnostics",
+          "SrcK8S_OwnerName": "network-check-source",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459950,
+            "513.7833333333333"
+          ],
+          [
+            1786459980,
+            "513.7266666666667"
+          ],
+          [
+            1786460010,
+            "513.6466666666666"
+          ],
+          [
+            1786460040,
+            "513.6033333333334"
+          ],
+          [
+            1786460070,
+            "513.5733333333334"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.21",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "prometheus-k8s-0",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_OwnerType": "StatefulSet",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.21",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "control-plane-metrics-forwarder-58479bb4c9-kmvft",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "control-plane-metrics-forwarder",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "171693.04333333333"
+          ],
+          [
+            1786459620,
+            "344120.2133333333"
+          ],
+          [
+            1786459650,
+            "516572.3333333333"
+          ],
+          [
+            1786459680,
+            "689151.4333333333"
+          ],
+          [
+            1786459710,
+            "861729.1066666667"
+          ],
+          [
+            1786459740,
+            "1034294.8833333333"
+          ],
+          [
+            1786459770,
+            "1206932.25"
+          ],
+          [
+            1786459800,
+            "1379549.4533333334"
+          ],
+          [
+            1786459830,
+            "1552314.24"
+          ],
+          [
+            1786459860,
+            "1725008.8233333332"
+          ],
+          [
+            1786459890,
+            "1726134.9666666666"
+          ],
+          [
+            1786459920,
+            "1726546.6866666668"
+          ],
+          [
+            1786459950,
+            "1726881.7033333334"
+          ],
+          [
+            1786459980,
+            "1727148.3933333333"
+          ],
+          [
+            1786460010,
+            "1727342.9233333333"
+          ],
+          [
+            1786460040,
+            "1727626.62"
+          ],
+          [
+            1786460070,
+            "1727836.2133333334"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.21",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "prometheus-k8s-0",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_OwnerType": "StatefulSet",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.22",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "cluster-monitoring-operator-6d46cdd977-9zrbt",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "cluster-monitoring-operator",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459980,
+            "457.9533333333333"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.21",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "prometheus-k8s-0",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_OwnerType": "StatefulSet",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.25",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "console-operator-bb5cd8849-krtr7",
+          "SrcK8S_Namespace": "openshift-console-operator",
+          "SrcK8S_OwnerName": "console-operator",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459740,
+            "471.04333333333335"
+          ],
+          [
+            1786459800,
+            "614.4866666666667"
+          ],
+          [
+            1786459830,
+            "714.4033333333333"
+          ],
+          [
+            1786459860,
+            "786.65"
+          ],
+          [
+            1786459890,
+            "858.5866666666667"
+          ],
+          [
+            1786459920,
+            "858.6266666666667"
+          ],
+          [
+            1786459950,
+            "803.3233333333334"
+          ],
+          [
+            1786459980,
+            "831.2333333333333"
+          ],
+          [
+            1786460010,
+            "803.3733333333333"
+          ],
+          [
+            1786460040,
+            "776.23"
+          ],
+          [
+            1786460070,
+            "790.68"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.21",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "prometheus-k8s-0",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_OwnerType": "StatefulSet",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.38",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "thanos-querier-74fb86b44c-ntx8b",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "thanos-querier",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459650,
+            "244.76666666666668"
+          ],
+          [
+            1786459680,
+            "354.8333333333333"
+          ],
+          [
+            1786459710,
+            "425.38666666666666"
+          ],
+          [
+            1786459740,
+            "490.70666666666665"
+          ],
+          [
+            1786459770,
+            "559.12"
+          ],
+          [
+            1786459800,
+            "628.2366666666667"
+          ],
+          [
+            1786459830,
+            "699.5233333333333"
+          ],
+          [
+            1786459860,
+            "769.63"
+          ],
+          [
+            1786459890,
+            "830.3866666666667"
+          ],
+          [
+            1786459920,
+            "817.8066666666666"
+          ],
+          [
+            1786459950,
+            "736.77"
+          ],
+          [
+            1786459980,
+            "690.9833333333333"
+          ],
+          [
+            1786460010,
+            "688.99"
+          ],
+          [
+            1786460040,
+            "692.21"
+          ],
+          [
+            1786460070,
+            "692.5966666666667"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.21",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "prometheus-k8s-0",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_OwnerType": "StatefulSet",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.39",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "metrics-server-98fccfc84-bzkd7",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "metrics-server",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "52.29333333333334"
+          ],
+          [
+            1786459920,
+            "622.6333333333333"
+          ],
+          [
+            1786459950,
+            "608.7166666666667"
+          ],
+          [
+            1786459980,
+            "608.9766666666667"
+          ],
+          [
+            1786460010,
+            "608.9333333333333"
+          ],
+          [
+            1786460040,
+            "609.16"
+          ],
+          [
+            1786460070,
+            "608.89"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.21",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "prometheus-k8s-0",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_OwnerType": "StatefulSet",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.41",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "prometheus-k8s-1",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "prometheus-k8s",
+          "SrcK8S_OwnerType": "StatefulSet",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "168.52666666666667"
+          ],
+          [
+            1786459620,
+            "337.97333333333336"
+          ],
+          [
+            1786459650,
+            "508.5133333333333"
+          ],
+          [
+            1786459680,
+            "679.6033333333334"
+          ],
+          [
+            1786459710,
+            "850.95"
+          ],
+          [
+            1786459740,
+            "1021.5266666666666"
+          ],
+          [
+            1786459770,
+            "1192.5966666666666"
+          ],
+          [
+            1786459800,
+            "1363.7266666666667"
+          ],
+          [
+            1786459830,
+            "1535.08"
+          ],
+          [
+            1786459860,
+            "1706.1766666666667"
+          ],
+          [
+            1786459890,
+            "1707.9566666666667"
+          ],
+          [
+            1786459920,
+            "1708.6066666666666"
+          ],
+          [
+            1786459950,
+            "1708.33"
+          ],
+          [
+            1786459980,
+            "1707.38"
+          ],
+          [
+            1786460010,
+            "1706.4966666666667"
+          ],
+          [
+            1786460040,
+            "1706.24"
+          ],
+          [
+            1786460070,
+            "1705.8533333333332"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.21",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "prometheus-k8s-0",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-k8s",
+          "DstK8S_OwnerType": "StatefulSet",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.52",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "flowlogs-pipeline-7f6c7b955b-g89df",
+          "SrcK8S_Namespace": "netobserv",
+          "SrcK8S_OwnerName": "flowlogs-pipeline",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459710,
+            "372.34"
+          ],
+          [
+            1786459740,
+            "559.26"
+          ],
+          [
+            1786459770,
+            "747.5233333333333"
+          ],
+          [
+            1786459800,
+            "937.0433333333333"
+          ],
+          [
+            1786459830,
+            "1144.6266666666668"
+          ],
+          [
+            1786459860,
+            "1325.85"
+          ],
+          [
+            1786459890,
+            "1534.5666666666666"
+          ],
+          [
+            1786459920,
+            "1716.3966666666668"
+          ],
+          [
+            1786459950,
+            "1887.24"
+          ],
+          [
+            1786459980,
+            "1872.47"
+          ],
+          [
+            1786460010,
+            "1856.6133333333332"
+          ],
+          [
+            1786460040,
+            "1840.5666666666666"
+          ],
+          [
+            1786460070,
+            "1679.55"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.31",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "console-56f5d88d88-qn55z",
           "DstK8S_Namespace": "openshift-console",
           "DstK8S_OwnerName": "console",
           "DstK8S_OwnerType": "Deployment",
           "DstK8S_Type": "Pod",
-          "SrcAddr": "10.128.0.31",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "router-default-759449f6d8-cwcdj",
+          "SrcAddr": "10.128.0.13",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "networking-console-plugin-9479766d6-cdtvm",
+          "SrcK8S_Namespace": "openshift-network-console",
+          "SrcK8S_OwnerName": "networking-console-plugin",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "208.17666666666668"
+          ],
+          [
+            1786459620,
+            "601.67"
+          ],
+          [
+            1786459650,
+            "601.67"
+          ],
+          [
+            1786459680,
+            "601.67"
+          ],
+          [
+            1786459710,
+            "601.67"
+          ],
+          [
+            1786459740,
+            "601.67"
+          ],
+          [
+            1786459770,
+            "601.67"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.31",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "console-56f5d88d88-qn55z",
+          "DstK8S_Namespace": "openshift-console",
+          "DstK8S_OwnerName": "console",
+          "DstK8S_OwnerType": "Deployment",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.15",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "router-default-74c56bd696-qtgxw",
           "SrcK8S_Namespace": "openshift-ingress",
           "SrcK8S_OwnerName": "router-default",
           "SrcK8S_OwnerType": "Deployment",
@@ -1027,1690 +2664,2300 @@
         },
         "values": [
           [
-            1708009560,
-            "0.7694444444444445"
+            1786459590,
+            "675.1966666666667"
           ],
           [
-            1708009920,
-            "2.422222222222222"
+            1786459620,
+            "1605.7333333333333"
           ],
           [
-            1708010280,
-            "3.6791666666666667"
+            1786459650,
+            "1605.7333333333333"
           ],
           [
-            1708010640,
-            "4.006944444444445"
+            1786459680,
+            "1605.7333333333333"
           ],
           [
-            1708011000,
-            "3.566666666666667"
+            1786459710,
+            "1605.7333333333333"
           ],
           [
-            1708011360,
-            "5.669444444444444"
+            1786459740,
+            "1605.7333333333333"
           ],
           [
-            1708011720,
-            "5.923611111111111"
+            1786459770,
+            "1605.7333333333333"
+          ],
+          [
+            1786459800,
+            "1605.7333333333333"
+          ],
+          [
+            1786459830,
+            "1605.7333333333333"
+          ],
+          [
+            1786459860,
+            "1605.7333333333333"
+          ],
+          [
+            1786459890,
+            "930.5366666666666"
           ]
         ]
       },
       {
         "metric": {
-          "DstAddr": "10.129.0.36",
-          "DstK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "DstK8S_Name": "flowlogs-pipeline-45pxk",
-          "DstK8S_Namespace": "netobserv",
-          "DstK8S_OwnerName": "flowlogs-pipeline",
-          "DstK8S_OwnerType": "DaemonSet",
+          "DstAddr": "10.129.0.31",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "console-56f5d88d88-qn55z",
+          "DstK8S_Namespace": "openshift-console",
+          "DstK8S_OwnerName": "console",
+          "DstK8S_OwnerType": "Deployment",
           "DstK8S_Type": "Pod",
-          "SrcAddr": "10.128.0.34",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "loki",
-          "SrcK8S_Namespace": "netobserv",
-          "SrcK8S_OwnerName": "loki",
-          "SrcK8S_OwnerType": "Pod",
+          "SrcAddr": "10.128.0.38",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "thanos-querier-74fb86b44c-ntx8b",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "thanos-querier",
+          "SrcK8S_OwnerType": "Deployment",
           "SrcK8S_Type": "Pod"
         },
         "values": [
           [
-            1708009560,
-            "1.0152777777777777"
+            1786459590,
+            "146.59333333333333"
           ],
           [
-            1708009920,
-            "2.776388888888889"
+            1786459620,
+            "447.05333333333334"
           ],
           [
-            1708010280,
-            "3.6041666666666665"
+            1786459650,
+            "447.05333333333334"
           ],
           [
-            1708010640,
-            "3.6791666666666667"
+            1786459680,
+            "447.05333333333334"
           ],
           [
-            1708011000,
-            "3.602777777777778"
+            1786459710,
+            "447.05333333333334"
           ],
           [
-            1708011360,
-            "3.459722222222222"
-          ],
-          [
-            1708011720,
-            "1.6930555555555555"
+            1786459740,
+            "447.05333333333334"
           ]
         ]
       },
       {
         "metric": {
-          "DstAddr": "10.129.0.41",
-          "DstK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "DstK8S_Name": "flowlogs-pipeline-4m5mz",
-          "DstK8S_Namespace": "netobserv",
-          "DstK8S_OwnerName": "flowlogs-pipeline",
-          "DstK8S_OwnerType": "DaemonSet",
+          "DstAddr": "10.129.0.31",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "console-56f5d88d88-qn55z",
+          "DstK8S_Namespace": "openshift-console",
+          "DstK8S_OwnerName": "console",
+          "DstK8S_OwnerType": "Deployment",
           "DstK8S_Type": "Pod",
-          "SrcAddr": "10.128.0.34",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "loki",
-          "SrcK8S_Namespace": "netobserv",
-          "SrcK8S_OwnerName": "loki",
-          "SrcK8S_OwnerType": "Pod",
+          "SrcAddr": "10.128.0.50",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "netobserv-plugin-static-747465fd89-6kqjm",
+          "SrcK8S_Namespace": "openshift-netobserv-operator",
+          "SrcK8S_OwnerName": "netobserv-controller-manager",
+          "SrcK8S_OwnerType": "Deployment",
           "SrcK8S_Type": "Pod"
         },
         "values": [
           [
-            1708011720,
-            "1.9458333333333333"
+            1786459590,
+            "87.63666666666667"
+          ],
+          [
+            1786459620,
+            "237.39666666666668"
+          ],
+          [
+            1786459650,
+            "237.39666666666668"
           ]
         ]
       },
       {
         "metric": {
-          "DstAddr": "10.129.0.7",
-          "DstK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "DstK8S_Name": "router-default-759449f6d8-v2f62",
+          "DstAddr": "10.129.0.35",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "loki-8459d5ccb8-kmqgj",
+          "DstK8S_Namespace": "netobserv",
+          "DstK8S_OwnerName": "loki",
+          "DstK8S_OwnerType": "Deployment",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.51",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "netobserv-plugin-6684f47f6d-8l7cd",
+          "SrcK8S_Namespace": "netobserv",
+          "SrcK8S_OwnerName": "netobserv-plugin",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459650,
+            "228.50333333333333"
+          ],
+          [
+            1786459680,
+            "576.9633333333334"
+          ],
+          [
+            1786459710,
+            "670.2433333333333"
+          ],
+          [
+            1786459740,
+            "670.2433333333333"
+          ],
+          [
+            1786459770,
+            "670.2433333333333"
+          ],
+          [
+            1786459800,
+            "670.2433333333333"
+          ],
+          [
+            1786459830,
+            "670.2433333333333"
+          ],
+          [
+            1786459860,
+            "670.2433333333333"
+          ],
+          [
+            1786459890,
+            "670.2433333333333"
+          ],
+          [
+            1786459920,
+            "582.16"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.35",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "loki-8459d5ccb8-kmqgj",
+          "DstK8S_Namespace": "netobserv",
+          "DstK8S_OwnerName": "loki",
+          "DstK8S_OwnerType": "Deployment",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.52",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "flowlogs-pipeline-7f6c7b955b-g89df",
+          "SrcK8S_Namespace": "netobserv",
+          "SrcK8S_OwnerName": "flowlogs-pipeline",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "1018.6266666666667"
+          ],
+          [
+            1786459620,
+            "4664.503333333333"
+          ],
+          [
+            1786459650,
+            "8660.053333333333"
+          ],
+          [
+            1786459680,
+            "13322.853333333333"
+          ],
+          [
+            1786459710,
+            "16348.26"
+          ],
+          [
+            1786459740,
+            "18404.003333333334"
+          ],
+          [
+            1786459770,
+            "20417.26"
+          ],
+          [
+            1786459800,
+            "22536.76"
+          ],
+          [
+            1786459830,
+            "24642.55"
+          ],
+          [
+            1786459860,
+            "26737.57"
+          ],
+          [
+            1786459890,
+            "27547.646666666667"
+          ],
+          [
+            1786459920,
+            "23901.77"
+          ],
+          [
+            1786459950,
+            "19906.22"
+          ],
+          [
+            1786459980,
+            "15243.42"
+          ],
+          [
+            1786460010,
+            "12218.013333333334"
+          ],
+          [
+            1786460040,
+            "10162.27"
+          ],
+          [
+            1786460070,
+            "8149.013333333333"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.6",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "router-default-74c56bd696-jtvvt",
           "DstK8S_Namespace": "openshift-ingress",
           "DstK8S_OwnerName": "router-default",
           "DstK8S_OwnerType": "Deployment",
           "DstK8S_Type": "Pod",
-          "SrcAddr": "10.128.0.29",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "prometheus-k8s-1",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "prometheus-k8s",
-          "SrcK8S_OwnerType": "StatefulSet",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.3902777777777778"
-          ],
-          [
-            1708009920,
-            "1.073611111111111"
-          ],
-          [
-            1708010280,
-            "1.3666666666666667"
-          ],
-          [
-            1708010640,
-            "1.3666666666666667"
-          ],
-          [
-            1708011000,
-            "1.3652777777777778"
-          ],
-          [
-            1708011360,
-            "1.351388888888889"
-          ],
-          [
-            1708011720,
-            "1.3527777777777779"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.20.0.1",
-          "SrcAddr": "10.128.0.12",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "console-operator-6b6dd4f56d-5vsr8",
-          "SrcK8S_Namespace": "openshift-console-operator",
-          "SrcK8S_OwnerName": "console-operator",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "1.5805555555555555"
-          ],
-          [
-            1708009920,
-            "5.375"
-          ],
-          [
-            1708010280,
-            "6.926388888888889"
-          ],
-          [
-            1708010640,
-            "6.65"
-          ],
-          [
-            1708011000,
-            "6.708333333333333"
-          ],
-          [
-            1708011360,
-            "6.875"
-          ],
-          [
-            1708011720,
-            "7.529166666666667"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.20.0.1",
-          "SrcAddr": "10.128.0.14",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "insights-operator-f4dddbd5d-sptj5",
-          "SrcK8S_Namespace": "openshift-insights",
-          "SrcK8S_OwnerName": "insights-operator",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009920,
-            "1.3486111111111112"
-          ],
-          [
-            1708010280,
-            "1.4097222222222223"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.20.0.1",
-          "SrcAddr": "10.128.0.18",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "route-monitor-operator-controller-manager-6974d56747-44w6d",
-          "SrcK8S_Namespace": "openshift-route-monitor-operator",
-          "SrcK8S_OwnerName": "route-monitor-operator-controller-manager",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.6972222222222222"
-          ],
-          [
-            1708009920,
-            "1.9555555555555555"
-          ],
-          [
-            1708010280,
-            "2.5347222222222223"
-          ],
-          [
-            1708010640,
-            "2.5347222222222223"
-          ],
-          [
-            1708011000,
-            "2.5208333333333335"
-          ],
-          [
-            1708011360,
-            "2.515277777777778"
-          ],
-          [
-            1708011720,
-            "2.5305555555555554"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.20.0.1",
-          "SrcAddr": "10.128.0.29",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "prometheus-k8s-1",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "prometheus-k8s",
-          "SrcK8S_OwnerType": "StatefulSet",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "1.226388888888889"
-          ],
-          [
-            1708009920,
-            "3.7180555555555554"
-          ],
-          [
-            1708010280,
-            "4.968055555555556"
-          ],
-          [
-            1708010640,
-            "4.954166666666667"
-          ],
-          [
-            1708011000,
-            "4.918055555555555"
-          ],
-          [
-            1708011360,
-            "5.054166666666666"
-          ],
-          [
-            1708011720,
-            "5.211111111111111"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.20.0.1",
-          "SrcAddr": "10.128.0.33",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "deployment-validation-operator-5877d8b98-qqdhh",
-          "SrcK8S_Namespace": "openshift-deployment-validation-operator",
-          "SrcK8S_OwnerName": "deployment-validation-operator",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "4.5055555555555555"
-          ],
-          [
-            1708009920,
-            "12.65"
-          ],
-          [
-            1708010280,
-            "16.290277777777778"
-          ],
-          [
-            1708010640,
-            "16.333333333333332"
-          ],
-          [
-            1708011000,
-            "16.42222222222222"
-          ],
-          [
-            1708011360,
-            "16.122222222222224"
-          ],
-          [
-            1708011720,
-            "16.108333333333334"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.20.0.1",
-          "SrcAddr": "10.128.0.9",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "cluster-monitoring-operator-6bc9675865-nvxv2",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "cluster-monitoring-operator",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "6.5152777777777775"
-          ],
-          [
-            1708009920,
-            "6.733333333333333"
-          ],
-          [
-            1708010640,
-            "6.809722222222222"
-          ],
-          [
-            1708011000,
-            "6.798611111111111"
-          ],
-          [
-            1708011360,
-            "6.851388888888889"
-          ],
-          [
-            1708011720,
-            "6.844444444444444"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.20.0.1",
-          "SrcAddr": "10.129.0.19",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "kube-state-metrics-6595568c75-h47dq",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "kube-state-metrics",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "1.2416666666666667"
-          ],
-          [
-            1708009920,
-            "3.0791666666666666"
-          ],
-          [
-            1708010280,
-            "3.745833333333333"
-          ],
-          [
-            1708010640,
-            "3.7777777777777777"
-          ],
-          [
-            1708011000,
-            "3.7555555555555555"
-          ],
-          [
-            1708011360,
-            "3.863888888888889"
-          ],
-          [
-            1708011720,
-            "3.886111111111111"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.20.0.1",
-          "SrcAddr": "10.129.0.26",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "prometheus-k8s-0",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "prometheus-k8s",
-          "SrcK8S_OwnerType": "StatefulSet",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "1.2222222222222223"
-          ],
-          [
-            1708009920,
-            "3.720833333333333"
-          ],
-          [
-            1708010280,
-            "4.966666666666667"
-          ],
-          [
-            1708010640,
-            "4.913888888888889"
-          ],
-          [
-            1708011000,
-            "4.888888888888889"
-          ],
-          [
-            1708011360,
-            "5.101388888888889"
-          ],
-          [
-            1708011720,
-            "5.180555555555555"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.20.0.1",
-          "SrcAddr": "10.129.0.30",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "netobserv-controller-manager-54d5d67fdb-pk69f",
-          "SrcK8S_Namespace": "netobserv",
-          "SrcK8S_OwnerName": "netobserv-controller-manager",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "1.0680555555555555"
-          ],
-          [
-            1708009920,
-            "2.4680555555555554"
-          ],
-          [
-            1708010280,
-            "2.826388888888889"
-          ],
-          [
-            1708010640,
-            "2.823611111111111"
-          ],
-          [
-            1708011000,
-            "2.8375"
-          ],
-          [
-            1708011360,
-            "3.0569444444444445"
-          ],
-          [
-            1708011720,
-            "3.040277777777778"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.20.0.1",
-          "SrcAddr": "10.129.0.34",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "console-6bc7bf6577-mw7zj",
-          "SrcK8S_Namespace": "openshift-console",
-          "SrcK8S_OwnerName": "console",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.7555555555555555"
-          ],
-          [
-            1708009920,
-            "1.6458333333333333"
-          ],
-          [
-            1708010280,
-            "3.9791666666666665"
-          ],
-          [
-            1708010640,
-            "6.113888888888889"
-          ],
-          [
-            1708011000,
-            "3.908333333333333"
-          ],
-          [
-            1708011360,
-            "7.1625"
-          ],
-          [
-            1708011720,
-            "7.091666666666667"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.30.0.1",
-          "DstK8S_Name": "kubernetes",
-          "DstK8S_Namespace": "default",
-          "DstK8S_OwnerName": "kubernetes",
-          "DstK8S_OwnerType": "Service",
-          "DstK8S_Type": "Service",
-          "SrcAddr": "10.128.0.12",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "console-operator-6b6dd4f56d-5vsr8",
-          "SrcK8S_Namespace": "openshift-console-operator",
-          "SrcK8S_OwnerName": "console-operator",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "1.5791666666666666"
-          ],
-          [
-            1708009920,
-            "5.373611111111111"
-          ],
-          [
-            1708010280,
-            "6.926388888888889"
-          ],
-          [
-            1708010640,
-            "6.65"
-          ],
-          [
-            1708011000,
-            "6.708333333333333"
-          ],
-          [
-            1708011360,
-            "6.875"
-          ],
-          [
-            1708011720,
-            "7.529166666666667"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.30.0.1",
-          "DstK8S_Name": "kubernetes",
-          "DstK8S_Namespace": "default",
-          "DstK8S_OwnerName": "kubernetes",
-          "DstK8S_OwnerType": "Service",
-          "DstK8S_Type": "Service",
-          "SrcAddr": "10.128.0.14",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "insights-operator-f4dddbd5d-sptj5",
-          "SrcK8S_Namespace": "openshift-insights",
-          "SrcK8S_OwnerName": "insights-operator",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009920,
-            "1.3486111111111112"
-          ],
-          [
-            1708010280,
-            "1.4097222222222223"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.30.0.1",
-          "DstK8S_Name": "kubernetes",
-          "DstK8S_Namespace": "default",
-          "DstK8S_OwnerName": "kubernetes",
-          "DstK8S_OwnerType": "Service",
-          "DstK8S_Type": "Service",
-          "SrcAddr": "10.128.0.18",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "route-monitor-operator-controller-manager-6974d56747-44w6d",
-          "SrcK8S_Namespace": "openshift-route-monitor-operator",
-          "SrcK8S_OwnerName": "route-monitor-operator-controller-manager",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.7041666666666667"
-          ],
-          [
-            1708009920,
-            "1.961111111111111"
-          ],
-          [
-            1708010280,
-            "2.5319444444444446"
-          ],
-          [
-            1708010640,
-            "2.533333333333333"
-          ],
-          [
-            1708011000,
-            "2.5194444444444444"
-          ],
-          [
-            1708011360,
-            "2.5125"
-          ],
-          [
-            1708011720,
-            "2.529166666666667"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.30.0.1",
-          "DstK8S_Name": "kubernetes",
-          "DstK8S_Namespace": "default",
-          "DstK8S_OwnerName": "kubernetes",
-          "DstK8S_OwnerType": "Service",
-          "DstK8S_Type": "Service",
-          "SrcAddr": "10.128.0.29",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "prometheus-k8s-1",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "prometheus-k8s",
-          "SrcK8S_OwnerType": "StatefulSet",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708011720,
-            "1.4097222222222223"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.30.0.1",
-          "DstK8S_Name": "kubernetes",
-          "DstK8S_Namespace": "default",
-          "DstK8S_OwnerName": "kubernetes",
-          "DstK8S_OwnerType": "Service",
-          "DstK8S_Type": "Service",
-          "SrcAddr": "10.128.0.33",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "deployment-validation-operator-5877d8b98-qqdhh",
-          "SrcK8S_Namespace": "openshift-deployment-validation-operator",
-          "SrcK8S_OwnerName": "deployment-validation-operator",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "4.519444444444445"
-          ],
-          [
-            1708009920,
-            "12.66388888888889"
-          ],
-          [
-            1708010280,
-            "16.290277777777778"
-          ],
-          [
-            1708010640,
-            "16.333333333333332"
-          ],
-          [
-            1708011000,
-            "16.42222222222222"
-          ],
-          [
-            1708011360,
-            "16.122222222222224"
-          ],
-          [
-            1708011720,
-            "16.108333333333334"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.30.0.1",
-          "DstK8S_Name": "kubernetes",
-          "DstK8S_Namespace": "default",
-          "DstK8S_OwnerName": "kubernetes",
-          "DstK8S_OwnerType": "Service",
-          "DstK8S_Type": "Service",
-          "SrcAddr": "10.128.0.9",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "cluster-monitoring-operator-6bc9675865-nvxv2",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "cluster-monitoring-operator",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "6.518055555555556"
-          ],
-          [
-            1708009920,
-            "6.736111111111111"
-          ],
-          [
-            1708010640,
-            "6.809722222222222"
-          ],
-          [
-            1708011000,
-            "6.798611111111111"
-          ],
-          [
-            1708011360,
-            "6.851388888888889"
-          ],
-          [
-            1708011720,
-            "6.844444444444444"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.30.0.1",
-          "DstK8S_Name": "kubernetes",
-          "DstK8S_Namespace": "default",
-          "DstK8S_OwnerName": "kubernetes",
-          "DstK8S_OwnerType": "Service",
-          "DstK8S_Type": "Service",
-          "SrcAddr": "10.129.0.19",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "kube-state-metrics-6595568c75-h47dq",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "kube-state-metrics",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "1.261111111111111"
-          ],
-          [
-            1708009920,
-            "3.098611111111111"
-          ],
-          [
-            1708010280,
-            "3.745833333333333"
-          ],
-          [
-            1708010640,
-            "3.7777777777777777"
-          ],
-          [
-            1708011000,
-            "3.7555555555555555"
-          ],
-          [
-            1708011360,
-            "3.863888888888889"
-          ],
-          [
-            1708011720,
-            "3.8847222222222224"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.30.0.1",
-          "DstK8S_Name": "kubernetes",
-          "DstK8S_Namespace": "default",
-          "DstK8S_OwnerName": "kubernetes",
-          "DstK8S_OwnerType": "Service",
-          "DstK8S_Type": "Service",
-          "SrcAddr": "10.129.0.26",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "prometheus-k8s-0",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "prometheus-k8s",
-          "SrcK8S_OwnerType": "StatefulSet",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708010280,
-            "1.2541666666666667"
-          ],
-          [
-            1708011360,
-            "1.3375"
-          ],
-          [
-            1708011720,
-            "1.4416666666666667"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.30.0.1",
-          "DstK8S_Name": "kubernetes",
-          "DstK8S_Namespace": "default",
-          "DstK8S_OwnerName": "kubernetes",
-          "DstK8S_OwnerType": "Service",
-          "DstK8S_Type": "Service",
-          "SrcAddr": "10.129.0.30",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "netobserv-controller-manager-54d5d67fdb-pk69f",
-          "SrcK8S_Namespace": "netobserv",
-          "SrcK8S_OwnerName": "netobserv-controller-manager",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "1.0972222222222223"
-          ],
-          [
-            1708009920,
-            "2.4972222222222222"
-          ],
-          [
-            1708010280,
-            "2.826388888888889"
-          ],
-          [
-            1708010640,
-            "2.823611111111111"
-          ],
-          [
-            1708011000,
-            "2.8375"
-          ],
-          [
-            1708011360,
-            "3.0555555555555554"
-          ],
-          [
-            1708011720,
-            "3.0388888888888888"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.30.0.1",
-          "DstK8S_Name": "kubernetes",
-          "DstK8S_Namespace": "default",
-          "DstK8S_OwnerName": "kubernetes",
-          "DstK8S_OwnerType": "Service",
-          "DstK8S_Type": "Service",
-          "SrcAddr": "10.129.0.34",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "console-6bc7bf6577-mw7zj",
-          "SrcK8S_Namespace": "openshift-console",
-          "SrcK8S_OwnerName": "console",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.7652777777777777"
-          ],
-          [
-            1708009920,
-            "1.6555555555555554"
-          ],
-          [
-            1708010280,
-            "3.9791666666666665"
-          ],
-          [
-            1708010640,
-            "6.113888888888889"
-          ],
-          [
-            1708011000,
-            "3.908333333333333"
-          ],
-          [
-            1708011360,
-            "7.1625"
-          ],
-          [
-            1708011720,
-            "7.091666666666667"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.30.0.10",
-          "DstK8S_Name": "dns-default",
-          "DstK8S_Namespace": "openshift-dns",
-          "DstK8S_OwnerName": "dns-default",
-          "DstK8S_OwnerType": "Service",
-          "DstK8S_Type": "Service",
-          "SrcAddr": "10.128.0.26",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "thanos-querier-6dc4476754-rgqgz",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "thanos-querier",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.39305555555555555"
-          ],
-          [
-            1708009920,
-            "1.0597222222222222"
-          ],
-          [
-            1708010280,
-            "1.3333333333333333"
-          ],
-          [
-            1708010640,
-            "1.3333333333333333"
-          ],
-          [
-            1708011000,
-            "1.3333333333333333"
-          ],
-          [
-            1708011360,
-            "1.3333333333333333"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.30.0.10",
-          "DstK8S_Name": "dns-default",
-          "DstK8S_Namespace": "openshift-dns",
-          "DstK8S_OwnerName": "dns-default",
-          "DstK8S_OwnerType": "Service",
-          "DstK8S_Type": "Service",
           "SrcAddr": "10.128.0.37",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "flowlogs-pipeline-cvmb9",
-          "SrcK8S_Namespace": "netobserv",
-          "SrcK8S_OwnerName": "flowlogs-pipeline",
-          "SrcK8S_OwnerType": "DaemonSet",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708010640,
-            "1.2"
-          ],
-          [
-            1708011000,
-            "1.2"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.30.0.10",
-          "DstK8S_Name": "dns-default",
-          "DstK8S_Namespace": "openshift-dns",
-          "DstK8S_OwnerName": "dns-default",
-          "DstK8S_OwnerType": "Service",
-          "DstK8S_Type": "Service",
-          "SrcAddr": "10.129.0.23",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "thanos-querier-6dc4476754-gzxlq",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "alertmanager-main-1",
           "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "thanos-querier",
-          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_OwnerName": "alertmanager-main",
+          "SrcK8S_OwnerType": "StatefulSet",
           "SrcK8S_Type": "Pod"
         },
         "values": [
           [
-            1708009560,
-            "0.39305555555555555"
+            1786459590,
+            "48.35"
           ],
           [
-            1708009920,
-            "1.0597222222222222"
+            1786459920,
+            "558.49"
           ],
           [
-            1708010280,
-            "1.3333333333333333"
+            1786459950,
+            "568.3"
           ],
           [
-            1708010640,
-            "1.3333333333333333"
+            1786459980,
+            "569"
           ],
           [
-            1708011000,
-            "1.3333333333333333"
+            1786460010,
+            "570.4"
           ],
           [
-            1708011360,
-            "1.3333333333333333"
+            1786460040,
+            "571.8"
+          ],
+          [
+            1786460070,
+            "573.9"
           ]
         ]
       },
       {
         "metric": {
-          "DstAddr": "172.30.136.217",
-          "SrcAddr": "169.254.169.2"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.41805555555555557"
-          ],
-          [
-            1708009920,
-            "1.1680555555555556"
-          ],
-          [
-            1708010280,
-            "1.5041666666666667"
-          ],
-          [
-            1708010640,
-            "1.5041666666666667"
-          ],
-          [
-            1708011000,
-            "1.4986111111111111"
-          ],
-          [
-            1708011360,
-            "1.4916666666666667"
-          ],
-          [
-            1708011720,
-            "1.488888888888889"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.30.72.14",
-          "DstK8S_Name": "loki",
-          "DstK8S_Namespace": "netobserv",
-          "DstK8S_OwnerName": "loki",
-          "DstK8S_OwnerType": "Service",
-          "DstK8S_Type": "Service",
-          "SrcAddr": "10.128.0.37",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "flowlogs-pipeline-cvmb9",
-          "SrcK8S_Namespace": "netobserv",
-          "SrcK8S_OwnerName": "flowlogs-pipeline",
-          "SrcK8S_OwnerType": "DaemonSet",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.7972222222222223"
-          ],
-          [
-            1708009920,
-            "2.2708333333333335"
-          ],
-          [
-            1708010280,
-            "2.922222222222222"
-          ],
-          [
-            1708010640,
-            "2.890277777777778"
-          ],
-          [
-            1708011000,
-            "2.8875"
-          ],
-          [
-            1708011360,
-            "2.783333333333333"
-          ],
-          [
-            1708011720,
-            "1.3375"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.30.72.14",
-          "DstK8S_Name": "loki",
-          "DstK8S_Namespace": "netobserv",
-          "DstK8S_OwnerName": "loki",
-          "DstK8S_OwnerType": "Service",
-          "DstK8S_Type": "Service",
-          "SrcAddr": "10.128.0.38",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "flowlogs-pipeline-qlkbg",
-          "SrcK8S_Namespace": "netobserv",
-          "SrcK8S_OwnerName": "flowlogs-pipeline",
-          "SrcK8S_OwnerType": "DaemonSet",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708011720,
-            "1.575"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.30.72.14",
-          "DstK8S_Name": "loki",
-          "DstK8S_Namespace": "netobserv",
-          "DstK8S_OwnerName": "loki",
-          "DstK8S_OwnerType": "Service",
-          "DstK8S_Type": "Service",
-          "SrcAddr": "10.129.0.36",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "flowlogs-pipeline-45pxk",
-          "SrcK8S_Namespace": "netobserv",
-          "SrcK8S_OwnerName": "flowlogs-pipeline",
-          "SrcK8S_OwnerType": "DaemonSet",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.8652777777777778"
-          ],
-          [
-            1708009920,
-            "2.3069444444444445"
-          ],
-          [
-            1708010280,
-            "2.925"
-          ],
-          [
-            1708010640,
-            "2.933333333333333"
-          ],
-          [
-            1708011000,
-            "2.8958333333333335"
-          ],
-          [
-            1708011360,
-            "2.8305555555555557"
-          ],
-          [
-            1708011720,
-            "1.3847222222222222"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "172.30.72.14",
-          "DstK8S_Name": "loki",
-          "DstK8S_Namespace": "netobserv",
-          "DstK8S_OwnerName": "loki",
-          "DstK8S_OwnerType": "Service",
-          "DstK8S_Type": "Service",
-          "SrcAddr": "10.129.0.41",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "flowlogs-pipeline-4m5mz",
-          "SrcK8S_Namespace": "netobserv",
-          "SrcK8S_OwnerName": "flowlogs-pipeline",
-          "SrcK8S_OwnerType": "DaemonSet",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708011720,
-            "1.5944444444444446"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "37.67.80.241",
-          "SrcAddr": "10.0.1.137",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_OwnerName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_OwnerType": "Node",
-          "SrcK8S_Type": "Node"
-        },
-        "values": [
-          [
-            1708009560,
-            "1.0083333333333333"
-          ],
-          [
-            1708009920,
-            "2"
-          ],
-          [
-            1708010280,
-            "2.575"
-          ],
-          [
-            1708010640,
-            "3.325"
-          ],
-          [
-            1708011000,
-            "2.6347222222222224"
-          ],
-          [
-            1708011360,
-            "5.284722222222222"
-          ],
-          [
-            1708011720,
-            "5.258333333333334"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "37.67.80.241",
-          "SrcAddr": "10.0.1.7",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_OwnerName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_OwnerType": "Node",
-          "SrcK8S_Type": "Node"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.5305555555555556"
-          ],
-          [
-            1708009920,
-            "1.6097222222222223"
-          ],
-          [
-            1708010280,
-            "2.7958333333333334"
-          ],
-          [
-            1708010640,
-            "3.5"
-          ],
-          [
-            1708011000,
-            "2.8680555555555554"
-          ],
-          [
-            1708011360,
-            "8.806944444444444"
-          ],
-          [
-            1708011720,
-            "8.929166666666667"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "37.67.80.241",
-          "SrcAddr": "10.128.0.31",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Name": "router-default-759449f6d8-cwcdj",
-          "SrcK8S_Namespace": "openshift-ingress",
-          "SrcK8S_OwnerName": "router-default",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.5361111111111111"
-          ],
-          [
-            1708009920,
-            "1.6152777777777778"
-          ],
-          [
-            1708010280,
-            "2.7958333333333334"
-          ],
-          [
-            1708010640,
-            "3.5"
-          ],
-          [
-            1708011000,
-            "2.8680555555555554"
-          ],
-          [
-            1708011360,
-            "8.806944444444444"
-          ],
-          [
-            1708011720,
-            "8.929166666666667"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "37.67.80.241",
-          "SrcAddr": "10.129.0.7",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Name": "router-default-759449f6d8-v2f62",
-          "SrcK8S_Namespace": "openshift-ingress",
-          "SrcK8S_OwnerName": "router-default",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.9819444444444444"
-          ],
-          [
-            1708009920,
-            "1.9736111111111112"
-          ],
-          [
-            1708010280,
-            "2.575"
-          ],
-          [
-            1708010640,
-            "3.325"
-          ],
-          [
-            1708011000,
-            "2.6347222222222224"
-          ],
-          [
-            1708011360,
-            "5.281944444444444"
-          ],
-          [
-            1708011720,
-            "5.2555555555555555"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.128.0.70",
-          "DstK8S_Name": "gateway-api",
-          "DstK8S_Namespace": "istio-system",
-          "DstK8S_Type": "Gateway",
-          "SrcAddr": "10.128.0.71",
-          "SrcK8S_Name": "web-pod",
-          "SrcK8S_Namespace": "production",
-          "SrcK8S_OwnerName": "web-deployment",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "200.5"
-          ],
-          [
-            1708009920,
-            "225.8"
-          ],
-          [
-            1708010280,
-            "245.3"
-          ],
-          [
-            1708010640,
-            "258.7"
-          ],
-          [
-            1708011000,
-            "252.1"
-          ],
-          [
-            1708011360,
-            "265.4"
-          ],
-          [
-            1708011720,
-            "270.2"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.128.0.80",
-          "DstK8S_Name": "gateway-external",
-          "DstK8S_Namespace": "gateway-system",
-          "DstK8S_Type": "Gateway",
-          "SrcAddr": "10.128.0.81",
-          "SrcK8S_Name": "gateway-internal",
-          "SrcK8S_Namespace": "gateway-system",
-          "SrcK8S_Type": "Gateway"
-        },
-        "values": [
-          [
-            1708009560,
-            "150.2"
-          ],
-          [
-            1708009920,
-            "168.5"
-          ],
-          [
-            1708010280,
-            "182.3"
-          ],
-          [
-            1708010640,
-            "195.8"
-          ],
-          [
-            1708011000,
-            "188.1"
-          ],
-          [
-            1708011360,
-            "202.5"
-          ],
-          [
-            1708011720,
-            "210.7"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.128.0.110",
-          "DstK8S_Name": "vm-ubuntu-server",
-          "DstK8S_Namespace": "vms",
-          "DstK8S_Type": "VirtualMachine",
-          "SrcAddr": "10.128.0.111",
-          "SrcK8S_Name": "vm-centos-server",
-          "SrcK8S_Namespace": "vms",
-          "SrcK8S_Type": "VirtualMachine"
-        },
-        "values": [
-          [
-            1708009560,
-            "95.3"
-          ],
-          [
-            1708009920,
-            "108.7"
-          ],
-          [
-            1708010280,
-            "118.2"
-          ],
-          [
-            1708010640,
-            "125.8"
-          ],
-          [
-            1708011000,
-            "122.1"
-          ],
-          [
-            1708011360,
-            "132.5"
-          ],
-          [
-            1708011720,
-            "138.9"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.128.0.120",
-          "DstK8S_Name": "vmi-windows",
-          "DstK8S_Namespace": "vms",
-          "DstK8S_Type": "VirtualMachineInstance",
-          "SrcAddr": "10.128.0.121",
-          "SrcK8S_Name": "vmi-linux",
-          "SrcK8S_Namespace": "vms",
-          "SrcK8S_Type": "VirtualMachineInstance"
-        },
-        "values": [
-          [
-            1708009560,
-            "88.2"
-          ],
-          [
-            1708009920,
-            "98.5"
-          ],
-          [
-            1708010280,
-            "105.8"
-          ],
-          [
-            1708010640,
-            "112.3"
-          ],
-          [
-            1708011000,
-            "109.1"
-          ],
-          [
-            1708011360,
-            "118.7"
-          ],
-          [
-            1708011720,
-            "125.2"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstAddr": "10.128.0.130",
-          "DstK8S_Name": "app-pod",
-          "DstK8S_Namespace": "production",
-          "DstK8S_OwnerName": "app-deployment",
+          "DstAddr": "10.129.0.6",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "router-default-74c56bd696-jtvvt",
+          "DstK8S_Namespace": "openshift-ingress",
+          "DstK8S_OwnerName": "router-default",
           "DstK8S_OwnerType": "Deployment",
           "DstK8S_Type": "Pod",
-          "SrcAddr": "10.128.0.110",
-          "SrcK8S_Name": "vm-ubuntu-server",
-          "SrcK8S_Namespace": "vms",
-          "SrcK8S_Type": "VirtualMachine"
+          "SrcAddr": "10.128.0.38",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "thanos-querier-74fb86b44c-ntx8b",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "thanos-querier",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
         },
         "values": [
           [
-            1708009560,
-            "65.4"
+            1786459590,
+            "37.72"
           ],
           [
-            1708009920,
-            "72.8"
+            1786459920,
+            "574.2"
           ],
           [
-            1708010280,
-            "78.1"
+            1786459950,
+            "574.2"
           ],
           [
-            1708010640,
-            "82.5"
+            1786459980,
+            "574.9"
           ],
           [
-            1708011000,
-            "79.9"
+            1786460010,
+            "573.5"
           ],
           [
-            1708011360,
-            "85.2"
+            1786460040,
+            "574.2"
           ],
           [
-            1708011720,
-            "88.7"
+            1786460070,
+            "572.8"
           ]
         ]
       },
       {
         "metric": {
-          "DstAddr": "10.128.0.150",
-          "DstK8S_Name": "vm-database",
-          "DstK8S_Namespace": "vms",
-          "DstK8S_Type": "VirtualMachine",
-          "SrcK8S_Name": "db-pod-0",
-          "SrcK8S_Namespace": "production",
-          "SrcK8S_OwnerName": "db-statefulset",
+          "DstAddr": "10.129.0.6",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "router-default-74c56bd696-jtvvt",
+          "DstK8S_Namespace": "openshift-ingress",
+          "DstK8S_OwnerName": "router-default",
+          "DstK8S_OwnerType": "Deployment",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.41",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "prometheus-k8s-1",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "prometheus-k8s",
           "SrcK8S_OwnerType": "StatefulSet",
           "SrcK8S_Type": "Pod"
         },
         "values": [
           [
-            1708009560,
-            "42.5"
+            1786459590,
+            "102.34333333333333"
           ],
           [
-            1708009920,
-            "48.2"
+            1786459620,
+            "212.80666666666667"
           ],
           [
-            1708010280,
-            "52.8"
+            1786459650,
+            "325.37"
           ],
           [
-            1708010640,
-            "55.3"
+            1786459680,
+            "446.31333333333333"
           ],
           [
-            1708011000,
-            "53.9"
+            1786459710,
+            "567.9566666666667"
           ],
           [
-            1708011360,
-            "57.1"
+            1786459740,
+            "690.3"
           ],
           [
-            1708011720,
-            "59.7"
+            1786459770,
+            "812.6433333333333"
+          ],
+          [
+            1786459800,
+            "934.2866666666666"
+          ],
+          [
+            1786459830,
+            "1053.13"
+          ],
+          [
+            1786459860,
+            "1176.1733333333334"
+          ],
+          [
+            1786459890,
+            "1195.4733333333334"
+          ],
+          [
+            1786459920,
+            "1207.3533333333332"
+          ],
+          [
+            1786459950,
+            "1214.3333333333333"
+          ],
+          [
+            1786459980,
+            "1215.0333333333333"
+          ],
+          [
+            1786460010,
+            "1215.0333333333333"
+          ],
+          [
+            1786460040,
+            "1214.3333333333333"
+          ],
+          [
+            1786460070,
+            "1215.0333333333333"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.6",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "router-default-74c56bd696-jtvvt",
+          "DstK8S_Namespace": "openshift-ingress",
+          "DstK8S_OwnerName": "router-default",
+          "DstK8S_OwnerType": "Deployment",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.53",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "console-68dc8d4f8d-p9nwg",
+          "SrcK8S_Namespace": "openshift-console",
+          "SrcK8S_OwnerName": "console",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459620,
+            "20241.123333333333"
+          ],
+          [
+            1786459650,
+            "22604.3"
+          ],
+          [
+            1786459680,
+            "23724.88"
+          ],
+          [
+            1786459710,
+            "23906.47333333333"
+          ],
+          [
+            1786459740,
+            "24215.62"
+          ],
+          [
+            1786459770,
+            "24424.933333333334"
+          ],
+          [
+            1786459800,
+            "24947.35"
+          ],
+          [
+            1786459830,
+            "25147.976666666666"
+          ],
+          [
+            1786459860,
+            "25538.603333333333"
+          ],
+          [
+            1786459890,
+            "25881.07"
+          ],
+          [
+            1786459920,
+            "6058.9766666666665"
+          ],
+          [
+            1786459950,
+            "3890.7966666666666"
+          ],
+          [
+            1786459980,
+            "3112.483333333333"
+          ],
+          [
+            1786460010,
+            "2989.9933333333333"
+          ],
+          [
+            1786460040,
+            "3155.036666666667"
+          ],
+          [
+            1786460070,
+            "3004.826666666667"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "10.129.0.9",
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Name": "prometheus-operator-admission-webhook-5f8765476f-2tjsg",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "prometheus-operator-admission-webhook",
+          "DstK8S_OwnerType": "Deployment",
+          "DstK8S_Type": "Pod",
+          "SrcAddr": "10.128.0.2",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_OwnerType": "Node",
+          "SrcK8S_Type": "Node"
+        },
+        "values": [
+          [
+            1786460070,
+            "1594.3766666666668"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "100.56.119.80",
+          "SrcAddr": "10.0.1.132",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_OwnerType": "Node",
+          "SrcK8S_Type": "Node"
+        },
+        "values": [
+          [
+            1786459590,
+            "32.49666666666667"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.20.0.1",
+          "SrcAddr": "10.128.0.22",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "cluster-monitoring-operator-6d46cdd977-9zrbt",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "cluster-monitoring-operator",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459770,
+            "1284.2866666666666"
+          ],
+          [
+            1786459800,
+            "1303.2933333333333"
+          ],
+          [
+            1786459830,
+            "1309.66"
+          ],
+          [
+            1786459860,
+            "1313.2333333333333"
+          ],
+          [
+            1786459890,
+            "1320.29"
+          ],
+          [
+            1786459920,
+            "1321.2366666666667"
+          ],
+          [
+            1786459950,
+            "1314.27"
+          ],
+          [
+            1786459980,
+            "1314.78"
+          ],
+          [
+            1786460010,
+            "1318.48"
+          ],
+          [
+            1786460040,
+            "1319.1666666666667"
+          ],
+          [
+            1786460070,
+            "1335.5933333333332"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.20.0.1",
+          "SrcAddr": "10.128.0.25",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "console-operator-bb5cd8849-krtr7",
+          "SrcK8S_Namespace": "openshift-console-operator",
+          "SrcK8S_OwnerName": "console-operator",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459620,
+            "302.6566666666667"
+          ],
+          [
+            1786459650,
+            "444.5833333333333"
+          ],
+          [
+            1786459680,
+            "485.53333333333336"
+          ],
+          [
+            1786459710,
+            "499.23"
+          ],
+          [
+            1786459740,
+            "542.7733333333333"
+          ],
+          [
+            1786459770,
+            "557.2233333333334"
+          ],
+          [
+            1786459800,
+            "618.39"
+          ],
+          [
+            1786459860,
+            "688.34"
+          ],
+          [
+            1786459890,
+            "681.36"
+          ],
+          [
+            1786460040,
+            "507.4066666666667"
+          ],
+          [
+            1786460070,
+            "530.24"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.20.0.1",
+          "SrcAddr": "10.128.0.41",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "prometheus-k8s-1",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "prometheus-k8s",
+          "SrcK8S_OwnerType": "StatefulSet",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "60.346666666666664"
+          ],
+          [
+            1786459620,
+            "129.39"
+          ],
+          [
+            1786459920,
+            "628.1966666666667"
+          ],
+          [
+            1786459950,
+            "617.5033333333333"
+          ],
+          [
+            1786459980,
+            "616.75"
+          ],
+          [
+            1786460010,
+            "619.7333333333333"
+          ],
+          [
+            1786460040,
+            "624.7466666666667"
+          ],
+          [
+            1786460070,
+            "630.6666666666666"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.20.0.1",
+          "SrcAddr": "10.128.0.51",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "netobserv-plugin-6684f47f6d-8l7cd",
+          "SrcK8S_Namespace": "netobserv",
+          "SrcK8S_OwnerName": "netobserv-plugin",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459620,
+            "677.5933333333334"
+          ],
+          [
+            1786459650,
+            "951.5166666666667"
+          ],
+          [
+            1786459680,
+            "1752.06"
+          ],
+          [
+            1786459710,
+            "1767.04"
+          ],
+          [
+            1786459740,
+            "1773.7"
+          ],
+          [
+            1786459770,
+            "1778.34"
+          ],
+          [
+            1786459800,
+            "1778.34"
+          ],
+          [
+            1786459830,
+            "1778.34"
+          ],
+          [
+            1786459860,
+            "1778.34"
+          ],
+          [
+            1786459890,
+            "1778.34"
+          ],
+          [
+            1786459920,
+            "1100.7466666666667"
+          ],
+          [
+            1786459950,
+            "826.8233333333334"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.20.0.1",
+          "SrcAddr": "10.128.0.53",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "console-68dc8d4f8d-p9nwg",
+          "SrcK8S_Namespace": "openshift-console",
+          "SrcK8S_OwnerName": "console",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459620,
+            "1205.9033333333334"
+          ],
+          [
+            1786459650,
+            "1245.4566666666667"
+          ],
+          [
+            1786459680,
+            "1285.7566666666667"
+          ],
+          [
+            1786459710,
+            "1338.4233333333334"
+          ],
+          [
+            1786459740,
+            "1391.6066666666666"
+          ],
+          [
+            1786459770,
+            "1422.9866666666667"
+          ],
+          [
+            1786459800,
+            "1457.0166666666667"
+          ],
+          [
+            1786459830,
+            "1474.7833333333333"
+          ],
+          [
+            1786459860,
+            "1529.6966666666667"
+          ],
+          [
+            1786459890,
+            "1547.44"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.20.0.1",
+          "SrcAddr": "10.129.0.14",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "prometheus-operator-86f64bd85d-86qgk",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "prometheus-operator",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786460010,
+            "635.12"
+          ],
+          [
+            1786460040,
+            "612.5733333333334"
+          ],
+          [
+            1786460070,
+            "612.26"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.20.0.1",
+          "SrcAddr": "10.129.0.21",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "prometheus-k8s-0",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "prometheus-k8s",
+          "SrcK8S_OwnerType": "StatefulSet",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "50.333333333333336"
+          ],
+          [
+            1786459650,
+            "214.01"
+          ],
+          [
+            1786459920,
+            "667.58"
+          ],
+          [
+            1786459950,
+            "640.4133333333333"
+          ],
+          [
+            1786459980,
+            "620.8233333333334"
+          ],
+          [
+            1786460010,
+            "626.5833333333334"
+          ],
+          [
+            1786460040,
+            "619.4733333333334"
+          ],
+          [
+            1786460070,
+            "628.78"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.20.0.1",
+          "SrcAddr": "10.129.0.31",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "console-56f5d88d88-qn55z",
+          "SrcK8S_Namespace": "openshift-console",
+          "SrcK8S_OwnerName": "console",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "1998.1866666666667"
+          ],
+          [
+            1786459620,
+            "3359.4766666666665"
+          ],
+          [
+            1786459650,
+            "3359.4766666666665"
+          ],
+          [
+            1786459680,
+            "3359.4766666666665"
+          ],
+          [
+            1786459710,
+            "3359.4766666666665"
+          ],
+          [
+            1786459740,
+            "3359.4766666666665"
+          ],
+          [
+            1786459770,
+            "3359.4766666666665"
+          ],
+          [
+            1786459800,
+            "3359.4766666666665"
+          ],
+          [
+            1786459830,
+            "3359.4766666666665"
+          ],
+          [
+            1786459860,
+            "3359.4766666666665"
+          ],
+          [
+            1786459890,
+            "1361.29"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.20.0.1",
+          "SrcAddr": "10.129.0.32",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "netobserv-controller-manager-6d85794888-jfpt2",
+          "SrcK8S_Namespace": "openshift-netobserv-operator",
+          "SrcK8S_OwnerName": "netobserv-controller-manager",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "1150.9733333333334"
+          ],
+          [
+            1786459620,
+            "1194.8633333333332"
+          ],
+          [
+            1786459650,
+            "1583.44"
+          ],
+          [
+            1786459680,
+            "1622.7033333333334"
+          ],
+          [
+            1786459710,
+            "1666.5866666666666"
+          ],
+          [
+            1786459740,
+            "1707.0666666666666"
+          ],
+          [
+            1786459770,
+            "1750.0633333333333"
+          ],
+          [
+            1786459800,
+            "1789.4966666666667"
+          ],
+          [
+            1786459830,
+            "1832.47"
+          ],
+          [
+            1786459860,
+            "1871.9533333333334"
+          ],
+          [
+            1786459890,
+            "768.6666666666666"
+          ],
+          [
+            1786459920,
+            "771.38"
+          ],
+          [
+            1786459980,
+            "430.75666666666666"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.30.0.1",
+          "DstK8S_Name": "kubernetes",
+          "DstK8S_Namespace": "default",
+          "DstK8S_OwnerName": "kubernetes",
+          "DstK8S_OwnerType": "Service",
+          "DstK8S_Type": "Service",
+          "SrcAddr": "10.128.0.22",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "cluster-monitoring-operator-6d46cdd977-9zrbt",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "cluster-monitoring-operator",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459770,
+            "1284.2866666666666"
+          ],
+          [
+            1786459800,
+            "1303.2933333333333"
+          ],
+          [
+            1786459830,
+            "1309.66"
+          ],
+          [
+            1786459860,
+            "1313.2333333333333"
+          ],
+          [
+            1786459890,
+            "1320.29"
+          ],
+          [
+            1786459920,
+            "1321.2366666666667"
+          ],
+          [
+            1786459950,
+            "1314.27"
+          ],
+          [
+            1786459980,
+            "1314.78"
+          ],
+          [
+            1786460010,
+            "1318.48"
+          ],
+          [
+            1786460040,
+            "1319.1666666666667"
+          ],
+          [
+            1786460070,
+            "1335.5933333333332"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.30.0.1",
+          "DstK8S_Name": "kubernetes",
+          "DstK8S_Namespace": "default",
+          "DstK8S_OwnerName": "kubernetes",
+          "DstK8S_OwnerType": "Service",
+          "DstK8S_Type": "Service",
+          "SrcAddr": "10.128.0.25",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "console-operator-bb5cd8849-krtr7",
+          "SrcK8S_Namespace": "openshift-console-operator",
+          "SrcK8S_OwnerName": "console-operator",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459620,
+            "302.6566666666667"
+          ],
+          [
+            1786459650,
+            "444.5833333333333"
+          ],
+          [
+            1786459680,
+            "485.53333333333336"
+          ],
+          [
+            1786459710,
+            "499.23"
+          ],
+          [
+            1786459740,
+            "542.7733333333333"
+          ],
+          [
+            1786459770,
+            "557.2233333333334"
+          ],
+          [
+            1786459800,
+            "618.39"
+          ],
+          [
+            1786459830,
+            "640.27"
+          ],
+          [
+            1786459860,
+            "688.34"
+          ],
+          [
+            1786459890,
+            "681.36"
+          ],
+          [
+            1786460040,
+            "507.4066666666667"
+          ],
+          [
+            1786460070,
+            "530.24"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.30.0.1",
+          "DstK8S_Name": "kubernetes",
+          "DstK8S_Namespace": "default",
+          "DstK8S_OwnerName": "kubernetes",
+          "DstK8S_OwnerType": "Service",
+          "DstK8S_Type": "Service",
+          "SrcAddr": "10.128.0.51",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "netobserv-plugin-6684f47f6d-8l7cd",
+          "SrcK8S_Namespace": "netobserv",
+          "SrcK8S_OwnerName": "netobserv-plugin",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459620,
+            "677.5933333333334"
+          ],
+          [
+            1786459650,
+            "951.5166666666667"
+          ],
+          [
+            1786459680,
+            "1752.06"
+          ],
+          [
+            1786459710,
+            "1767.04"
+          ],
+          [
+            1786459740,
+            "1773.7"
+          ],
+          [
+            1786459770,
+            "1778.34"
+          ],
+          [
+            1786459800,
+            "1778.34"
+          ],
+          [
+            1786459830,
+            "1778.34"
+          ],
+          [
+            1786459860,
+            "1778.34"
+          ],
+          [
+            1786459890,
+            "1778.34"
+          ],
+          [
+            1786459920,
+            "1100.7466666666667"
+          ],
+          [
+            1786459950,
+            "826.8233333333334"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.30.0.1",
+          "DstK8S_Name": "kubernetes",
+          "DstK8S_Namespace": "default",
+          "DstK8S_OwnerName": "kubernetes",
+          "DstK8S_OwnerType": "Service",
+          "DstK8S_Type": "Service",
+          "SrcAddr": "10.128.0.53",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "console-68dc8d4f8d-p9nwg",
+          "SrcK8S_Namespace": "openshift-console",
+          "SrcK8S_OwnerName": "console",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459620,
+            "1205.9033333333334"
+          ],
+          [
+            1786459650,
+            "1245.4566666666667"
+          ],
+          [
+            1786459680,
+            "1285.7566666666667"
+          ],
+          [
+            1786459710,
+            "1338.4233333333334"
+          ],
+          [
+            1786459740,
+            "1391.6066666666666"
+          ],
+          [
+            1786459770,
+            "1422.9866666666667"
+          ],
+          [
+            1786459800,
+            "1457.0166666666667"
+          ],
+          [
+            1786459830,
+            "1474.7833333333333"
+          ],
+          [
+            1786459860,
+            "1529.6966666666667"
+          ],
+          [
+            1786459890,
+            "1547.44"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.30.0.1",
+          "DstK8S_Name": "kubernetes",
+          "DstK8S_Namespace": "default",
+          "DstK8S_OwnerName": "kubernetes",
+          "DstK8S_OwnerType": "Service",
+          "DstK8S_Type": "Service",
+          "SrcAddr": "10.129.0.14",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "prometheus-operator-86f64bd85d-86qgk",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "prometheus-operator",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786460010,
+            "635.12"
+          ],
+          [
+            1786460040,
+            "612.5733333333334"
+          ],
+          [
+            1786460070,
+            "612.26"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.30.0.1",
+          "DstK8S_Name": "kubernetes",
+          "DstK8S_Namespace": "default",
+          "DstK8S_OwnerName": "kubernetes",
+          "DstK8S_OwnerType": "Service",
+          "DstK8S_Type": "Service",
+          "SrcAddr": "10.129.0.31",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "console-56f5d88d88-qn55z",
+          "SrcK8S_Namespace": "openshift-console",
+          "SrcK8S_OwnerName": "console",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "1998.1866666666667"
+          ],
+          [
+            1786459620,
+            "3359.4766666666665"
+          ],
+          [
+            1786459650,
+            "3359.4766666666665"
+          ],
+          [
+            1786459680,
+            "3359.4766666666665"
+          ],
+          [
+            1786459710,
+            "3359.4766666666665"
+          ],
+          [
+            1786459740,
+            "3359.4766666666665"
+          ],
+          [
+            1786459770,
+            "3359.4766666666665"
+          ],
+          [
+            1786459800,
+            "3359.4766666666665"
+          ],
+          [
+            1786459830,
+            "3359.4766666666665"
+          ],
+          [
+            1786459860,
+            "3359.4766666666665"
+          ],
+          [
+            1786459890,
+            "1361.29"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.30.0.1",
+          "DstK8S_Name": "kubernetes",
+          "DstK8S_Namespace": "default",
+          "DstK8S_OwnerName": "kubernetes",
+          "DstK8S_OwnerType": "Service",
+          "DstK8S_Type": "Service",
+          "SrcAddr": "10.129.0.32",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "netobserv-controller-manager-6d85794888-jfpt2",
+          "SrcK8S_Namespace": "openshift-netobserv-operator",
+          "SrcK8S_OwnerName": "netobserv-controller-manager",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "1068.2166666666667"
+          ],
+          [
+            1786459620,
+            "1112.1066666666666"
+          ],
+          [
+            1786459650,
+            "1500.6833333333334"
+          ],
+          [
+            1786459680,
+            "1539.9466666666667"
+          ],
+          [
+            1786459710,
+            "1583.83"
+          ],
+          [
+            1786459740,
+            "1624.31"
+          ],
+          [
+            1786459770,
+            "1667.3066666666666"
+          ],
+          [
+            1786459800,
+            "1706.74"
+          ],
+          [
+            1786459830,
+            "1749.7133333333334"
+          ],
+          [
+            1786459860,
+            "1789.1966666666667"
+          ],
+          [
+            1786459890,
+            "768.6666666666666"
+          ],
+          [
+            1786459920,
+            "771.38"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.30.0.10",
+          "DstK8S_Name": "dns-default",
+          "DstK8S_Namespace": "openshift-dns",
+          "DstK8S_OwnerName": "dns-default",
+          "DstK8S_OwnerType": "Service",
+          "DstK8S_Type": "Service",
+          "SrcAddr": "10.128.0.53",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "console-68dc8d4f8d-p9nwg",
+          "SrcK8S_Namespace": "openshift-console",
+          "SrcK8S_OwnerName": "console",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459620,
+            "178.75333333333333"
+          ],
+          [
+            1786459680,
+            "330.1"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.30.0.10",
+          "DstK8S_Name": "dns-default",
+          "DstK8S_Namespace": "openshift-dns",
+          "DstK8S_OwnerName": "dns-default",
+          "DstK8S_OwnerType": "Service",
+          "DstK8S_Type": "Service",
+          "SrcAddr": "10.129.0.31",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "console-56f5d88d88-qn55z",
+          "SrcK8S_Namespace": "openshift-console",
+          "SrcK8S_OwnerName": "console",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "103.86666666666666"
+          ],
+          [
+            1786459620,
+            "160.40666666666667"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.30.10.138",
+          "DstK8S_Name": "netobserv-plugin",
+          "DstK8S_Namespace": "netobserv",
+          "DstK8S_OwnerName": "netobserv-plugin",
+          "DstK8S_OwnerType": "Service",
+          "DstK8S_Type": "Service",
+          "SrcAddr": "10.128.0.53",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "console-68dc8d4f8d-p9nwg",
+          "SrcK8S_Namespace": "openshift-console",
+          "SrcK8S_OwnerName": "console",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459620,
+            "755.8733333333333"
+          ],
+          [
+            1786459650,
+            "1302.8933333333334"
+          ],
+          [
+            1786459680,
+            "3071.88"
+          ],
+          [
+            1786459710,
+            "3083.7066666666665"
+          ],
+          [
+            1786459740,
+            "3095.173333333333"
+          ],
+          [
+            1786459770,
+            "3101.5266666666666"
+          ],
+          [
+            1786459800,
+            "3108.7"
+          ],
+          [
+            1786459830,
+            "3109.58"
+          ],
+          [
+            1786459860,
+            "3114.6133333333332"
+          ],
+          [
+            1786459890,
+            "3115.4933333333333"
+          ],
+          [
+            1786459920,
+            "2364.653333333333"
+          ],
+          [
+            1786459950,
+            "1818.5133333333333"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.30.15.194",
+          "DstK8S_Name": "loki",
+          "DstK8S_Namespace": "netobserv",
+          "DstK8S_OwnerName": "loki",
+          "DstK8S_OwnerType": "Service",
+          "DstK8S_Type": "Service",
+          "SrcAddr": "10.128.0.51",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "netobserv-plugin-6684f47f6d-8l7cd",
+          "SrcK8S_Namespace": "netobserv",
+          "SrcK8S_OwnerName": "netobserv-plugin",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459650,
+            "228.50333333333333"
+          ],
+          [
+            1786459680,
+            "576.9633333333334"
+          ],
+          [
+            1786459710,
+            "670.2433333333333"
+          ],
+          [
+            1786459740,
+            "670.2433333333333"
+          ],
+          [
+            1786459770,
+            "670.2433333333333"
+          ],
+          [
+            1786459800,
+            "670.2433333333333"
+          ],
+          [
+            1786459830,
+            "670.2433333333333"
+          ],
+          [
+            1786459860,
+            "670.2433333333333"
+          ],
+          [
+            1786459890,
+            "670.2433333333333"
+          ],
+          [
+            1786459920,
+            "582.16"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.30.15.194",
+          "DstK8S_Name": "loki",
+          "DstK8S_Namespace": "netobserv",
+          "DstK8S_OwnerName": "loki",
+          "DstK8S_OwnerType": "Service",
+          "DstK8S_Type": "Service",
+          "SrcAddr": "10.128.0.52",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "flowlogs-pipeline-7f6c7b955b-g89df",
+          "SrcK8S_Namespace": "netobserv",
+          "SrcK8S_OwnerName": "flowlogs-pipeline",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "1018.6266666666667"
+          ],
+          [
+            1786459620,
+            "4663.183333333333"
+          ],
+          [
+            1786459650,
+            "8657.853333333333"
+          ],
+          [
+            1786459680,
+            "13319.333333333334"
+          ],
+          [
+            1786459710,
+            "16342.98"
+          ],
+          [
+            1786459740,
+            "18397.403333333332"
+          ],
+          [
+            1786459770,
+            "20410.22"
+          ],
+          [
+            1786459800,
+            "22528.84"
+          ],
+          [
+            1786459830,
+            "24633.75"
+          ],
+          [
+            1786459860,
+            "26727.89"
+          ],
+          [
+            1786459890,
+            "27536.206666666665"
+          ],
+          [
+            1786459920,
+            "23891.65"
+          ],
+          [
+            1786459950,
+            "19896.98"
+          ],
+          [
+            1786459980,
+            "15235.5"
+          ],
+          [
+            1786460010,
+            "12211.853333333333"
+          ],
+          [
+            1786460040,
+            "10157.43"
+          ],
+          [
+            1786460070,
+            "8144.613333333334"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.30.15.194",
+          "DstK8S_Name": "loki",
+          "DstK8S_Namespace": "netobserv",
+          "DstK8S_OwnerName": "loki",
+          "DstK8S_OwnerType": "Service",
+          "DstK8S_Type": "Service",
+          "SrcAddr": "10.129.0.33",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "flowlogs-pipeline-7f6c7b955b-w64rp",
+          "SrcK8S_Namespace": "netobserv",
+          "SrcK8S_OwnerName": "flowlogs-pipeline",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "1668.6733333333334"
+          ],
+          [
+            1786459620,
+            "5157.823333333334"
+          ],
+          [
+            1786459650,
+            "7593.74"
+          ],
+          [
+            1786459680,
+            "10065.546666666667"
+          ],
+          [
+            1786459710,
+            "12423.643333333333"
+          ],
+          [
+            1786459740,
+            "14199.61"
+          ],
+          [
+            1786459770,
+            "15934.63"
+          ],
+          [
+            1786459800,
+            "17716.193333333333"
+          ],
+          [
+            1786459830,
+            "19465.16"
+          ],
+          [
+            1786459860,
+            "21137.803333333333"
+          ],
+          [
+            1786459890,
+            "21229.716666666667"
+          ],
+          [
+            1786459920,
+            "21442.156666666666"
+          ],
+          [
+            1786459950,
+            "22372.696666666667"
+          ],
+          [
+            1786459980,
+            "23515.963333333333"
+          ],
+          [
+            1786460010,
+            "24597.863333333335"
+          ],
+          [
+            1786460040,
+            "26330.233333333334"
+          ],
+          [
+            1786460070,
+            "28120.673333333332"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.30.55.52",
+          "DstK8S_Name": "thanos-querier",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "thanos-querier",
+          "DstK8S_OwnerType": "Service",
+          "DstK8S_Type": "Service",
+          "SrcAddr": "10.128.0.51",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "netobserv-plugin-6684f47f6d-8l7cd",
+          "SrcK8S_Namespace": "netobserv",
+          "SrcK8S_OwnerName": "netobserv-plugin",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459620,
+            "405.26666666666665"
+          ],
+          [
+            1786459650,
+            "543.55"
+          ],
+          [
+            1786459680,
+            "666.1533333333333"
+          ],
+          [
+            1786459710,
+            "682.0533333333333"
+          ],
+          [
+            1786459740,
+            "682.0533333333333"
+          ],
+          [
+            1786459770,
+            "682.0533333333333"
+          ],
+          [
+            1786459800,
+            "682.0533333333333"
+          ],
+          [
+            1786459830,
+            "682.0533333333333"
+          ],
+          [
+            1786459860,
+            "682.0533333333333"
+          ],
+          [
+            1786459890,
+            "682.0533333333333"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "172.30.55.52",
+          "DstK8S_Name": "thanos-querier",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "thanos-querier",
+          "DstK8S_OwnerType": "Service",
+          "DstK8S_Type": "Service",
+          "SrcAddr": "10.128.0.53",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "console-68dc8d4f8d-p9nwg",
+          "SrcK8S_Namespace": "openshift-console",
+          "SrcK8S_OwnerName": "console",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459620,
+            "182.10666666666665"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "2.18.67.10",
+          "SrcAddr": "10.0.1.132",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_OwnerType": "Node",
+          "SrcK8S_Type": "Node"
+        },
+        "values": [
+          [
+            1786459590,
+            "177.25"
+          ],
+          [
+            1786459620,
+            "177.25"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "23.15.3.134",
+          "SrcAddr": "10.0.1.132",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_OwnerType": "Node",
+          "SrcK8S_Type": "Node"
+        },
+        "values": [
+          [
+            1786459590,
+            "201.94333333333333"
+          ],
+          [
+            1786459620,
+            "201.94333333333333"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "82.67.17.14",
+          "SrcAddr": "10.0.1.132",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_OwnerType": "Node",
+          "SrcK8S_Type": "Node"
+        },
+        "values": [
+          [
+            1786459590,
+            "5802.076666666667"
+          ],
+          [
+            1786459620,
+            "39597.583333333336"
+          ],
+          [
+            1786459650,
+            "41933.83"
+          ],
+          [
+            1786459680,
+            "42990.52"
+          ],
+          [
+            1786459710,
+            "43111.46333333333"
+          ],
+          [
+            1786459740,
+            "43365.92"
+          ],
+          [
+            1786459770,
+            "43517.99"
+          ],
+          [
+            1786459800,
+            "43988.74333333333"
+          ],
+          [
+            1786459830,
+            "44131.16"
+          ],
+          [
+            1786459860,
+            "44462.03"
+          ],
+          [
+            1786459890,
+            "38941.19"
+          ],
+          [
+            1786459920,
+            "5506.516666666666"
+          ],
+          [
+            1786459950,
+            "3311.8566666666666"
+          ],
+          [
+            1786459980,
+            "2538.8866666666668"
+          ],
+          [
+            1786460010,
+            "2422.0666666666666"
+          ],
+          [
+            1786460040,
+            "2586.91"
+          ],
+          [
+            1786460070,
+            "2438.7033333333334"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "82.67.17.14",
+          "SrcAddr": "10.0.1.92",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_OwnerType": "Node",
+          "SrcK8S_Type": "Node"
+        },
+        "values": [
+          [
+            1786459590,
+            "2521.24"
+          ],
+          [
+            1786459620,
+            "14348.026666666667"
+          ],
+          [
+            1786459650,
+            "14826.733333333334"
+          ],
+          [
+            1786459680,
+            "16214.04"
+          ],
+          [
+            1786459710,
+            "16668.566666666666"
+          ],
+          [
+            1786459740,
+            "16848.52"
+          ],
+          [
+            1786459770,
+            "17173.31333333333"
+          ],
+          [
+            1786459800,
+            "17328.52666666667"
+          ],
+          [
+            1786459830,
+            "17332.006666666668"
+          ],
+          [
+            1786459860,
+            "17489.156666666666"
+          ],
+          [
+            1786459890,
+            "14971.396666666667"
+          ],
+          [
+            1786459920,
+            "3272.5866666666666"
+          ],
+          [
+            1786459950,
+            "2936.826666666667"
+          ],
+          [
+            1786459980,
+            "1751.1633333333334"
+          ],
+          [
+            1786460010,
+            "1437.14"
+          ],
+          [
+            1786460040,
+            "1462.2666666666667"
+          ],
+          [
+            1786460070,
+            "1277.7166666666667"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "82.67.17.14",
+          "SrcAddr": "10.128.0.15",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Name": "router-default-74c56bd696-qtgxw",
+          "SrcK8S_Namespace": "openshift-ingress",
+          "SrcK8S_OwnerName": "router-default",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "2521.24"
+          ],
+          [
+            1786459620,
+            "14348.026666666667"
+          ],
+          [
+            1786459650,
+            "14826.733333333334"
+          ],
+          [
+            1786459680,
+            "16214.04"
+          ],
+          [
+            1786459710,
+            "16668.566666666666"
+          ],
+          [
+            1786459740,
+            "16848.52"
+          ],
+          [
+            1786459770,
+            "17173.31333333333"
+          ],
+          [
+            1786459800,
+            "17328.52666666667"
+          ],
+          [
+            1786459830,
+            "17332.006666666668"
+          ],
+          [
+            1786459860,
+            "17489.156666666666"
+          ],
+          [
+            1786459890,
+            "14971.396666666667"
+          ],
+          [
+            1786459920,
+            "3272.5866666666666"
+          ],
+          [
+            1786459950,
+            "2936.826666666667"
+          ],
+          [
+            1786459980,
+            "1751.1633333333334"
+          ],
+          [
+            1786460010,
+            "1437.14"
+          ],
+          [
+            1786460040,
+            "1462.2666666666667"
+          ],
+          [
+            1786460070,
+            "1277.7166666666667"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "DstAddr": "82.67.17.14",
+          "SrcAddr": "10.129.0.6",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Name": "router-default-74c56bd696-jtvvt",
+          "SrcK8S_Namespace": "openshift-ingress",
+          "SrcK8S_OwnerName": "router-default",
+          "SrcK8S_OwnerType": "Deployment",
+          "SrcK8S_Type": "Pod"
+        },
+        "values": [
+          [
+            1786459590,
+            "5802.076666666667"
+          ],
+          [
+            1786459620,
+            "39597.583333333336"
+          ],
+          [
+            1786459650,
+            "41933.83"
+          ],
+          [
+            1786459680,
+            "42990.52"
+          ],
+          [
+            1786459710,
+            "43111.46333333333"
+          ],
+          [
+            1786459740,
+            "43365.92"
+          ],
+          [
+            1786459770,
+            "43517.99"
+          ],
+          [
+            1786459800,
+            "43988.74333333333"
+          ],
+          [
+            1786459830,
+            "44131.16"
+          ],
+          [
+            1786459860,
+            "44462.03"
+          ],
+          [
+            1786459890,
+            "38941.19"
+          ],
+          [
+            1786459920,
+            "5506.516666666666"
+          ],
+          [
+            1786459950,
+            "3311.8566666666666"
+          ],
+          [
+            1786459980,
+            "2538.8866666666668"
+          ],
+          [
+            1786460010,
+            "2422.0666666666666"
+          ],
+          [
+            1786460040,
+            "2586.91"
+          ],
+          [
+            1786460070,
+            "2438.7033333333334"
           ]
         ]
       }
     ],
     "stats": {
       "summary": {
-        "bytesProcessedPerSecond": 263971239,
-        "linesProcessedPerSecond": 401724,
-        "totalBytesProcessed": 211370848,
-        "totalLinesProcessed": 321675,
-        "execTime": 0.800734384,
-        "queueTime": 8.669621995,
+        "bytesProcessedPerSecond": 134361424,
+        "linesProcessedPerSecond": 142051,
+        "totalBytesProcessed": 58493041,
+        "totalLinesProcessed": 61841,
+        "execTime": 0.435341031,
+        "queueTime": 0.041917174,
         "subqueries": 0,
-        "totalEntriesReturned": 65,
-        "splits": 6,
-        "shards": 48,
-        "totalPostFilterLines": 199944,
-        "totalStructuredMetadataBytesProcessed": 0
+        "totalEntriesReturned": 84,
+        "splits": 13,
+        "shards": 13,
+        "totalPostFilterLines": 61701,
+        "totalStructuredMetadataBytesProcessed": 1521006
       },
       "querier": {
         "store": {
           "totalChunksRef": 0,
           "totalChunksDownloaded": 0,
           "chunksDownloadTime": 0,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
             "headChunkBytes": 0,
             "headChunkLines": 0,
@@ -2721,29 +4968,36 @@
             "postFilterLines": 0,
             "headChunkStructuredMetadataBytes": 0,
             "decompressedStructuredMetadataBytes": 0
-          }
+          },
+          "chunkRefsFetchTime": 0,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "ingester": {
-        "totalReached": 48,
-        "totalChunksMatched": 375,
-        "totalBatches": 394,
-        "totalLinesSent": 168379,
+        "totalReached": 13,
+        "totalChunksMatched": 331,
+        "totalBatches": 119,
+        "totalLinesSent": 53599,
         "store": {
-          "totalChunksRef": 16,
-          "totalChunksDownloaded": 16,
-          "chunksDownloadTime": 7874626,
+          "totalChunksRef": 4,
+          "totalChunksDownloaded": 4,
+          "chunksDownloadTime": 757082,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
-            "headChunkBytes": 18864260,
-            "headChunkLines": 28785,
-            "decompressedBytes": 192506588,
-            "decompressedLines": 292890,
-            "compressedBytes": 43190086,
-            "totalDuplicates": 0,
-            "postFilterLines": 199944,
-            "headChunkStructuredMetadataBytes": 0,
-            "decompressedStructuredMetadataBytes": 0
-          }
+            "headChunkBytes": 14925060,
+            "headChunkLines": 15192,
+            "decompressedBytes": 43567981,
+            "decompressedLines": 46649,
+            "compressedBytes": 9145813,
+            "totalDuplicates": 8050,
+            "postFilterLines": 61701,
+            "headChunkStructuredMetadataBytes": 121536,
+            "decompressedStructuredMetadataBytes": 1399470
+          },
+          "chunkRefsFetchTime": 1088715,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "cache": {
@@ -2754,7 +5008,8 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "index": {
           "entriesFound": 0,
@@ -2763,26 +5018,75 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "result": {
-          "entriesFound": 4,
-          "entriesRequested": 6,
-          "entriesStored": 3,
-          "bytesReceived": 63652,
+          "entriesFound": 0,
+          "entriesRequested": 12,
+          "entriesStored": 12,
+          "bytesReceived": 0,
           "bytesSent": 0,
-          "requests": 9,
-          "downloadTime": 66646
+          "requests": 24,
+          "downloadTime": 269899,
+          "queryLengthServed": 0
         },
         "statsResult": {
+          "entriesFound": 11,
+          "entriesRequested": 11,
+          "entriesStored": 4,
+          "bytesReceived": 4785,
+          "bytesSent": 0,
+          "requests": 15,
+          "downloadTime": 76517,
+          "queryLengthServed": 5070000000000
+        },
+        "volumeResult": {
           "entriesFound": 0,
           "entriesRequested": 0,
           "entriesStored": 0,
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "seriesResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "labelResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "instantMetricResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
         }
+      },
+      "index": {
+        "totalChunks": 0,
+        "postFilterChunks": 0,
+        "shardsDuration": 0,
+        "usedBloomFilters": false
       }
     }
   }

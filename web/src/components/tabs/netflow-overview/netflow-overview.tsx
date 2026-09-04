@@ -33,6 +33,7 @@ import { getDSCPServiceClassName } from '../../../utils/dscp';
 import { getStructuredHTTPError, StructuredError } from '../../../utils/errors';
 import { valueFormat } from '../../../utils/format';
 import { localStorageOverviewKebabKey, useLocalStorage } from '../../../utils/local-storage-hook';
+import { isUnknownPeer } from '../../../utils/metrics';
 import { observeDOMRect, toNamedMetric } from '../../../utils/metrics-helper';
 import {
   customPanelMatcher,
@@ -845,6 +846,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
         case 'dropped_packet_rates': {
           const isDrop = id.startsWith('dropped');
           const options = getKebabOptions(id, {
+            showInternal: true,
             showOutOfScope: false,
             showTop: true,
             showApp: { text: t('Show total'), value: !isDrop },
@@ -854,7 +856,13 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
           const showTopOnly = options.showTop && !options.showApp?.value && !options.showAppDrop?.value;
           const metricType = id.endsWith('byte_rates') ? 'Bytes' : 'Packets';
           const topKMetrics = getTopKRateMetrics(id);
-          const filteredTopk = topKMetrics.or([]).filter(m => m.source.id !== m.destination.id);
+          let rateMetrics = topKMetrics.or([]);
+          if (options.showInternal === false) {
+            rateMetrics = rateMetrics.filter(m => !m.isInternal);
+          }
+          if (options.showOutOfScope === false) {
+            rateMetrics = rateMetrics.filter(m => !isUnknownPeer(m.source) || !isUnknownPeer(m.destination));
+          }
           if (showTopOnly) {
             return {
               calculatedTitle: info.topTitle,
@@ -864,7 +872,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
                 <MetricsGraph
                   id={id}
                   metricType={metricType}
-                  metrics={filteredTopk}
+                  metrics={rateMetrics}
                   metricFunction="rate"
                   limit={props.limit}
                   showBar={false}
@@ -894,12 +902,12 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
             calculatedTitle: showTotalOnly ? info.totalTitle : undefined,
             element: panelError ? (
               <PanelErrorIndicator error={panelError} metricType={metricType} showDetails={!isFocus} />
-            ) : !_.isEmpty(filteredTopk) || namedTotalMetric.result || namedTotalDroppedMetric.result ? (
+            ) : !_.isEmpty(rateMetrics) || namedTotalMetric.result || namedTotalDroppedMetric.result ? (
               <MetricsGraphWithTotal
                 id={id}
                 metricType={metricType}
                 metricFunction="rate"
-                topKMetrics={filteredTopk}
+                topKMetrics={rateMetrics}
                 totalMetric={namedTotalMetric.result}
                 totalDropMetric={namedTotalDroppedMetric.result}
                 limit={props.limit}
@@ -907,6 +915,7 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
                 showTop={options.showTop!}
                 showTotal={options.showApp?.value || false}
                 showTotalDrop={options.showAppDrop?.value || false}
+                showInternal={options.showInternal}
                 showOutOfScope={options.showOutOfScope!}
                 smallerTexts={smallerTexts}
                 showOthers={false}

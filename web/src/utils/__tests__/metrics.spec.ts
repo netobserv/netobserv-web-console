@@ -1,209 +1,35 @@
 import { TFunction } from 'i18next';
-import {
-  GenericMetric,
-  MetricStats,
-  RawTopologyMetrics,
-  TopologyMetricPeer,
-  TopologyMetrics
-} from '../../api/query-response';
+import { MetricStats, TopologyMetricPeer, TopologyMetrics } from '../../api/query-response';
 import { ScopeDefSample } from '../../components/__tests-data__/scopes';
 import { NodeData } from '../../model/topology';
 import { ContextSingleton } from '../context';
 import {
-  calibrateRange,
   computeStats,
   createPeer,
   getFormattedValue,
+  hydratePeer,
+  hydrateTopologyMetrics,
   matchPeer,
-  mergeTlsIntoTopologyMetrics,
-  mergeTlsVersionUsageMetrics,
-  normalizeMetrics,
-  parseGenericMetrics,
-  parseTopologyMetrics
+  mergeTlsIntoTopologyMetrics
 } from '../metrics';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const t = (k: string) => k as any;
 
-describe('normalize and computeStats', () => {
-  beforeEach(() => {
-    ContextSingleton.setScopes(ScopeDefSample);
-  });
-
-  it('should normalize and compute simple stats', () => {
-    const values: [number, unknown][] = [
-      [1664372000, '5'],
-      [1664372015, '5'],
-      [1664372030, '5'],
-      [1664372045, '5'],
-      [1664372060, '5'],
-      [1664372075, '5'],
-      [1664372090, '5'],
-      [1664372105, '10'],
-      [1664372120, '10'],
-      [1664372135, '10'],
-      [1664372150, '10'],
-      [1664372165, '10'],
-      [1664372180, '10'],
-      [1664372195, '10'],
-      [1664372210, '8'],
-      [1664372225, '8'],
-      [1664372240, '8'],
-      [1664372255, '8'],
-      [1664372270, '8'],
-      [1664372285, '8'],
-      [1664372300, '8']
-    ];
-
-    const { start, end, step } = calibrateRange([values], { from: 1664372000, to: 1664372300 }, 1664372300, true);
-    const norm = normalizeMetrics(values, start, end, step, true);
-    expect(norm).toEqual([
+describe('computeStats', () => {
+  it('computes avg/min/max/total from numeric series', () => {
+    const norm: [number, number][] = [
       [1664372000, 5],
-      [1664372015, 5],
-      [1664372030, 5],
-      [1664372045, 5],
-      [1664372060, 5],
-      [1664372075, 5],
-      [1664372090, 5],
       [1664372105, 10],
-      [1664372120, 10],
-      [1664372135, 10],
-      [1664372150, 10],
-      [1664372165, 10],
-      [1664372180, 10],
-      [1664372195, 10],
       [1664372210, 8],
-      [1664372225, 8],
-      [1664372240, 8],
-      [1664372255, 8],
-      [1664372270, 8],
-      [1664372285, 8],
       [1664372300, 8]
-    ]);
-
+    ];
     const stats = computeStats(norm);
-
     expect(stats.latest).toEqual(8);
     expect(stats.min).toEqual(5);
     expect(stats.max).toEqual(10);
-    expect(stats.avg).toEqual(7.67 /* 161/21 */);
-    expect(stats.total).toEqual(2300 /* 7.67*300 */);
-  });
-
-  it('should normalize and compute stats with missing close to "now"', () => {
-    // Building data so that there is a missing datapoint at +300s, which is close to "now"
-    // This missing datapoint should be ignored for tolerance, rather than counted as a zero
-    const now = Math.floor(new Date().getTime() / 1000);
-    const first = now - 330;
-    const values: [number, unknown][] = [
-      [first, '5'],
-      [first + 15, '5'],
-      [first + 30, '5'],
-      [first + 45, '5'],
-      [first + 60, '5'],
-      [first + 75, '5'],
-      [first + 90, '5'],
-      [first + 105, '10'],
-      [first + 120, '10'],
-      [first + 135, '10'],
-      [first + 150, '10'],
-      [first + 165, '10'],
-      [first + 180, '10'],
-      [first + 195, '10'],
-      [first + 210, '8'],
-      [first + 225, '8'],
-      [first + 240, '8'],
-      [first + 255, '8'],
-      [first + 270, '8'],
-      [first + 285, '8']
-    ];
-
-    const { start, end, step } = calibrateRange([values], 300, now, true);
-    const norm = normalizeMetrics(values, start, end, step, true);
-    expect(norm).toEqual([
-      [first, 5],
-      [first + 15, 5],
-      [first + 30, 5],
-      [first + 45, 5],
-      [first + 60, 5],
-      [first + 75, 5],
-      [first + 90, 5],
-      [first + 105, 10],
-      [first + 120, 10],
-      [first + 135, 10],
-      [first + 150, 10],
-      [first + 165, 10],
-      [first + 180, 10],
-      [first + 195, 10],
-      [first + 210, 8],
-      [first + 225, 8],
-      [first + 240, 8],
-      [first + 255, 8],
-      [first + 270, 8],
-      [first + 285, 8]
-    ]);
-
-    const stats = computeStats(norm);
-
-    expect(stats.latest).toEqual(8);
-    expect(stats.min).toEqual(5);
-    expect(stats.max).toEqual(10);
-    expect(stats.avg).toEqual(7.65 /* 153/20 */);
-    expect(stats.total).toEqual(2180 /* 7.65*285 */);
-  });
-
-  it('should normalize and compute stats with missing data points', () => {
-    // No data between 1664372105 and 1664372195
-    const values: [number, unknown][] = [
-      [1664372000, '5'],
-      [1664372015, '5'],
-      [1664372030, '5'],
-      [1664372045, '5'],
-      [1664372060, '5'],
-      [1664372075, '5'],
-      [1664372090, '5'],
-      [1664372210, '8'],
-      [1664372225, '8'],
-      [1664372240, '8'],
-      [1664372255, '8'],
-      [1664372270, '8'],
-      [1664372285, '8'],
-      [1664372300, '8']
-    ];
-
-    const { start, end, step } = calibrateRange([values], { from: 1664372000, to: 1664372300 }, 1664372300, true);
-    const norm = normalizeMetrics(values, start, end, step, true);
-    expect(norm).toEqual([
-      [1664372000, 5],
-      [1664372015, 5],
-      [1664372030, 5],
-      [1664372045, 5],
-      [1664372060, 5],
-      [1664372075, 5],
-      [1664372090, 5],
-      [1664372105, 0],
-      [1664372120, 0],
-      [1664372135, 0],
-      [1664372150, 0],
-      [1664372165, 0],
-      [1664372180, 0],
-      [1664372195, 0],
-      [1664372210, 8],
-      [1664372225, 8],
-      [1664372240, 8],
-      [1664372255, 8],
-      [1664372270, 8],
-      [1664372285, 8],
-      [1664372300, 8]
-    ]);
-
-    const stats = computeStats(norm);
-
-    expect(stats.latest).toEqual(8);
-    expect(stats.min).toEqual(0);
-    expect(stats.max).toEqual(8);
-    expect(stats.avg).toEqual(4.33 /* 91/21 */);
-    expect(stats.total).toEqual(1300 /* 4.33*300 */);
+    expect(stats.avg).toEqual(7.75);
+    expect(stats.total).toEqual(2325 /* 7.75*300 */);
   });
 });
 
@@ -381,81 +207,48 @@ describe('matchBidirectional', () => {
   });
 });
 
-describe('parseTopologyMetrics', () => {
-  it('should disambiguate same names', () => {
-    const metrics: RawTopologyMetrics[] = [
-      {
-        metric: {
-          SrcK8S_Name: 'A',
-          SrcK8S_Namespace: 'ns1',
-          SrcK8S_Type: 'Pod',
-          DstK8S_Name: 'B',
-          DstK8S_Namespace: 'ns1',
-          DstK8S_Type: 'Pod'
-        },
-        values: []
-      },
-      {
-        metric: {
-          SrcK8S_Name: 'A',
-          SrcK8S_Namespace: 'ns1',
-          SrcK8S_Type: 'Pod',
-          DstK8S_Name: 'B',
-          DstK8S_Namespace: 'ns1',
-          DstK8S_Type: 'Service'
-        },
-        values: []
-      }
-    ];
-
-    const parsed = parseTopologyMetrics(metrics, 300, 'resource', 0, true) as TopologyMetrics[];
-
-    expect(parsed).toHaveLength(2);
-    expect(parsed[0].source.getDisplayName(true, true)).toEqual('ns1.A');
-    expect(parsed[0].destination.getDisplayName(true, true)).toEqual('ns1.B (pod)');
-    expect(parsed[1].source.getDisplayName(true, true)).toEqual('ns1.A');
-    expect(parsed[1].destination.getDisplayName(true, true)).toEqual('ns1.B (svc)');
-  });
-});
-
-describe('parseGenericMetrics', () => {
-  it('should attach TLSVersion and TLSGroup from matrix labels', () => {
-    const metrics: RawTopologyMetrics[] = [
-      {
-        metric: {
-          SrcK8S_Name: 'A',
-          SrcK8S_Type: 'Pod',
-          DstK8S_Name: 'B',
-          DstK8S_Type: 'Pod',
-          TLSVersion: 'TLS 1.3',
-          TLSGroup: 'X25519MLKEM768'
-        },
-        values: [[1, 1]]
-      }
-    ];
-    const parsed = parseGenericMetrics(metrics, 300, 'SrcK8S_Name', 0, true);
-    expect(parsed[0].name).toBe('A');
-    expect(parsed[0].tls?.versions).toEqual(['TLS 1.3']);
-    expect(parsed[0].tls?.groups).toEqual(['X25519MLKEM768']);
+describe('hydrateTopologyMetrics', () => {
+  beforeEach(() => {
+    ContextSingleton.setScopes(ScopeDefSample);
   });
 
-  it('should not attach TLSTypes (omitted from topology TLS aggregation)', () => {
-    const metrics: RawTopologyMetrics[] = [
+  it('should attach getDisplayName for resource peers from JSON', () => {
+    const hydrated = hydrateTopologyMetrics([
       {
-        metric: {
-          SrcK8S_Name: 'A',
-          SrcK8S_Type: 'Pod',
-          DstK8S_Name: 'B',
-          DstK8S_Type: 'Pod',
-          TLSTypes: ['ClientHello'],
-          TLSVersion: 'TLS 1.3'
+        source: {
+          id: 'r=Pod.A',
+          resource: { name: 'A', type: 'Pod' },
+          resourceKind: 'Pod',
+          isAmbiguous: false,
+          namespace: 'ns1',
+          getDisplayName: () => undefined
         },
-        values: [[1, 1]]
+        destination: {
+          id: 'namespace=default',
+          resourceKind: 'Namespace',
+          isAmbiguous: false,
+          namespace: 'default',
+          getDisplayName: () => undefined
+        },
+        values: [[1, 2]],
+        stats: { sum: 2, latest: 2, avg: 2, min: 2, max: 2, percentiles: [2, 2], total: 0 },
+        scope: 'resource'
       }
-    ];
-    const parsed = parseGenericMetrics(metrics, 300, 'SrcK8S_Name', 0, true);
-    expect(parsed[0].tls?.versions).toEqual(['TLS 1.3']);
-    expect(parsed[0].tls).not.toHaveProperty('types');
+    ]);
+    expect(hydratePeer(hydrated[0].source).getDisplayName(true, false)).toEqual('ns1.A');
+    expect(hydrated[0].destination.getDisplayName(false, false)).toEqual('default');
+  });
+
+  it('should disambiguate display names when isAmbiguous is set by backend', () => {
+    const peer = hydratePeer({
+      id: 'r=Service.B',
+      resource: { name: 'B', type: 'Service' },
+      resourceKind: 'Service',
+      isAmbiguous: true,
+      namespace: 'ns1'
+    });
+    expect(peer.getDisplayName(true, true)).toEqual('ns1.B (svc)');
+    expect(peer.getDisplayName(true, false)).toEqual('ns1.B');
   });
 });
 
@@ -492,85 +285,6 @@ describe('mergeTlsIntoTopologyMetrics', () => {
     ];
     const out = mergeTlsIntoTopologyMetrics(vol, tlsRows);
     expect(out[0].tls).toBeUndefined();
-  });
-});
-
-describe('mergeTlsVersionUsageMetrics', () => {
-  it('merges duplicate version rows by summing aligned datapoints', () => {
-    const valuesA: [number, number][] = [
-      [100, 1],
-      [200, 2]
-    ];
-    const valuesB: [number, number][] = [
-      [100, 10],
-      [200, 20]
-    ];
-    const a: GenericMetric = {
-      name: 'TLS 1.3',
-      values: valuesA,
-      stats: computeStats(valuesA),
-      aggregateBy: 'TLSVersion'
-    };
-    const b: GenericMetric = {
-      name: 'TLS 1.3',
-      values: valuesB,
-      stats: computeStats(valuesB),
-      aggregateBy: 'TLSVersion'
-    };
-    const merged = mergeTlsVersionUsageMetrics([a, b]);
-    expect(merged).toHaveLength(1);
-    expect(merged[0].metric.name).toBe('TLS 1.3');
-    expect(merged[0].metric.values).toEqual([
-      [100, 11],
-      [200, 22]
-    ]);
-  });
-
-  it('keeps distinct TLSVersion label strings as separate buckets', () => {
-    const valuesA: [number, number][] = [[1, 5]];
-    const valuesB: [number, number][] = [[1, 5]];
-    const merged = mergeTlsVersionUsageMetrics([
-      { name: 'TLS 1.3', values: valuesA, stats: computeStats(valuesA), aggregateBy: 'TLSVersion' },
-      { name: '0x0304', values: valuesB, stats: computeStats(valuesB), aggregateBy: 'TLSVersion' }
-    ]);
-    expect(merged).toHaveLength(2);
-    const names = merged.map(m => m.metric.name).sort();
-    expect(names).toEqual(['0x0304', 'TLS 1.3']);
-  });
-
-  it('keeps non-standard hex TLSVersion labels', () => {
-    const values: [number, number][] = [[1, 9]];
-    const merged = mergeTlsVersionUsageMetrics([
-      { name: '0xFAFA', values, stats: computeStats(values), aggregateBy: 'TLSVersion' }
-    ]);
-    expect(merged).toHaveLength(1);
-    expect(merged[0].metric.name).toBe('0xFAFA');
-    expect(merged[0].filterValue).toBe('0xFAFA');
-  });
-
-  it('merges when the first duplicate row has empty values', () => {
-    const emptyValues: [number, number][] = [];
-    const datapoints: [number, number][] = [
-      [100, 3],
-      [200, 7]
-    ];
-    const merged = mergeTlsVersionUsageMetrics([
-      {
-        name: 'TLS 1.3',
-        values: emptyValues,
-        stats: computeStats(emptyValues),
-        aggregateBy: 'TLSVersion'
-      },
-      {
-        name: 'TLS 1.3',
-        values: datapoints,
-        stats: computeStats(datapoints),
-        aggregateBy: 'TLSVersion'
-      }
-    ]);
-    expect(merged).toHaveLength(1);
-    expect(merged[0].metric.values).toEqual(datapoints);
-    expect(merged[0].filterValue).toBe('TLS 1.3');
   });
 });
 

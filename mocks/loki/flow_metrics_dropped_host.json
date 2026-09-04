@@ -5,55 +5,328 @@
     "result": [
       {
         "metric": {
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal"
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal"
         },
         "values": [
           [
-            1708011360,
-            "0.041666666666666664"
+            1786459590,
+            "0.17666666666666667"
           ],
           [
-            1708011720,
-            "0.6236111111111111"
+            1786459620,
+            "1.16"
+          ],
+          [
+            1786459650,
+            "2.1233333333333335"
+          ],
+          [
+            1786459680,
+            "3.1366666666666667"
+          ],
+          [
+            1786459710,
+            "4.116666666666666"
+          ],
+          [
+            1786459740,
+            "5.206666666666667"
+          ],
+          [
+            1786459770,
+            "6.1866666666666665"
+          ],
+          [
+            1786459800,
+            "7.18"
+          ],
+          [
+            1786459830,
+            "8.16"
+          ],
+          [
+            1786459860,
+            "9.183333333333334"
+          ],
+          [
+            1786459890,
+            "10.003333333333334"
+          ],
+          [
+            1786459920,
+            "10.036666666666667"
+          ],
+          [
+            1786459950,
+            "10.123333333333333"
+          ],
+          [
+            1786459980,
+            "10.06"
+          ],
+          [
+            1786460010,
+            "10.146666666666667"
+          ],
+          [
+            1786460040,
+            "10.136666666666667"
+          ],
+          [
+            1786460070,
+            "10.1"
           ]
         ]
       },
       {
         "metric": {
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal"
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal"
         },
         "values": [
           [
-            1708011360,
-            "0.036111111111111115"
+            1786459590,
+            "0.15666666666666668"
           ],
           [
-            1708011720,
-            "0.49166666666666664"
+            1786459620,
+            "1.4233333333333333"
+          ],
+          [
+            1786459650,
+            "2.59"
+          ],
+          [
+            1786459680,
+            "3.7666666666666666"
+          ],
+          [
+            1786459710,
+            "4.8966666666666665"
+          ],
+          [
+            1786459740,
+            "6.043333333333333"
+          ],
+          [
+            1786459770,
+            "7.173333333333333"
+          ],
+          [
+            1786459800,
+            "8.44"
+          ],
+          [
+            1786459830,
+            "9.626666666666667"
+          ],
+          [
+            1786459860,
+            "10.8"
+          ],
+          [
+            1786459890,
+            "11.82"
+          ],
+          [
+            1786459920,
+            "11.683333333333334"
+          ],
+          [
+            1786459950,
+            "11.733333333333333"
+          ],
+          [
+            1786459980,
+            "11.76"
+          ],
+          [
+            1786460010,
+            "11.793333333333333"
+          ],
+          [
+            1786460040,
+            "11.793333333333333"
+          ],
+          [
+            1786460070,
+            "11.813333333333333"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal"
+        },
+        "values": [
+          [
+            1786459590,
+            "0.18"
+          ],
+          [
+            1786459620,
+            "0.30333333333333334"
+          ],
+          [
+            1786459650,
+            "0.31666666666666665"
+          ],
+          [
+            1786459680,
+            "0.32666666666666666"
+          ],
+          [
+            1786459710,
+            "0.3433333333333333"
+          ],
+          [
+            1786459740,
+            "0.3466666666666667"
+          ],
+          [
+            1786459770,
+            "0.35"
+          ],
+          [
+            1786459800,
+            "0.3566666666666667"
+          ],
+          [
+            1786459830,
+            "0.37"
+          ],
+          [
+            1786459860,
+            "0.38"
+          ],
+          [
+            1786459890,
+            "0.20333333333333334"
+          ],
+          [
+            1786459920,
+            "0.08333333333333333"
+          ],
+          [
+            1786459950,
+            "0.08666666666666667"
+          ],
+          [
+            1786459980,
+            "0.11"
+          ],
+          [
+            1786460010,
+            "0.11"
+          ],
+          [
+            1786460040,
+            "0.11"
+          ],
+          [
+            1786460070,
+            "0.11333333333333333"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal"
+        },
+        "values": [
+          [
+            1786459590,
+            "14.053333333333333"
+          ],
+          [
+            1786459620,
+            "29.583333333333332"
+          ],
+          [
+            1786459650,
+            "42.53333333333333"
+          ],
+          [
+            1786459680,
+            "56.55"
+          ],
+          [
+            1786459710,
+            "72.20666666666666"
+          ],
+          [
+            1786459740,
+            "86.09666666666666"
+          ],
+          [
+            1786459770,
+            "100.27333333333333"
+          ],
+          [
+            1786459800,
+            "113.57666666666667"
+          ],
+          [
+            1786459830,
+            "126.3"
+          ],
+          [
+            1786459860,
+            "140.43"
+          ],
+          [
+            1786459890,
+            "141.13"
+          ],
+          [
+            1786459920,
+            "139.53666666666666"
+          ],
+          [
+            1786459950,
+            "139.62666666666667"
+          ],
+          [
+            1786459980,
+            "135.54"
+          ],
+          [
+            1786460010,
+            "132.45666666666668"
+          ],
+          [
+            1786460040,
+            "133.99"
+          ],
+          [
+            1786460070,
+            "132.19666666666666"
           ]
         ]
       }
     ],
     "stats": {
       "summary": {
-        "bytesProcessedPerSecond": 379050316,
-        "linesProcessedPerSecond": 577163,
-        "totalBytesProcessed": 221936446,
-        "totalLinesProcessed": 337933,
-        "execTime": 0.585506558,
-        "queueTime": 5.295528995,
+        "bytesProcessedPerSecond": 192477954,
+        "linesProcessedPerSecond": 202821,
+        "totalBytesProcessed": 60675320,
+        "totalLinesProcessed": 63936,
+        "execTime": 0.315232568,
+        "queueTime": 0.042929042,
         "subqueries": 0,
-        "totalEntriesReturned": 2,
-        "splits": 6,
-        "shards": 48,
-        "totalPostFilterLines": 810,
-        "totalStructuredMetadataBytesProcessed": 0
+        "totalEntriesReturned": 4,
+        "splits": 13,
+        "shards": 13,
+        "totalPostFilterLines": 3100,
+        "totalStructuredMetadataBytesProcessed": 1583856
       },
       "querier": {
         "store": {
           "totalChunksRef": 0,
           "totalChunksDownloaded": 0,
           "chunksDownloadTime": 0,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
             "headChunkBytes": 0,
             "headChunkLines": 0,
@@ -64,29 +337,36 @@
             "postFilterLines": 0,
             "headChunkStructuredMetadataBytes": 0,
             "decompressedStructuredMetadataBytes": 0
-          }
+          },
+          "chunkRefsFetchTime": 0,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "ingester": {
-        "totalReached": 48,
-        "totalChunksMatched": 375,
-        "totalBatches": 56,
-        "totalLinesSent": 802,
+        "totalReached": 13,
+        "totalChunksMatched": 331,
+        "totalBatches": 19,
+        "totalLinesSent": 2685,
         "store": {
-          "totalChunksRef": 16,
-          "totalChunksDownloaded": 16,
-          "chunksDownloadTime": 7855086,
+          "totalChunksRef": 4,
+          "totalChunksDownloaded": 4,
+          "chunksDownloadTime": 3599927,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
-            "headChunkBytes": 18755808,
-            "headChunkLines": 28594,
-            "decompressedBytes": 203180638,
-            "decompressedLines": 309339,
-            "compressedBytes": 43253118,
-            "totalDuplicates": 0,
-            "postFilterLines": 810,
-            "headChunkStructuredMetadataBytes": 0,
-            "decompressedStructuredMetadataBytes": 0
-          }
+            "headChunkBytes": 14925060,
+            "headChunkLines": 15192,
+            "decompressedBytes": 45750260,
+            "decompressedLines": 48744,
+            "compressedBytes": 9145813,
+            "totalDuplicates": 403,
+            "postFilterLines": 3100,
+            "headChunkStructuredMetadataBytes": 121536,
+            "decompressedStructuredMetadataBytes": 1462320
+          },
+          "chunkRefsFetchTime": 1023912,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "cache": {
@@ -97,7 +377,8 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "index": {
           "entriesFound": 0,
@@ -106,26 +387,75 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "result": {
-          "entriesFound": 4,
-          "entriesRequested": 6,
-          "entriesStored": 3,
-          "bytesReceived": 1372,
+          "entriesFound": 0,
+          "entriesRequested": 12,
+          "entriesStored": 12,
+          "bytesReceived": 0,
           "bytesSent": 0,
-          "requests": 9,
-          "downloadTime": 63334
+          "requests": 24,
+          "downloadTime": 401810,
+          "queryLengthServed": 0
         },
         "statsResult": {
+          "entriesFound": 11,
+          "entriesRequested": 11,
+          "entriesStored": 0,
+          "bytesReceived": 2893,
+          "bytesSent": 0,
+          "requests": 11,
+          "downloadTime": 106550,
+          "queryLengthServed": 6000000000000
+        },
+        "volumeResult": {
           "entriesFound": 0,
           "entriesRequested": 0,
           "entriesStored": 0,
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "seriesResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "labelResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "instantMetricResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
         }
+      },
+      "index": {
+        "totalChunks": 0,
+        "postFilterChunks": 0,
+        "shardsDuration": 0,
+        "usedBloomFilters": false
       }
     }
   }

@@ -7,7 +7,8 @@ import { Field, Flow, Record } from './ipfix';
 
 export interface AggregatedQueryResponse {
   resultType: string;
-  result: StreamResult[] | RawTopologyMetrics[];
+  /** streams | topologyMetrics | genericMetrics */
+  result: StreamResult[] | TopologyMetrics[] | GenericMetric[];
   stats: Stats;
   unixTimestamp: number;
 }
@@ -50,17 +51,10 @@ export const parseStream = (raw: StreamResult): Record[] => {
   });
 };
 
-export type RawTopologyMetric = Flow;
-
-export interface RawTopologyMetrics {
-  metric: RawTopologyMetric;
-  values: [number, unknown][];
-}
-
-export interface NameAndType {
+export type NameAndType = {
   name: string;
   type: string;
-}
+};
 
 export interface TopologyMetricPeer {
   id: string;

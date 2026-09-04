@@ -5,270 +5,328 @@
     "result": [
       {
         "metric": {
-          "DstK8S_HostName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal"
+          "DstK8S_HostName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal"
         },
         "values": [
           [
-            1708009560,
-            "30.462500000000002"
+            1786459590,
+            "350307.36666666664"
           ],
           [
-            1708009920,
-            "83.63333333333333"
+            1786459620,
+            "754836.2433333333"
           ],
           [
-            1708010280,
-            "106.85972222222223"
+            1786459650,
+            "1142738.3466666667"
           ],
           [
-            1708010640,
-            "107.56805555555555"
+            1786459680,
+            "1508551.4466666668"
           ],
           [
-            1708011000,
-            "106.51805555555556"
+            1786459710,
+            "1868090.5166666666"
           ],
           [
-            1708011360,
-            "109.6125"
+            1786459740,
+            "2225712.783333333"
           ],
           [
-            1708011720,
-            "110.91944444444444"
+            1786459770,
+            "2583431.0733333332"
+          ],
+          [
+            1786459800,
+            "2941807.07"
+          ],
+          [
+            1786459830,
+            "3299821.51"
+          ],
+          [
+            1786459860,
+            "3657704.0966666667"
+          ],
+          [
+            1786459890,
+            "3665047.5833333335"
+          ],
+          [
+            1786459920,
+            "3615905.026666667"
+          ],
+          [
+            1786459950,
+            "3582774.64"
+          ],
+          [
+            1786459980,
+            "3572243.84"
+          ],
+          [
+            1786460010,
+            "3567186.8366666664"
+          ],
+          [
+            1786460040,
+            "3565046.4166666665"
+          ],
+          [
+            1786460070,
+            "3564861.216666667"
           ]
         ]
       },
       {
         "metric": {
-          "DstK8S_HostName": "ip-10-0-1-137.ec2.internal"
+          "DstK8S_HostName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal"
         },
         "values": [
           [
-            1708009560,
-            "0.004166666666666667"
+            1786459590,
+            "10359.386666666667"
           ],
           [
-            1708009920,
-            "0.016666666666666666"
+            1786459620,
+            "61248.64333333333"
           ],
           [
-            1708010280,
-            "0.034722222222222224"
+            1786459650,
+            "76923.68666666666"
           ],
           [
-            1708010640,
-            "0.041666666666666664"
+            1786459680,
+            "103639.8"
           ],
           [
-            1708011000,
-            "0.06388888888888888"
+            1786459710,
+            "115155.61666666667"
           ],
           [
-            1708011360,
-            "0.04861111111111111"
+            1786459740,
+            "134396.97666666665"
           ],
           [
-            1708011720,
-            "0.02361111111111111"
+            1786459770,
+            "146753.3"
+          ],
+          [
+            1786459800,
+            "167917.41"
+          ],
+          [
+            1786459830,
+            "178954.16"
+          ],
+          [
+            1786459860,
+            "199856.55"
+          ],
+          [
+            1786459890,
+            "200362.73333333334"
+          ],
+          [
+            1786459920,
+            "170608.43333333332"
+          ],
+          [
+            1786459950,
+            "165946.76666666666"
+          ],
+          [
+            1786459980,
+            "158551.85333333333"
+          ],
+          [
+            1786460010,
+            "158005.40666666668"
+          ],
+          [
+            1786460040,
+            "159385.43333333332"
+          ],
+          [
+            1786460070,
+            "157415.04"
           ]
         ]
       },
       {
         "metric": {
-          "DstK8S_HostName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal"
+          "SrcK8S_HostName": "ip-10-0-1-132.ec2.internal"
         },
         "values": [
           [
-            1708009560,
-            "31.53055555555556"
+            1786459590,
+            "24214.003333333334"
           ],
           [
-            1708009920,
-            "83.43611111111112"
+            1786459620,
+            "100802.89666666667"
           ],
           [
-            1708010280,
-            "104.72083333333335"
+            1786459650,
+            "110692.38"
           ],
           [
-            1708010640,
-            "105.5486111111111"
+            1786459680,
+            "116586.88"
           ],
           [
-            1708011000,
-            "104.40833333333333"
+            1786459710,
+            "119952.00333333333"
           ],
           [
-            1708011360,
-            "110.03055555555555"
+            1786459740,
+            "123235.24333333333"
           ],
           [
-            1708011720,
-            "110.98749999999998"
+            1786459770,
+            "126212.22"
+          ],
+          [
+            1786459800,
+            "130108.15333333334"
+          ],
+          [
+            1786459830,
+            "133552.95"
+          ],
+          [
+            1786459860,
+            "136652.05333333334"
+          ],
+          [
+            1786459890,
+            "115819.63333333333"
+          ],
+          [
+            1786459920,
+            "45158.53"
+          ],
+          [
+            1786459950,
+            "39935.07666666667"
+          ],
+          [
+            1786459980,
+            "39167.74"
+          ],
+          [
+            1786460010,
+            "42296.82"
+          ],
+          [
+            1786460040,
+            "44565.56"
+          ],
+          [
+            1786460070,
+            "46031.89666666667"
           ]
         ]
       },
       {
         "metric": {
-          "DstK8S_HostName": "ip-10-0-1-7.ec2.internal"
+          "SrcK8S_HostName": "ip-10-0-1-92.ec2.internal"
         },
         "values": [
           [
-            1708009560,
-            "0.09444444444444444"
+            1786459590,
+            "9643.876666666667"
           ],
           [
-            1708009920,
-            "0.3902777777777778"
+            1786459620,
+            "49499.56"
           ],
           [
-            1708010280,
-            "0.4361111111111111"
+            1786459650,
+            "60321.68666666667"
           ],
           [
-            1708010640,
-            "0.3138888888888889"
+            1786459680,
+            "76882.00333333333"
           ],
           [
-            1708011000,
-            "0.4388888888888889"
+            1786459710,
+            "85123.3"
           ],
           [
-            1708011360,
-            "0.5305555555555554"
+            1786459740,
+            "91671.54"
           ],
           [
-            1708011720,
-            "0.5791666666666667"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "SrcK8S_HostName": "ip-10-0-1-137.ec2.internal"
-        },
-        "values": [
-          [
-            1708009560,
-            "28.173611111111114"
+            1786459770,
+            "101892.09"
           ],
           [
-            1708009920,
-            "69.80277777777779"
+            1786459800,
+            "108412.25"
           ],
           [
-            1708010280,
-            "90.45694444444445"
+            1786459830,
+            "114906.25666666667"
           ],
           [
-            1708010640,
-            "98.41944444444445"
+            1786459860,
+            "121653.68"
           ],
           [
-            1708011000,
-            "90.15416666666668"
+            1786459890,
+            "117750.89666666667"
           ],
           [
-            1708011360,
-            "111.44027777777778"
+            1786459920,
+            "82278.29"
           ],
           [
-            1708011720,
-            "113.11527777777778"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "SrcK8S_HostName": "ip-10-0-1-7.ec2.internal"
-        },
-        "values": [
-          [
-            1708009560,
-            "57.96527777777777"
+            1786459950,
+            "75472.02666666667"
           ],
           [
-            1708009920,
-            "134.44583333333335"
+            1786459980,
+            "62712.96"
           ],
           [
-            1708010280,
-            "147.5902777777778"
+            1786460010,
+            "58939.08666666667"
           ],
           [
-            1708010640,
-            "162.97222222222226"
+            1786460040,
+            "57424.83666666667"
           ],
           [
-            1708011000,
-            "162.59444444444446"
-          ],
-          [
-            1708011360,
-            "175.71666666666664"
-          ],
-          [
-            1708011720,
-            "179.0402777777778"
-          ]
-        ]
-      },
-      {
-        "metric": {},
-        "values": [
-          [
-            1708009560,
-            "1.0333333333333334"
-          ],
-          [
-            1708009920,
-            "2.9722222222222223"
-          ],
-          [
-            1708010280,
-            "3.791666666666667"
-          ],
-          [
-            1708010640,
-            "3.6625"
-          ],
-          [
-            1708011000,
-            "3.808333333333333"
-          ],
-          [
-            1708011360,
-            "3.8805555555555555"
-          ],
-          [
-            1708011720,
-            "3.863888888888889"
+            1786460070,
+            "54579.10666666667"
           ]
         ]
       }
     ],
     "stats": {
       "summary": {
-        "bytesProcessedPerSecond": 328874222,
-        "linesProcessedPerSecond": 500497,
-        "totalBytesProcessed": 211370848,
-        "totalLinesProcessed": 321675,
-        "execTime": 0.642710294,
-        "queueTime": 8.042418995,
+        "bytesProcessedPerSecond": 172655642,
+        "linesProcessedPerSecond": 182537,
+        "totalBytesProcessed": 58493041,
+        "totalLinesProcessed": 61841,
+        "execTime": 0.338784416,
+        "queueTime": 0.062961452,
         "subqueries": 0,
-        "totalEntriesReturned": 7,
-        "splits": 6,
-        "shards": 48,
-        "totalPostFilterLines": 199944,
-        "totalStructuredMetadataBytesProcessed": 0
+        "totalEntriesReturned": 4,
+        "splits": 13,
+        "shards": 13,
+        "totalPostFilterLines": 61701,
+        "totalStructuredMetadataBytesProcessed": 1521006
       },
       "querier": {
         "store": {
           "totalChunksRef": 0,
           "totalChunksDownloaded": 0,
           "chunksDownloadTime": 0,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
             "headChunkBytes": 0,
             "headChunkLines": 0,
@@ -279,29 +337,36 @@
             "postFilterLines": 0,
             "headChunkStructuredMetadataBytes": 0,
             "decompressedStructuredMetadataBytes": 0
-          }
+          },
+          "chunkRefsFetchTime": 0,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "ingester": {
-        "totalReached": 48,
-        "totalChunksMatched": 375,
-        "totalBatches": 394,
-        "totalLinesSent": 168379,
+        "totalReached": 13,
+        "totalChunksMatched": 331,
+        "totalBatches": 119,
+        "totalLinesSent": 53599,
         "store": {
-          "totalChunksRef": 16,
-          "totalChunksDownloaded": 16,
-          "chunksDownloadTime": 13901153,
+          "totalChunksRef": 4,
+          "totalChunksDownloaded": 4,
+          "chunksDownloadTime": 761937,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
-            "headChunkBytes": 18864260,
-            "headChunkLines": 28785,
-            "decompressedBytes": 192506588,
-            "decompressedLines": 292890,
-            "compressedBytes": 43190086,
-            "totalDuplicates": 0,
-            "postFilterLines": 199944,
-            "headChunkStructuredMetadataBytes": 0,
-            "decompressedStructuredMetadataBytes": 0
-          }
+            "headChunkBytes": 14925060,
+            "headChunkLines": 15192,
+            "decompressedBytes": 43567981,
+            "decompressedLines": 46649,
+            "compressedBytes": 9145813,
+            "totalDuplicates": 8050,
+            "postFilterLines": 61701,
+            "headChunkStructuredMetadataBytes": 121536,
+            "decompressedStructuredMetadataBytes": 1399470
+          },
+          "chunkRefsFetchTime": 1116229,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "cache": {
@@ -312,7 +377,8 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "index": {
           "entriesFound": 0,
@@ -321,26 +387,75 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "result": {
-          "entriesFound": 4,
-          "entriesRequested": 6,
-          "entriesStored": 3,
-          "bytesReceived": 3008,
+          "entriesFound": 0,
+          "entriesRequested": 12,
+          "entriesStored": 12,
+          "bytesReceived": 0,
           "bytesSent": 0,
-          "requests": 9,
-          "downloadTime": 59230
+          "requests": 24,
+          "downloadTime": 237332,
+          "queryLengthServed": 0
         },
         "statsResult": {
+          "entriesFound": 11,
+          "entriesRequested": 11,
+          "entriesStored": 7,
+          "bytesReceived": 4785,
+          "bytesSent": 0,
+          "requests": 18,
+          "downloadTime": 92823,
+          "queryLengthServed": 3360000000000
+        },
+        "volumeResult": {
           "entriesFound": 0,
           "entriesRequested": 0,
           "entriesStored": 0,
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "seriesResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "labelResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "instantMetricResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
         }
+      },
+      "index": {
+        "totalChunks": 0,
+        "postFilterChunks": 0,
+        "shardsDuration": 0,
+        "usedBloomFilters": false
       }
     }
   }
