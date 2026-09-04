@@ -113,18 +113,6 @@ export const MetricsDonut: React.FC<MetricsDonutProps> = ({
     sliced = sliced.filter(m => m.name !== (othersName || t('Others')));
   }
 
-  const legendData = sliced.map((m, idx) => ({
-    childName: `${'area-'}${idx}`,
-    name: m.name
-  }));
-
-  const legendComponent = (
-    <ChartLegend
-      labelComponent={<ChartLabel className={smallerTexts ? 'small-chart-label' : ''} />}
-      data={legendData}
-    />
-  );
-
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useLocalStorage<Dimensions>(
     `${localStorageOverviewDonutDimensionKey}${showLegend ? '-legend' : ''}`,
@@ -136,6 +124,104 @@ export const MetricsDonut: React.FC<MetricsDonutProps> = ({
 
   // Hide legend on small screens to prevent overlap/cropping
   const showLegendResponsive = showLegend && dimensions.width >= 550;
+
+  // Use adaptive padding based on panel width
+  // Wide panels (full-width): use original asymmetric padding
+  // Narrow panels (half-width): use more balanced padding to center donut+legend
+  const isNarrowPanel = dimensions.width <= 800;
+
+  // Truncate text with end ellipsis, preserving arrow structure
+  const truncateEnd = (text: string, maxLength: number): string => {
+    if (text.length <= maxLength) {
+      return text;
+    }
+    return text.substring(0, maxLength - 1) + '…';
+  };
+
+  // Truncate both sides of arrow separately for better readability
+  const truncateArrowFormat = (text: string, maxLength: number): string => {
+    // Check if text contains arrow notation
+    const arrowMatch = text.match(/^(.+?)\s*(->|→)\s*(.+)$/);
+    if (arrowMatch) {
+      const [, source, arrow, destination] = arrowMatch;
+      // Split available length between source and destination (accounting for arrow)
+      const arrowLength = arrow.length + 2; // " -> " or " → "
+      const sideLength = Math.floor((maxLength - arrowLength) / 2);
+
+      return `${truncateEnd(source, sideLength)} ${arrow} ${truncateEnd(destination, sideLength)}`;
+    }
+    // No arrow, just truncate normally
+    return truncateEnd(text, maxLength);
+  };
+
+  // Create extra-short names for narrow panels to prevent cutoff
+  const createDisplayName = (shortName: string, fullName: string): string => {
+    if (!isNarrowPanel) {
+      return fullName;
+    }
+    // For narrow panels, aggressively truncate to max 30 characters
+    return truncateArrowFormat(shortName, 30);
+  };
+
+  const legendData = sliced.map((m, idx) => ({
+    childName: `${'area-'}${idx}`,
+    name: createDisplayName(m.shortName, m.fullName),
+    fullName: m.fullName,
+    formattedValue: getFormattedValue(m.value, metricType, metricFunction, t)
+  }));
+
+  // Custom label component with SVG title tooltip for truncated legend items
+  interface LegendLabelData {
+    name?: string;
+    fullName?: string;
+    formattedValue?: string;
+  }
+
+  interface LegendLabelProps {
+    datum?: LegendLabelData;
+    text?: string;
+    [key: string]: unknown;
+  }
+
+  const TooltipLabel = (props: LegendLabelProps) => {
+    const { datum, text, ...rest } = props;
+    const displayName = text || datum?.name || '';
+    const fullName = datum?.fullName || displayName;
+    const formattedValue = datum?.formattedValue || '';
+    const tooltipContent = `${fullName}: ${formattedValue}`;
+
+    // Only show tooltip if the displayed name is truncated (different from full name)
+    const isTruncated = displayName !== fullName;
+
+    return (
+      <g>
+        <ChartLabel {...rest} text={text} className={smallerTexts ? 'small-chart-label' : ''} />
+        {isTruncated && <title>{tooltipContent}</title>}
+      </g>
+    );
+  };
+
+  const legendComponent = <ChartLegend labelComponent={<TooltipLabel />} data={legendData} />;
+  const legendPadding = showLegendResponsive
+    ? isNarrowPanel
+      ? {
+          bottom: 20,
+          left: 100,
+          right: 250,
+          top: 20
+        }
+      : {
+          bottom: 20,
+          left: 20,
+          right: 350,
+          top: 20
+        }
+    : {
+        bottom: 0,
+        left: 0,
+        right: 0,
+        top: 0
+      };
 
   return (
     <div id={id} className="metrics-content-div" ref={containerRef} data-test-metrics={topKMetrics.length}>
@@ -157,21 +243,7 @@ export const MetricsDonut: React.FC<MetricsDonutProps> = ({
         }))}
         allowTooltip={showLegend}
         animate={animate}
-        padding={
-          showLegendResponsive
-            ? {
-                bottom: 20,
-                left: 20,
-                right: 350,
-                top: 20
-              }
-            : {
-                bottom: 0,
-                left: 0,
-                right: 0,
-                top: 0
-              }
-        }
+        padding={legendPadding}
         title={internalText || `${getFormattedValue(total, metricType, metricFunction, t)}`}
         subTitle={internalSubtitle || t('Total')}
       />

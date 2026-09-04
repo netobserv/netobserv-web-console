@@ -13,10 +13,6 @@
   overflow: hidden;
 }
 
-.overview-flex-item.center {
-  align-self: flex-start;
-}
-
 .overview-flex-item.full {
   flex: auto;
   width: 100%;

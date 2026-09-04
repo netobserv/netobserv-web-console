@@ -1,5 +1,5 @@
+import '@testing-library/jest-dom';
 import * as React from 'react';
-import '@testing-library/jest-dom'
 
 // Mock i18n translation to return key
 jest.mock('react-i18next', () => {
@@ -15,7 +15,7 @@ jest.mock('react-i18next', () => {
             });
           }
           return s;
-        },
+        }
       };
     }
   };
@@ -59,13 +59,17 @@ jest.mock('react-router', () => ({
   }
 }));
 
+// Mock @patternfly/react-charts/victory to use actual module
+// This is needed because Jest has issues resolving the /victory subpath export
+jest.mock('@patternfly/react-charts/victory', () => jest.requireActual('@patternfly/react-charts/victory'));
+
 // Mock routes
 jest.mock('./src/api/routes', () => ({
   getPods: jest.fn(async () => ['ABCD']),
   getNamespaces: jest.fn(async () => ['EFGH']),
   getConfig: jest.fn(async () => ({ portNaming: { enable: true, portNames: new Map() } })),
-  getRole: jest.fn(async () => ('admin')),
-  getLokiReady: jest.fn(async () => 'ready'),
+  getRole: jest.fn(async () => 'admin'),
+  getLokiReady: jest.fn(async () => 'ready')
 }));
 
 global.console = {
@@ -73,9 +77,8 @@ global.console = {
   log: jest.fn(),
   warn: jest.fn(),
   info: jest.fn(),
-  
+
   // Keep native behaviour for error, and allow logging for debugging
   debug: console.log,
-  error: console.error,
-
+  error: console.error
 };
