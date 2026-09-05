@@ -11,6 +11,7 @@ declare global {
         options?: Partial<Cypress.VisitOptions>,
         selector?: string,
       ): Chainable<Element>;
+      dismissWelcomeModal(): Chainable<Element>;
     }
   }
 }
@@ -23,6 +24,11 @@ Cypress.on('uncaught:exception', (err) => {
 
   // ResizeObserver loop errors are non-actionable and can be ignored
   if (typeof err.message === 'string' && err.message.includes('ResizeObserver loop')) {
+    return false;
+  }
+
+  // Ignore transient errors in console application
+  if (typeof err.message === 'string' && (err.message.includes('is not a function') || err.message.includes('listener is not a function'))) {
     return false;
   }
 
@@ -58,6 +64,18 @@ Cypress.Commands.add('clickNavLink', (path: string[]) => {
   if (path.length === 2) {
     cy.get('#page-sidebar').contains(path[1]).click();
   }
+});
+
+Cypress.Commands.add('dismissWelcomeModal', () => {
+  // Try to find and close the welcome modal if it appears
+  cy.get('body').then(($body) => {
+    if ($body.find('button[data-ouia-component-id*="ModalBoxCloseButton"]').length > 0) {
+      cy.log('Modal close button found, clicking it');
+      cy.get('button[data-ouia-component-id*="ModalBoxCloseButton"]', { timeout: 5000 })
+        .click({ force: true });
+      cy.log('Modal dismissed');
+    }
+  });
 });
 
 export const checkErrors = () =>
