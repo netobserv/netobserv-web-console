@@ -30,7 +30,7 @@ spec:
           pod: {}
       volumes:
         - containerDisk:
-            image: quay.io/containerdisks/fedora:latest
+            image: quay.io/containerdisks/fedora:40
           name: containerdisk
         - cloudInitNoCloud:
             userData: |

@@ -27,8 +27,12 @@ Cypress.on('uncaught:exception', (err) => {
     return false;
   }
 
-  // Ignore transient errors in console application
-  if (typeof err.message === 'string' && (err.message.includes('is not a function') || err.message.includes('listener is not a function'))) {
+  // Ignore known transient errors in console application
+  const allowlistedErrors = [
+    'listener is not a function',
+    // Add other specific known transient error messages here
+  ];
+  if (typeof err.message === 'string' && allowlistedErrors.some((msg) => err.message === msg || err.message.includes(msg))) {
     return false;
   }
 

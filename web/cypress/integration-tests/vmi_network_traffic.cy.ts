@@ -128,11 +128,11 @@ describe('(OCP-90529) Network Traffic Tab on VMI Page', { tags: ['Network_Observ
         cy.wait(2000)
 
         // Click on Network Traffic tab
-        cy.byLegacyTestID('horizontal-link-Network Traffic').should('be.visible', { timeout: 60000 }).click()
+        cy.byLegacyTestID('horizontal-link-Network Traffic', { timeout: 60000 }).should('be.visible').click()
 
         // Increase time range to capture flows
-        cy.byTestID('time-range-dropdown-dropdown').should('be.visible', { timeout: 30000 }).click()
-        cy.get('[data-test="1h"]').should('be.visible', { timeout: 10000 }).click()
+        cy.byTestID('time-range-dropdown-dropdown', { timeout: 30000 }).should('be.visible').click()
+        cy.get('[data-test="1h"]', { timeout: 10000 }).should('be.visible').click()
 
         // Wait for page to stabilize and allow flows to load
         cy.wait(5000)
@@ -184,11 +184,11 @@ describe('(OCP-90529) Network Traffic Tab on VMI Page', { tags: ['Network_Observ
         cy.wait(2000)
 
         // Click on Network Traffic tab
-        cy.byLegacyTestID('horizontal-link-Network Traffic').should('be.visible', { timeout: 60000 }).click()
+        cy.byLegacyTestID('horizontal-link-Network Traffic', { timeout: 60000 }).should('be.visible').click()
 
         // Increase time range to capture flows
-        cy.byTestID('time-range-dropdown-dropdown').should('be.visible', { timeout: 30000 }).click()
-        cy.get('[data-test="1h"]').should('be.visible', { timeout: 10000 }).click()
+        cy.byTestID('time-range-dropdown-dropdown', { timeout: 30000 }).should('be.visible').click()
+        cy.get('[data-test="1h"]', { timeout: 10000 }).should('be.visible').click()
 
         // Verify traffic flows are present in the table tab
         cy.get('#tabs-container').contains('Traffic flows').click()
