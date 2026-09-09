@@ -71,13 +71,13 @@ Cypress.Commands.add('clickNavLink', (path: string[]) => {
 });
 
 Cypress.Commands.add('dismissWelcomeModal', () => {
-  // Try to find and close the welcome modal if it appears
   cy.get('body').then(($body) => {
-    if ($body.find('button[data-ouia-component-id*="ModalBoxCloseButton"]').length > 0) {
-      cy.log('Modal close button found, clicking it');
-      cy.get('button[data-ouia-component-id*="ModalBoxCloseButton"]', { timeout: 5000 })
-        .click({ force: true });
-      cy.log('Modal dismissed');
+    const modal = $body.find('[role="dialog"]');
+    if (modal.length > 0) {
+        cy.get('[role="dialog"] [class*="modal-box__close"] button', { timeout: 5000 })
+            .click({ force: true });
+      // Wait for modal to be removed from DOM
+      cy.get('[role="dialog"]', { timeout: 5000 }).should('not.exist');
     }
   });
 });

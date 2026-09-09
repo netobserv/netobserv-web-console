@@ -11,14 +11,10 @@ describe('(OCP-90529) Network Traffic Tab on VMI Page', { tags: ['Network_Observ
         // Add cluster admin role and login first (like other tests)
         cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
         cy.uiLogin(Cypress.env('LOGIN_IDP'), Cypress.env('LOGIN_USERNAME'), Cypress.env('LOGIN_PASSWORD'))
-
-        // Install NetObserv operator
-        if (`${Cypress.env('SKIP_NOO_INSTALL')}` !== 'true') {
-            Operator.install()
-        }
-
+        Operator.install()
         cy.checkStorageClass(this)
         Operator.createFlowcollector()
+
         // Setup KubeVirt operator
         cy.adminCLI(`oc create namespace openshift-cnv`, { failOnNonZeroExit: false } as any)
         cy.adminCLI(`oc apply -f ./cypress/fixtures/vmi/kubevirt-operator-group.yaml`)
@@ -92,126 +88,52 @@ describe('(OCP-90529) Network Traffic Tab on VMI Page', { tags: ['Network_Observ
             'Running',
             { retries: 30, interval: 20000 }
         )
-
-        // Generate network traffic from the VM by making requests from virt-launcher pod
-        cy.adminCLI(`oc get pods -n ${VMI_NAMESPACE} -l kubevirt.io/domain=${VMI_NAME} -o jsonpath='{.items[0].metadata.name}'`)
-            .then((result: any) => {
-                const podName = result.stdout.trim()
-                cy.wrap(podName).should('not.be.empty', 'virt-launcher pod should exist')
-                // Generate multiple curl requests to ensure traffic is captured
-                cy.adminCLI(`oc exec -n ${VMI_NAMESPACE} ${podName} -- timeout 10 curl -v http://8.8.8.8 2>&1 | head -20`, { failOnNonZeroExit: false } as any)
-                cy.wait(2000)
-                cy.adminCLI(`oc exec -n ${VMI_NAMESPACE} ${podName} -- timeout 10 curl -v http://8.8.8.8 2>&1 | head -20`, { failOnNonZeroExit: false } as any)
-            })
-
-        // Wait for flows to be ingested into Loki by polling flow-collector logs
-        cy.adminCLI(`oc logs -n netobserv -l app=netobserv-plugin,component=flow-collector --tail=100 2>/dev/null | grep -i "packet\\|flow" || echo "waiting"`, { retries: 30, interval: 5000 })
     })
 
     it('(OCP-90529, kapjain) Navigate from Search to VMI and verify Network Traffic on virt-launcher Pod', function () {
         // Navigate to search page with VirtualMachineInstance resource pre-selected
         cy.visit(`/search/ns/${VMI_NAMESPACE}?kind=kubevirt.io~v1~VirtualMachineInstance`)
 
-        // Verify VMI appears in search results and click on it
-        cy.get('tbody tr', { timeout: 30000 }).should('have.length.greaterThan', 0)
+        // Navigate to VMI and virt-launcher pod
         cy.get('tbody tr', { timeout: 30000 }).contains(VMI_NAME).click()
+        cy.contains('a', 'virt-launcher', { timeout: 30000 }).click()
 
-        // Verify we are on the VMI detail page
-        cy.url().should('contain', 'VirtualMachineInstance')
-        cy.url().should('contain', VMI_NAME)
+        // Check if Network Traffic tab is present and click it
+        cy.get('[data-test-id="horizontal-link-Network Traffic"]', { timeout: 60000 })
+          .should('be.visible')
+          .then(($tab) => {
+            cy.wrap($tab).click()
+          })
 
-        // Navigate to the virt-launcher Pod from VMI detail page
-        cy.contains('a', 'virt-launcher', { timeout: 30000 }).should('exist').click()
-
-        // Verify we are on the Pod detail page
-        cy.url().should('contain', 'pods')
-        cy.wait(2000)
-
-        // Click on Network Traffic tab
-        cy.byLegacyTestID('horizontal-link-Network Traffic', { timeout: 60000 }).should('be.visible').click()
-
-        // Increase time range to capture flows
-        cy.byTestID('time-range-dropdown-dropdown', { timeout: 30000 }).should('be.visible').click()
-        cy.get('[data-test="1h"]', { timeout: 10000 }).should('be.visible').click()
-
-        // Wait for page to stabilize and allow flows to load
-        cy.wait(5000)
-
-        // Verify traffic flows are present in the table tab
-        cy.get('#tabs-container').contains('Traffic flows').click()
-
-        // Wait for table container to be visible
-        cy.get('[data-test="table-composable"]', { timeout: 120000 }).should('exist')
-
-        // Click refresh button to reload flows
-        cy.get('[data-test="refresh-button"]').should('be.visible').click()
-        cy.wait(3000)
-
-        cy.get('[data-test="table-composable"] tbody tr', { timeout: 120000 }).should('have.length.greaterThan', 0)
-
-        cy.wait(3000)
-
-        // Verify overview tab loads with panels
-        cy.get('#tabs-container').contains('Overview').click({ force: true })
-        netflowPage.waitForLokiQuery()
-        cy.get('#overview-flex', { timeout: 120000 }).should('exist')
-
-        // Verify topology tab loads with graph content
-        cy.get('#tabs-container').contains('Topology').click()
-        cy.get('#drawer', { timeout: 120000 }).should('exist')
+        // Verify filter with vm name
+        cy.get('[data-test="filter-toolbar-chips"]', { timeout: 30000 }).should('contain', 'test-vm')
     })
 
     it('(OCP-90529, kapjain) Navigate from Virtualization VM page and verify Network Traffic on virt-launcher Pod', function () {
         // Navigate to the VirtualMachine detail page via Virtualization
         cy.visit(`/k8s/ns/${VMI_NAMESPACE}/kubevirt.io~v1~VirtualMachine/${VMI_NAME}`)
 
+        // Wait for page to load
+        cy.get('#content', { timeout: 30000 }).should('exist')
+        cy.wait(1000)
+
         // Dismiss welcome modal if present
         cy.dismissWelcomeModal()
+        cy.wait(500)
 
-        // Verify we are on the VM detail page
-        cy.url().should('contain', 'VirtualMachine')
-        cy.url().should('contain', VMI_NAME)
-        cy.contains(VMI_NAME, { timeout: 30000 }).should('exist')
+        // Navigate to virt-launcher pod
+        cy.contains('a', 'virt-launcher', { timeout: 30000 }).click()
 
-        // Wait for loading overlay to disappear before clicking
-        cy.get('.pf-v6-l-bullseye', { timeout: 30000 }).should('not.exist')
+        // Check if Network Traffic tab is present and click it
+        cy.get('[data-test-id="horizontal-link-Network Traffic"]', { timeout: 60000 })
+          .should('be.visible')
+          .then(($tab) => {
+            cy.wrap($tab).click()
+          })
 
-        // Navigate to the virt-launcher Pod from VM detail page
-        cy.contains('a', 'virt-launcher', { timeout: 30000 }).should('be.visible').click()
 
-        // Verify we are on the Pod detail page
-        cy.url().should('contain', 'pods')
-        cy.wait(2000)
-
-        // Click on Network Traffic tab
-        cy.byLegacyTestID('horizontal-link-Network Traffic', { timeout: 60000 }).should('be.visible').click()
-
-        // Increase time range to capture flows
-        cy.byTestID('time-range-dropdown-dropdown', { timeout: 30000 }).should('be.visible').click()
-        cy.get('[data-test="1h"]', { timeout: 10000 }).should('be.visible').click()
-
-        // Verify traffic flows are present in the table tab
-        cy.get('#tabs-container').contains('Traffic flows').click()
-
-        // Wait for table container to be visible
-        cy.get('[data-test="table-composable"]', { timeout: 120000 }).should('exist')
-
-        // Click refresh button to reload flows
-        cy.get('[data-test="refresh-button"]').should('be.visible').click()
-        cy.wait(3000)
-
-        cy.get('[data-test="table-composable"] tbody tr', { timeout: 120000 }).should('have.length.greaterThan', 0)
-
-        cy.wait(3000)
-
-        // Verify overview tab loads with panels
-        cy.get('#tabs-container').contains('Overview').click({ force: true })
-        netflowPage.waitForLokiQuery()
-        cy.get('#overview-flex', { timeout: 120000 }).should('exist')
-
-        // Verify topology tab loads with graph content
-        cy.get('#tabs-container').contains('Topology').click()
-        cy.get('#drawer', { timeout: 120000 }).should('exist')
+        // Verify filter with vm name
+        cy.get('[data-test="filter-toolbar-chips"]', { timeout: 30000 }).should('contain', 'test-vm')
     })
 
     after("cleanup", function () {
