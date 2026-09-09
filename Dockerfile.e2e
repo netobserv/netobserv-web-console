@@ -1,7 +1,9 @@
 # Dockerfile for running Cypress E2E tests in OpenShift CI
 # This runs tests against a real OpenShift cluster
 
-FROM cypress/included:15.16.0
+# cypress/browsers ships browsers but not the Cypress binary, so the Cypress
+# version comes solely from web/package.json (no version mismatch on tag bumps).
+FROM cypress/browsers:24.20.0
 
 # Install additional dependencies
 USER root
