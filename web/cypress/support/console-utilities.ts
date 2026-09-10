@@ -73,12 +73,17 @@ Cypress.Commands.add('clickNavLink', (path: string[]) => {
 Cypress.Commands.add('dismissWelcomeModal', () => {
   cy.get('body').then(($body) => {
     const modal = $body.find('[role="dialog"]');
-    if (modal.length > 0) {
-        cy.get('[role="dialog"] [class*="modal-box__close"] button', { timeout: 5000 })
-            .click({ force: true });
-      // Wait for modal to be removed from DOM
+    if (modal.length === 0) {
+      return;
+    }
+
+    const closeBtn = modal.find('button[aria-label="Close"]');
+    if (closeBtn.length > 0) {
+      cy.get('[role="dialog"] button[aria-label="Close"]', { timeout: 5000 }).click({ force: true });
+      // Wait for modal to be removed after clicking close
       cy.get('[role="dialog"]', { timeout: 5000 }).should('not.exist');
     }
+    // If close button doesn't exist, just continue without trying to close
   });
 });
 

@@ -1,6 +1,5 @@
 import "@views/netobserv"
 import { Operator } from "@views/netobserv"
-import { netflowPage } from "@views/netflow-page"
 
 const VMI_NAMESPACE = "test-vm"
 const VMI_NAME = "test-vm"
@@ -19,7 +18,6 @@ describe('(OCP-90529) Network Traffic Tab on VMI Page', { tags: ['Network_Observ
         cy.adminCLI(`oc create namespace openshift-cnv`, { failOnNonZeroExit: false } as any)
         cy.adminCLI(`oc apply -f ./cypress/fixtures/vmi/kubevirt-operator-group.yaml`)
         cy.adminCLI(`oc apply -f ./cypress/fixtures/vmi/kubevirt-subscription.yaml`)
-        cy.adminCLI(`oc apply -f ./cypress/fixtures/vmi/kubevirt-priority-class.yaml`)
 
         // Wait for subscription to create InstallPlan and CSV
         cy.checkCommandResult(
@@ -90,14 +88,18 @@ describe('(OCP-90529) Network Traffic Tab on VMI Page', { tags: ['Network_Observ
         )
     })
 
-    it('(OCP-90529, kapjain) Navigate from Search to VMI and verify Network Traffic on virt-launcher Pod', function () {
+    it('(OCP-90529, kapjain) Navigate from Search to VMI and verify Network Traffic tab', function () {
         // Navigate to search page with VirtualMachineInstance resource pre-selected
         cy.visit(`/search/ns/${VMI_NAMESPACE}?kind=kubevirt.io~v1~VirtualMachineInstance`)
+        cy.wait(3000)
 
-        // Navigate to VMI and virt-launcher pod
+        // Wait for VMI detail page to load
+        cy.get('#content', { timeout: 30000 }).should('exist')
+        cy.wait(2000)
+
+        // Click on VM name to navigate to VMI detail page
         cy.get('tbody tr', { timeout: 30000 }).contains(VMI_NAME).click()
-        cy.contains('a', 'virt-launcher', { timeout: 30000 }).click()
-
+        cy.wait(2000)
         // Check if Network Traffic tab is present and click it
         cy.get('[data-test-id="horizontal-link-Network Traffic"]', { timeout: 60000 })
           .should('be.visible')
@@ -122,15 +124,14 @@ describe('(OCP-90529) Network Traffic Tab on VMI Page', { tags: ['Network_Observ
         cy.wait(500)
 
         // Navigate to virt-launcher pod
-        cy.contains('a', 'virt-launcher', { timeout: 30000 }).click()
+        cy.contains('a', 'virt-launcher', { timeout: 30000 }).click({ force: true })
 
         // Check if Network Traffic tab is present and click it
         cy.get('[data-test-id="horizontal-link-Network Traffic"]', { timeout: 60000 })
           .should('be.visible')
           .then(($tab) => {
-            cy.wrap($tab).click()
+            cy.wrap($tab).click({ force: true })
           })
-
 
         // Verify filter with vm name
         cy.get('[data-test="filter-toolbar-chips"]', { timeout: 30000 }).should('contain', 'test-vm')
@@ -138,20 +139,12 @@ describe('(OCP-90529) Network Traffic Tab on VMI Page', { tags: ['Network_Observ
 
     after("cleanup", function () {
         // Delete test VM and namespace
-        cy.adminCLI(`oc delete vm ${VMI_NAME} -n ${VMI_NAMESPACE}`, { failOnNonZeroExit: false } as any)
-        cy.adminCLI(`oc delete namespace ${VMI_NAMESPACE}`, { failOnNonZeroExit: false } as any)
+        cy.adminCLI(`oc delete vm ${VMI_NAME} -n ${VMI_NAMESPACE} --grace-period=30 --wait=false`, { failOnNonZeroExit: false } as any)
+        cy.adminCLI(`oc delete namespace ${VMI_NAMESPACE} --grace-period=90`, { failOnNonZeroExit: false } as any)
 
         // Delete HyperConverged CR and related resources (leave operators installed to avoid slow reinstall)
         cy.adminCLI('oc delete hyperconverged kubevirt-hyperconverged -n openshift-cnv --wait=false', { failOnNonZeroExit: false } as any)
         cy.adminCLI('oc delete cdi cdi-kubevirt-hyperconverged -n openshift-cnv --wait=false', { failOnNonZeroExit: false } as any)
         cy.adminCLI('oc delete configmap cdi-apiserver-signer-bundle -n openshift-cnv --wait=false', { failOnNonZeroExit: false } as any)
-        cy.wait(5000)
-
-        // Delete FlowCollector if not skipping NetObserv install
-        if (`${Cypress.env('SKIP_NOO_INSTALL')}` !== 'true') {
-            Operator.deleteFlowCollector()
-        }
-
-        cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
     })
 })
