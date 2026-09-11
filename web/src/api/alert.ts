@@ -30,4 +30,7 @@ export interface SilencedAlertStatus {
 export interface SilenceMatcher {
   name: string;
   value: string;
+  isRegex?: boolean;
+  /** Defaults to true when omitted (Alertmanager API). */
+  isEqual?: boolean;
 }

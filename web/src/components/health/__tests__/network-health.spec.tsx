@@ -48,6 +48,7 @@ jest.mock('../../../api/routes', () => ({
     } as unknown as AlertsResult)
   ),
   getSilencedAlerts: jest.fn(() => Promise.resolve([])),
+  getAllSilencedAlerts: jest.fn(() => Promise.resolve([])),
   getRecordingRules: jest.fn(() => Promise.resolve({ data: { groups: [] }, status: 'success' } as AlertsResult)),
   queryPrometheusMetric: jest.fn(() => Promise.resolve({ data: { result: [] } }))
 }));

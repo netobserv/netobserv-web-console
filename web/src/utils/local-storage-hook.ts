@@ -9,6 +9,7 @@ export const localStorageRefreshKey = 'netflow-traffic-refresh';
 export const localStorageHealthRefreshKey = 'network-health-refresh';
 export const localStorageHealthSummaryExpandedKey = 'network-health-summary-expanded';
 export const localStorageHealthFiltersKey = 'network-health-filters';
+export const localStorageHealthReadonlySummaryExpandedKey = 'network-health-readonly-summary-expanded';
 export const localStorageSizeKey = 'netflow-traffic-size-size';
 export const localStorageViewIdKey = 'netflow-traffic-view-id';
 export const localStorageOverviewTruncateKey = 'netflow-traffic-overview-truncate';

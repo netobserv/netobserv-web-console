@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 
 	"github.com/prometheus/common/model"
 	"github.com/sirupsen/logrus"
@@ -427,130 +428,172 @@ func createRule(probability float64, name, severity, extraFilter string, thresho
 	}
 }
 
+var (
+	netobservAlertRulesOnce  sync.Once
+	netobservAlertRulesCache []AlertingRule
+)
+
+func getNetobservAlertRules() []AlertingRule {
+	netobservAlertRulesOnce.Do(func() {
+		netobservAlertRulesCache = []AlertingRule{
+			createRule(0.4, "Packet delivery failed", "info", "", 5, 100, true, []string{"SrcK8S_Namespace", "DstK8S_Namespace"}, []string{}),
+			createRule(0.3, "You have reached your hourly rate limit", "info", "", 5, 100, true, []string{"SrcK8S_Namespace", "DstK8S_Namespace"}, []string{}),
+			createRule(0.1, "It's always DNS", "warning", `dns_flag_response_code!=\"\"`, 15, 100, true, []string{"SrcK8S_Namespace", "DstK8S_Namespace"}, []string{}),
+			createRule(0.1, "We're under attack", "warning", "", 20, 100, true, []string{}, []string{}),
+			createRule(0.1, "Sh*t - Famous last words", "critical", "", 5, 100, true, []string{}, []string{"SrcK8S_Hostname", "DstK8S_Hostname"}),
+			createRule(0.3, "FromIngress", "info", "", 10, 100, false, []string{"exported_namespace"}, []string{}),
+			createRule(0.3, "Degraded latency", "info", "", 100, 1000, true, []string{"SrcK8S_Namespace", "DstK8S_Namespace"}, []string{}),
+			// Additional global alerts
+			createRule(0.8, "High overall traffic volume", "warning", "", 1000, 5000, true, []string{}, []string{}),
+			createRule(0.6, "Cluster-wide packet loss detected", "critical", "", 10, 50, true, []string{}, []string{}),
+			createRule(0.5, "Global DNS resolution issues", "info", "", 100, 500, true, []string{}, []string{}),
+			// Workload-specific alerts
+			createWorkloadRule(0.2, "High workload packet drops", "warning", "", 10, 50, true, []string{"SrcK8S_Namespace", "SrcK8S_OwnerName", "SrcK8S_Type"}),
+			createWorkloadRule(0.15, "Workload connection errors", "info", "", 5, 30, true, []string{"SrcK8S_Namespace", "SrcK8S_OwnerName", "SrcK8S_Type"}),
+			createWorkloadRule(0.1, "Workload DNS issues", "warning", `dns_flag_response_code!=\"\"`, 15, 60, true, []string{"SrcK8S_Namespace", "SrcK8S_OwnerName", "SrcK8S_Type"}),
+			createWorkloadRule(0.12, "Workload high latency", "info", "", 100, 500, true, []string{"SrcK8S_Namespace", "SrcK8S_OwnerName", "SrcK8S_Type"}),
+			createWorkloadRule(0.08, "Workload network policy denied", "warning", "", 5, 25, true, []string{"SrcK8S_Namespace", "SrcK8S_OwnerName", "SrcK8S_Type"}),
+		}
+	})
+	return netobservAlertRulesCache
+}
+
+func getNetobservRecordingRules() []RecordingRule {
+	return []RecordingRule{
+		{
+			Name:  "netobserv_health_packet_drops_kernel_total",
+			Query: "100 * (sum by (SrcK8S_Namespace) (rate(netobserv_workload_ingress_drop_packets_total{PktDropLatestDropCause=\"SKB_DROP_REASON_SOCKET_FILTER\"}[2m])) / (sum by (SrcK8S_Namespace) (rate(netobserv_workload_ingress_packets_total[2m])) > 0))",
+			Labels: model.LabelSet{
+				"netobserv": "true",
+				"template":  "PacketDropsByKernel",
+			},
+		},
+		{
+			Name:  "netobserv_health_packet_drops_device_total",
+			Query: "100 * (sum by (SrcK8S_HostName) (rate(netobserv_workload_ingress_drop_packets_total{PktDropLatestDropCause!=\"SKB_DROP_REASON_SOCKET_FILTER\"}[2m])) / (sum by (SrcK8S_HostName) (rate(netobserv_workload_ingress_packets_total[2m])) > 0))",
+			Labels: model.LabelSet{
+				"netobserv": "true",
+				"template":  "PacketDropsByDevice",
+			},
+		},
+		{
+			Name:  "netobserv:network:dns_latency:src:p99",
+			Query: "histogram_quantile(0.99, sum by (SrcK8S_Namespace, le) (rate(netobserv_workload_dns_latency_seconds_bucket[2m])))",
+			Labels: model.LabelSet{
+				"netobserv": "true",
+				"template":  "DNSErrors",
+			},
+		},
+		{
+			Name:  "netobserv_health_dns_errors_total",
+			Query: "100 * (sum(rate(netobserv_workload_dns_latency_seconds_count{DnsFlagsResponseCode!~\"NoError|NXDomain\"}[2m])) / (sum(rate(netobserv_workload_dns_latency_seconds_count[2m])) > 0))",
+			Labels: model.LabelSet{
+				"netobserv": "true",
+				"template":  "DNSErrors",
+			},
+		},
+		{
+			Name:  "netobserv_health_dns_nxdomain_total",
+			Query: "100 * (sum by (SrcK8S_Namespace) (rate(netobserv_workload_dns_latency_seconds_count{DnsFlagsResponseCode=\"NXDomain\"}[2m])) / (sum by (SrcK8S_Namespace) (rate(netobserv_workload_dns_latency_seconds_count[2m])) > 0))",
+			Labels: model.LabelSet{
+				"netobserv": "true",
+				"template":  "DNSNxDomain",
+			},
+		},
+		{
+			Name:  "netobserv:network:packet_drop_rate:dst:avg",
+			Query: "100 * (sum by (DstK8S_Namespace) (rate(netobserv_workload_ingress_drop_packets_total[2m])) / (sum by (DstK8S_Namespace) (rate(netobserv_workload_ingress_packets_total[2m])) > 0))",
+			Labels: model.LabelSet{
+				"netobserv": "true",
+				"template":  "PacketDropsByKernel",
+			},
+		},
+		{
+			Name:  "netobserv_health_netpol_denied_total",
+			Query: "100 * (sum by (SrcK8S_Namespace) (rate(netobserv_workload_network_events_total{NetworkEventsAction=\"NetworkPolicyDrop\"}[2m])) / (sum by (SrcK8S_Namespace) (rate(netobserv_workload_ingress_packets_total[2m])) > 0))",
+			Labels: model.LabelSet{
+				"netobserv": "true",
+				"template":  "NetpolDenied",
+			},
+		},
+		{
+			Name:  "netobserv_health_latency_high_trend",
+			Query: "100 * ((avg by (SrcK8S_Namespace) (rate(netobserv_workload_flow_rtt_seconds_sum[1h])) / avg by (SrcK8S_Namespace) (rate(netobserv_workload_flow_rtt_seconds_count[1h]))) - (avg by (SrcK8S_Namespace) (rate(netobserv_workload_flow_rtt_seconds_sum[1h] offset 1d)) / avg by (SrcK8S_Namespace) (rate(netobserv_workload_flow_rtt_seconds_count[1h] offset 1d)))) / (avg by (SrcK8S_Namespace) (rate(netobserv_workload_flow_rtt_seconds_sum[1h] offset 1d)) / avg by (SrcK8S_Namespace) (rate(netobserv_workload_flow_rtt_seconds_count[1h] offset 1d)))",
+			Labels: model.LabelSet{
+				"netobserv": "true",
+				"template":  "LatencyHighTrend",
+			},
+		},
+		{
+			Name:  "netobserv_health_external_egress_high_trend",
+			Query: "100 * ((sum by (SrcK8S_Namespace) (rate(netobserv_workload_egress_bytes_total{DstK8S_Type=\"\"}[1h])) - (sum by (SrcK8S_Namespace) (rate(netobserv_workload_egress_bytes_total{DstK8S_Type=\"\"} offset 1d [1h])))) / (sum by (SrcK8S_Namespace) (rate(netobserv_workload_egress_bytes_total{DstK8S_Type=\"\"} offset 1d [1h]))))",
+			Labels: model.LabelSet{
+				"netobserv": "true",
+				"template":  "ExternalEgressHighTrend",
+			},
+		},
+		{
+			Name:  "netobserv_health_external_ingress_high_trend",
+			Query: "100 * ((sum by (DstK8S_Namespace) (rate(netobserv_workload_ingress_bytes_total{SrcK8S_Type=\"\"}[1h])) - (sum by (DstK8S_Namespace) (rate(netobserv_workload_ingress_bytes_total{SrcK8S_Type=\"\"} offset 1d [1h])))) / (sum by (DstK8S_Namespace) (rate(netobserv_workload_ingress_bytes_total{SrcK8S_Type=\"\"} offset 1d [1h]))))",
+			Labels: model.LabelSet{
+				"netobserv": "true",
+				"template":  "ExternalIngressHighTrend",
+			},
+		},
+	}
+}
+
 func GetRules() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ruleType := r.URL.Query().Get("type")
+		matchers := labelMatchersFromRequest(r.URL.Query())
 		mlog.Infof("GetRules called with type=%s, full query: %s", ruleType, r.URL.RawQuery)
 
-		var rules any
+		groups := []map[string]any{}
 		if ruleType == "record" {
-			// Recording rules based on real operator templates
-			rules = []RecordingRule{
-				{
-					Name:  "netobserv_health_packet_drops_kernel_total",
-					Query: "100 * (sum by (SrcK8S_Namespace) (rate(netobserv_workload_ingress_drop_packets_total{PktDropLatestDropCause=\"SKB_DROP_REASON_SOCKET_FILTER\"}[2m])) / (sum by (SrcK8S_Namespace) (rate(netobserv_workload_ingress_packets_total[2m])) > 0))",
-					Labels: model.LabelSet{
-						"netobserv": "true",
-						"template":  "PacketDropsByKernel",
-					},
-				},
-				{
-					Name:  "netobserv_health_packet_drops_device_total",
-					Query: "100 * (sum by (SrcK8S_HostName) (rate(netobserv_workload_ingress_drop_packets_total{PktDropLatestDropCause!=\"SKB_DROP_REASON_SOCKET_FILTER\"}[2m])) / (sum by (SrcK8S_HostName) (rate(netobserv_workload_ingress_packets_total[2m])) > 0))",
-					Labels: model.LabelSet{
-						"netobserv": "true",
-						"template":  "PacketDropsByDevice",
-					},
-				},
-				{
-					Name:  "netobserv:network:dns_latency:src:p99",
-					Query: "histogram_quantile(0.99, sum by (SrcK8S_Namespace, le) (rate(netobserv_workload_dns_latency_seconds_bucket[2m])))",
-					Labels: model.LabelSet{
-						"netobserv": "true",
-						"template":  "DNSErrors",
-					},
-				},
-				{
-					Name:  "netobserv_health_dns_errors_total",
-					Query: "100 * (sum(rate(netobserv_workload_dns_latency_seconds_count{DnsFlagsResponseCode!~\"NoError|NXDomain\"}[2m])) / (sum(rate(netobserv_workload_dns_latency_seconds_count[2m])) > 0))",
-					Labels: model.LabelSet{
-						"netobserv": "true",
-						"template":  "DNSErrors",
-					},
-				},
-				{
-					Name:  "netobserv_health_dns_nxdomain_total",
-					Query: "100 * (sum by (SrcK8S_Namespace) (rate(netobserv_workload_dns_latency_seconds_count{DnsFlagsResponseCode=\"NXDomain\"}[2m])) / (sum by (SrcK8S_Namespace) (rate(netobserv_workload_dns_latency_seconds_count[2m])) > 0))",
-					Labels: model.LabelSet{
-						"netobserv": "true",
-						"template":  "DNSNxDomain",
-					},
-				},
-				{
-					Name:  "netobserv:network:packet_drop_rate:dst:avg",
-					Query: "100 * (sum by (DstK8S_Namespace) (rate(netobserv_workload_ingress_drop_packets_total[2m])) / (sum by (DstK8S_Namespace) (rate(netobserv_workload_ingress_packets_total[2m])) > 0))",
-					Labels: model.LabelSet{
-						"netobserv": "true",
-						"template":  "PacketDropsByKernel",
-					},
-				},
-				{
-					Name:  "netobserv_health_netpol_denied_total",
-					Query: "100 * (sum by (SrcK8S_Namespace) (rate(netobserv_workload_network_events_total{NetworkEventsAction=\"NetworkPolicyDrop\"}[2m])) / (sum by (SrcK8S_Namespace) (rate(netobserv_workload_ingress_packets_total[2m])) > 0))",
-					Labels: model.LabelSet{
-						"netobserv": "true",
-						"template":  "NetpolDenied",
-					},
-				},
-				{
-					Name:  "netobserv_health_latency_high_trend",
-					Query: "100 * ((avg by (SrcK8S_Namespace) (rate(netobserv_workload_flow_rtt_seconds_sum[1h])) / avg by (SrcK8S_Namespace) (rate(netobserv_workload_flow_rtt_seconds_count[1h]))) - (avg by (SrcK8S_Namespace) (rate(netobserv_workload_flow_rtt_seconds_sum[1h] offset 1d)) / avg by (SrcK8S_Namespace) (rate(netobserv_workload_flow_rtt_seconds_count[1h] offset 1d)))) / (avg by (SrcK8S_Namespace) (rate(netobserv_workload_flow_rtt_seconds_sum[1h] offset 1d)) / avg by (SrcK8S_Namespace) (rate(netobserv_workload_flow_rtt_seconds_count[1h] offset 1d)))",
-					Labels: model.LabelSet{
-						"netobserv": "true",
-						"template":  "LatencyHighTrend",
-					},
-				},
-				{
-					Name:  "netobserv_health_external_egress_high_trend",
-					Query: "100 * ((sum by (SrcK8S_Namespace) (rate(netobserv_workload_egress_bytes_total{DstK8S_Type=\"\"}[1h])) - (sum by (SrcK8S_Namespace) (rate(netobserv_workload_egress_bytes_total{DstK8S_Type=\"\"} offset 1d [1h])))) / (sum by (SrcK8S_Namespace) (rate(netobserv_workload_egress_bytes_total{DstK8S_Type=\"\"} offset 1d [1h]))))",
-					Labels: model.LabelSet{
-						"netobserv": "true",
-						"template":  "ExternalEgressHighTrend",
-					},
-				},
-				{
-					Name:  "netobserv_health_external_ingress_high_trend",
-					Query: "100 * ((sum by (DstK8S_Namespace) (rate(netobserv_workload_ingress_bytes_total{SrcK8S_Type=\"\"}[1h])) - (sum by (DstK8S_Namespace) (rate(netobserv_workload_ingress_bytes_total{SrcK8S_Type=\"\"} offset 1d [1h])))) / (sum by (DstK8S_Namespace) (rate(netobserv_workload_ingress_bytes_total{SrcK8S_Type=\"\"} offset 1d [1h]))))",
-					Labels: model.LabelSet{
-						"netobserv": "true",
-						"template":  "ExternalIngressHighTrend",
-					},
-				},
+			recordingRules := filterRecordingRules(getNetobservRecordingRules(), matchers)
+			if len(recordingRules) > 0 {
+				groups = append(groups, map[string]any{
+					"name":     "netobserv-recording-rules",
+					"file":     "/etc/prometheus/rules/netobserv-recording.yml",
+					"interval": 30,
+					"rules":    recordingRules,
+				})
 			}
 		} else {
-			// Alerting rules (default or type=alert)
-			rules = []AlertingRule{
-				createRule(0.4, "Packet delivery failed", "info", "", 5, 100, true, []string{"SrcK8S_Namespace", "DstK8S_Namespace"}, []string{}),
-				createRule(0.3, "You have reached your hourly rate limit", "info", "", 5, 100, true, []string{"SrcK8S_Namespace", "DstK8S_Namespace"}, []string{}),
-				createRule(0.1, "It's always DNS", "warning", `dns_flag_response_code!=\"\"`, 15, 100, true, []string{"SrcK8S_Namespace", "DstK8S_Namespace"}, []string{}),
-				createRule(0.1, "We're under attack", "warning", "", 20, 100, true, []string{}, []string{}),
-				createRule(0.1, "Sh*t - Famous last words", "critical", "", 5, 100, true, []string{}, []string{"SrcK8S_Hostname", "DstK8S_Hostname"}),
-				createRule(0.3, "FromIngress", "info", "", 10, 100, false, []string{"exported_namespace"}, []string{}),
-				createRule(0.3, "Degraded latency", "info", "", 100, 1000, true, []string{"SrcK8S_Namespace", "DstK8S_Namespace"}, []string{}),
-				// Additional global alerts
-				createRule(0.8, "High overall traffic volume", "warning", "", 1000, 5000, true, []string{}, []string{}),
-				createRule(0.6, "Cluster-wide packet loss detected", "critical", "", 10, 50, true, []string{}, []string{}),
-				createRule(0.5, "Global DNS resolution issues", "info", "", 100, 500, true, []string{}, []string{}),
-				// Workload-specific alerts
-				createWorkloadRule(0.2, "High workload packet drops", "warning", "", 10, 50, true, []string{"SrcK8S_Namespace", "SrcK8S_OwnerName", "SrcK8S_Type"}),
-				createWorkloadRule(0.15, "Workload connection errors", "info", "", 5, 30, true, []string{"SrcK8S_Namespace", "SrcK8S_OwnerName", "SrcK8S_Type"}),
-				createWorkloadRule(0.1, "Workload DNS issues", "warning", `dns_flag_response_code!=\"\"`, 15, 60, true, []string{"SrcK8S_Namespace", "SrcK8S_OwnerName", "SrcK8S_Type"}),
-				createWorkloadRule(0.12, "Workload high latency", "info", "", 100, 500, true, []string{"SrcK8S_Namespace", "SrcK8S_OwnerName", "SrcK8S_Type"}),
-				createWorkloadRule(0.08, "Workload network policy denied", "warning", "", 5, 25, true, []string{"SrcK8S_Namespace", "SrcK8S_OwnerName", "SrcK8S_Type"}),
+			netobservRules := filterAlertingRules(getNetobservAlertRules(), matchers)
+			if len(netobservRules) > 0 {
+				groups = append(groups, map[string]any{
+					"name":     "netobserv-rules",
+					"file":     "/etc/prometheus/rules/netobserv.yml",
+					"interval": 30,
+					"rules":    netobservRules,
+				})
+			}
+			ovnRules := filterAlertingRules(getOvnPlatformAlertRules(), matchers)
+			if len(ovnRules) > 0 {
+				groups = append(groups, map[string]any{
+					"name":     "cluster-network-operator-ovn.rules",
+					"file":     "/etc/prometheus/rules/openshift-ovn-kubernetes/networking-rules.yaml",
+					"interval": 30,
+					"rules":    ovnRules,
+				})
+			}
+			kialiRules := filterAlertingRules(getKialiMockAlertRules(), matchers)
+			if len(kialiRules) > 0 {
+				groups = append(groups, map[string]any{
+					"name":     "kiali-health.rules",
+					"file":     "/etc/prometheus/rules/kiali/health-rules.yaml",
+					"interval": 30,
+					"rules":    kialiRules,
+				})
 			}
 		}
 
 		res := map[string]any{
 			"status": "success",
 			"data": map[string]any{
-				"groups": []map[string]any{
-					{
-						"name":     "netobserv-rules",
-						"file":     "/etc/prometheus/rules/netobserv.yml",
-						"interval": 30,
-						"rules":    rules,
-					},
-				},
+				"groups": groups,
 			},
 		}
 
@@ -572,11 +615,36 @@ func GetRules() func(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type silenceResponse struct {
+	ID     string `json:"id"`
+	Status struct {
+		State string `json:"state"`
+	} `json:"status"`
+	Matchers []struct {
+		Name  string `json:"name"`
+		Value string `json:"value"`
+	} `json:"matchers"`
+}
+
 func GetSilences() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, _ *http.Request) {
-		// Return empty array for silences in mock mode
-		// This matches the error handling behavior in the frontend (fetcher.tsx)
-		response, err := json.Marshal([]any{})
+		// One deterministic silence so OVN tab can exercise silenced state in mock mode.
+		silences := []silenceResponse{
+			{
+				ID: "ovn-mock-silence-pod-delete",
+				Status: struct {
+					State string `json:"state"`
+				}{State: "active"},
+				Matchers: []struct {
+					Name  string `json:"name"`
+					Value string `json:"value"`
+				}{
+					{Name: "alertname", Value: "OVNKubernetesNodePodDeleteError"},
+					{Name: "instance", Value: ovnMockInstances[1]},
+				},
+			},
+		}
+		response, err := json.Marshal(silences)
 		if err != nil {
 			mlog.Errorf("Marshalling error while responding JSON: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)

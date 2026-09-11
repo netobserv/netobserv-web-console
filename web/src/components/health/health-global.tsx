@@ -81,7 +81,7 @@ export const HealthGlobal: React.FC<HealthGlobalProps> = ({ info, isLoading }) =
   }, []);
 
   return (
-    <div className="health-global-content">
+    <div className="health-tab-panel health-global-content">
       {isLoading ? (
         <Bullseye data-test="health-global-loading">
           <Spinner size="lg" aria-label={t('Loading network health')} />
