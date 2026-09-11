@@ -86,14 +86,15 @@ func (o *LokiClientMock) Get(url string) ([]byte, int, error) {
 			}
 		} else {
 			path = "mocks/loki/flow_records"
-			//nolint:gocritic // if-else is ok
-			if strings.Contains(url, "|~`\"Packets\":0[,}]|~`\"PktDropPackets\":[1-9][0-9]*[,}]") {
+			// Match pkg/loki/flow_query.go packetLoss filters (order matters).
+			switch {
+			case strings.Contains(url, "!~`\"Packets\"`") && strings.Contains(url, "|~`\"PktDropPackets\":[1-9]"):
 				path += "_dropped.json"
-			} else if strings.Contains(url, "|~`\"PktDropPackets\":[1-9][0-9]*[,}]") {
+			case strings.Contains(url, "|~`\"PktDropPackets\":[1-9]"):
 				path += "_has_dropped.json"
-			} else if strings.Contains(url, "|~`\"PktDropPackets\":0[,}]") {
+			case strings.Contains(url, "!~`\"PktDropPackets\"`"):
 				path += "_sent.json"
-			} else {
+			default:
 				path += ".json"
 				parseNetEvents = true
 			}
@@ -155,6 +156,10 @@ func (o *LokiClientMock) Get(url string) ([]byte, int, error) {
 		if err != nil {
 			return nil, 500, err
 		}
+	}
+
+	if strings.Contains(path, "flow_metrics") {
+		file = shiftMetricFixtureTimestamps(file)
 	}
 
 	return []byte(file), 200, nil

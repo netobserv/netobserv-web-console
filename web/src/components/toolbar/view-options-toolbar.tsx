@@ -13,7 +13,7 @@ import {
   Toolbar,
   ToolbarItem
 } from '@patternfly/react-core';
-import { ColumnsIcon, EllipsisVIcon, ExportIcon } from '@patternfly/react-icons';
+import { CameraIcon, ColumnsIcon, EllipsisVIcon, ExportIcon } from '@patternfly/react-icons';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlowScope, MetricType, StatFunction } from '../../model/flow-query';
@@ -36,6 +36,7 @@ export interface ViewOptionsToolbarProps {
   setOverviewModalOpen: (v: boolean) => void;
   setColModalOpen: (v: boolean) => void;
   setExportModalOpen: (v: boolean) => void;
+  setMetricsExportModalOpen: (v: boolean) => void;
   isViewOptionOverflowMenuOpen: boolean;
   setViewOptionOverflowMenuOpen: (v: boolean) => void;
   metricScope: FlowScope;
@@ -108,16 +109,30 @@ export const ViewOptionsToolbar = React.forwardRef<SearchHandle, ViewOptionsTool
         </OverflowMenuItem>
       );
       items.push(
-        <OverflowMenuItem key="export">
+        <OverflowMenuItem key="export-metrics">
           <Button
-            data-test="export-button"
-            id="export-button"
+            data-test="export-metrics-button"
+            id="export-metrics-button"
             variant="link"
             className="overflow-button"
             icon={<ExportIcon />}
+            onClick={() => props.setMetricsExportModalOpen(true)}
+          >
+            {t('Export metrics report')}
+          </Button>
+        </OverflowMenuItem>
+      );
+      items.push(
+        <OverflowMenuItem key="export-image">
+          <Button
+            data-test="export-image-button"
+            id="export-button"
+            variant="link"
+            className="overflow-button"
+            icon={<CameraIcon />}
             onClick={() => onOverviewExport()}
           >
-            {t('Export overview')}
+            {t('Save as image')}
           </Button>
         </OverflowMenuItem>
       );
@@ -152,16 +167,30 @@ export const ViewOptionsToolbar = React.forwardRef<SearchHandle, ViewOptionsTool
       );
     } else if (props.selectedViewId === 'topology') {
       items.push(
-        <OverflowMenuItem key="export">
+        <OverflowMenuItem key="export-metrics">
           <Button
-            data-test="export-button"
-            id="export-button"
+            data-test="export-metrics-button"
+            id="export-metrics-button"
             variant="link"
             className="overflow-button"
             icon={<ExportIcon />}
+            onClick={() => props.setMetricsExportModalOpen(true)}
+          >
+            {t('Export metrics report')}
+          </Button>
+        </OverflowMenuItem>
+      );
+      items.push(
+        <OverflowMenuItem key="export-image">
+          <Button
+            data-test="export-image-button"
+            id="export-button"
+            variant="link"
+            className="overflow-button"
+            icon={<CameraIcon />}
             onClick={() => onTopologyExport()}
           >
-            {t('Export topology view')}
+            {t('Save as image')}
           </Button>
         </OverflowMenuItem>
       );
@@ -186,8 +215,15 @@ export const ViewOptionsToolbar = React.forwardRef<SearchHandle, ViewOptionsTool
       );
       dropdownItems.push(
         <DropdownGroup key="export-group" label={t('Actions')}>
-          <DropdownItem key="export" id="export-button" onClick={() => onOverviewExport()}>
-            {t('Export overview')}
+          <DropdownItem
+            key="export-metrics"
+            id="export-metrics-button"
+            onClick={() => props.setMetricsExportModalOpen(true)}
+          >
+            {t('Export metrics report')}
+          </DropdownItem>
+          <DropdownItem key="export-image" id="export-button" onClick={() => onOverviewExport()}>
+            {t('Save as image')}
           </DropdownItem>
         </DropdownGroup>
       );
@@ -209,8 +245,15 @@ export const ViewOptionsToolbar = React.forwardRef<SearchHandle, ViewOptionsTool
     } else if (props.selectedViewId === 'topology') {
       dropdownItems.push(
         <DropdownGroup key="export-group" label={t('Actions')}>
-          <DropdownItem key="export" id="export-button" onClick={() => onTopologyExport()}>
-            {t('Export view')}
+          <DropdownItem
+            key="export-metrics"
+            id="export-metrics-button"
+            onClick={() => props.setMetricsExportModalOpen(true)}
+          >
+            {t('Export metrics report')}
+          </DropdownItem>
+          <DropdownItem key="export-image" id="export-button" onClick={() => onTopologyExport()}>
+            {t('Save as image')}
           </DropdownItem>
         </DropdownGroup>
       );

@@ -17,7 +17,7 @@ describe('buildExportQuery', () => {
     );
   });
 
-  it('should build with columns', () => {
+  it('should build with columns and json format', () => {
     const query = buildExportQuery(
       {
         filters: '',
@@ -26,10 +26,10 @@ describe('buildExportQuery', () => {
         packetLoss: 'all',
         limit: 500
       },
-      ['foo', 'bar']
+      { format: 'json', columns: ['foo', 'bar'] }
     );
     expect(query).toEqual(
-      'filters=&recordType=flowLog&dataSource=auto&packetLoss=all&limit=500&format=csv&columns=foo%2Cbar'
+      'filters=&recordType=flowLog&dataSource=auto&packetLoss=all&limit=500&format=json&columns=foo%2Cbar'
     );
   });
 });

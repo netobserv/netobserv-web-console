@@ -1,11 +1,18 @@
 package handler
 
 import (
+	"net/http"
 	"testing"
+	"time"
 
+	"github.com/netobserv/network-observability-console-plugin/pkg/config"
 	"github.com/netobserv/network-observability-console-plugin/pkg/model/filters"
+	"github.com/netobserv/network-observability-console-plugin/pkg/prometheus"
 	"github.com/netobserv/network-observability-console-plugin/pkg/utils/constants"
+	"github.com/netobserv/network-observability-console-plugin/pkg/utils/queryparams"
+	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSplitForReportersMerge_NoSplit(t *testing.T) {
@@ -115,4 +122,50 @@ func TestExpand_ComplexQuery(t *testing.T) {
 		filters.NewRegexMatch("key1", "c"),
 		filters.NewRegexMatch("key2", "d"),
 	}, res[10])
+}
+
+func TestBuildTopologyQuery_MockForcesLokiEvenWhenPromEligible(t *testing.T) {
+	frontend := config.Frontend{
+		Scopes: []config.Scope{
+			{ID: "namespace", Name: "Namespace", Labels: []string{"SrcK8S_Namespace", "DstK8S_Namespace"}},
+		},
+	}
+	lokiCfg := config.Loki{
+		URL:    "http://loki",
+		Labels: []string{"SrcK8S_Namespace", "DstK8S_Namespace", "FlowDirection"},
+	}
+	inv := prometheus.NewInventory(&config.Prometheus{Metrics: []config.MetricInfo{{
+		Enabled:    true,
+		Name:       "netobserv_namespace_bytes_total",
+		Type:       "Counter",
+		ValueField: "Bytes",
+		Direction:  config.AnyDirection,
+		Labels:     []string{"SrcK8S_Namespace", "DstK8S_Namespace"},
+	}}})
+	in := &queryparams.TopologyInput{
+		Start:          "(start)",
+		Top:            "50",
+		RateInterval:   "2m",
+		Step:           "10s",
+		DataField:      "Bytes",
+		MetricFunction: constants.MetricFunctionRate,
+		RecordType:     constants.RecordTypeLog,
+		DataSource:     constants.DataSourceAuto,
+		Aggregate:      "namespace",
+	}
+	qr := &v1.Range{Start: time.Now().Add(-5 * time.Minute), End: time.Now(), Step: 30 * time.Second}
+
+	nonMockCfg := &config.Config{ConsoleMode: config.OpenShiftPlugin, Loki: lokiCfg, Frontend: frontend}
+	lokiQ, promQ, code, err := buildTopologyQuery(nonMockCfg, inv, nil, in, qr, false)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, code)
+	assert.NotNil(t, promQ, "non-mock should prefer Prometheus when eligible")
+	assert.Empty(t, lokiQ)
+
+	mockCfg := &config.Config{ConsoleMode: config.Mock, Loki: lokiCfg, Frontend: frontend}
+	lokiQ, promQ, code, err = buildTopologyQuery(mockCfg, inv, nil, in, qr, false)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, code)
+	assert.Nil(t, promQ, "mock mode must skip Prometheus and use Loki fixtures")
+	assert.NotEmpty(t, lokiQ)
 }

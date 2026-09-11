@@ -2,9 +2,11 @@
   "status": "success",
   "data": [
     "default",
+    "kube-system",
     "netobserv",
     "openshift-backplane",
     "openshift-cluster-samples-operator",
+    "openshift-cluster-storage-operator",
     "openshift-console",
     "openshift-console-operator",
     "openshift-deployment-validation-operator",
@@ -17,10 +19,10 @@
     "openshift-kube-storage-version-migrator-operator",
     "openshift-monitoring",
     "openshift-multus",
+    "openshift-netobserv-operator",
+    "openshift-network-console",
     "openshift-network-diagnostics",
-    "openshift-route-monitor-operator",
     "openshift-service-ca",
-    "openshift-service-ca-operator",
-    "openshift-user-workload-monitoring"
+    "openshift-service-ca-operator"
   ]
 }

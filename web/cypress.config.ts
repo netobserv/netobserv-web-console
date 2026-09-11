@@ -79,6 +79,22 @@ export default defineConfig({
           }
           return null;
         },
+        listDownloadsByExtension({ dir, extension }) {
+          if (!fs.existsSync(dir)) {
+            return [];
+          }
+          return fs.readdirSync(dir).filter((file: string) => file.endsWith(`.${extension}`));
+        },
+        renameDownload({ from, to }) {
+          fs.renameSync(from, to);
+          return null;
+        },
+        deleteDownload(filePath) {
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+          return null;
+        },
       });
       on('after:screenshot', (details) => {
         // Prepend "1_", "2_", etc. to screenshot filenames because they are sorted alphanumerically in CI's artifacts dir

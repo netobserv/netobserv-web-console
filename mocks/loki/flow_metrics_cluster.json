@@ -4,166 +4,175 @@
     "resultType": "matrix",
     "result": [
       {
-        "metric": {
-          "K8S_ClusterName": "production-cluster"
-        },
+        "metric": {},
         "values": [
           [
-            1708009560,
-            "320.5"
+            1786459590,
+            "394524.63333333336"
           ],
           [
-            1708009920,
-            "385.2"
+            1786459620,
+            "966387.3433333334"
           ],
           [
-            1708010280,
-            "425.8"
+            1786459650,
+            "1390676.1"
           ],
           [
-            1708010640,
-            "445.3"
+            1786459680,
+            "1805660.13"
           ],
           [
-            1708011000,
-            "438.7"
+            1786459710,
+            "2188321.4366666665"
           ],
           [
-            1708011360,
-            "465.1"
+            1786459740,
+            "2575016.5433333335"
           ],
           [
-            1708011720,
-            "478.9"
+            1786459770,
+            "2958288.683333333"
+          ],
+          [
+            1786459800,
+            "3348244.8833333333"
+          ],
+          [
+            1786459830,
+            "3727234.8766666665"
+          ],
+          [
+            1786459860,
+            "4115866.38"
+          ],
+          [
+            1786459890,
+            "4098980.8466666667"
+          ],
+          [
+            1786459920,
+            "3913950.28"
+          ],
+          [
+            1786459950,
+            "3864128.51"
+          ],
+          [
+            1786459980,
+            "3832676.3933333335"
+          ],
+          [
+            1786460010,
+            "3826428.15"
+          ],
+          [
+            1786460040,
+            "3826422.2466666666"
+          ],
+          [
+            1786460070,
+            "3822887.26"
           ]
         ]
       },
       {
         "metric": {
-          "K8S_ClusterName": "staging-cluster"
+          "K8S_ClusterName": "my-cluster"
         },
         "values": [
           [
-            1708009560,
-            "180.3"
+            1786459590,
+            "350000.5"
           ],
           [
-            1708009920,
-            "225.8"
+            1786459620,
+            "850000.2"
           ],
           [
-            1708010280,
-            "245.2"
+            1786459650,
+            "1200000.8"
           ],
           [
-            1708010640,
-            "258.7"
+            1786459680,
+            "1600000.1"
           ],
           [
-            1708011000,
-            "252.1"
+            1786459710,
+            "1950000.4"
           ],
           [
-            1708011360,
-            "268.5"
+            1786459740,
+            "2300000.9"
           ],
           [
-            1708011720,
-            "275.2"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "K8S_ClusterName": "development-cluster"
-        },
-        "values": [
-          [
-            1708009560,
-            "95.8"
+            1786459770,
+            "2650000.3"
           ],
           [
-            1708009920,
-            "112.5"
+            1786459800,
+            "3000000.7"
           ],
           [
-            1708010280,
-            "128.3"
+            1786459830,
+            "3350000.2"
           ],
           [
-            1708010640,
-            "135.7"
+            1786459860,
+            "3700000.6"
           ],
           [
-            1708011000,
-            "132.2"
+            1786459890,
+            "3680000.1"
           ],
           [
-            1708011360,
-            "142.8"
+            1786459920,
+            "3520000.4"
           ],
           [
-            1708011720,
-            "148.5"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "K8S_ClusterName": "edge-cluster"
-        },
-        "values": [
-          [
-            1708009560,
-            "65.2"
+            1786459950,
+            "3480000.8"
           ],
           [
-            1708009920,
-            "78.5"
+            1786459980,
+            "3450000.3"
           ],
           [
-            1708010280,
-            "85.1"
+            1786460010,
+            "3440000.9"
           ],
           [
-            1708010640,
-            "92.3"
+            1786460040,
+            "3435000.2"
           ],
           [
-            1708011000,
-            "88.7"
-          ],
-          [
-            1708011360,
-            "95.2"
-          ],
-          [
-            1708011720,
-            "98.8"
+            1786460070,
+            "3430000.5"
           ]
         ]
       }
     ],
     "stats": {
       "summary": {
-        "bytesProcessedPerSecond": 294218275,
-        "linesProcessedPerSecond": 447756,
-        "totalBytesProcessed": 211370848,
-        "totalLinesProcessed": 321675,
-        "execTime": 0.718415087,
-        "queueTime": 11.360357994,
+        "bytesProcessedPerSecond": 205930801,
+        "linesProcessedPerSecond": 217795,
+        "totalBytesProcessed": 58469421,
+        "totalLinesProcessed": 61838,
+        "execTime": 0.283927516,
+        "queueTime": 0.123254436,
         "subqueries": 0,
-        "totalEntriesReturned": 4,
-        "splits": 6,
-        "shards": 48,
-        "totalPostFilterLines": 199944,
-        "totalStructuredMetadataBytesProcessed": 0
+        "totalEntriesReturned": 2,
+        "splits": 13,
+        "shards": 13,
+        "totalPostFilterLines": 61698,
+        "totalStructuredMetadataBytesProcessed": 1509916
       },
       "querier": {
         "store": {
           "totalChunksRef": 0,
           "totalChunksDownloaded": 0,
           "chunksDownloadTime": 0,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
             "headChunkBytes": 0,
             "headChunkLines": 0,
@@ -174,29 +183,36 @@
             "postFilterLines": 0,
             "headChunkStructuredMetadataBytes": 0,
             "decompressedStructuredMetadataBytes": 0
-          }
+          },
+          "chunkRefsFetchTime": 0,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "ingester": {
-        "totalReached": 48,
-        "totalChunksMatched": 375,
-        "totalBatches": 394,
-        "totalLinesSent": 168379,
+        "totalReached": 13,
+        "totalChunksMatched": 331,
+        "totalBatches": 119,
+        "totalLinesSent": 53599,
         "store": {
-          "totalChunksRef": 16,
-          "totalChunksDownloaded": 16,
-          "chunksDownloadTime": 39157387,
+          "totalChunksRef": 4,
+          "totalChunksDownloaded": 4,
+          "chunksDownloadTime": 742538,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
-            "headChunkBytes": 18864260,
-            "headChunkLines": 28785,
-            "decompressedBytes": 192506588,
-            "decompressedLines": 292890,
-            "compressedBytes": 43190086,
-            "totalDuplicates": 0,
-            "postFilterLines": 199944,
-            "headChunkStructuredMetadataBytes": 0,
-            "decompressedStructuredMetadataBytes": 0
-          }
+            "headChunkBytes": 15349694,
+            "headChunkLines": 15692,
+            "decompressedBytes": 43119727,
+            "decompressedLines": 46146,
+            "compressedBytes": 9038744,
+            "totalDuplicates": 8050,
+            "postFilterLines": 61698,
+            "headChunkStructuredMetadataBytes": 125536,
+            "decompressedStructuredMetadataBytes": 1384380
+          },
+          "chunkRefsFetchTime": 1061110,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "cache": {
@@ -207,7 +223,8 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "index": {
           "entriesFound": 0,
@@ -216,26 +233,75 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "result": {
-          "entriesFound": 4,
-          "entriesRequested": 6,
-          "entriesStored": 3,
-          "bytesReceived": 1359,
+          "entriesFound": 0,
+          "entriesRequested": 12,
+          "entriesStored": 12,
+          "bytesReceived": 0,
           "bytesSent": 0,
-          "requests": 9,
-          "downloadTime": 98137
+          "requests": 24,
+          "downloadTime": 246989,
+          "queryLengthServed": 0
         },
         "statsResult": {
+          "entriesFound": 11,
+          "entriesRequested": 11,
+          "entriesStored": 10,
+          "bytesReceived": 2893,
+          "bytesSent": 0,
+          "requests": 21,
+          "downloadTime": 66208,
+          "queryLengthServed": 1110000000000
+        },
+        "volumeResult": {
           "entriesFound": 0,
           "entriesRequested": 0,
           "entriesStored": 0,
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "seriesResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "labelResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "instantMetricResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
         }
+      },
+      "index": {
+        "totalChunks": 0,
+        "postFilterChunks": 0,
+        "shardsDuration": 0,
+        "usedBloomFilters": false
       }
     }
   }
