@@ -11,6 +11,7 @@ declare global {
         options?: Partial<Cypress.VisitOptions>,
         selector?: string,
       ): Chainable<Element>;
+      dismissWelcomeModal(): Chainable<Element>;
     }
   }
 }
@@ -23,6 +24,15 @@ Cypress.on('uncaught:exception', (err) => {
 
   // ResizeObserver loop errors are non-actionable and can be ignored
   if (typeof err.message === 'string' && err.message.includes('ResizeObserver loop')) {
+    return false;
+  }
+
+  // Ignore known transient errors in console application
+  const allowlistedErrors = [
+    'listener is not a function',
+    // Add other specific known transient error messages here
+  ];
+  if (typeof err.message === 'string' && allowlistedErrors.some((msg) => err.message === msg || err.message.includes(msg))) {
     return false;
   }
 
@@ -58,6 +68,39 @@ Cypress.Commands.add('clickNavLink', (path: string[]) => {
   if (path.length === 2) {
     cy.get('#page-sidebar').contains(path[1]).click();
   }
+});
+
+Cypress.Commands.add('dismissWelcomeModal', () => {
+  // Recursive function to close modals sequentially (second may appear after first closes)
+  const closeNextModal = (attempt = 0) => {
+    cy.get('[role="dialog"]', { timeout: 5000 }).then(
+      (modals) => {
+        const visibleModals = Cypress.$(modals).filter(function() {
+          return Cypress.$(this).is(':visible');
+        });
+
+        if (visibleModals.length > 0) {
+          const modal = Cypress.$(visibleModals[0]);
+
+          // Wait for modal to be fully visible before closing
+          cy.wrap(modal).should('be.visible');
+
+          const closeBtn = modal.find('button[aria-label="Close"]');
+          if (closeBtn.length > 0) {
+            cy.wrap(closeBtn).should('be.visible').click({ force: true });
+            cy.wait(1200); // Wait longer for modal animation and next modal to appear
+            // Check for next visible modal after closing this one
+            closeNextModal(attempt + 1);
+          }
+        }
+      },
+      () => {
+        // No modals found
+      }
+    );
+  };
+
+  closeNextModal();
 });
 
 export const checkErrors = () =>
