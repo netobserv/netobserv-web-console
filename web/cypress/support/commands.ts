@@ -303,7 +303,7 @@ Cypress.Commands.add("switchPerspective", (perspective: string) => {
 Cypress.Commands.add('adminCLI', (command: string, options?: Partial<Cypress.ExecOptions>) => {
   const kubeconfig = Cypress.env('KUBECONFIG_PATH');
   cy.log(`Run admin command: ${command}`);
-  cy.exec(`${command} --kubeconfig ${kubeconfig}`, options);
+  return cy.exec(`${command} --kubeconfig ${kubeconfig}`, options);
 });
 
 // to avoid influence from upstream login change

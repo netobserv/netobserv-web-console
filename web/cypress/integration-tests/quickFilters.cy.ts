@@ -35,8 +35,8 @@ describe('(OCP-56222) Quick Filters test', { tags: ['Network_Observability'] }, 
         cy.wait(10000)
 
         // Wait for pods to be ready
-        cy.adminCLI('oc wait --for=condition=Ready pod -l app=nginx -n test-server-56222 --timeout=120s')
-        cy.adminCLI('oc wait --for=condition=Ready pod -n test-client-56222 client --timeout=120s')
+        cy.adminCLI('oc wait --for=condition=Ready pod -l app=nginx -n test-server-56222 --timeout=120s', { timeout: 140000 })
+        cy.adminCLI('oc wait --for=condition=Ready pod -n test-client-56222 client --timeout=120s', { timeout: 140000 })
     })
 
     beforeEach('any netflow table test', function () {
@@ -49,11 +49,15 @@ describe('(OCP-56222) Quick Filters test', { tags: ['Network_Observability'] }, 
     it("(OCP-56222, memodi) should verify quick filters add", function () {
         const addQuickFilterPatch = JSON.stringify(patch).replace('$op', 'add')
         cy.adminCLI(`oc patch flowcollector/cluster --type json -p \'${addQuickFilterPatch}\'`)
-        // Wait for plugin to reload with updated config
-        cy.contains("Quick filters", { timeout: 15000 }).should('exist').then(() => {
-            cy.reload()
+        // Wait for FC reconciliation and plugin to reload with updated config
+        cy.adminCLI(`oc wait --for=condition=Ready flowcollector/cluster --timeout=180s`, { timeout: 200000 })
+        cy.adminCLI(`oc rollout status deployment/netobserv-plugin -n netobserv --timeout=120s`, {
+            failOnNonZeroExit: false, timeout: 140000
         })
-        cy.contains("Quick filters").should('be.visible').click()
+        cy.visit('/netflow-traffic')
+        cy.get('#tabs-container').contains('Traffic flows').click()
+        cy.byTestID("table-composable").should('exist')
+        cy.contains("Quick filters", { timeout: 30000 }).should('be.visible').click()
         cy.get('#quick-filters-dropdown').should('be.visible').within(() => {
             cy.contains("Test NS").should('exist')
             cy.contains('label', "Test NS").find('input[type="checkbox"]').should('exist').click()
@@ -78,11 +82,14 @@ describe('(OCP-56222) Quick Filters test', { tags: ['Network_Observability'] }, 
     it("(OCP-56222, memodi) should verify quick filters remove", function () {
         const addQuickFilterPatch = JSON.stringify(patch).replace('$op', 'remove')
         cy.adminCLI(`oc patch flowcollector/cluster --type json -p \'${addQuickFilterPatch}\'`)
-
-        // Wait for plugin to reload with updated config
-        cy.contains("Quick filters", { timeout: 15000 }).should('exist').then(() => {
-            cy.reload()
+        // Wait for FC reconciliation and plugin to reload with updated config
+        cy.adminCLI(`oc wait --for=condition=Ready flowcollector/cluster --timeout=180s`, { timeout: 200000 })
+        cy.adminCLI(`oc rollout status deployment/netobserv-plugin -n netobserv --timeout=120s`, {
+            failOnNonZeroExit: false, timeout: 140000
         })
+        cy.visit('/netflow-traffic')
+        cy.get('#tabs-container').contains('Traffic flows').click()
+        cy.byTestID("table-composable").should('exist')
         cy.contains("Quick filters").should('exist').click()
         cy.get('#quick-filters-dropdown label').should('exist').each((ele, index, $list) => {
             cy.wrap(ele).should('not.contain', "Test NS")

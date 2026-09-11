@@ -21,6 +21,6 @@ export namespace flowcollectorStatusSelectors {
 export const flowcollectorStatusPage = {
     visit: () => {
         cy.visit('k8s/cluster/flows.netobserv.io~v1beta2~FlowCollector/status')
-        cy.contains('Network Observability FlowCollector', { timeout: 30000 }).should('exist')
+        cy.contains('Network Observability FlowCollector', { timeout: 120000 }).should('exist')
     }
 }

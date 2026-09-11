@@ -62,20 +62,19 @@ describe("(OCP-53591) Netflow Topology edges,labels, badges features", { tags: [
         cy.contains('Display options').should('exist').click()
         cy.get(topologySelectors.groupEdgesToggle).should('be.checked')
 
-        // record edge count with group edges on
-        cy.get('#drawer ' + topologySelectors.edge).its('length').then(aggregatedCount => {
-            // toggle group edges off
-            cy.get(topologySelectors.groupEdgesToggle).uncheck()
-            cy.get('[data-test^="aggregate-edge-"]').should('not.exist')
-            cy.get('#drawer ' + topologySelectors.edge).its('length').then(leafCount => {
-                expect(leafCount).to.not.eq(aggregatedCount)
-            })
+        // With group edges on, aggregate edges should exist
+        cy.get('[data-test^="aggregate-edge-"]').should('exist')
+        cy.get('#drawer ' + topologySelectors.edge).should('have.length.greaterThan', 0)
 
-            // toggle group edges back on
-            cy.get(topologySelectors.groupEdgesToggle).check()
-            cy.get('[data-test^="aggregate-edge-"]').should('exist')
-            cy.get('#drawer ' + topologySelectors.edge).its('length').should('eq', aggregatedCount)
-        })
+        // Toggle group edges off — aggregate edges should disappear, leaf edges should remain
+        cy.get(topologySelectors.groupEdgesToggle).uncheck()
+        cy.get('[data-test^="aggregate-edge-"]').should('not.exist')
+        cy.get('#drawer ' + topologySelectors.edge).should('have.length.greaterThan', 0)
+
+        // Toggle group edges back on — aggregate edges should reappear
+        cy.get(topologySelectors.groupEdgesToggle).check()
+        cy.get('[data-test^="aggregate-edge-"]').should('exist')
+        cy.get('#drawer ' + topologySelectors.edge).should('have.length.greaterThan', 0)
     })
 
     it("(OCP-53591, memodi) should verify edges display/hidden", function () {

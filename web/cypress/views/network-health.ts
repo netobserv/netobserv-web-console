@@ -36,7 +36,8 @@ export const healthRuleWizard = {
   // Back is handled by the uncaught:exception filter at the top of the spec.
   reviewRoundTrip: () => {
     healthRuleWizard.next();
-    cy.get('.monaco-editor', { timeout: 60000 }).should('be.visible');
+    // Monaco (ResourceYAMLEditor) can take a long time to initialize in CI.
+    cy.get('.monaco-editor', { timeout: 120000 }).should('be.visible');
     healthRuleWizard.back();
     cy.get(networkHealthSelectors.dynamicForm, { timeout: 60000 }).should('be.visible');
   },
@@ -66,6 +67,27 @@ export namespace networkHealthFiltersSelectors {
   export const nameInput = '[data-test="health-name-filter"] input';
   export const clearAll = '[data-test="health-filters-clear-all"]';
   export const option = (filterId: string, value: string) => `[data-test="${filterId}-option-${value}"]`;
+}
+
+const waitForHealthCard = (name: string, retries = 2): void => {
+    const selector = `[data-test^="health-card-${name}"]`
+    const pollForCard = (attempt = 0, maxAttempts = 12): void => {
+        cy.get('body').then($body => {
+            if ($body.find(selector).length > 0) {
+                return
+            }
+            if (attempt < maxAttempts) {
+                cy.wait(10000)
+                pollForCard(attempt + 1, maxAttempts)
+            } else if (retries > 0) {
+                cy.log(`health-card-${name} not found, reloading (${retries} retries left)`)
+                cy.reload()
+                cy.get('#content-scrollable', { timeout: 30000 }).should('exist')
+                waitForHealthCard(name, retries - 1)
+            }
+        })
+    }
+    pollForCard()
 }
 
 export const networkHealth = {

@@ -20,25 +20,8 @@ describe('Network_Observability networking dashboards tests', { tags: ['Network_
         cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
         cy.uiLogin(Cypress.env('LOGIN_IDP'), Cypress.env('LOGIN_USERNAME'), Cypress.env('LOGIN_PASSWORD'))
 
-        // navigate to 'Networking / Ingress' Dashboard page
-        dashboard.visit()
-        cy.visit(`/monitoring/dashboards/grafana-dashboard-ingress-operator`)
-
-        cy.byTestID('poll-interval-dropdown').find('button').should('exist').then(btn => {
-            cy.wrap(btn).click().then(drop => {
-                cy.contains('15 seconds').should('exist').click()
-            })
-        })
-
-        cy.get('[data-test="time-range-dropdown"]').should('exist').then(btn => {
-            cy.wrap(btn).click().then(drop => {
-                cy.contains('Last 5 minutes').should('exist').click()
-            })
-        })
-
-        cy.wait(1000)
-        cy.get('#content-scrollable').scrollTo('bottom')
-        cy.wait(1000)
+        // navigate to 'Networking / Ingress' Dashboard page (retry-with-reload until registered)
+        dashboard.visitDashboard('grafana-dashboard-ingress-operator')
     })
 
     it('(OCP-69946, aramesha), should have ingress operator dashboards', function () {

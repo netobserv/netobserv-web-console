@@ -60,7 +60,7 @@ describe('(OCP-88966) TLSTracking test', { tags: ['Network_Observability'] }, fu
         // add filter for tls_version= TLS 1.3 and tls_types = ServerHello
         cy.get(filterSelectors.filterInput).type("tls_version=TLS 1.3" + '{enter}')
         cy.get(filterSelectors.filterInput).type("tls_types=ServerHello" + '{enter}')
-        netflowPage.waitForLokiQuery()
+        netflowPage.waitForTableRows(1)
 
         // Verify TLS column data for all rows
         cy.get('[data-test-td-column-id="TLSVersion"]')

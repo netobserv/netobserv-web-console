@@ -20,7 +20,15 @@ spec:
   - command:
       - sh
       - -c
-      - "curl -kIL https://52.200.142.250 --output /tmp/test ;"
+      - |
+        # Fail the pod if curl fails (do not mask with trailing ';').
+        # Repeat to improve eBPF/Loki capture chances for the subnet-label test.
+        # Do not use curl -f: non-2xx HTTP can still generate the traffic we need.
+        set -e
+        for i in 1 2 3 4 5; do
+          curl -ksSIL --max-time 30 "https://52.200.142.250" -o /tmp/test
+          sleep 2
+        done
     image: quay.io/openshifttest/hello-openshift:1.2.0
     securityContext:
       allowPrivilegeEscalation: false
