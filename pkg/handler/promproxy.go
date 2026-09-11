@@ -47,6 +47,7 @@ func simpleProxy(toURLStr string, timeout time.Duration, skipTLS bool, caPath st
 			ContentLength: r.ContentLength,
 			Header:        http.Header{},
 		}
+		hlog.Debugf("promproxy query: %v", backendURL.RawQuery)
 		resp, err := roundTripper.RoundTrip(&rq)
 		if err != nil {
 			hlog.Errorf("Proxying to %s; RoundTrip error: %v", toURL, err)
@@ -59,6 +60,7 @@ func simpleProxy(toURLStr string, timeout time.Duration, skipTLS bool, caPath st
 		if err != nil {
 			hlog.Errorf("Error reading response from proxy on %s: %v", toURL, err)
 		}
+		hlog.Tracef("Result:\n%s", string(body))
 		if _, err := w.Write(body); err != nil {
 			hlog.Errorf("Error proxying response from %s: %v", toURL, err)
 		}

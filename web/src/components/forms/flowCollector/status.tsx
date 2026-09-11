@@ -14,7 +14,7 @@ import {
   Tooltip
 } from '@patternfly/react-core';
 import { useTranslation } from 'react-i18next';
-import { flowCollectorEditPath, flowCollectorSetupPath, netflowTrafficPath, useNavigate } from '../../../utils/url';
+import { flowCollectorPath, netflowTrafficPath, useNavigate } from '../../../utils/url';
 import FlowCollectorStatusIndicator from '../../status/flowcollector-status-indicator';
 import '../forms.css';
 import { Pipeline } from '../pipeline';
@@ -156,7 +156,7 @@ export const FlowCollectorStatus: FC<FlowCollectorStatusProps> = () => {
                           data-test-id="edit-flow-collector"
                           variant="primary"
                           isDisabled={isDeleting}
-                          onClick={() => navigate(flowCollectorEditPath)}
+                          onClick={() => navigate(flowCollectorPath('edit')!)}
                         >
                           {t('Edit FlowCollector')}
                         </Button>
@@ -171,7 +171,7 @@ export const FlowCollectorStatus: FC<FlowCollectorStatusProps> = () => {
                             data-test-id="open-network-traffic"
                             variant="link"
                             isAriaDisabled={!showTrafficButton}
-                            onClick={() => showTrafficButton && navigate(netflowTrafficPath)}
+                            onClick={() => showTrafficButton && navigate(netflowTrafficPath())}
                           >
                             {t('Open Network Traffic page')}
                           </Button>
@@ -218,7 +218,7 @@ export const FlowCollectorStatus: FC<FlowCollectorStatusProps> = () => {
                           id="create-flow-collector"
                           data-test-id="create-flow-collector"
                           variant="primary"
-                          onClick={() => navigate(flowCollectorSetupPath)}
+                          onClick={() => navigate(flowCollectorPath('setup')!)}
                         >
                           {t('Create FlowCollector')}
                         </Button>

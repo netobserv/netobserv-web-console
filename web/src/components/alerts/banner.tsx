@@ -2,7 +2,7 @@ import { Rule } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertActionCloseButton, AlertActionLink, Content, ContentVariants } from '@patternfly/react-core';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { flowCollectorStatusPath, useNavigate } from '../../utils/url';
+import { flowCollectorPath, useNavigate } from '../../utils/url';
 import './banner.css';
 
 export interface AlertBannerProps {
@@ -23,6 +23,7 @@ export const AlertBanner: React.FC<AlertBannerProps> = ({ rule, onDelete }) => {
     const path = `/monitoring/dashboards/grafana-dashboard-netobserv-health`;
     navigate(path);
   };
+  const statusPath = flowCollectorPath('status');
   return (
     <div className="netobserv-alert">
       <Alert
@@ -31,13 +32,13 @@ export const AlertBanner: React.FC<AlertBannerProps> = ({ rule, onDelete }) => {
         variant="danger"
         actionClose={<AlertActionCloseButton onClose={onDelete} />}
         actionLinks={
-          <React.Fragment>
-            <AlertActionLink onClick={routeAlert}>{t('View alert details')}</AlertActionLink>
-            <AlertActionLink onClick={routeDashboard}>{t('View health dashboard')}</AlertActionLink>
-            <AlertActionLink onClick={() => navigate(flowCollectorStatusPath)}>
-              {t('View FlowCollector status')}
-            </AlertActionLink>
-          </React.Fragment>
+          statusPath && (
+            <React.Fragment>
+              <AlertActionLink onClick={routeAlert}>{t('View alert details')}</AlertActionLink>
+              <AlertActionLink onClick={routeDashboard}>{t('View health dashboard')}</AlertActionLink>
+              <AlertActionLink onClick={() => navigate(statusPath)}>{t('View FlowCollector status')}</AlertActionLink>
+            </React.Fragment>
+          )
         }
       >
         <Content>

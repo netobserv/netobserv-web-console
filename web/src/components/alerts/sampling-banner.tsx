@@ -2,7 +2,7 @@ import { Alert, AlertActionCloseButton, AlertActionLink } from '@patternfly/reac
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { localStorageSamplingBannerDismissedKey, useLocalStorage } from '../../utils/local-storage-hook';
-import { flowCollectorSetupPath, useNavigate } from '../../utils/url';
+import { flowCollectorPath, useNavigate } from '../../utils/url';
 import './banner.css';
 
 export interface SamplingBannerProps {
@@ -20,7 +20,7 @@ export const SamplingBanner: React.FC<SamplingBannerProps> = ({ samplingValue })
   }
 
   // Link to FlowCollector setup wizard Consumption tab (requires PR #1570)
-  const configLink = flowCollectorSetupPath + '?tab=consumption';
+  const configLink = flowCollectorPath('setup')?.concat('?tab=consumption');
 
   return (
     <div className="netobserv-alert" data-test="sampling-banner">
@@ -30,11 +30,13 @@ export const SamplingBanner: React.FC<SamplingBannerProps> = ({ samplingValue })
         variant="info"
         actionClose={<AlertActionCloseButton data-test-id="sampling-banner-close" onClose={() => setDismissed(true)} />}
         actionLinks={
-          <React.Fragment>
-            <AlertActionLink data-test-id="sampling-action-link" onClick={() => navigate(configLink)}>
-              {t('View sampling & resource usage')}
-            </AlertActionLink>
-          </React.Fragment>
+          configLink && (
+            <React.Fragment>
+              <AlertActionLink data-test-id="sampling-action-link" onClick={() => navigate(configLink)}>
+                {t('View sampling & resource usage')}
+              </AlertActionLink>
+            </React.Fragment>
+          )
         }
       >
         {t(

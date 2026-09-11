@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import {
-  flowCollectorStatusPath,
+  flowCollectorPath,
   getFlowCollectorResourceName,
   isFlowCollectorCreatePath,
   useNavigate,
@@ -37,7 +37,7 @@ export const FlowCollectorForm: FC<FlowCollectorFormProps> = props => {
       version="v1beta2"
       kind="FlowCollector"
       name={name}
-      onSuccess={() => navigate(flowCollectorStatusPath)}
+      onSuccess={() => navigate(flowCollectorPath('status')!)}
       defaultFrom="CSVExample"
     >
       <ResourceForm uiSchema={flowCollectorUISchema} />

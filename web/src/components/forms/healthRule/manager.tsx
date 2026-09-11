@@ -30,7 +30,7 @@ import { isK8sConflictError, k8sErrorMessage } from '../utils';
 import { healthRuleEditCustomPath, healthRuleEditTemplatePath, healthRuleSetupPath } from './paths';
 import { removeHealthRuleFromFlowCollector } from './templateForm';
 import { FLOW_COLLECTOR_GVK, FLPHealthRule, PROMETHEUS_RULE_GVK, PrometheusRuleResource } from './types';
-import { HEALTH_RULE_DEFAULTS } from './variantDefaults';
+import { HEALTH_RULE_DEFAULTS, HealthRuleDefaultSummary } from './variantDefaults';
 
 export type HealthRulesManagerProps = {
   isOpen: boolean;
@@ -119,10 +119,51 @@ export const HealthRulesManager: React.FC<HealthRulesManagerProps> = ({ isOpen, 
     return list.filter(pr => pr?.metadata?.name && pr?.metadata?.namespace);
   }, [prometheusRules]);
 
-  const openTemplate = (template: string) => {
-    onClose();
-    navigateTo(healthRuleEditTemplatePath(template));
+  const defaultRuleActions = (hr: HealthRuleDefaultSummary) => {
+    const editPath = healthRuleEditTemplatePath(hr.template);
+    if (editPath) {
+      return [
+        {
+          title: t('Edit'),
+          onClick: () => {
+            onClose();
+            navigateTo(editPath);
+          }
+        }
+      ];
+    }
+    return [];
   };
+
+  const customRuleActions = (namespace: string, name: string) => {
+    const editPath = healthRuleEditCustomPath(namespace, name);
+    if (editPath) {
+      return [
+        {
+          title: t('Edit'),
+          onClick: () => {
+            onClose();
+            navigateTo(editPath);
+          }
+        },
+        {
+          title: t('Delete'),
+          isDanger: true,
+          onClick: () => {
+            setActionError(null);
+            setPending({
+              type: 'delete',
+              namespace,
+              name
+            });
+          }
+        }
+      ];
+    }
+    return [];
+  };
+
+  const setupPath = healthRuleSetupPath();
 
   const confirmPending = async () => {
     if (!pending) {
@@ -170,18 +211,19 @@ export const HealthRulesManager: React.FC<HealthRulesManagerProps> = ({ isOpen, 
         </DrawerActions>
       </DrawerHead>
       <DrawerContentBody>
-        <Button
-          variant="primary"
-          data-test="create-health-rule"
-          onClick={() => {
-            onClose();
-            navigateTo(healthRuleSetupPath());
-          }}
-          style={{ marginBottom: '1rem' }}
-        >
-          {t('Create health rule')}
-        </Button>
-
+        {setupPath && (
+          <Button
+            variant="primary"
+            data-test="create-health-rule"
+            onClick={() => {
+              onClose();
+              navigateTo(setupPath);
+            }}
+            style={{ marginBottom: '1rem' }}
+          >
+            {t('Create health rule')}
+          </Button>
+        )}
         <Title headingLevel="h3" size="md" style={{ marginBottom: '0.5rem' }}>
           {t('FlowCollector templates')}
         </Title>
@@ -231,10 +273,7 @@ export const HealthRulesManager: React.FC<HealthRulesManagerProps> = ({ isOpen, 
                       <div data-test={`template-health-rule-actions-${def.template}`}>
                         <ActionsColumn
                           items={[
-                            {
-                              title: t('Edit'),
-                              onClick: () => openTemplate(def.template)
-                            },
+                            ...defaultRuleActions(def),
                             ...(override
                               ? [
                                   {
@@ -301,29 +340,7 @@ export const HealthRulesManager: React.FC<HealthRulesManagerProps> = ({ isOpen, 
                     <Td dataLabel={t('Type')}>{type}</Td>
                     <Td isActionCell>
                       <div data-test={`custom-health-rule-actions-${namespace}/${name}`}>
-                        <ActionsColumn
-                          items={[
-                            {
-                              title: t('Edit'),
-                              onClick: () => {
-                                onClose();
-                                navigateTo(healthRuleEditCustomPath(namespace, name));
-                              }
-                            },
-                            {
-                              title: t('Delete'),
-                              isDanger: true,
-                              onClick: () => {
-                                setActionError(null);
-                                setPending({
-                                  type: 'delete',
-                                  namespace,
-                                  name
-                                });
-                              }
-                            }
-                          ]}
-                        />
+                        <ActionsColumn items={customRuleActions(namespace, name)} />
                       </div>
                     </Td>
                   </Tr>

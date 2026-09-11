@@ -5,6 +5,7 @@ export const defaultHost = '/api/proxy/plugin/netobserv-plugin/backend';
 export class ContextSingleton {
   private static instance: ContextSingleton;
   private isStandalone: boolean;
+  private isMock: boolean;
   private host: string;
   private forcedNamespace?: string;
   private flowCollectorK8SModel?: K8sModel;
@@ -12,6 +13,8 @@ export class ContextSingleton {
 
   private constructor() {
     this.host = defaultHost;
+    this.isStandalone = false;
+    this.isMock = false;
   }
 
   public static getInstance(): ContextSingleton {
@@ -26,6 +29,11 @@ export class ContextSingleton {
     const instance = ContextSingleton.getInstance();
     instance.isStandalone = true;
     instance.host = '';
+  }
+
+  public static setMock() {
+    const instance = ContextSingleton.getInstance();
+    instance.isMock = true;
   }
 
   public static setContext(forcedNamespace?: string) {
@@ -43,6 +51,10 @@ export class ContextSingleton {
 
   public static isStandalone() {
     return ContextSingleton.getInstance().isStandalone;
+  }
+
+  public static isMock() {
+    return ContextSingleton.getInstance().isMock;
   }
 
   public static getHost() {

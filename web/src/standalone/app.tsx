@@ -128,6 +128,9 @@ export const App: React.FunctionComponent<{ endUser?: boolean }> = ({ endUser })
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
   const [theme, setTheme] = React.useState<StandaloneTheme>('light');
   ContextSingleton.setStandalone();
+  if (!endUser) {
+    ContextSingleton.setMock();
+  }
   const pages = endUser ? endUserPages : allPages;
 
   React.useEffect(() => {

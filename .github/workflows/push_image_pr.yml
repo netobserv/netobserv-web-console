@@ -117,7 +117,12 @@ jobs:
 
             To deploy this build, run from the operator repo, assuming the operator is running:
             \`\`\`bash
-            USER=netobserv VERSION=${shortSHA} make set-plugin-image
+            IMAGE_ORG=netobserv VERSION=${shortSHA} make set-plugin-image
+            \`\`\`
+
+            Or for standalone:
+            \`\`\`bash
+            IMAGE_ORG=netobserv VERSION=${shortSHA} make set-standalone-console-image
             \`\`\`
             `
             })

@@ -119,6 +119,7 @@ export const NetworkHealth: React.FC<{}> = ({}) => {
   };
 
   const isDrawerOpen = isScoringDrawerOpen || isRulesManagerOpen;
+  const ruleSetupPath = healthRuleSetupPath();
 
   const mainContent = () => {
     return (
@@ -240,15 +241,17 @@ export const NetworkHealth: React.FC<{}> = ({}) => {
                           flexWrap={{ default: 'wrap' }}
                           gap={{ default: 'gapSm' }}
                         >
-                          <FlexItem>
-                            <Button
-                              data-test="create-health-rule-button"
-                              variant="primary"
-                              onClick={() => navigateTo(healthRuleSetupPath())}
-                            >
-                              {t('Create health rule')}
-                            </Button>
-                          </FlexItem>
+                          {ruleSetupPath && (
+                            <FlexItem>
+                              <Button
+                                data-test="create-health-rule-button"
+                                variant="primary"
+                                onClick={() => navigateTo(ruleSetupPath)}
+                              >
+                                {t('Create health rule')}
+                              </Button>
+                            </FlexItem>
+                          )}
                           <FlexItem>
                             <Button
                               data-test="manage-health-rules-button"

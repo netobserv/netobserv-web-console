@@ -14,6 +14,7 @@ import {
   useParams as useRouterParams,
   useSearchParams as useRouterSearchParams
 } from 'react-router';
+import { ContextSingleton } from './context';
 
 export { RouterLink as Link };
 
@@ -51,12 +52,30 @@ export const useParams = <T extends Record<string, string | undefined> = Record<
 
 export const useSearchParams = useRouterSearchParams;
 
-export const netflowTrafficPath = '/netflow-traffic';
-export const flowCollectorBasePath = '/k8s/cluster/flows.netobserv.io~v1beta2~FlowCollector';
-export const flowCollectorNewPath = `${flowCollectorBasePath}/~new`;
-export const flowCollectorSetupPath = `${flowCollectorBasePath}/setup`;
-export const flowCollectorEditPath = `${flowCollectorBasePath}/edit`;
-export const flowCollectorStatusPath = `${flowCollectorBasePath}/status`;
+export const netflowTrafficPath = () => {
+  if (ContextSingleton.isStandalone()) {
+    return '/console-netflow-traffic';
+  }
+  return '/netflow-traffic';
+};
+
+const flowCollectorBasePath = '/k8s/cluster/flows.netobserv.io~v1beta2~FlowCollector';
+
+export const flowCollectorPath = (action: 'new' | 'setup' | 'edit' | 'status') => {
+  if (ContextSingleton.isStandalone() && !ContextSingleton.isMock()) {
+    return undefined;
+  }
+  switch (action) {
+    case 'new':
+      return `${flowCollectorBasePath}/~new`;
+    case 'setup':
+      return `${flowCollectorBasePath}/setup`;
+    case 'edit':
+      return `${flowCollectorBasePath}/edit`;
+    case 'status':
+      return `${flowCollectorBasePath}/status`;
+  }
+};
 
 const flowCollectorPathSegment = (pathname: string = window.location.pathname): string | undefined => {
   const prefix = `${flowCollectorBasePath}/`;
@@ -91,7 +110,6 @@ export const getFlowCollectorResourceName = (pathname: string = window.location.
   return segment;
 };
 export const flowMetricNewPath = '/k8s/cluster/flows.netobserv.io~v1alpha1~FlowMetric/~new';
-export const flowCollectorSliceNewPath = '/k8s/cluster/flows.netobserv.io~v1alpha1~FlowCollectorSlice/~new';
 
 // React-router query argument (not backend routes)
 export enum URLParam {

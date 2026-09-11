@@ -48,7 +48,7 @@ export const Header: React.FunctionComponent<{
           <ToolbarContent>
             <ToolbarItem className="masthead-link">
               <a href="https://netobserv.io" title="Open netobserv.io" target="_blank" rel="noreferrer">
-                NetObserv
+                NetObserv.io
               </a>
             </ToolbarItem>
             <ToolbarItem align={{ default: 'alignEnd' }}>

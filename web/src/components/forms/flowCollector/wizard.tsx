@@ -14,16 +14,7 @@ import _ from 'lodash';
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDiscardGuard } from '../../../utils/discard-guard-hook';
-import {
-  flowCollectorEditPath,
-  flowCollectorNewPath,
-  flowCollectorSetupPath,
-  flowCollectorStatusPath,
-  navigateTo,
-  useNavigate,
-  useParams,
-  useSearchParams
-} from '../../../utils/url';
+import { flowCollectorPath, navigateTo, useNavigate, useParams, useSearchParams } from '../../../utils/url';
 import { DynamicForm } from '../dynamic-form/dynamic-form';
 import { ErrorTemplate } from '../dynamic-form/templates';
 import '../forms.css';
@@ -65,7 +56,7 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [discard, discardModal] = useDiscardGuard();
-  const isSetupRoute = window.location.pathname.startsWith(flowCollectorSetupPath);
+  const isSetupRoute = window.location.pathname.startsWith(flowCollectorPath('setup')!);
 
   const validSteps = Object.keys(stepPaths);
   const initialTab = searchParams.get('tab');
@@ -144,7 +135,7 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
       name={isSetupRoute ? 'cluster' : params.name || props.name || 'cluster'}
       skipCRError
       onSuccess={() => {
-        navigate(flowCollectorStatusPath);
+        navigate(flowCollectorPath('status')!);
       }}
       defaultFrom="CSVExample"
     >
@@ -154,7 +145,7 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
           // We can't handle edition here since this page doesn't include ResourceYAMLEditor
           // which handle reload / update buttons
           if (ctx.data.metadata?.resourceVersion && !blockAutoRedirectToEditRef.current && !isSetupRoute) {
-            navigate(flowCollectorEditPath);
+            navigate(flowCollectorPath('edit')!);
           }
           // first init schema & data when watch resource query got results
           if (schema == null) {
@@ -207,7 +198,7 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
                         data-test-id="open-flow-collector-form"
                         className="no-padding"
                         variant="link"
-                        onClick={() => navigateTo(flowCollectorNewPath)}
+                        onClick={() => navigateTo(flowCollectorPath('new')!)}
                       >
                         {t('FlowCollector form')}
                       </Button>
