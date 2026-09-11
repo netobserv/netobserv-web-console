@@ -462,6 +462,7 @@
   "Reset time range and try again.": "Reset time range and try again.",
   "Reset time range": "Reset time range",
   "Others": "Others",
+  "{{name}}: {{value}}": "{{name}}: {{value}}",
   "Total dropped": "Total dropped",
   "Manage columns": "Manage columns",
   "Selected columns will appear in the table.": "Selected columns will appear in the table.",

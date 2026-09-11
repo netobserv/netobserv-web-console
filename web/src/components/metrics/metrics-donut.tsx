@@ -113,18 +113,6 @@ export const MetricsDonut: React.FC<MetricsDonutProps> = ({
     sliced = sliced.filter(m => m.name !== (othersName || t('Others')));
   }
 
-  const legendData = sliced.map((m, idx) => ({
-    childName: `${'area-'}${idx}`,
-    name: m.name
-  }));
-
-  const legendComponent = (
-    <ChartLegend
-      labelComponent={<ChartLabel className={smallerTexts ? 'small-chart-label' : ''} />}
-      data={legendData}
-    />
-  );
-
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useLocalStorage<Dimensions>(
     `${localStorageOverviewDonutDimensionKey}${showLegend ? '-legend' : ''}`,
@@ -136,6 +124,65 @@ export const MetricsDonut: React.FC<MetricsDonutProps> = ({
 
   // Hide legend on small screens to prevent overlap/cropping
   const showLegendResponsive = showLegend && dimensions.width >= 550;
+
+  // Helper to truncate text with ellipsis
+  const truncateText = (text: string, maxLength: number): string => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength - 1) + '…';
+  };
+
+  // Format legend names with truncation for arrow notation
+  const formatLegendName = (fullName: string, maxLength: number = 45): string => {
+    if (fullName.length <= maxLength) return fullName;
+
+    // Check if text contains arrow notation (src -> dst or src → dst)
+    const arrowMatch = fullName.match(/^(.+?)\s*(->|→)\s*(.+)$/);
+    if (arrowMatch) {
+      const [, source, arrow, destination] = arrowMatch;
+      const arrowLen = arrow.length + 2; // " -> " or " → "
+      const sideLen = Math.floor((maxLength - arrowLen) / 2);
+      return `${truncateText(source, sideLen)} ${arrow} ${truncateText(destination, sideLen)}`;
+    }
+
+    // No arrow, simple truncation
+    return truncateText(fullName, maxLength);
+  };
+
+  const legendData = sliced.map((m, idx) => ({
+    childName: `${'area-'}${idx}`,
+    name: formatLegendName(m.fullName), // Truncated for legend
+    fullName: m.fullName, // Full name for tooltip
+    formattedValue: getFormattedValue(m.value, metricType, metricFunction, t)
+  }));
+
+  // Custom label component with SVG title tooltip showing full name and value
+  const TooltipLabel = (props: {
+    datum?: { fullName?: string; formattedValue?: string; name?: string };
+    text?: string;
+  }) => {
+    const { datum, text, ...rest } = props;
+    const displayName = text || datum?.name || '';
+    const fullName = datum?.fullName || displayName;
+    const formattedValue = datum?.formattedValue || '';
+    const tooltipContent = t('{{name}}: {{value}}', { name: fullName, value: formattedValue });
+
+    // Only show tooltip if the displayed name is truncated (different from full name)
+    const isTruncated = displayName !== fullName;
+
+    return (
+      <g>
+        <ChartLabel {...rest} text={text} className={smallerTexts ? 'small-chart-label' : ''} />
+        {isTruncated && <title>{tooltipContent}</title>}
+      </g>
+    );
+  };
+
+  const legendComponent = <ChartLegend labelComponent={<TooltipLabel />} data={legendData} />;
+
+  // Use consistent padding that works for all panel widths
+  const legendPadding = showLegendResponsive
+    ? { bottom: 20, left: 20, right: 300, top: 20 }
+    : { bottom: 0, left: 0, right: 0, top: 0 };
 
   return (
     <div id={id} className="metrics-content-div" ref={containerRef} data-test-metrics={topKMetrics.length}>
@@ -157,21 +204,7 @@ export const MetricsDonut: React.FC<MetricsDonutProps> = ({
         }))}
         allowTooltip={showLegend}
         animate={animate}
-        padding={
-          showLegendResponsive
-            ? {
-                bottom: 20,
-                left: 20,
-                right: 350,
-                top: 20
-              }
-            : {
-                bottom: 0,
-                left: 0,
-                right: 0,
-                top: 0
-              }
-        }
+        padding={legendPadding}
         title={internalText || `${getFormattedValue(total, metricType, metricFunction, t)}`}
         subTitle={internalSubtitle || t('Total')}
       />

@@ -33,7 +33,7 @@ export const NetflowOverviewPanel: React.FC<NetflowOverviewPanelProps> = ({
   const { t } = useTranslation('plugin__netobserv-plugin');
 
   return (
-    <FlexItem id={id} className={`overview-flex-item center ${doubleWidth ? 'full' : ''}`}>
+    <FlexItem id={id} className={`overview-flex-item ${doubleWidth ? 'full' : ''}`}>
       <Card isFullHeight isSelectable={onClick !== undefined} className="overview-card" onClick={onClick}>
         <Flex className="overview-card-content" direction={{ default: 'column' }} gap={{ default: 'gapNone' }}>
           <FlexItem>
