@@ -71,20 +71,36 @@ Cypress.Commands.add('clickNavLink', (path: string[]) => {
 });
 
 Cypress.Commands.add('dismissWelcomeModal', () => {
-  cy.get('body').then(($body) => {
-    const modal = $body.find('[role="dialog"]');
-    if (modal.length === 0) {
-      return;
-    }
+  // Recursive function to close modals sequentially (second may appear after first closes)
+  const closeNextModal = (attempt = 0) => {
+    cy.get('[role="dialog"]', { timeout: 5000 }).then(
+      (modals) => {
+        const visibleModals = Cypress.$(modals).filter(function() {
+          return Cypress.$(this).is(':visible');
+        });
 
-    const closeBtn = modal.find('button[aria-label="Close"]');
-    if (closeBtn.length > 0) {
-      cy.get('[role="dialog"] button[aria-label="Close"]', { timeout: 5000 }).click({ force: true });
-      // Wait for modal to be removed after clicking close
-      cy.get('[role="dialog"]', { timeout: 5000 }).should('not.exist');
-    }
-    // If close button doesn't exist, just continue without trying to close
-  });
+        if (visibleModals.length > 0) {
+          const modal = Cypress.$(visibleModals[0]);
+
+          // Wait for modal to be fully visible before closing
+          cy.wrap(modal).should('be.visible');
+
+          const closeBtn = modal.find('button[aria-label="Close"]');
+          if (closeBtn.length > 0) {
+            cy.wrap(closeBtn).should('be.visible').click({ force: true });
+            cy.wait(1200); // Wait longer for modal animation and next modal to appear
+            // Check for next visible modal after closing this one
+            closeNextModal(attempt + 1);
+          }
+        }
+      },
+      () => {
+        // No modals found
+      }
+    );
+  };
+
+  closeNextModal();
 });
 
 export const checkErrors = () =>
