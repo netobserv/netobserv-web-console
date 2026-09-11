@@ -1,7 +1,10 @@
 # Dockerfile for running Cypress E2E tests in OpenShift CI
 # This runs tests against a real OpenShift cluster
 
-FROM cypress/included:15.16.0
+# cypress/browsers ships Node + real browsers (Chrome/Firefox/Edge) without the Cypress binary
+FROM cypress/browsers:24.20.0
+
+ENV CYPRESS_CACHE_FOLDER=/opt/app-root/.cache/Cypress
 
 # Install additional dependencies
 USER root
@@ -31,8 +34,9 @@ WORKDIR /opt/app-root/web
 # Copy package files first for better layer caching
 COPY web/package.json web/package-lock.json ./
 
-# Install npm dependencies
-RUN npm --legacy-peer-deps ci
+# Install npm dependencies, including the cypress binary. Verify fails the
+# build early if the binary/deps are wrong.
+RUN npm --legacy-peer-deps ci && npx cypress verify
 
 # Copy the rest of the web application
 COPY web/ ./
@@ -48,11 +52,10 @@ ENV HOME=/tmp
 ENV NO_COLOR=1
 ENV WEB_DIR=/opt/app-root/web
 
-RUN mkdir -p /root/.cache/Cypress /tmp && \
-    chmod 1777 /tmp && \
-    chmod -R g+rwX /root/.cache/Cypress
+RUN mkdir -p /tmp && chmod 1777 /tmp
 
-# Make directories writable for OpenShift arbitrary UIDs (group 0)
+# Make directories writable for OpenShift arbitrary UIDs (group 0).
+# This also covers the Cypress binary cache at ${CYPRESS_CACHE_FOLDER}.
 RUN chmod -R g+rwX /opt/app-root
 
 WORKDIR /opt/app-root
