@@ -110,7 +110,13 @@ export const NetworkHealth: React.FC<{}> = ({}) => {
 
   const panelContent = () => {
     if (isRulesManagerOpen) {
-      return <HealthRulesManager isOpen={isRulesManagerOpen} onClose={() => setIsRulesManagerOpen(false)} />;
+      return (
+        <HealthRulesManager
+          isOpen={isRulesManagerOpen}
+          onClose={() => setIsRulesManagerOpen(false)}
+          templates={config.healthTemplates}
+        />
+      );
     }
     if (isScoringDrawerOpen) {
       return <HealthScoringDrawer isOpen={isScoringDrawerOpen} onClose={() => setIsScoringDrawerOpen(false)} />;

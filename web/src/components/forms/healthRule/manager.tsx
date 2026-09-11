@@ -23,6 +23,7 @@ import {
 import { ActionsColumn, IAction, Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
+import { HealthTemplate } from '../../../model/config';
 import { useK8sModel } from '../../../utils/k8s-models-hook';
 import { navigateTo } from '../../../utils/url';
 import Modal from '../../modals/modal';
@@ -35,6 +36,7 @@ import { HEALTH_RULE_DEFAULTS, HealthRuleDefaultSummary } from './variantDefault
 export type HealthRulesManagerProps = {
   isOpen: boolean;
   onClose: () => void;
+  templates: HealthTemplate[];
 };
 
 type PendingAction = { type: 'reset'; template: string } | { type: 'delete'; namespace: string; name: string } | null;
@@ -70,7 +72,7 @@ const updateFlowCollectorWithRetry = async (
  * Must be rendered as `panelContent` of Network Health's page Drawer
  * (same pattern as HealthScoringDrawer) so the page stays behind the panel.
  */
-export const HealthRulesManager: React.FC<HealthRulesManagerProps> = ({ isOpen, onClose }) => {
+export const HealthRulesManager: React.FC<HealthRulesManagerProps> = ({ isOpen, onClose, templates }) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
   const drawerRef = React.useRef<HTMLDivElement>(null);
   const flowCollectorModel = useK8sModel(FLOW_COLLECTOR_GVK.group, FLOW_COLLECTOR_GVK.version, FLOW_COLLECTOR_GVK.kind);
@@ -120,7 +122,7 @@ export const HealthRulesManager: React.FC<HealthRulesManagerProps> = ({ isOpen, 
     return list.filter(pr => pr?.metadata?.name && pr?.metadata?.namespace);
   }, [prometheusRules]);
 
-  const defaultRuleActions = (hr: HealthRuleDefaultSummary, hasOverride: boolean) => {
+  const defaultRuleActions = (hr: HealthRuleDefaultSummary, hasOverride: boolean, tpl: HealthTemplate | undefined) => {
     const actions: IAction[] = [];
     const editPath = healthRuleEditTemplatePath(hr.template);
     if (editPath) {
@@ -140,6 +142,9 @@ export const HealthRulesManager: React.FC<HealthRulesManagerProps> = ({ isOpen, 
           }
         });
       }
+    }
+    if (tpl?.runbookURL) {
+      actions.push({ title: <a href={tpl.runbookURL}>{t('View runbook')}</a> });
     }
     return actions;
   };
@@ -267,16 +272,19 @@ export const HealthRulesManager: React.FC<HealthRulesManagerProps> = ({ isOpen, 
               {HEALTH_RULE_DEFAULTS.map(def => {
                 const override = templateOverrides.get(def.template);
                 const mode = override?.mode || def.mode;
-                const actions = defaultRuleActions(def, override !== undefined);
+                const templateInfo = templates.find(t => t.name === def.template);
+                const actions = defaultRuleActions(def, override !== undefined, templateInfo);
                 return (
                   <Tr key={def.template} data-test={`template-health-rule-row-${def.template}`}>
                     <Td dataLabel={t('Template')}>{def.template}</Td>
                     <Td dataLabel={t('Mode')}>{mode}</Td>
                     <Td dataLabel={t('Status')}>
-                      {override ? (
+                      {override && templateInfo?.isConfigured ? (
                         <Label color="blue">{t('Customized')}</Label>
+                      ) : templateInfo?.isConfigured ? (
+                        <Label color="green">{t('Default')}</Label>
                       ) : (
-                        <Label color="grey">{t('Default')}</Label>
+                        <Label color="grey">{t('Inactive')}</Label>
                       )}
                     </Td>
                     <Td isActionCell>
