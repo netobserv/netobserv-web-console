@@ -60,11 +60,9 @@ Cypress.Commands.add('checkDashboards', (names) => {
         // Add wait to allow metrics to populate
         cy.wait(2000)
 
-        // Check that graph body doesn't have empty state - use a custom retry mechanism
+        // Verify panel doesn't have empty state - works for both chart panels and tile panels
         cy.byTestID(names[i]).first({ timeout: 120000 }).should($panel => {
-            const $region = $panel.find(graphSelector.graphBody)
-            expect($region.length, `${names[i]} graph region should exist`).to.be.greaterThan(0)
-            expect($region.find('[data-test="empty-state"]').length, `${names[i]} should not be empty`).to.equal(0)
+            expect($panel.find('[data-test="empty-state"]').length, `${names[i]} should not be empty`).to.equal(0)
         })
     }
 })
