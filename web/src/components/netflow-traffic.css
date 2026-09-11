@@ -33,6 +33,8 @@
 span.pf-v5-c-button__icon.pf-v5-m-start {
     width: 14px;
     display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /*rotate animation for loading icon*/

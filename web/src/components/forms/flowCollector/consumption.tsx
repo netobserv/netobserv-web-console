@@ -10,7 +10,7 @@ import { Table, TableVariant, Tbody, Td, Th, Thead, Tr } from '@patternfly/react
 import _ from 'lodash';
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import './forms.css';
+import '../forms.css';
 
 export type ResourceCalculatorProps = {
   flowCollector: K8sResourceKind | null;

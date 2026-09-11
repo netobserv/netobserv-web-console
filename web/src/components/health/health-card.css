@@ -50,7 +50,8 @@
 }
 
 .health-card .card-header {
-    min-height: 5rem;
+    min-height: 0;
+    padding-block-end: 0.5rem;
 }
 
 .health-card .card-header-hidden {
@@ -61,12 +62,23 @@
 }
 
 .health-card .card-header .icon {
-    width: 1.9rem;
-    height: 1.9rem;
+    width: 1.25rem;
+    height: 1.25rem;
 }
 
 .health-card .card-body-icon .icon {
-    width: 1.9rem;
-    height: 1.9rem;
-    margin-right: 1rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.75rem;
+}
+
+.health-card .health-card-score {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.2;
+    margin: 0;
+}
+
+.health-card .pf-v6-c-card__body {
+    padding-block-start: 0.5rem;
 }

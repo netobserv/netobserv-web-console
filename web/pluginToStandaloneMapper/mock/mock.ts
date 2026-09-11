@@ -2,6 +2,46 @@ import _ from 'lodash';
 import { flowCollectorSchema, flowMetricSchema, flowCollectorSliceSchema } from '../schemas';
 import { getFlowCollectorJS, getFlowMetricJS, getFlowCollectorSliceJS } from '../templates';
 
+/** Sample custom PrometheusRule for Network Health manager / edit flows in mock mode. */
+export const mockCustomPrometheusRule = (
+  name = 'netobserv-custom-surge',
+  namespace = 'openshift-monitoring'
+) => ({
+  apiVersion: 'monitoring.coreos.com/v1',
+  kind: 'PrometheusRule',
+  metadata: {
+    name,
+    namespace,
+    labels: { netobserv: 'true' },
+    resourceVersion: '1',
+    uid: 'mock-prometheus-rule-uid'
+  },
+  spec: {
+    groups: [
+      {
+        name: 'netobserv-custom',
+        rules: [
+          {
+            alert: 'IncomingTrafficSurge',
+            expr: 'vector(1) > 0',
+            for: '5m',
+            labels: { severity: 'warning', netobserv: 'true' },
+            annotations: {
+              summary: 'Traffic surge',
+              message: 'Incoming traffic is elevated',
+              netobserv_io_network_health: JSON.stringify({
+                unit: '%',
+                alertThreshold: '80',
+                namespaceLabels: ['DstK8S_Namespace']
+              })
+            }
+          }
+        ]
+      }
+    ]
+  }
+});
+
 const mockFlowCollector = () => {
   const fc = _.cloneDeep(getFlowCollectorJS());
   fc.spec!.loki.enable = false;
@@ -203,6 +243,15 @@ export function mockK8SResource(req: any, setResource: (r: any) => void, setLoad
             const fm = _.cloneDeep(getFlowMetricJS());
             fm.spec!.metricName = 'test_metric';
             setResource(fm);
+          }
+          break;
+        case 'PrometheusRule':
+          if (req.isList) {
+            setResource([mockCustomPrometheusRule()]);
+          } else {
+            setResource(
+              mockCustomPrometheusRule(req.name || 'netobserv-custom-surge', req.namespace || 'openshift-monitoring')
+            );
           }
           break;
       }

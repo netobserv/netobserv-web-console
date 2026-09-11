@@ -13,6 +13,7 @@ import validator from '@rjsf/validator-ajv8';
 import _ from 'lodash';
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDiscardGuard } from '../../../utils/discard-guard-hook';
 import {
   flowCollectorEditPath,
   flowCollectorNewPath,
@@ -21,14 +22,14 @@ import {
   navigateTo,
   useNavigate,
   useParams
-} from '../../utils/url';
-import { flowCollectorUISchema } from './config/uiSchema';
+} from '../../../utils/url';
+import { DynamicForm } from '../dynamic-form/dynamic-form';
+import { ErrorTemplate } from '../dynamic-form/templates';
+import '../forms.css';
+import ResourceWatcher, { Consumer } from '../resource-watcher';
+import { getFilteredUISchema } from '../utils';
 import Consumption from './consumption';
-import { DynamicForm } from './dynamic-form/dynamic-form';
-import { ErrorTemplate } from './dynamic-form/templates';
-import './forms.css';
-import ResourceWatcher, { Consumer } from './resource-watcher';
-import { getFilteredUISchema } from './utils';
+import { flowCollectorUISchema } from './uiSchema';
 
 export type FlowCollectorWizardProps = {
   name?: string;
@@ -61,6 +62,7 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
   const [data, setData] = React.useState<any>(null);
   const params = useParams<{ name?: string }>();
   const navigate = useNavigate();
+  const [discard, discardModal] = useDiscardGuard();
   const isSetupRoute = window.location.pathname.startsWith(flowCollectorSetupPath);
 
   const validSteps = Object.keys(stepPaths);
@@ -68,6 +70,20 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
   const initialStepId = initialTab && validSteps.includes(initialTab) ? initialTab : 'overview';
   const [startIndex] = React.useState(validSteps.indexOf(initialStepId) + 1);
   const [paths, setPaths] = React.useState<string[]>(stepPaths[initialStepId]);
+  const blockAutoRedirectToEditRef = React.useRef(false);
+
+  React.useEffect(() => {
+    blockAutoRedirectToEditRef.current = false;
+  }, []);
+
+  const submitFlowCollector = React.useCallback(
+    (ctx: { onSubmit: (d: any) => void }, formData: any) => {
+      blockAutoRedirectToEditRef.current = true;
+      discard.clearDirty();
+      ctx.onSubmit(formData);
+    },
+    [discard]
+  );
 
   const form = React.useCallback(
     (errors?: string[]) => {
@@ -83,17 +99,21 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
           validator={validator}
           onChange={event => {
             setData(event.formData);
+            discard.markDirty();
           }}
           errors={errors}
           skipDefaults
         />
       );
     },
-    [data, paths, schema]
+    [data, discard, paths, schema]
   );
 
   const onStepChange = React.useCallback((_event: React.MouseEvent<HTMLButtonElement>, step: WizardStepType) => {
     if (step.id) {
+      const newParams = new URLSearchParams(window.location.search);
+      newParams.set('tab', step.id as string);
+      window.history.replaceState(null, '', `${window.location.pathname}?${newParams.toString()}`);
       setPaths(stepPaths[step.id as string] ?? []);
     }
   }, []);
@@ -126,8 +146,7 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
           // redirect to edit page if resource already exists or is created while using the wizard
           // We can't handle edition here since this page doesn't include ResourceYAMLEditor
           // which handle reload / update buttons
-          // Skip redirect when accessed via /setup route (e.g. from the sampling banner)
-          if (ctx.data.metadata?.resourceVersion && !isSetupRoute) {
+          if (ctx.data.metadata?.resourceVersion && !blockAutoRedirectToEditRef.current && !isSetupRoute) {
             navigate(flowCollectorEditPath);
           }
           // first init schema & data when watch resource query got results
@@ -162,8 +181,8 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
                 <Wizard
                   startIndex={startIndex}
                   onStepChange={onStepChange}
-                  onSave={() => ctx.onSubmit(data)}
-                  onClose={() => navigateTo('/')}
+                  onSave={() => submitFlowCollector(ctx, data)}
+                  onClose={() => discard.requestClose(() => navigateTo('/'))}
                 >
                   <WizardStep name={t('Overview')} id="overview">
                     <span className="co-pre-line">
@@ -208,14 +227,14 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
                         <Button
                           variant="primary"
                           data-test-id="flowcollector-wizard-consumption-submit"
-                          onClick={() => ctx.onSubmit(data)}
+                          onClick={() => submitFlowCollector(ctx, data)}
                         >
                           {t('Submit')}
                         </Button>
                         <Button
                           variant="link"
                           data-test-id="flowcollector-wizard-consumption-cancel"
-                          onClick={() => navigateTo('/')}
+                          onClick={() => discard.requestClose(() => navigateTo('/'))}
                         >
                           {t('Cancel')}
                         </Button>
@@ -227,6 +246,7 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
                   </WizardStep>
                 </Wizard>
               </div>
+              {discardModal}
             </PageSection>
           );
         }}

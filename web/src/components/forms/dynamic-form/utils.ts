@@ -70,3 +70,14 @@ export const pruneRecursive = (current: any, sample: any): any => {
 export const prune = (obj: any, sample?: any): any => {
   return pruneRecursive(_.cloneDeep(obj), sample);
 };
+
+export const isDependencyControlUnset = (spec: Record<string, unknown>, controlFieldPath: string[]): boolean => {
+  let val: unknown = spec;
+  for (const path of controlFieldPath) {
+    if (val === null || val === undefined || typeof val !== 'object') {
+      return true;
+    }
+    val = (val as Record<string, unknown>)[path];
+  }
+  return val === null || val === undefined || val === '';
+};

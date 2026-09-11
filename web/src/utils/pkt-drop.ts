@@ -18,9 +18,9 @@ export const dropStates: ReadOnlyValues = [
   { value: 11, name: 'TCP_NEW_SYN_RECV' }
 ] as const;
 
-export type DropStatesValues = typeof dropStates[number]['value'];
+export type DropStatesValues = (typeof dropStates)[number]['value'];
 
-export type DropStatesNames = typeof dropStates[number]['name'];
+export type DropStatesNames = (typeof dropStates)[number]['name'];
 // https://github.com/torvalds/linux/blob/master/include/net/dropreason-core.h
 export const dropCauses: ReadOnlyValues = [
   { value: coreDropSubSystem + 2, name: 'SKB_DROP_REASON_NOT_SPECIFIED', description: 'drop reason is not specified' },
@@ -338,9 +338,9 @@ export const dropCauses: ReadOnlyValues = [
   }
 ] as const;
 
-export type DropCausesValues = typeof dropCauses[number]['value'];
+export type DropCausesValues = (typeof dropCauses)[number]['value'];
 
-export type DropCausesNames = typeof dropCauses[number]['name'];
+export type DropCausesNames = (typeof dropCauses)[number]['name'];
 
 export const coreDropCausesDocUrl = 'https://github.com/torvalds/linux/blob/master/include/net/dropreason-core.h';
 export const ovsDropCausesDocUrl =

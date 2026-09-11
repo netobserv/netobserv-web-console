@@ -1,4 +1,6 @@
 /* eslint-disable max-len */
+import '@patternfly/patternfly/patternfly-charts-theme-dark.css';
+import '@patternfly/patternfly/patternfly-theme-dark.css';
 import {
   Nav,
   NavItem,
@@ -11,25 +13,23 @@ import {
   Tabs,
   Title
 } from '@patternfly/react-core';
+import '@patternfly/react-core/dist/styles/base.css';
 import { configure } from 'mobx';
 import React from 'react';
 import { BrowserRouter, Navigate, NavLink, Route, Routes } from 'react-router-dom-v5-compat';
-import FlowCollectorForm from '../components/forms/flowCollector';
-import FlowCollectorStatus from '../components/forms/flowCollector-status';
-import FlowCollectorWizard from '../components/forms/flowCollector-wizard';
-import FlowCollectorSliceForm from '../components/forms/flowCollectorSlice';
-import FlowMetricForm from '../components/forms/flowMetric';
-import FlowMetricWizard from '../components/forms/flowMetric-wizard';
+import FlowCollectorForm from '../components/forms/flowCollector/form';
+import FlowCollectorStatus from '../components/forms/flowCollector/status';
+import FlowCollectorWizard from '../components/forms/flowCollector/wizard';
+import FlowCollectorSliceForm from '../components/forms/flowCollectorSlice/form';
+import FlowMetricForm from '../components/forms/flowMetric/form';
+import FlowMetricWizard from '../components/forms/flowMetric/wizard';
+import HealthRuleWizard from '../components/forms/healthRule/wizard';
 import NetworkHealth from '../components/health/network-health';
 import NetflowTrafficDevTab from '../components/netflow-traffic-dev-tab';
 import NetflowTrafficParent from '../components/netflow-traffic-parent';
 import NetflowTab from '../components/netflow-traffic-tab';
 import { ContextSingleton } from '../utils/context';
 import Header from './header';
-
-import '@patternfly/patternfly/patternfly-charts-theme-dark.css';
-import '@patternfly/patternfly/patternfly-theme-dark.css';
-import '@patternfly/react-core/dist/styles/base.css';
 import './index.css';
 
 configure({ isolateGlobalState: true });
@@ -87,6 +87,11 @@ const allPages = [
     content: <NetworkHealth />
   },
   {
+    id: 'health-rule-wizard',
+    name: 'Health Rule wizard',
+    content: <HealthRuleWizard />
+  },
+  {
     id: 'flowCollector-wizard',
     name: 'FlowCollector wizard',
     content: <FlowCollectorWizard name="cluster" />
@@ -130,8 +135,9 @@ export const App: React.FunctionComponent<{ endUser?: boolean }> = ({ endUser })
   };
 
   const withContext = (content: JSX.Element, name: string) => {
+    const tabScheme = isDark ? 'dark' : 'light';
     return (
-      <PageSection id="netobservPageSection" className={`tab ${isDark ? 'dark' : 'light'}`}>
+      <PageSection id="consolePageSection" className={`tab ${tabScheme}`}>
         <div style={{ padding: '1rem' }}>
           <Title headingLevel="h1">{`${name} example`}</Title>
         </div>

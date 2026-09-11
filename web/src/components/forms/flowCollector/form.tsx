@@ -6,10 +6,10 @@ import {
   isFlowCollectorCreatePath,
   useNavigate,
   useParams
-} from '../../utils/url';
-import { flowCollectorUISchema } from './config/uiSchema';
-import { ResourceForm } from './resource-form';
-import { ResourceWatcher } from './resource-watcher';
+} from '../../../utils/url';
+import { ResourceForm } from '../resource-form';
+import { ResourceWatcher } from '../resource-watcher';
+import { flowCollectorUISchema } from './uiSchema';
 
 export type FlowCollectorFormProps = {
   name?: string;

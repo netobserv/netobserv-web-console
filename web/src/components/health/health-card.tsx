@@ -1,15 +1,5 @@
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Flex,
-  FlexItem,
-  Text,
-  TextContent,
-  TextVariants
-} from '@patternfly/react-core';
+import { Card, CardBody, CardHeader, CardTitle, Flex, FlexItem, Text, TextVariants } from '@patternfly/react-core';
 import { BellIcon, ExclamationCircleIcon, ExclamationTriangleIcon, InfoAltIcon } from '@patternfly/react-icons';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -102,17 +92,13 @@ export const HealthCard: React.FC<HealthCardProps> = ({
       <CardHeader
         className={hideTitle ? 'card-header-hidden' : 'card-header'}
         selectableActions={{
-          selectableActionId: `health-card-selectable-${name || 'global'}`,
-          selectableActionAriaLabelledby: `health-card-title-${name || 'global'}`,
+          selectableActionId: `selectable-action-${name || 'global'}`,
+          selectableActionAriaLabelledby: `selectable-card-${name || 'global'}`,
           variant: 'single',
           onClickAction: onClick
         }}
       >
-        {hideTitle ? (
-          <span id={`health-card-title-${name || 'global'}`} className="pf-v5-screen-reader">
-            {k8sKind && name ? `${k8sKind} ${name}` : t('Global')}
-          </span>
-        ) : (
+        {!hideTitle ? (
           <Flex
             gap={{ default: 'gapSm' }}
             alignItems={{ default: 'alignItemsCenter' }}
@@ -120,11 +106,15 @@ export const HealthCard: React.FC<HealthCardProps> = ({
           >
             <FlexItem>{icon}</FlexItem>
             <FlexItem>
-              <CardTitle id={`health-card-title-${name || 'global'}`}>
+              <CardTitle id={`selectable-card-${name || 'global'}`}>
                 {k8sKind && name ? <ResourceLink inline={true} kind={k8sKind} name={name} /> : t('Global')}
               </CardTitle>
             </FlexItem>
           </Flex>
+        ) : (
+          <span id={`selectable-card-${name || 'global'}`} className="pf-v5-screen-reader">
+            {name || t('Global')}
+          </span>
         )}
       </CardHeader>
       <CardBody>
@@ -155,8 +145,12 @@ export const HealthCard: React.FC<HealthCardProps> = ({
             </ul>
           </FlexItem>
           <FlexItem>
-            <div style={{ textAlign: 'right' }}>
-              <TextContent>
+            <Flex
+              direction={{ default: 'column' }}
+              alignItems={{ default: 'alignItemsCenter' }}
+              gap={{ default: 'gapNone' }}
+            >
+              <FlexItem>
                 <Text
                   component={TextVariants.small}
                   style={{
@@ -165,11 +159,13 @@ export const HealthCard: React.FC<HealthCardProps> = ({
                 >
                   {t('Score')}
                 </Text>
-                <Text component={TextVariants.h1}>
+              </FlexItem>
+              <FlexItem>
+                <Text component={TextVariants.p} className="health-card-score">
                   {isNaN(score) || !isFinite(score) ? '-' : valueFormat(score, 1)}
                 </Text>
-              </TextContent>
-            </div>
+              </FlexItem>
+            </Flex>
           </FlexItem>
         </Flex>
       </CardBody>

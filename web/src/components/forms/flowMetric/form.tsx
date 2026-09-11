@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
 
-import { useNavigate, useParams } from '../../utils/url';
-import { flowMetricUISchema } from './config/uiSchema';
-import { ResourceForm } from './resource-form';
-import { ResourceWatcher } from './resource-watcher';
+import { useNavigate, useParams } from '../../../utils/url';
+import { ResourceForm } from '../resource-form';
+import { ResourceWatcher } from '../resource-watcher';
+import { flowMetricUISchema } from './uiSchema';
 
 export type FlowMetricFormProps = {
   name?: string;

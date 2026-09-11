@@ -18,13 +18,15 @@ import {
   HealthItem,
   HealthStat,
   HealthSuperKind,
-  ScoreDetail
+  ScoreDetail,
+  Severity
 } from './health-helper';
 import './rule-details.css';
 
 export interface RuleDetailsProps {
   kind: HealthSuperKind;
   resourceHealth: HealthStat;
+  severityFilter?: Severity;
 }
 
 // Helper: Get direction from recording rule name
@@ -238,12 +240,11 @@ const RuleCard: React.FC<{
   );
 };
 
-export const RuleDetails: React.FC<RuleDetailsProps> = ({ kind, resourceHealth }) => {
+export const RuleDetails: React.FC<RuleDetailsProps> = ({ kind, resourceHealth, severityFilter }) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
 
   const resourceName = resourceHealth.name || 'Global';
   const isGlobal = kind === 'Global';
-
   // Build one score breakdown for the resource and derive each rule's "points lost": how many points it
   // subtracts from the perfect score of 10. Using the same denominator (sum of the active rules' weights,
   // inactive rules excluded, matching computeResourceScore) guarantees the listed rows add up to
@@ -253,6 +254,7 @@ export const RuleDetails: React.FC<RuleDetailsProps> = ({ kind, resourceHealth }
     const breakdown = computeResourceScore(resourceHealth);
     const totalWeight = breakdown.details.reduce((sum, d) => sum + d.weight, 0);
     const base = getAllHealthItems(resourceHealth)
+      .filter(item => !severityFilter || item.severity === severityFilter)
       .map(item => {
         const detail = computeHealthItemScore(item);
         const pointsLost = totalWeight > 0 ? ((10 - detail.rawScore) * detail.weight) / totalWeight : 0;
@@ -263,7 +265,7 @@ export const RuleDetails: React.FC<RuleDetailsProps> = ({ kind, resourceHealth }
     // total impact shown in the drawer header. This way a manual sum of the displayed values reconciles.
     const displayImpacts = apportionToOneDecimal(base.map(r => r.pointsLost));
     return base.map((r, i) => ({ ...r, impact: displayImpacts[i] }));
-  }, [resourceHealth]);
+  }, [resourceHealth, severityFilter]);
 
   // Global view: render table
   if (isGlobal) {
