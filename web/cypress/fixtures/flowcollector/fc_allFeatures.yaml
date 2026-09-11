@@ -1,0 +1,41 @@
+kind: FlowCollector
+apiVersion: flows.netobserv.io/v1beta2
+metadata:
+  name: cluster
+spec:
+  agent:
+    ebpf:
+      sampling: 1
+      privileged: true
+      features:
+        - PacketDrop
+        - DNSTracking
+        - FlowRTT
+        - NetworkEvents
+        - PacketTranslation
+        - UDNMapping
+        - TLSTracking
+    type: eBPF
+  loki:
+    enable: true
+    mode: Monolithic
+    namespace: netobserv
+    monolithic:
+      installDemoLoki: true
+  processor:
+    metrics:
+      additionalIncludeList:
+        - node_ingress_packets_total
+        - node_egress_packets_total
+        - namespace_ingress_packets_total
+        - namespace_egress_packets_total
+        - workload_ingress_packets_total
+        - namespace_drop_packets_total
+        - node_drop_packets_total
+        - workload_drop_packets_total
+        - namespace_dns_latency_seconds
+        - node_dns_latency_seconds
+        - workload_dns_latency_seconds
+        - namespace_rtt_seconds
+        - node_rtt_seconds
+        - workload_rtt_seconds

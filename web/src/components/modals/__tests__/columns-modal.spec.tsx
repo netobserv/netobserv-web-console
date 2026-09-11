@@ -13,6 +13,9 @@ describe('<ColumnsModal />', () => {
     columns: ShuffledColumnSample,
     setColumns: jest.fn(),
     setColumnSizes: jest.fn(),
+    activeView: 'all' as const,
+    genericPrefs: { added: [], removed: [] },
+    setGenericPrefs: jest.fn(),
     id: 'columns-modal'
   };
 

@@ -123,13 +123,13 @@ endif
 start: YQ build-backend install-frontend ## Run backend and frontend
 	$(YQ) '.server.port |= 9002 | .server.metricsPort |= 9003 | .consoleMode |= "Standalone"' ./config/sample-config.yaml > ./config/config.yaml
 	@echo "### Starting backend on http://localhost:9002"
-	bash -c "trap 'fuser -k 9002/tcp' EXIT; \
+	bash -c "trap 'lsof -ti tcp:9002 | xargs kill -9 2>/dev/null || true' EXIT; \
 					./plugin-backend $(CMDLINE_ARGS) & cd web && npm run start"
 
 .PHONY: start-backend
 start-backend: YQ build-backend
 	$(YQ) '.server.port |= 9002 | .server.metricsPort |= 9003 | .consoleMode |= "Standalone"' ./config/sample-config.yaml > ./config/config.yaml
-	bash -c "trap 'fuser -k 9002/tcp' EXIT; \
+	bash -c "trap 'lsof -ti tcp:9002 | xargs kill -9 2>/dev/null || true' EXIT; \
 					./plugin-backend $(CMDLINE_ARGS)"
 
 .PHONY: bridge

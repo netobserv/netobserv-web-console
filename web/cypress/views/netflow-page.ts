@@ -350,6 +350,19 @@ export const memoryUsage = {
     "topology": 600
 }
 
+export namespace viewSelectors {
+    export const container = '[data-test="view-selector-container"]'
+    export const dropdown = '[data-test="view-selector-dropdown"]'
+    export const allTraffic = '#view-option-all'
+    export const packetDrops = '#view-option-pktdrop'
+    export const dnsLatency = '#view-option-dns'
+    export const flowRTT = '#view-option-rtt'
+    export const tlsTracking = '#view-option-tls'
+    export const udnMapping = '#view-option-udn'
+    export const networkEvents = '#view-option-networkEvents'
+    export const packetTranslation = '#view-option-packetTranslation'
+}
+
 export namespace histogramSelectors {
     export const timeRangeContainer = "#chart-histogram .histogram-range-container"
     export const zoomin = '[data-test="histogram-zoom-in"]'

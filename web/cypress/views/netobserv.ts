@@ -28,6 +28,7 @@ type FlowCollectorParameter =
     | 'SubnetLabels'
     | 'StaticPlugin'
     | 'NetworkAlertHealth'
+    | 'AllFeatures'
 
 // Constants
 export const project = "netobserv"
@@ -55,7 +56,8 @@ const FIXTURE_PATHS = {
     conversations: './cypress/fixtures/flowcollector/fc_conversations.yaml',
     subnetLabels: './cypress/fixtures/flowcollector/fc_subnetLabel.yaml',
     zonesMultiCluster: './cypress/fixtures/flowcollector/fc_zoneMulticluster.yaml',
-    networkAlertHealth: './cypress/fixtures/flowcollector/fc_networkalert.yaml'
+    networkAlertHealth: './cypress/fixtures/flowcollector/fc_networkalert.yaml',
+    allFeatures: './cypress/fixtures/flowcollector/fc_allFeatures.yaml'
 } as const
 
 export const Operator = {
@@ -196,6 +198,9 @@ export const Operator = {
                     case "NetworkAlertHealth":
                         // Flowcollector deployed with DNSTracking enabled
                         cy.deployFlowcollectorFromFixture(FIXTURE_PATHS.networkAlertHealth)
+                        break;
+                    case "AllFeatures":
+                        cy.deployFlowcollectorFromFixture(FIXTURE_PATHS.allFeatures)
                         break;
                     default:
                         cy.deployFlowcollectorFromFixture(FIXTURE_PATHS.default)
