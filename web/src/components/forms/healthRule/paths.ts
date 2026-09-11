@@ -1,29 +1,46 @@
 import { ContextSingleton } from '../../../utils/context';
 
-export const healthRuleSetupPath = () =>
-  ContextSingleton.isStandalone() ? '/console-health-rule-wizard' : '/network-health/rules/setup';
+export const networkHealthPath = () =>
+  ContextSingleton.isStandalone() ? '/console-network-health' : '/network-health';
+
+export const healthRuleSetupPath = () => {
+  if (ContextSingleton.isStandalone()) {
+    if (ContextSingleton.isMock()) {
+      return '/console-health-rule-wizard';
+    }
+    // Standalone / no mock case: setup currently unavailable, needs rbac / https://github.com/netobserv/netobserv-operator/issues/2554
+    return undefined;
+  }
+  return '/network-health/rules/setup';
+};
 
 /** Edit/customize a FlowCollector template — template is always in query (and path in plugin mode). */
 export const healthRuleEditTemplatePath = (template: string) => {
   const q = `template=${encodeURIComponent(template)}`;
-  return ContextSingleton.isStandalone()
-    ? `/console-health-rule-wizard?${q}`
-    : `/network-health/rules/template/${encodeURIComponent(template)}?${q}`;
+  if (ContextSingleton.isStandalone()) {
+    if (ContextSingleton.isMock()) {
+      return `/console-health-rule-wizard?${q}`;
+    }
+    // Standalone / no mock case: edit currently unavailable, needs rbac / https://github.com/netobserv/netobserv-operator/issues/2554
+    return undefined;
+  }
+  return `/network-health/rules/template/${encodeURIComponent(template)}?${q}`;
 };
 
 /** Edit a custom PrometheusRule — ns/name in query (and path in plugin mode). */
 export const healthRuleEditCustomPath = (namespace: string, name: string) => {
   const q = `namespace=${encodeURIComponent(namespace)}&name=${encodeURIComponent(name)}`;
-  return ContextSingleton.isStandalone()
-    ? `/console-health-rule-wizard?${q}`
-    : `/network-health/rules/ns/${encodeURIComponent(namespace)}/name/${encodeURIComponent(name)}?${q}`;
+  if (ContextSingleton.isStandalone()) {
+    if (ContextSingleton.isMock()) {
+      return `/console-health-rule-wizard?${q}`;
+    }
+    // Standalone / no mock case: edit currently unavailable, needs rbac / https://github.com/netobserv/netobserv-operator/issues/2554
+    return undefined;
+  }
+  return `/network-health/rules/ns/${encodeURIComponent(namespace)}/name/${encodeURIComponent(name)}?${q}`;
 };
 
-export const networkHealthPath = () =>
-  ContextSingleton.isStandalone() ? '/console-network-health' : '/network-health';
-
-export const networkHealthCreatedPath = () =>
-  ContextSingleton.isStandalone() ? '/console-network-health?ruleCreated=1' : '/network-health?ruleCreated=1';
+export const networkHealthCreatedPath = () => networkHealthPath() + '?ruleCreated=1';
 
 const safeDecodeURIComponent = (value: string): string => {
   try {

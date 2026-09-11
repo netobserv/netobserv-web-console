@@ -309,8 +309,8 @@ html.netobserv-standalone-theme-glass .pf-v6-c-toggle-group__button.pf-m-selecte
 .pf-v6-c-masthead .masthead-link a {
   text-decoration: none;
   font-weight: bold;
-  color: var(--pf-t--global--text--color--inverse);
+  color: var(--pf-t--global--text--color--subtle);
 }
 .pf-v6-c-masthead .masthead-link a:hover {
-  color: var(--pf-t--global--text--color--subtle);
+  color: var(--pf-t--global--text--color);
 }

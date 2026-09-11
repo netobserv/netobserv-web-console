@@ -437,7 +437,7 @@ export const FiltersChips: React.FC<FiltersChipsProps> = ({
           <Button
             id="edit-filters-button"
             data-test="edit-filters-button"
-            onClick={() => navigate(getPathWithParams(netflowTrafficPath))}
+            onClick={() => navigate(getPathWithParams(netflowTrafficPath()))}
           >
             {t('Edit filters')}
           </Button>

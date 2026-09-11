@@ -247,7 +247,8 @@ export const getConfig = (): Promise<Config> => {
       lokiLabels: r.data.lokiLabels || defaultConfig.lokiLabels,
       consoleMode: r.data.consoleMode || defaultConfig.consoleMode,
       maxChunkAgeMs: r.data.maxChunkAgeMs,
-      recordingAnnotations: r.data.recordingAnnotations || defaultConfig.recordingAnnotations
+      recordingAnnotations: r.data.recordingAnnotations || defaultConfig.recordingAnnotations,
+      healthTemplates: r.data.healthTemplates || defaultConfig.healthTemplates
     };
   });
 };

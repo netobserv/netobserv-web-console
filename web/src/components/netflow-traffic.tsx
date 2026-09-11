@@ -310,7 +310,7 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
 
   const clearFilters = React.useCallback(() => {
     if (forcedFilters) {
-      navigate(netflowTrafficPath);
+      navigate(netflowTrafficPath());
     } else if (filters) {
       //set URL Param to empty value to be able to restore state coming from another page
       const empty: Filters = { ...filters, list: [], match: 'all' };

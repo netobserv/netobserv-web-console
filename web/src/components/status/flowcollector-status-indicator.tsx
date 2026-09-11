@@ -8,7 +8,7 @@ import {
 } from '@patternfly/react-icons';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { flowCollectorStatusPath, useNavigate } from '../../utils/url';
+import { flowCollectorPath, useNavigate } from '../../utils/url';
 import { FlowCollectorOverallStatus, getFlowCollectorOverallStatus } from '../forms/utils';
 
 export const FlowCollectorStatusIndicator: React.FC<{
@@ -76,14 +76,16 @@ export const FlowCollectorStatusIndicator: React.FC<{
     }
   }, [status]);
 
+  const statusPath = flowCollectorPath('status');
+
   return (
     <Tooltip id="flowcollector-status-tooltip" content={tooltipContent} position="bottom">
       <Button
         id="flowcollector-status-indicator"
         variant="plain"
         aria-label={t('FlowCollector status')}
-        onClick={handleClick !== false ? () => navigate(flowCollectorStatusPath) : undefined}
-        style={handleClick === false ? { cursor: 'default' } : undefined}
+        onClick={statusPath && handleClick !== false ? () => navigate(statusPath) : undefined}
+        style={statusPath && handleClick !== false ? undefined : { cursor: 'default' }}
       >
         <span style={{ display: 'inline-flex', verticalAlign: 'middle' }}>{icon}</span>
       </Button>

@@ -110,7 +110,13 @@ export const NetworkHealth: React.FC<{}> = ({}) => {
 
   const panelContent = () => {
     if (isRulesManagerOpen) {
-      return <HealthRulesManager isOpen={isRulesManagerOpen} onClose={() => setIsRulesManagerOpen(false)} />;
+      return (
+        <HealthRulesManager
+          isOpen={isRulesManagerOpen}
+          onClose={() => setIsRulesManagerOpen(false)}
+          templates={config.healthTemplates}
+        />
+      );
     }
     if (isScoringDrawerOpen) {
       return <HealthScoringDrawer isOpen={isScoringDrawerOpen} onClose={() => setIsScoringDrawerOpen(false)} />;
@@ -119,6 +125,7 @@ export const NetworkHealth: React.FC<{}> = ({}) => {
   };
 
   const isDrawerOpen = isScoringDrawerOpen || isRulesManagerOpen;
+  const ruleSetupPath = healthRuleSetupPath();
 
   const mainContent = () => {
     return (
@@ -240,15 +247,17 @@ export const NetworkHealth: React.FC<{}> = ({}) => {
                           flexWrap={{ default: 'wrap' }}
                           gap={{ default: 'gapSm' }}
                         >
-                          <FlexItem>
-                            <Button
-                              data-test="create-health-rule-button"
-                              variant="primary"
-                              onClick={() => navigateTo(healthRuleSetupPath())}
-                            >
-                              {t('Create health rule')}
-                            </Button>
-                          </FlexItem>
+                          {ruleSetupPath && (
+                            <FlexItem>
+                              <Button
+                                data-test="create-health-rule-button"
+                                variant="primary"
+                                onClick={() => navigateTo(ruleSetupPath)}
+                              >
+                                {t('Create health rule')}
+                              </Button>
+                            </FlexItem>
+                          )}
                           <FlexItem>
                             <Button
                               data-test="manage-health-rules-button"

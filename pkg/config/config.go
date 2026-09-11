@@ -140,6 +140,12 @@ type FieldConfig struct {
 	Description string `yaml:"description" json:"description"`
 }
 
+type HealthTemplate struct {
+	Name         string `yaml:"name" json:"name"`
+	RunbookURL   string `yaml:"runbookURL" json:"runbookURL"`
+	IsConfigured bool   `yaml:"isConfigured" json:"isConfigured"`
+}
+
 type ConsoleMode string
 
 const (
@@ -168,6 +174,7 @@ type Frontend struct {
 	PromLabels           []string                     `yaml:"promLabels" json:"promLabels"`
 	MaxChunkAgeMs        int                          `yaml:"maxChunkAgeMs,omitempty" json:"maxChunkAgeMs,omitempty"` // populated at query time
 	RecordingAnnotations map[string]map[string]string `yaml:"recordingAnnotations,omitempty" json:"recordingAnnotations,omitempty"`
+	HealthTemplates      []HealthTemplate             `yaml:"healthTemplates,omitempty" json:"healthTemplates,omitempty"`
 }
 
 type Config struct {

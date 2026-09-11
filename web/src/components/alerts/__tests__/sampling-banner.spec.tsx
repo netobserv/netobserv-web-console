@@ -7,7 +7,7 @@ import { SamplingBanner } from '../sampling-banner';
 // Mock the url module
 const mockNavigate = jest.fn();
 jest.mock('../../../utils/url', () => ({
-  flowCollectorSetupPath: '/k8s/cluster/flows.netobserv.io~v1beta2~FlowCollector/setup',
+  flowCollectorPath: () => '/k8s/cluster/flows.netobserv.io~v1beta2~FlowCollector/setup',
   useNavigate: () => mockNavigate
 }));
 
