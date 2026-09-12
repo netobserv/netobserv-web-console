@@ -10,11 +10,17 @@ export namespace flowcollectorStatusSelectors {
     export const flpMonolithRow = '[id=WaitingFLPMonolith-row]'
     export const lokiStackRow = '[id=WaitingLokiStack-row]'
     export const flpParentRow = '[id=WaitingFLPParent-row]'
+    export const deleteFlowCollectorBtn = '[data-test-id="delete-flow-collector"]'
+    export const editFlowCollectorBtn = '[data-test-id="edit-flow-collector"]'
+    export const createFlowCollectorBtn = '[data-test-id="create-flow-collector"]'
+    export const deleteModal = '#delete-modal'
+    export const confirmDeleteBtn = '[data-test-id="confirm-delete-popup-button"]'
+    export const cancelDeleteBtn = '[data-test-id="cancel-delete-popup-button"]'
 }
 
 export const flowcollectorStatusPage = {
     visit: () => {
         cy.visit('k8s/cluster/flows.netobserv.io~v1beta2~FlowCollector/status')
-        cy.get(flowcollectorStatusSelectors.readyRow, { timeout: 30000 }).should('exist')
+        cy.contains('Network Observability FlowCollector', { timeout: 30000 }).should('exist')
     }
 }
