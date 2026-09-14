@@ -43,15 +43,24 @@ reviews:
     - "!web/yarn.lock"
 
   path_instructions:
+    - path: "**"
+      instructions: |
+        Scope every comment to what materially changed in the diff. If a hunk is only
+        moved, renamed, reindented, reformatted, or has reordered imports with no
+        behavioral change, do not raise findings on it — even if the surrounding code
+        could theoretically be improved. Do not treat relocated existing code as newly
+        introduced. Only flag pre-existing issues when the diff meaningfully changes
+        that code's behavior. Be pragmatic: prefer fewer, high-confidence comments.
     - path: "web/src/**/*.{ts,tsx}"
       instructions: |
-        Check React hooks dependencies, component re-render optimization, and TypeScript type safety. 
-        Verify PatternFly component usage follows best practices. 
+        Check React hooks dependencies, component re-render optimization, and TypeScript type safety.
+        Verify PatternFly component usage follows best practices.
         Ensure clickable elements (buttons, links, inputs) have data-test attributes for E2E testing.
     - path: "web/src/**/*.test.{ts,tsx}"
       instructions: "Ensure proper test isolation, mock cleanup, and coverage of edge cases"
     - path: "pkg/**/*.go"
-      instructions: "Review error handling, context cancellation, and API backward compatibility"
+      instructions: |
+        Review error handling, context cancellation, and API backward compatibility.
     - path: "web/cypress/**/*.ts"
       instructions: "Verify E2E test stability, proper waits, and selector resilience"
     - path: "**/Dockerfile*"
