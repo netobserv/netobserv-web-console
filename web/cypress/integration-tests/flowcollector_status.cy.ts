@@ -1,7 +1,7 @@
 import { Operator } from "@views/netobserv"
 import { flowcollectorStatusPage, flowcollectorStatusSelectors } from "@views/flowcollector-status"
 
-describe('FlowCollector status error scenario', { tags: ['Network_Observability'] }, function () {
+describe('Network_Observability FlowCollector status error scenario', { tags: ['Network_Observability'] }, function () {
 
     before('setup', function () {
         cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
@@ -12,7 +12,7 @@ describe('FlowCollector status error scenario', { tags: ['Network_Observability'
         Operator.createFlowcollector("WithLokiStack")
     })
 
-    it("(OCP-88744 kapjain) Verify error status when Loki enabled without LokiStack", function () {
+    it("(OCP-88744, kapjain) Verify error status when Loki enabled without LokiStack", function () {
         // Visit status page and wait for Ready condition to show False (error state)
         flowcollectorStatusPage.visit()
         cy.get(flowcollectorStatusSelectors.readyRow, { timeout: 120000 }).should('exist')
