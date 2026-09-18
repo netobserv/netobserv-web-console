@@ -82,13 +82,27 @@ const RuleTableRow: React.FC<{
             <HealthColorSquare item={item} />
           </FlexItem>
           <FlexItem>
-            {item.description ? (
-              <Tooltip content={item.description}>
-                <span>{item.summary}</span>
-              </Tooltip>
-            ) : (
-              <span>{item.summary}</span>
-            )}
+            <Flex direction={{ default: 'column' }} gap={{ default: 'gapXs' }}>
+              <FlexItem>
+                {item.description ? (
+                  <Tooltip content={item.description}>
+                    <span>{item.summary}</span>
+                  </Tooltip>
+                ) : (
+                  <span>{item.summary}</span>
+                )}
+              </FlexItem>
+              {isAlert && item.ruleName && item.ruleName !== item.summary && (
+                <FlexItem>
+                  <Content
+                    component={ContentVariants.small}
+                    style={{ color: 'var(--pf-t--global--text--color--subtle)' }}
+                  >
+                    {item.ruleName}
+                  </Content>
+                </FlexItem>
+              )}
+            </Flex>
           </FlexItem>
         </Flex>
       </Td>
@@ -122,11 +136,12 @@ const RuleTableRow: React.FC<{
       <Td dataLabel={t('Direction')}>{direction || ''}</Td>
       <Td dataLabel={t('Description')}>{item.description}</Td>
       <Td noPadding>
-        <ActionsColumn
-          data-test="rule-details-actions"
-          isDisabled={links.length === 0}
-          items={links.map(l => ({ title: <a href={l.url}>{l.name}</a> }))}
-        />
+        <span data-test="rule-details-actions">
+          <ActionsColumn
+            isDisabled={links.length === 0}
+            items={links.map(l => ({ title: <a href={l.url}>{l.name}</a> }))}
+          />
+        </span>
       </Td>
     </Tr>
   );
@@ -159,27 +174,42 @@ const RuleCard: React.FC<{
               <HealthColorSquare item={item} />
             </FlexItem>
             <FlexItem flex={{ default: 'flex_1' }}>
-              <Flex gap={{ default: 'gapXs' }} alignItems={{ default: 'alignItemsCenter' }}>
-                <FlexItem>{item.summary}</FlexItem>
-                {item.description && (
+              <Flex direction={{ default: 'column' }} gap={{ default: 'gapXs' }}>
+                <FlexItem>
+                  <Flex gap={{ default: 'gapXs' }} alignItems={{ default: 'alignItemsCenter' }}>
+                    <FlexItem>{item.summary}</FlexItem>
+                    {item.description && (
+                      <FlexItem>
+                        <Tooltip content={item.description}>
+                          <InfoCircleIcon
+                            style={{
+                              color: 'var(--pf-t--global--text--color--subtle)'
+                            }}
+                          />
+                        </Tooltip>
+                      </FlexItem>
+                    )}
+                  </Flex>
+                </FlexItem>
+                {isAlert && item.ruleName && item.ruleName !== item.summary && (
                   <FlexItem>
-                    <Tooltip content={item.description}>
-                      <InfoCircleIcon
-                        style={{
-                          color: 'var(--pf-t--global--text--color--subtle)'
-                        }}
-                      />
-                    </Tooltip>
+                    <Content
+                      component={ContentVariants.small}
+                      style={{ color: 'var(--pf-t--global--text--color--subtle)' }}
+                    >
+                      {item.ruleName}
+                    </Content>
                   </FlexItem>
                 )}
               </Flex>
             </FlexItem>
             <FlexItem>
-              <ActionsColumn
-                data-test="rule-details-actions"
-                isDisabled={links.length === 0}
-                items={links.map(l => ({ title: <a href={l.url}>{l.name}</a> }))}
-              />
+              <span data-test="rule-details-actions">
+                <ActionsColumn
+                  isDisabled={links.length === 0}
+                  items={links.map(l => ({ title: <a href={l.url}>{l.name}</a> }))}
+                />
+              </span>
             </FlexItem>
           </Flex>
         </Flex>

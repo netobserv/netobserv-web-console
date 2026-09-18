@@ -1,4 +1,4 @@
-import { PrometheusLabels } from '@openshift-console/dynamic-plugin-sdk';
+import { PrometheusLabels, Rule } from '@openshift-console/dynamic-plugin-sdk';
 import {
   AlertState,
   apportionToOneDecimal,
@@ -8,7 +8,9 @@ import {
   computeResourceScore,
   HealthItem,
   HealthStat,
+  isSilenced,
   NamedItem,
+  rulesToHealthItems,
   Severity
 } from '../health-helper';
 
@@ -214,5 +216,97 @@ describe('health helpers, grouping', () => {
     const g = mockAlert('test5', 'warning', 'firing', 20, 30, {});
 
     expect(collectAvailableNamespaces([a1, a2, b, w, g])).toEqual(['a', 'b', 'c']);
+  });
+});
+
+describe('isSilenced', () => {
+  it('matches positive equality matchers', () => {
+    expect(isSilenced([{ name: 'alertname', value: 'Foo' }], { alertname: 'Foo' })).toBe(true);
+    expect(isSilenced([{ name: 'alertname', value: 'Foo' }], { alertname: 'Bar' })).toBe(false);
+  });
+
+  it('honors negative and regex matchers', () => {
+    expect(isSilenced([{ name: 'severity', value: 'info', isEqual: false }], { severity: 'warning' })).toBe(true);
+    expect(isSilenced([{ name: 'alertname', value: 'Foo.*', isRegex: true }], { alertname: 'FooBar' })).toBe(true);
+    expect(isSilenced([{ name: 'alertname', value: 'Foo.*', isRegex: true }], { alertname: 'Bar' })).toBe(false);
+  });
+
+  it('negative matcher matches when label is absent', () => {
+    // {severity!="info"} should match when the label is entirely absent
+    expect(isSilenced([{ name: 'severity', value: 'info', isEqual: false }], {})).toBe(true);
+  });
+
+  it('negative matcher matches when label value is empty', () => {
+    // {severity!="info"} should match when the label is present but empty
+    expect(isSilenced([{ name: 'severity', value: 'info', isEqual: false }], { severity: '' })).toBe(true);
+  });
+
+  it('negative matcher does not match when label equals the matcher value', () => {
+    expect(isSilenced([{ name: 'severity', value: 'info', isEqual: false }], { severity: 'info' })).toBe(false);
+  });
+
+  it('anchors alternation as a whole (RE2 full-match semantics)', () => {
+    const m = [{ name: 'alertname', value: 'foo|bar', isRegex: true }];
+    expect(isSilenced(m, { alertname: 'foo' })).toBe(true);
+    expect(isSilenced(m, { alertname: 'bar' })).toBe(true);
+    // Must NOT match partial values that a non-grouped "^foo|bar$" would wrongly accept.
+    expect(isSilenced(m, { alertname: 'fooBaz' })).toBe(false);
+    expect(isSilenced(m, { alertname: 'Bazbar' })).toBe(false);
+  });
+});
+
+describe('rulesToHealthItems, malformed annotation', () => {
+  const ruleWithAnnotation = (netobservHealth: string): Rule =>
+    ({
+      name: 'ThirdPartyAlert',
+      annotations: {
+        summary: 'Third party summary',
+        netobserv_io_network_health: netobservHealth
+      },
+      labels: { severity: 'critical' },
+      alerts: [
+        {
+          state: 'firing',
+          labels: { severity: 'critical' },
+          annotations: { summary: 'Third party summary' },
+          value: '1'
+        }
+      ]
+    } as unknown as Rule);
+
+  it('falls back to default metadata (and logs) instead of throwing on truncated JSON', () => {
+    // Regression: a third-party rule with a truncated netobserv_io_network_health value used to throw
+    // from JSON.parse and take down the whole Network Health page. It must now degrade gracefully.
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    try {
+      const malformed = '{"contextTab":"kiali","displayName":"Truncated"';
+      expect(() => rulesToHealthItems([ruleWithAnnotation(malformed)], {}, [])).not.toThrow();
+      const items = rulesToHealthItems([ruleWithAnnotation(malformed)], {}, []);
+      expect(items).toHaveLength(1);
+      // Default metadata unit is used since the annotation could not be parsed.
+      expect(items[0].metadata.unit).toBe('%');
+      expect(items[0].summary).toBe('Third party summary');
+      // The parse failure is surfaced to the console rather than silently swallowed.
+      expect(errorSpy).toHaveBeenCalled();
+    } finally {
+      errorSpy.mockRestore();
+    }
+  });
+});
+
+describe('isSilenced, regex compilation', () => {
+  it('does not apply a silence whose regex JS cannot compile, and logs it', () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    try {
+      // RE2 inline flags like "(?i)foo" are valid for Alertmanager but throw in JS RegExp.
+      expect(isSilenced([{ name: 'alertname', value: '(?i)foo', isRegex: true }], { alertname: 'FOO' })).toBe(false);
+      // A negative matcher with an unevaluable regex must also not silence the alert.
+      expect(
+        isSilenced([{ name: 'alertname', value: '(?i)foo', isRegex: true, isEqual: false }], { alertname: 'bar' })
+      ).toBe(false);
+      expect(errorSpy).toHaveBeenCalledTimes(2);
+    } finally {
+      errorSpy.mockRestore();
+    }
   });
 });
