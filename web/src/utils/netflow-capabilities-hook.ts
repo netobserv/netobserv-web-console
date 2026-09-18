@@ -8,12 +8,20 @@ import { DataSource, FlowScope, MetricType, PacketLoss, RecordType, StructuredFl
 import { parseQuickFilters, QuickFilter } from '../model/quick-filters';
 import { resolveGroupTypes, ScopeConfigDef } from '../model/scope';
 import { TopologyOptions } from '../model/topology';
+import { DraftView, GenericPrefs, getAvailableViews, getViewPreset, ViewPreset, ViewPresetId } from '../model/views';
 import { getFetchFunctions as getBackAndForthFetch } from './back-and-forth';
 import { Column, ColumnsId } from './columns';
 import { ContextSingleton } from './context';
 import { computeStepInterval, TimeRange } from './datetime';
 import { checkFilterAvailable, getFilterDefinitions } from './filter-definitions';
-import { dnsMatcher, droppedIdMatcher, OverviewPanel, rttIdMatcher, tlsIdMatcher } from './overview-panels';
+import {
+  dnsMatcher,
+  droppedIdMatcher,
+  getPanelFeature,
+  OverviewPanel,
+  rttIdMatcher,
+  tlsIdMatcher
+} from './overview-panels';
 
 export interface ConfigCapabilities {
   allowLoki: boolean;
@@ -36,6 +44,7 @@ export interface ConfigCapabilities {
   defaultFilters: Filter[];
   flowQuery: StructuredFlowQuery;
   fetchFunctions: ReturnType<typeof getBackAndForthFetch>;
+  availableViews: ViewPreset[];
 }
 
 export function useConfigCapabilities(params: {
@@ -44,6 +53,7 @@ export function useConfigCapabilities(params: {
   dataSource: DataSource;
   columns: Column[];
   panels: OverviewPanel[];
+  activeView: ViewPresetId;
   metricScope: FlowScope;
   topologyOptions: TopologyOptions;
   topologyMetricType: MetricType;
@@ -54,6 +64,9 @@ export function useConfigCapabilities(params: {
   recordType: RecordType;
   packetLoss: PacketLoss;
   range: number | TimeRange;
+  genericColumnPrefs: GenericPrefs;
+  genericPanelPrefs: GenericPrefs;
+  draftView: DraftView | null;
 }): ConfigCapabilities {
   const {
     config,
@@ -61,6 +74,7 @@ export function useConfigCapabilities(params: {
     dataSource,
     columns,
     panels,
+    activeView,
     metricScope,
     topologyOptions,
     topologyMetricType,
@@ -70,7 +84,10 @@ export function useConfigCapabilities(params: {
     limit,
     recordType,
     packetLoss,
-    range
+    range,
+    genericColumnPrefs,
+    genericPanelPrefs,
+    draftView
   } = params;
 
   const { t } = useTranslation('plugin__netobserv-plugin');
@@ -121,7 +138,7 @@ export function useConfigCapabilities(params: {
 
   const allowedMetricTypes = React.useMemo(() => {
     let options: MetricType[] = ['Bytes', 'Packets'];
-    if (selectedViewId === 'topology') {
+    if (selectedViewId === 'topology' || activeView !== 'all') {
       if (isPktDrop) {
         options = options.concat('PktDropBytes', 'PktDropPackets');
       }
@@ -133,7 +150,7 @@ export function useConfigCapabilities(params: {
       }
     }
     return options;
-  }, [isDNSTracking, isFlowRTT, isPktDrop, selectedViewId]);
+  }, [isDNSTracking, isFlowRTT, isPktDrop, selectedViewId, activeView]);
 
   const availablePanels = React.useMemo(
     () =>
@@ -147,7 +164,39 @@ export function useConfigCapabilities(params: {
     [isDNSTracking, isFlowRTT, isPktDrop, isTLSTracking, panels]
   );
 
-  const selectedPanels = React.useMemo(() => availablePanels.filter(panel => panel.isSelected), [availablePanels]);
+  const selectedPanels = React.useMemo(() => {
+    // Draft view overrides when viewing the draft's base view
+    if (draftView && draftView.baseViewId === activeView) {
+      const draftPanelIds = new Set(draftView.panels);
+      return availablePanels.filter(panel => draftPanelIds.has(panel.id));
+    }
+    // Feature preset view: preset panels + generic prefs
+    // Generic prefs override preset inclusion for generic panels
+    if (activeView !== 'all') {
+      const preset = getViewPreset(activeView);
+      if (preset?.panels) {
+        const presetPanelSet = new Set(preset.panels as string[]);
+        return availablePanels.filter(panel => {
+          const isGeneric = !getPanelFeature(panel.id);
+          if (isGeneric) {
+            if (genericPanelPrefs.removed.includes(panel.id)) return false;
+            if (genericPanelPrefs.added.includes(panel.id)) return true;
+          }
+          if (presetPanelSet.has(panel.id)) return true;
+          return false;
+        });
+      }
+    }
+    // "All Traffic": user's manual selection + generic prefs override
+    return availablePanels.filter(panel => {
+      const isGeneric = !getPanelFeature(panel.id);
+      if (isGeneric) {
+        if (genericPanelPrefs.removed.includes(panel.id)) return false;
+        if (genericPanelPrefs.added.includes(panel.id)) return true;
+      }
+      return panel.isSelected;
+    });
+  }, [availablePanels, activeView, draftView, genericPanelPrefs]);
 
   const availableColumns = React.useMemo(
     () =>
@@ -159,7 +208,38 @@ export function useConfigCapabilities(params: {
     [columns, config.features, isConnectionTracking]
   );
 
-  const selectedColumns = React.useMemo(() => availableColumns.filter(column => column.isSelected), [availableColumns]);
+  const selectedColumns = React.useMemo(() => {
+    // Draft view overrides when viewing the draft's base view
+    if (draftView && draftView.baseViewId === activeView) {
+      const colMap = new Map(availableColumns.map(col => [col.id as string, col]));
+      return draftView.columns.map(id => colMap.get(id)).filter((col): col is Column => col !== undefined);
+    }
+    // Feature preset view: preset columns + generic prefs
+    if (activeView !== 'all') {
+      const preset = getViewPreset(activeView);
+      if (preset?.columns) {
+        const presetColSet = new Set(preset.columns);
+        return availableColumns.filter(col => {
+          const isGeneric = !col.feature;
+          if (isGeneric) {
+            if (genericColumnPrefs.removed.includes(col.id)) return false;
+            if (genericColumnPrefs.added.includes(col.id)) return true;
+          }
+          if (presetColSet.has(col.id)) return true;
+          return false;
+        });
+      }
+    }
+    // "All Traffic": user's manual selection + generic prefs override
+    return availableColumns.filter(col => {
+      const isGeneric = !col.feature;
+      if (isGeneric) {
+        if (genericColumnPrefs.removed.includes(col.id)) return false;
+        if (genericColumnPrefs.added.includes(col.id)) return true;
+      }
+      return col.isSelected;
+    });
+  }, [availableColumns, activeView, draftView, genericColumnPrefs]);
 
   const filterDefs = React.useMemo(() => {
     const allFilterDefs = getFilterDefinitions(config.filters, config.columns, t);
@@ -240,6 +320,8 @@ export function useConfigCapabilities(params: {
     return getBackAndForthFetch(filterDefs);
   }, [filterDefs]);
 
+  const availableViews = React.useMemo(() => getAvailableViews(config.features), [config.features]);
+
   return {
     allowLoki,
     allowProm,
@@ -260,6 +342,7 @@ export function useConfigCapabilities(params: {
     quickFilters,
     defaultFilters,
     flowQuery,
-    fetchFunctions
+    fetchFunctions,
+    availableViews
   };
 }

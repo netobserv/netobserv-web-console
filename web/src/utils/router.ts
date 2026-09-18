@@ -8,6 +8,7 @@ import {
   fromFilterKey
 } from '../model/filters';
 import { DataSource, Match, MetricType, PacketLoss, RecordType, StatFunction } from '../model/flow-query';
+import { ViewPresetId } from '../model/views';
 import { TimeRange } from './datetime';
 import { findFilter } from './filter-definitions';
 import {
@@ -194,5 +195,17 @@ export const setURLMetricType = (metricType?: MetricType, replace?: boolean) => 
     setURLParam(URLParam.MetricType, metricType, replace);
   } else {
     removeURLParam(URLParam.MetricType, replace);
+  }
+};
+
+export const getViewFromURL = (): ViewPresetId => {
+  return (getURLParam(URLParam.View) as ViewPresetId | null) || 'all';
+};
+
+export const setURLView = (viewId: ViewPresetId, replace?: boolean) => {
+  if (viewId && viewId !== 'all') {
+    setURLParam(URLParam.View, viewId, replace);
+  } else {
+    removeURLParam(URLParam.View, replace);
   }
 };

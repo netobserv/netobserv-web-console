@@ -425,7 +425,7 @@ frontend:
       tooltip: Network name, such as Secondary network or UDN.
       field: SrcK8S_NetworkName
       filter: src_network
-      default: true
+      default: false
       width: 15
       feature: multiNetworks
     - id: DstK8S_Name
@@ -566,7 +566,7 @@ frontend:
       tooltip: Network name, such as Secondary network or UDN.
       field: DstK8S_NetworkName
       filter: dst_network
-      default: true
+      default: false
       width: 15
       feature: multiNetworks
     - id: K8S_Name
@@ -687,7 +687,7 @@ frontend:
       tooltip: TLS version found in handshake headers
       field: TLSVersion
       filter: tls_version
-      default: true
+      default: false
       width: 10
       feature: tlsTracking
     - id: TLSCipherSuite
@@ -861,7 +861,7 @@ frontend:
       tooltip: Time elapsed between DNS request and response.
       field: DnsLatencyMs
       filter: dns_latency
-      default: true
+      default: false
       width: 5
       feature: dnsTracking
     - id: DNSResponseCode
@@ -870,7 +870,7 @@ frontend:
       tooltip: DNS RCODE name from response header.
       field: DnsFlagsResponseCode
       filter: dns_flag_response_code
-      default: true
+      default: false
       width: 5
       feature: dnsTracking
     - id: DNSErrNo
@@ -887,7 +887,7 @@ frontend:
       tooltip: TCP Smoothed Round Trip Time (SRTT)
       field: TimeFlowRttNs
       filter: time_flow_rtt
-      default: true
+      default: false
       width: 5
       feature: flowRTT
     - id: NetworkEvents
@@ -895,7 +895,7 @@ frontend:
       tooltip: Network events flow monitor
       field: NetworkEvents
       filter: network_events
-      default: true
+      default: false
       width: 15
       feature: networkEvents
     - id: XlatZoneId
@@ -903,7 +903,7 @@ frontend:
       name: Xlat zone id
       field: ZoneId
       filter: xlat_zone_id
-      default: true
+      default: false
       width: 5
       feature: packetTranslation
     - id: XlatSrcAddr
@@ -928,7 +928,7 @@ frontend:
       group: Xlat
       name: Xlat Src Kubernetes Object
       calculated: kubeObject(XlatSrcK8S_Type,XlatSrcK8S_Namespace,XlatSrcK8S_Name,1) or concat(XlatSrcAddr,':',XlatSrcPort)
-      default: true
+      default: false
       width: 15
       feature: packetTranslation
     - id: XlatDstAddr
@@ -953,7 +953,7 @@ frontend:
       group: Xlat
       name: Xlat Dst Kubernetes Object
       calculated: kubeObject(XlatDstK8S_Type,XlatDstK8S_Namespace,XlatDstK8S_Name,1) or concat(XlatDstAddr,':',XlatDstPort)
-      default: true
+      default: false
       width: 15
       feature: packetTranslation
     - id: XlatK8S_Object
@@ -968,7 +968,7 @@ frontend:
       tooltip: Status of the IPsec encryption (on egress, provided by the kernel function xfrm_output) or decryption (on ingress, via xfrm_input).
       field: IPSecStatus
       filter: ipsec_status
-      default: true
+      default: false
       width: 10
       feature: ipsec
   filters:
