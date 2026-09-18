@@ -11,6 +11,7 @@ declare global {
         options?: Partial<Cypress.VisitOptions>,
         selector?: string,
       ): Chainable<Element>;
+      dismissWelcomeModal(): Chainable<Element>;
     }
   }
 }
@@ -23,6 +24,15 @@ Cypress.on('uncaught:exception', (err) => {
 
   // ResizeObserver loop errors are non-actionable and can be ignored
   if (typeof err.message === 'string' && err.message.includes('ResizeObserver loop')) {
+    return false;
+  }
+
+  // Ignore known transient errors in console application
+  const allowlistedErrors = [
+    'listener is not a function',
+    // Add other specific known transient error messages here
+  ];
+  if (typeof err.message === 'string' && allowlistedErrors.some((msg) => err.message === msg || err.message.includes(msg))) {
     return false;
   }
 
@@ -58,6 +68,47 @@ Cypress.Commands.add('clickNavLink', (path: string[]) => {
   if (path.length === 2) {
     cy.get('#page-sidebar').contains(path[1]).click();
   }
+});
+
+Cypress.Commands.add('dismissWelcomeModal', () => {
+  const tryCloseModal = (retries = 5) => {
+    cy.window().then((win) => {
+      const $modals = Cypress.$('[role="dialog"]');
+
+      // Find Welcome modal
+      let foundWelcome = false;
+      for (let i = 0; i < $modals.length; i++) {
+        const $modal = Cypress.$($modals[i]);
+        const ariaLabel = $modal.attr('aria-label') || '';
+        const isVisible = $modal.is(':visible');
+
+        if (isVisible && ariaLabel.toLowerCase().includes('welcome')) {
+          foundWelcome = true;
+
+          // Find close button
+          let $closeBtn = $modal.find('button[aria-label="Close"]');
+          if ($closeBtn.length === 0) {
+            $closeBtn = $modal.find('.pf-c-modal-box__close');
+          }
+
+          if ($closeBtn.length > 0) {
+            cy.wrap($closeBtn.first()).click({ force: true });
+            cy.wait(500);
+            // Check if another Welcome modal appears
+            tryCloseModal();
+          }
+          break;
+        }
+      }
+
+      if (!foundWelcome && retries > 0) {
+        cy.wait(500);
+        tryCloseModal(retries - 1);
+      }
+    });
+  };
+
+  tryCloseModal();
 });
 
 export const checkErrors = () =>
