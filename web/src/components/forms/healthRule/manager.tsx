@@ -144,7 +144,13 @@ export const HealthRulesManager: React.FC<HealthRulesManagerProps> = ({ isOpen, 
       }
     }
     if (tpl?.runbookURL) {
-      actions.push({ title: <a href={tpl.runbookURL} data-test={`template-health-rule-row-${hr.template}-runbook`}>{t('View runbook')}</a> });
+      actions.push({
+        title: (
+          <a href={tpl.runbookURL} data-test={`template-health-rule-row-${hr.template}-runbook`}>
+            {t('View runbook')}
+          </a>
+        )
+      });
     }
     return actions;
   };
