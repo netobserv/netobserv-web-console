@@ -43,7 +43,7 @@ COPY --from=web-builder /opt/app-root/web/dist ./web/dist
 COPY --from=go-builder /opt/app-root/plugin-backend ./
 
 # cypress/base ships Node + OS deps, without the Cypress binary or browsers.
-FROM cypress/base:24.20.0
+FROM cypress/base:24.21.0
 WORKDIR /opt/app-root
 
 ENV HOME=/home/user
