@@ -1,23 +1,40 @@
 import axios from 'axios';
 import { Config, defaultConfig } from '../model/config';
+import { ExportApiFormat } from '../model/export-format';
 import { buildExportQuery } from '../model/export-query';
-import { FlowQuery, FlowScope, isTimeMetric, StructuredFlowQuery, structuredToRawQuery } from '../model/flow-query';
+import { FlowQuery, StructuredFlowQuery, structuredToRawQuery } from '../model/flow-query';
+import { MetricsExportRequest } from '../model/metrics-export-query';
 import { ContextSingleton } from '../utils/context';
 import { TimeRange } from '../utils/datetime';
-import { parseGenericMetrics, parseTopologyMetrics } from '../utils/metrics';
+import { parseExportError } from '../utils/export-download';
+import { genericMetricsFromTopology, hydrateTopologyMetrics } from '../utils/metrics';
 import { AlertsResult, SilencedAlert } from './alert';
 import { Field } from './ipfix';
 import {
   AggregatedQueryResponse,
   FlowMetricsResult,
+  GenericMetric,
   GenericMetricsResult,
   parseStream,
-  RawTopologyMetrics,
   RecordsResult,
   Stats,
   Status,
-  StreamResult
+  StreamResult,
+  TopologyMetrics
 } from './query-response';
+
+// OpenShift Console proxy CSRF (double-submit cookie). Required for POST/PUT/PATCH/DELETE
+// through /api/proxy/plugin/... — axios defaults look for XSRF-TOKEN / X-XSRF-TOKEN.
+axios.defaults.xsrfCookieName = 'csrf-token';
+axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+function getCookie(name: string): string | undefined {
+  if (typeof document === 'undefined') {
+    return undefined;
+  }
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : undefined;
+}
 
 export const getFlowRecords = (params: FlowQuery): Promise<RecordsResult> => {
   return axios.get(ContextSingleton.getHost() + '/api/loki/flow/records', { params }).then(r => {
@@ -73,10 +90,44 @@ export const queryPrometheusMetric = (query: string): Promise<unknown> => {
   });
 };
 
-export const getExportFlowsURL = (q: StructuredFlowQuery, columns?: string[]): string => {
+export const getExportFlowsURL = (
+  q: StructuredFlowQuery,
+  options?: { format?: ExportApiFormat; columns?: string[] }
+): string => {
   const params = structuredToRawQuery(q);
-  const exportQuery = buildExportQuery(params, columns);
+  const exportQuery = buildExportQuery(params, options);
   return `${ContextSingleton.getHost()}/api/loki/export?${exportQuery}`;
+};
+
+export const exportFlows = (
+  q: StructuredFlowQuery,
+  options: { format: ExportApiFormat; columns?: string[] }
+): Promise<Blob> => {
+  return axios
+    .get(getExportFlowsURL(q, options), { responseType: 'blob', validateStatus: () => true })
+    .then(async r => {
+      if (r.status >= 400) {
+        throw new Error(await parseExportError(r.data, r.status, r.statusText));
+      }
+      return r.data;
+    });
+};
+
+export const exportMetricsReport = (request: MetricsExportRequest): Promise<Blob> => {
+  // Console plugin proxy requires X-CSRFToken matching the csrf-token cookie on POST.
+  const csrfToken = getCookie('csrf-token');
+  return axios
+    .post(ContextSingleton.getHost() + '/api/flow/metrics/export', request, {
+      responseType: 'blob',
+      validateStatus: () => true,
+      headers: csrfToken ? { 'X-CSRFToken': csrfToken } : undefined
+    })
+    .then(async r => {
+      if (r.status >= 400) {
+        throw new Error(await parseExportError(r.data, r.status, r.statusText));
+      }
+      return r.data;
+    });
 };
 
 export const getRole = (): Promise<string> => {
@@ -171,33 +222,32 @@ export const getFlowCollector = (): Promise<any> => {
     });
 };
 
-export const getFlowMetrics = (params: FlowQuery, range: number | TimeRange): Promise<FlowMetricsResult> => {
+export const getFlowMetrics = (params: FlowQuery, _range: number | TimeRange): Promise<FlowMetricsResult> => {
   return getFlowMetricsGeneric(params, res => {
-    return parseTopologyMetrics(
-      res.result as RawTopologyMetrics[],
-      range,
-      params.aggregateBy as FlowScope,
-      res.unixTimestamp,
-      !isTimeMetric(params.type),
-      res.stats.dataSources.includes('mock')
-    );
+    if (res.resultType !== 'topologyMetrics') {
+      throw new Error(`unexpected flow metrics resultType ${res.resultType}; expected topologyMetrics`);
+    }
+    return hydrateTopologyMetrics((res.result as TopologyMetrics[]) || []);
   });
 };
 
 export const getFlowGenericMetrics = (
   q: StructuredFlowQuery,
-  range: number | TimeRange
+  _range: number | TimeRange
 ): Promise<GenericMetricsResult> => {
   const params = structuredToRawQuery(q);
   return getFlowMetricsGeneric(params, res => {
-    return parseGenericMetrics(
-      res.result as RawTopologyMetrics[],
-      range,
-      params.aggregateBy as Field,
-      res.unixTimestamp,
-      !isTimeMetric(params.type),
-      res.stats.dataSources.includes('mock')
-    );
+    if (res.resultType === 'genericMetrics') {
+      return (res.result as GenericMetric[]) || [];
+    }
+    if (res.resultType === 'topologyMetrics') {
+      // Scope aggregates (e.g. app totals) enrich as topologyMetrics; flatten for generic callers.
+      return genericMetricsFromTopology(
+        hydrateTopologyMetrics((res.result as TopologyMetrics[]) || []),
+        (params.aggregateBy || 'app') as Field
+      );
+    }
+    throw new Error(`unexpected flow metrics resultType ${res.resultType}; expected genericMetrics`);
   });
 };
 

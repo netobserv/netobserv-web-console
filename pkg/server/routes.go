@@ -60,6 +60,7 @@ func setupRoutes(ctx context.Context, cfg *config.Config, authChecker auth.Check
 
 		// Common endpoints
 		api.HandleFunc("/flow/metrics", h.GetTopology(ctx))
+		api.HandleFunc("/flow/metrics/export", h.ExportMetrics(ctx))
 		api.HandleFunc("/resources/clusters", h.GetClusters(ctx))
 		api.HandleFunc("/resources/udns", h.GetUDNs(ctx))
 		api.HandleFunc("/resources/zones", h.GetZones(ctx))
