@@ -100,6 +100,9 @@ export const flowCollectorUISchema: UiSchema = {
           'ui:widget': 'arrayCheckboxes',
           'ui:descriptionFirst': 'true'
         },
+        dnsTrackingPort: {
+          'ui:widget': 'hidden'
+        },
         flowFilter: {
           'ui:title': 'Filters',
           'ui:widget': 'hidden',
@@ -442,6 +445,7 @@ export const flowCollectorUISchema: UiSchema = {
           'sampling',
           'privileged',
           'features',
+          'dnsTrackingPort',
           'flowFilter',
           'interfaces',
           'excludeInterfaces',
@@ -452,7 +456,8 @@ export const flowCollectorUISchema: UiSchema = {
           'cacheActiveTimeout',
           'kafkaBatchSize',
           'resources',
-          'advanced'
+          'advanced',
+          '*'
         ]
       },
       'ui:order': ['ipfix', 'type', 'ebpf', '*']
