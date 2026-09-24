@@ -1,4 +1,4 @@
-import { netflowPage, topologyPage, topologySelectors } from "@views/netflow-page"
+import { topologyPage, topologySelectors } from "@views/netflow-page"
 import { Operator } from "@views/netobserv"
 import { verifyResourceSVGLogo } from "@views/netobserv-logo"
 
@@ -37,7 +37,10 @@ describe("(OCP-87215) Gateway API owner metadata", { tags: ['Network_Observabili
     })
 
     afterEach("test", function () {
-        netflowPage.clearAllFilters()
+        // Unmount topology before resetting filters: clearing the namespace on this
+        // page renders the whole cluster graph and can stall the Cypress runner.
+        cy.visit('/')
+        cy.clearNetobservLocalStorage()
     })
 
     after("all tests", function () {
