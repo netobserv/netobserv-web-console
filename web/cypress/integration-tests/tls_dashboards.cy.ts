@@ -1,6 +1,6 @@
-import { Operator } from "@views/netobserv"
 import { dashboard } from "@views/dashboards-page"
 import { filterSelectors, netflowPage, topologyPage } from "@views/netflow-page"
+import { Operator } from "@views/netobserv"
 
 const TLSPanels = [
     "flows-rate-per-tls-version-chart",
@@ -29,6 +29,7 @@ describe('(OCP-88966) TLSTracking test', { tags: ['Network_Observability'] }, fu
             topologyPage.setupWithNamespaceFilter('test-tls-server')
             cy.get(filterSelectors.filterInput).type("dst_namespace=test-tls-client{enter}")
             cy.get(filterSelectors.filterInput).type("protocol=TCP{enter}")
+            netflowPage.selectView("tls")
         })
 
         it("(OCP-88966, aramesha) Verify TLS lock icons", function () {

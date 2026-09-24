@@ -6,7 +6,7 @@ import { DraftView, ViewPresetId } from '../../model/views';
 import { useOutsideClickEvent } from '../../utils/outside-hook';
 
 // i18n extraction hints for dynamic view labels
-// t('All Traffic') t('Packet Drops') t('DNS Latency') t('Flow RTT') t('TLS Tracking') t('UDN Mapping') t('Network Events') t('Packet Translation')
+// t('Default') t('Packet Drops') t('DNS') t('Flow RTT') t('TLS Tracking') t('UDN') t('Network Events') t('Packet Translation')
 // t('Custom') t('Discard changes') t('Restore defaults')
 
 export interface ViewSelectorProps {
@@ -55,7 +55,7 @@ export const ViewSelector: React.FC<ViewSelectorProps> = ({
     setOpen(false);
   };
 
-  const activeLabel = availableViews.find(v => v.id === activeView)?.label ?? 'All Traffic';
+  const activeLabel = availableViews.find(v => v.id === activeView)?.label ?? 'Default';
 
   return (
     <div id="view-selector-container" data-test="view-selector-container" ref={ref}>

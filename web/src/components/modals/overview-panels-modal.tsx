@@ -129,7 +129,7 @@ export const OverviewPanelsModal: React.FC<OverviewPanelsModalProps> = ({
       const nonPresetPanels = panels.filter(p => !presetPanelIds.includes(p.id as string));
       setUpdatedPanels([...resetPanels, ...nonPresetPanels.map(p => ({ ...p, isSelected: false }))]);
     } else {
-      // "All Traffic" or custom view: reset to config defaults
+      // "Default" or custom view: reset to config defaults
       const defaults = getAvailablePanels(customIds).filter(p => panels.some(existing => existing.id === p.id));
       setUpdatedPanels(defaults);
     }

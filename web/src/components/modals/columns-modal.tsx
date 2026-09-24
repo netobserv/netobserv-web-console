@@ -110,7 +110,7 @@ export const ColumnsModal: React.FC<ColumnsModalProps> = ({
       const nonPresetCols = columns.filter(c => !presetColIds.includes(c.id as string));
       setUpdatedColumns([...resetColumns, ...nonPresetCols.map(c => ({ ...c, isSelected: false }))]);
     } else {
-      // "All Traffic": reset to config defaults
+      // "Default": reset to config defaults
       const defaults = getDefaultColumns(config.columns, config.fields).filter(c =>
         columns.some(existing => existing.id === c.id)
       );

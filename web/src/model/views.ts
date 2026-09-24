@@ -85,7 +85,7 @@ const baseColumns: ColumnsId[] = [
 export const viewPresets: ViewPreset[] = [
   {
     id: 'all',
-    label: 'All Traffic'
+    label: 'Default'
     // no requiredFeature, no panels/columns override — uses localStorage defaults
   },
   {
@@ -114,7 +114,7 @@ export const viewPresets: ViewPreset[] = [
   },
   {
     id: 'dns',
-    label: 'DNS Latency',
+    label: 'DNS',
     requiredFeature: 'dnsTracking',
     panels: [
       'top_avg_dns_latency',
@@ -124,7 +124,7 @@ export const viewPresets: ViewPreset[] = [
       'dns_name_flows',
       'dns_rcode_flows'
     ],
-    columns: [...baseColumns, ColumnsId.dnsid, ColumnsId.dnslatency, ColumnsId.dnsresponsecode, ColumnsId.dnserrno],
+    columns: [...baseColumns, ColumnsId.dnsname, ColumnsId.dnslatency, ColumnsId.dnsresponsecode, ColumnsId.dnserrno],
     topologyMetricType: 'DnsLatencyMs'
   },
   {
@@ -145,10 +145,12 @@ export const viewPresets: ViewPreset[] = [
   },
   {
     id: 'udn',
-    label: 'UDN Mapping',
+    label: 'UDN',
     requiredFeature: 'udnMapping',
     panels: ['top_sankey', 'top_avg_byte_rates', 'byte_rates'],
-    columns: [...baseColumns, ColumnsId.udns, ColumnsId.bytes, ColumnsId.packets]
+    // Src/Dst Network Name (multiNetworks) shown via this view; config default is false
+    columns: [...baseColumns, 'SrcNetworkName', 'DstNetworkName', ColumnsId.udns, ColumnsId.bytes, ColumnsId.packets],
+    topologyMetricType: 'Bytes'
   },
   {
     id: 'networkEvents',
@@ -167,7 +169,8 @@ export const viewPresets: ViewPreset[] = [
       ColumnsId.dropstate,
       ColumnsId.dropcause,
       'NetworkEvents'
-    ]
+    ],
+    topologyMetricType: 'Bytes'
   },
   {
     id: 'packetTranslation',
@@ -187,7 +190,8 @@ export const viewPresets: ViewPreset[] = [
       'XlatDstPort',
       'XlatDstK8S_Object',
       'XlatZoneId'
-    ]
+    ],
+    topologyMetricType: 'Bytes'
   }
 ];
 

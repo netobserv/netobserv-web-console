@@ -2,15 +2,19 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import * as React from 'react';
 
 import { RecordType } from '../../../model/flow-query';
-import { ShuffledDefaultPanels } from '../../__tests-data__/panels';
+import { OverviewPanel } from '../../../utils/overview-panels';
 import OverviewPanelsModal from '../overview-panels-modal';
 
 describe('<OverviewPanelsModal />', () => {
+  const panels: OverviewPanel[] = [
+    { id: 'byte_rates', isSelected: true },
+    { id: 'top_avg_byte_rates', isSelected: false }
+  ];
   const props = {
     isModalOpen: true,
     setModalOpen: jest.fn(),
     recordType: 'flowLog' as RecordType,
-    panels: ShuffledDefaultPanels,
+    panels,
     setPanels: jest.fn(),
     customIds: [],
     features: [],
@@ -25,8 +29,10 @@ describe('<OverviewPanelsModal />', () => {
     jest.clearAllMocks();
   });
 
-  afterEach(() => {
-    jest.runOnlyPendingTimers();
+  afterEach(async () => {
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
     jest.useRealTimers();
   });
 
@@ -70,7 +76,8 @@ describe('<OverviewPanelsModal />', () => {
       jest.runAllTimers();
     });
 
-    const saveButton = document.querySelector('.pf-v6-c-button.pf-m-primary') as HTMLElement;
+    const saveButton = screen.getByRole('button', { name: 'Save' });
+    expect(saveButton).toBeEnabled();
     await act(async () => {
       fireEvent.click(saveButton);
       jest.runAllTimers();
@@ -80,5 +87,24 @@ describe('<OverviewPanelsModal />', () => {
     updatedPanels[0] = { ...updatedPanels[0], isSelected: !updatedPanels[0].isSelected };
     updatedPanels[1] = { ...updatedPanels[1], isSelected: !updatedPanels[1].isSelected };
     expect(props.setPanels).toHaveBeenCalledWith(updatedPanels);
+  });
+
+  it('should disable save when no panels are selected', async () => {
+    render(<OverviewPanelsModal {...props} panels={panels.map(panel => ({ ...panel, isSelected: true }))} />);
+    await act(async () => {
+      jest.runAllTimers();
+    });
+
+    const saveButton = screen.getByRole('button', { name: 'Save' });
+    expect(saveButton).toBeEnabled();
+
+    await act(async () => {
+      screen.getAllByRole('checkbox').forEach(checkbox => fireEvent.click(checkbox));
+      jest.runAllTimers();
+    });
+
+    expect(saveButton).toBeDisabled();
+    fireEvent.click(saveButton);
+    expect(props.setPanels).not.toHaveBeenCalled();
   });
 });

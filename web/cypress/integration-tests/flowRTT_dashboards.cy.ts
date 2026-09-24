@@ -1,6 +1,6 @@
+import { dashboard } from "@views/dashboards-page"
+import { filterSelectors, netflowPage, querySumSelectors, topologySelectors } from "@views/netflow-page"
 import { Operator } from "@views/netobserv"
-import { netflowPage, querySumSelectors, topologySelectors, filterSelectors } from "@views/netflow-page"
-import { dashboard, graphSelector } from "@views/dashboards-page"
 
 const metricType = [
     "Bytes",
@@ -33,6 +33,7 @@ describe('(OCP-68246) FlowRTT test', { tags: ['Network_Observability'] }, functi
 
     it("(OCP-68246, aramesha) Validate flowRTT edge labels and Query Summary stats", function () {
         netflowPage.visit()
+        netflowPage.selectView('rtt')
         cy.get('#tabs-container').contains('Topology').click()
         cy.get('#drawer').should('not.be.empty')
 

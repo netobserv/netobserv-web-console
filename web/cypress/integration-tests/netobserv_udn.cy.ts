@@ -18,22 +18,19 @@ describe('(OCP-81751) UDN test', { tags: ['Network_Observability'] }, function (
         netflowPage.visit()
     })
 
-    it("(OCP-81751, aramesha) should verify default UDN Mapping columns", function () {
+    it("(OCP-81751, aramesha) should verify default UDN columns", function () {
         netflowPage.selectView('udn')
         cy.get('#tabs-container').contains('Traffic flows').click()
         cy.byTestID("table-composable").should('exist')
         netflowPage.stopAutoRefresh()
 
-        // verify UDN Mapping view preset columns
+        // verify UDN view preset columns
         cy.byTestID('table-composable').should('exist').within(() => {
+            cy.get(colSelectors.srcNetworkName).should('exist')
+            cy.get(colSelectors.dstNetworkName).should('exist')
             cy.get(colSelectors.udns).should('exist')
             cy.get(colSelectors.bytes).should('exist')
             cy.get(colSelectors.packets).should('exist')
-            // TODO(NETOBSERV-3007): verify Src/Dst Network Name columns should appear for UDNs.
-            // These are multiNetworks feature columns (default: true in operator config), not currently
-            // part of the UDN Mapping view preset — confirm if UDN Mapping view should include them.
-            // cy.get(colSelectors.dstNetworkName).should('exist')
-            // cy.get(colSelectors.srcNetworkName).should('exist')
         })
     })
 

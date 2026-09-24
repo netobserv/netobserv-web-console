@@ -406,7 +406,7 @@ export namespace overviewSelectors {
     export const manageDNSTrackingPanelsList = ['Top X DNS response code with total (donut or bars and lines)', 'Top X average DNS latencies with overall (donut or lines)', 'Bottom X minimum DNS latencies with overall (donut or lines)', 'Top X maximum DNS latencies with overall (donut or lines)', 'Top X 90th percentile DNS latencies with overall (donut or lines)']
     export const manageFlowRTTPanelsList = ['Top X average TCP smoothed Round Trip Time with overall (donut or lines)', 'Bottom X minimum TCP smoothed Round Trip Time with overall (donut or lines)', 'Top X maximum TCP smoothed Round Trip Time with overall (donut or lines)', 'Top X 90th percentile TCP smoothed Round Trip Time with overall (donut or lines)', 'Top X 99th percentile TCP smoothed Round Trip Time with overall (donut or lines)']
     export const manageTLSTrackingPanelsList = ['TLS usage (donut or lines)', 'TLS usage per version (donut or lines)', 'TLS usage per group (donut or lines)', 'TLS usage per cipher suite (donut or lines)']
-    // All Traffic default panels (generic)
+    // Default view panels (generic)
     export const defaultPanels = ['Top 5 average bytes rates', 'Top 5 bytes rates stacked with total']
     // Feature view presets — must match viewPresets in web/src/model/views.ts
     export const defaultPacketDropPanels = [

@@ -283,7 +283,7 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
   const searchRef = React.useRef<SearchHandle>(null);
   const guidedTourRef = React.useRef<GuidedTourHandle>(null);
   const initState = React.useRef<InitState>([]);
-  // Stores the user's "All Traffic" metric type before a view preset overrides it.
+  // Stores the user's Default-view metric type before a view preset overrides it.
   // Initialize to defaultMetricType (not topologyMetricType) because on a fresh load
   // from a feature-view session, topologyMetricType may hold the feature's metric.
   const savedMetricType = React.useRef<MetricType>(activeView === 'all' ? topologyMetricType : defaultMetricType);
@@ -313,6 +313,7 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
     caps,
     config,
     selectedViewId,
+    activeView,
     range,
     histogramRange,
     showHistogram,
@@ -334,7 +335,7 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
     queryParams
   });
 
-  // Keep savedMetricType in sync when user is on "All Traffic" and manually changes metric type
+  // Keep savedMetricType in sync when user is on Default view and manually changes metric type
   React.useEffect(() => {
     if (activeView === 'all') {
       savedMetricType.current = topologyMetricType;

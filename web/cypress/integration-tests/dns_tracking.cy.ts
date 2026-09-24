@@ -68,7 +68,7 @@ describe('(OCP-67087) DNSTracking test', { tags: ['Network_Observability'] }, fu
         // Avoid selectAndVerifyColumns (reloads and would drop the draft view).
         cy.openColumnsModal().then(() => {
             cy.get(colSelectors.columnsModal).should('be.visible')
-            cy.get(colSelectors.dnsName).check()
+            cy.get(colSelectors.dnsId).check()
             cy.byTestID(colSelectors.save).click()
         })
         cy.byTestID('table-composable').within(() => {
