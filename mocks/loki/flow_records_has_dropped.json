@@ -7,16 +7,25 @@
         "stream": {
           "FlowDirection": "1",
           "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "openshift-service-ca-operator",
-          "SrcK8S_OwnerName": "service-ca-operator",
-          "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
+          "SrcK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Type": "Node",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
         },
         "values": [
           [
-            "1708011867120999936",
-            "{\"SrcPort\":48974,\"Interface\":\"ovn-k8s-mp0\",\"Dscp\":0,\"Flags\":16,\"IfDirection\":0,\"DstMac\":\"42:12:CA:1E:09:61\",\"Packets\":2,\"Proto\":6,\"TimeReceived\":1708011867,\"TimeFlowEndMs\":1708011867121,\"SrcK8S_Name\":\"service-ca-operator-575d5cf89-s8pjm\",\"DstAddr\":\"172.20.0.1\",\"Etype\":2048,\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"SrcK8S_OwnerType\":\"Deployment\",\"PktDropLatestFlags\":16,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"Bytes\":132,\"PktDropBytes\":32,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DnsErrno\":0,\"DstPort\":6443,\"TimeFlowRttNs\":4047000,\"AgentIP\":\"10.0.1.7\",\"SrcMac\":\"0A:58:0A:80:00:01\",\"TimeFlowStartMs\":1708011866459,\"SrcK8S_HostIP\":\"10.0.1.7\",\"PktDropPackets\":1,\"SrcAddr\":\"10.128.0.7\"}"
+            "1786460077417999872",
+            "{\"DstAddr\":\"10.0.1.56\",\"PktDropPackets\":9,\"Packets\":9,\"AgentIP\":\"10.0.1.92\",\"Flags\":[\"ACK\"],\"Etype\":2048,\"DstMac\":\"02:e2:e9:01:aa:77\",\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"Bytes\":849,\"SrcK8S_OwnerType\":\"Node\",\"SrcAddr\":\"10.0.1.92\",\"DstSubnetLabel\":\"Machines\",\"Proto\":6,\"Sampling\":1,\"Dscp\":0,\"SrcMac\":\"02:45:8c:51:5f:b7\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_IP_RPFILTER\",\"DstPort\":443,\"SrcSubnetLabel\":\"Machines\",\"PktDropBytes\":723,\"SrcPort\":58527,\"SrcK8S_Name\":\"ip-10-0-1-92.ec2.internal\",\"SrcK8S_HostIP\":\"10.0.1.92\",\"PktDropLatestFlags\":16,\"Interfaces\":[\"ens5\",\"br-ex\"],\"TimeFlowStartMs\":1786460077387,\"TLSTypes\":[\"AppData\"],\"SrcK8S_NetworkName\":\"primary\",\"TimeReceived\":1786460077,\"TimeFlowEndMs\":1786460077418,\"PktDropLatestState\":\"TCP_ESTABLISHED\",\"Udns\":[\"\",\"\"],\"IfDirections\":[1,0]}"
+          ],
+          [
+            "1786460077248999936",
+            "{\"DstMac\":\"02:e2:e9:01:aa:77\",\"SrcK8S_Name\":\"ip-10-0-1-92.ec2.internal\",\"SrcK8S_HostIP\":\"10.0.1.92\",\"SrcPort\":48668,\"Sampling\":1,\"TimeFlowEndMs\":1786460077249,\"Bytes\":171,\"SrcMac\":\"02:45:8c:51:5f:b7\",\"DstAddr\":\"10.0.1.56\",\"Interfaces\":[\"ens5\",\"br-ex\"],\"IfDirections\":[1,0],\"TLSTypes\":[\"AppData\"],\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"PktDropLatestFlags\":16,\"Etype\":2048,\"PktDropLatestState\":\"TCP_ESTABLISHED\",\"SrcSubnetLabel\":\"Machines\",\"Proto\":6,\"SrcK8S_NetworkName\":\"primary\",\"SrcK8S_OwnerType\":\"Node\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_IP_RPFILTER\",\"Packets\":2,\"TimeReceived\":1786460077,\"TimeFlowStartMs\":1786460077229,\"PktDropPackets\":2,\"DstPort\":443,\"AgentIP\":\"10.0.1.92\",\"Udns\":[\"\",\"\"],\"Dscp\":0,\"PktDropBytes\":143,\"SrcAddr\":\"10.0.1.92\",\"Flags\":[\"ACK\"],\"DstSubnetLabel\":\"Machines\"}"
+          ],
+          [
+            "1786460077247000064",
+            "{\"Dscp\":0,\"SrcAddr\":\"10.0.1.92\",\"Interfaces\":[\"ens5\",\"br-ex\"],\"TimeFlowStartMs\":1786460077229,\"Packets\":8,\"PktDropLatestFlags\":532,\"DstSubnetLabel\":\"Machines\",\"SrcK8S_Name\":\"ip-10-0-1-92.ec2.internal\",\"SrcK8S_NetworkName\":\"primary\",\"SrcPort\":57609,\"SrcK8S_OwnerType\":\"Node\",\"PktDropBytes\":2054,\"Proto\":6,\"TimeFlowEndMs\":1786460077247,\"AgentIP\":\"10.0.1.92\",\"TLSTypes\":[\"ClientHello\",\"ChangeCipher\",\"AppData\"],\"PktDropLatestState\":\"TCP_CLOSE_WAIT\",\"IfDirections\":[1,0],\"DstAddr\":\"10.0.1.56\",\"Bytes\":2166,\"SrcSubnetLabel\":\"Machines\",\"TLSVersion\":\"TLS 1.3\",\"Sampling\":1,\"PktDropPackets\":8,\"DstMac\":\"02:e2:e9:01:aa:77\",\"Flags\":[\"SYN\",\"RST\",\"ACK\",\"FIN_ACK\"],\"Etype\":2048,\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"TimeReceived\":1786460077,\"Udns\":[\"\",\"\"],\"DstPort\":443,\"SrcK8S_HostIP\":\"10.0.1.92\",\"SrcMac\":\"02:45:8c:51:5f:b7\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_IP_RPFILTER\"}"
           ]
         ]
       },
@@ -24,16 +33,18 @@
         "stream": {
           "FlowDirection": "1",
           "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "openshift-service-ca",
-          "SrcK8S_OwnerName": "service-ca",
+          "SrcK8S_Namespace": "openshift-service-ca-operator",
+          "SrcK8S_OwnerName": "service-ca-operator",
           "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
         },
         "values": [
           [
-            "1708011869894000128",
-            "{\"TimeFlowRttNs\":12380000,\"IfDirection\":0,\"SrcMac\":\"0A:58:0A:81:00:01\",\"PktDropLatestFlags\":16,\"SrcK8S_HostIP\":\"10.0.1.137\",\"SrcK8S_Name\":\"service-ca-5474dcc54d-8v84x\",\"Packets\":2,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"DstPort\":6443,\"TimeFlowStartMs\":1708011866413,\"TimeFlowEndMs\":1708011869894,\"PktDropPackets\":1,\"SrcPort\":35586,\"Flags\":16,\"Bytes\":167,\"Proto\":6,\"AgentIP\":\"10.0.1.137\",\"SrcK8S_OwnerType\":\"Deployment\",\"TimeReceived\":1708011870,\"DstAddr\":\"172.20.0.1\",\"Etype\":2048,\"PktDropBytes\":32,\"SrcAddr\":\"10.129.0.11\",\"DnsErrno\":0,\"Interface\":\"ovn-k8s-mp0\",\"DstMac\":\"FE:70:6A:E1:72:17\",\"Dscp\":0,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcK8S_HostName\":\"ip-10-0-1-137.ec2.internal\"}"
+            "1786460077518000128",
+            "{\"TimeFlowRttNs\":13061000,\"TimeReceived\":1786460077,\"Packets\":14,\"PktDropBytes\":32,\"SrcK8S_NetworkName\":\"primary\",\"PktDropLatestFlags\":16,\"Dscp\":0,\"SrcK8S_OwnerType\":\"Deployment\",\"PktDropPackets\":1,\"DstSubnetLabel\":\"Services\",\"SrcMac\":\"0a:58:0a:80:00:01\",\"DstPort\":6443,\"DstAddr\":\"172.20.0.1\",\"SrcAddr\":\"10.128.0.17\",\"SrcK8S_Name\":\"service-ca-operator-6d4bb6c9-crvqx\",\"AgentIP\":\"10.0.1.92\",\"SrcK8S_HostIP\":\"10.0.1.92\",\"Udns\":[\"\"],\"Bytes\":1109,\"TLSTypes\":[\"AppData\"],\"Sampling\":1,\"TimeFlowStartMs\":1786460062683,\"DstMac\":\"0a:58:0a:80:00:02\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"IfDirections\":[0],\"Etype\":2048,\"Proto\":6,\"Flags\":[\"ACK\"],\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"SrcPort\":51628,\"SrcSubnetLabel\":\"Pods\",\"Interfaces\":[\"ovn-k8s-mp0\"],\"TimeFlowEndMs\":1786460077518}"
           ]
         ]
       },
@@ -44,13 +55,53 @@
           "SrcK8S_Namespace": "openshift-network-diagnostics",
           "SrcK8S_OwnerName": "network-check-source",
           "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
         },
         "values": [
           [
-            "1708011865435000064",
-            "{\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"Bytes\":66,\"PktDropBytes\":32,\"AgentIP\":\"10.0.1.7\",\"Proto\":6,\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"DnsErrno\":0,\"TimeReceived\":1708011867,\"IfDirection\":0,\"PktDropPackets\":1,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DstAddr\":\"172.20.0.1\",\"Etype\":2048,\"SrcAddr\":\"10.128.0.16\",\"SrcK8S_Name\":\"network-check-source-5b56bb9fd6-crprs\",\"SrcK8S_OwnerType\":\"Deployment\",\"PktDropLatestFlags\":16,\"Packets\":1,\"TimeFlowRttNs\":4309000,\"SrcK8S_HostIP\":\"10.0.1.7\",\"SrcPort\":44238,\"DstPort\":6443,\"Dscp\":0,\"TimeFlowStartMs\":1708011865435,\"DstMac\":\"42:12:CA:1E:09:61\",\"Interface\":\"ovn-k8s-mp0\",\"TimeFlowEndMs\":1708011865435,\"Flags\":16,\"SrcMac\":\"0A:58:0A:80:00:01\"}"
+            "1786460077244000000",
+            "{\"Flags\":[\"ACK\"],\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"DstSubnetLabel\":\"Services\",\"PktDropLatestFlags\":16,\"PktDropPackets\":3,\"TimeReceived\":1786460077,\"SrcK8S_Name\":\"network-check-source-5d66fb6458-hjpvk\",\"DstPort\":6443,\"SrcSubnetLabel\":\"Pods\",\"Interfaces\":[\"ovn-k8s-mp0\"],\"TimeFlowStartMs\":1786460063072,\"AgentIP\":\"10.0.1.92\",\"TimeFlowRttNs\":7820000,\"IfDirections\":[0],\"Dscp\":0,\"Etype\":2048,\"SrcK8S_HostIP\":\"10.0.1.92\",\"PktDropBytes\":96,\"SrcPort\":39252,\"TimeFlowEndMs\":1786460077244,\"Bytes\":18077,\"TLSTypes\":[\"AppData\"],\"SrcAddr\":\"10.128.0.20\",\"SrcMac\":\"0a:58:0a:80:00:01\",\"Udns\":[\"\"],\"SrcK8S_OwnerType\":\"Deployment\",\"Sampling\":1,\"DstAddr\":\"172.20.0.1\",\"DstMac\":\"0a:58:0a:80:00:02\",\"SrcK8S_NetworkName\":\"primary\",\"Proto\":6,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Packets\":25,\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\"}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "FlowDirection": "1",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_Namespace": "openshift-kube-storage-version-migrator-operator",
+          "SrcK8S_OwnerName": "kube-storage-version-migrator-operator",
+          "SrcK8S_Type": "Pod",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786460076969999872",
+            "{\"Udns\":[\"\"],\"Interfaces\":[\"ovn-k8s-mp0\"],\"Sampling\":1,\"SrcAddr\":\"10.128.0.18\",\"DstPort\":6443,\"DstSubnetLabel\":\"Services\",\"DstMac\":\"0a:58:0a:80:00:02\",\"TimeFlowStartMs\":1786460065546,\"Proto\":6,\"TimeReceived\":1786460077,\"Etype\":2048,\"Bytes\":1883,\"TimeFlowRttNs\":9690000,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"PktDropLatestFlags\":16,\"SrcK8S_OwnerType\":\"Deployment\",\"TimeFlowEndMs\":1786460076970,\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"SrcSubnetLabel\":\"Pods\",\"IfDirections\":[0],\"Flags\":[\"ACK\"],\"SrcMac\":\"0a:58:0a:80:00:01\",\"PktDropBytes\":64,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"Packets\":16,\"SrcPort\":56062,\"DstAddr\":\"172.20.0.1\",\"SrcK8S_NetworkName\":\"primary\",\"SrcK8S_Name\":\"kube-storage-version-migrator-operator-8c57ccc74-hd9jq\",\"SrcK8S_HostIP\":\"10.0.1.92\",\"AgentIP\":\"10.0.1.92\",\"TLSTypes\":[\"AppData\"],\"Dscp\":0,\"PktDropPackets\":2}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "FlowDirection": "1",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_Namespace": "openshift-insights",
+          "SrcK8S_OwnerName": "insights-operator",
+          "SrcK8S_Type": "Pod",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786460076896000000",
+            "{\"SrcK8S_OwnerType\":\"Deployment\",\"SrcK8S_HostIP\":\"10.0.1.92\",\"Udns\":[\"\"],\"DstPort\":6443,\"DstAddr\":\"172.20.0.1\",\"DstSubnetLabel\":\"Services\",\"Sampling\":1,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"AgentIP\":\"10.0.1.92\",\"PktDropPackets\":3,\"Etype\":2048,\"Interfaces\":[\"ovn-k8s-mp0\"],\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"Flags\":[\"ACK\"],\"SrcMac\":\"0a:58:0a:80:00:01\",\"SrcSubnetLabel\":\"Pods\",\"IfDirections\":[0],\"Bytes\":396,\"TimeFlowRttNs\":7242000,\"TimeFlowEndMs\":1786460076896,\"Packets\":6,\"Dscp\":0,\"Proto\":6,\"SrcK8S_Name\":\"insights-operator-76896796b6-v96ds\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcAddr\":\"10.128.0.19\",\"PktDropBytes\":96,\"TimeReceived\":1786460077,\"SrcK8S_NetworkName\":\"primary\",\"DstMac\":\"0a:58:0a:80:00:02\",\"SrcPort\":51244,\"TimeFlowStartMs\":1786460062683,\"PktDropLatestFlags\":16}"
           ]
         ]
       },
@@ -61,625 +112,712 @@
           "SrcK8S_Namespace": "openshift-console-operator",
           "SrcK8S_OwnerName": "console-operator",
           "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
         },
         "values": [
           [
-            "1708011866446000128",
-            "{\"TimeFlowEndMs\":1708011866446,\"DstAddr\":\"172.20.0.1\",\"Flags\":16,\"Dscp\":0,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"DstPort\":6443,\"Packets\":10,\"DnsErrno\":0,\"SrcK8S_OwnerType\":\"Deployment\",\"SrcK8S_Name\":\"console-operator-6b6dd4f56d-5vsr8\",\"TimeReceived\":1708011867,\"Etype\":2048,\"PktDropBytes\":32,\"SrcK8S_HostIP\":\"10.0.1.7\",\"SrcPort\":44626,\"SrcMac\":\"0A:58:0A:80:00:01\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"IfDirection\":0,\"PktDropLatestFlags\":16,\"DstMac\":\"42:12:CA:1E:09:61\",\"Interface\":\"ovn-k8s-mp0\",\"Proto\":6,\"Bytes\":2735,\"PktDropPackets\":1,\"AgentIP\":\"10.0.1.7\",\"TimeFlowRttNs\":12239000,\"TimeFlowStartMs\":1708011862362,\"SrcAddr\":\"10.128.0.12\"}"
+            "1786460077292000000",
+            "{\"Etype\":2048,\"SrcK8S_OwnerType\":\"Deployment\",\"PktDropBytes\":64,\"TimeFlowEndMs\":1786460077292,\"SrcSubnetLabel\":\"Pods\",\"Sampling\":1,\"Proto\":6,\"Bytes\":1188,\"SrcPort\":36564,\"TimeReceived\":1786460077,\"SrcK8S_Name\":\"console-operator-bb5cd8849-krtr7\",\"DstPort\":6443,\"DstAddr\":\"172.20.0.1\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DstSubnetLabel\":\"Services\",\"TimeFlowStartMs\":1786460062627,\"IfDirections\":[0],\"PktDropLatestFlags\":16,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"DstMac\":\"0a:58:0a:80:00:02\",\"Packets\":18,\"SrcAddr\":\"10.128.0.25\",\"Dscp\":0,\"AgentIP\":\"10.0.1.92\",\"SrcMac\":\"0a:58:0a:80:00:01\",\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"Interfaces\":[\"ovn-k8s-mp0\"],\"PktDropPackets\":2,\"SrcK8S_NetworkName\":\"primary\",\"Udns\":[\"\"],\"SrcK8S_HostIP\":\"10.0.1.92\",\"TimeFlowRttNs\":5596000,\"Flags\":[\"ACK\"]}"
+          ],
+          [
+            "1786460077019000064",
+            "{\"Proto\":6,\"Bytes\":2714,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"SrcK8S_NetworkName\":\"primary\",\"Etype\":2048,\"SrcK8S_HostIP\":\"10.0.1.92\",\"Udns\":[\"\"],\"SrcK8S_OwnerType\":\"Deployment\",\"SrcPort\":59808,\"SrcK8S_Name\":\"console-operator-bb5cd8849-krtr7\",\"Interfaces\":[\"ovn-k8s-mp0\"],\"AgentIP\":\"10.0.1.92\",\"TLSTypes\":[\"AppData\"],\"PktDropPackets\":2,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DstAddr\":\"172.20.0.1\",\"TimeFlowRttNs\":6169000,\"Sampling\":1,\"SrcSubnetLabel\":\"Pods\",\"TimeFlowStartMs\":1786460064582,\"DstMac\":\"0a:58:0a:80:00:02\",\"Packets\":10,\"SrcMac\":\"0a:58:0a:80:00:01\",\"PktDropBytes\":64,\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"SrcAddr\":\"10.128.0.25\",\"DstSubnetLabel\":\"Services\",\"PktDropLatestFlags\":16,\"DstPort\":6443,\"Dscp\":0,\"TimeReceived\":1786460077,\"TimeFlowEndMs\":1786460077019,\"Flags\":[\"ACK\"],\"IfDirections\":[0]}"
           ]
         ]
       },
       {
         "stream": {
-          "FlowDirection": "1",
-          "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "openshift-console",
-          "SrcK8S_OwnerName": "console",
-          "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
-        },
-        "values": [
-          [
-            "1708011870510000128",
-            "{\"SrcAddr\":\"10.129.0.34\",\"DstAddr\":\"172.20.0.1\",\"Etype\":2048,\"IfDirection\":0,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"AgentIP\":\"10.0.1.137\",\"SrcMac\":\"0A:58:0A:81:00:01\",\"TimeFlowStartMs\":1708011870510,\"PktDropLatestFlags\":16,\"Proto\":6,\"PktDropBytes\":32,\"Bytes\":66,\"DstPort\":6443,\"TimeReceived\":1708011870,\"Interface\":\"ovn-k8s-mp0\",\"SrcK8S_HostIP\":\"10.0.1.137\",\"Flags\":16,\"SrcK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"DnsErrno\":0,\"TimeFlowRttNs\":401000,\"Packets\":1,\"PktDropPackets\":1,\"SrcK8S_Name\":\"console-6bc7bf6577-mw7zj\",\"Dscp\":0,\"SrcK8S_OwnerType\":\"Deployment\",\"DstMac\":\"FE:70:6A:E1:72:17\",\"SrcPort\":54246,\"TimeFlowEndMs\":1708011870510}"
-          ],
-          [
-            "1708011870508999936",
-            "{\"AgentIP\":\"10.0.1.137\",\"IfDirection\":0,\"SrcK8S_Name\":\"console-6bc7bf6577-mw7zj\",\"PktDropLatestFlags\":16,\"Bytes\":66,\"Etype\":2048,\"PktDropPackets\":1,\"TimeFlowEndMs\":1708011870509,\"DstMac\":\"FE:70:6A:E1:72:17\",\"DstAddr\":\"172.20.0.1\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcAddr\":\"10.129.0.34\",\"SrcPort\":48938,\"Packets\":1,\"Interface\":\"ovn-k8s-mp0\",\"SrcMac\":\"0A:58:0A:81:00:01\",\"Dscp\":0,\"DnsErrno\":0,\"Proto\":6,\"TimeFlowStartMs\":1708011870509,\"DstPort\":6443,\"PktDropBytes\":32,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"TimeFlowRttNs\":262000,\"TimeReceived\":1708011870,\"Flags\":16,\"SrcK8S_HostIP\":\"10.0.1.137\",\"SrcK8S_OwnerType\":\"Deployment\",\"SrcK8S_HostName\":\"ip-10-0-1-137.ec2.internal\"}"
-          ],
-          [
-            "1708011869486000128",
-            "{\"Packets\":1,\"SrcK8S_Name\":\"console-6bc7bf6577-mw7zj\",\"Proto\":6,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"IfDirection\":0,\"SrcK8S_HostIP\":\"10.0.1.137\",\"SrcAddr\":\"10.129.0.34\",\"Dscp\":0,\"DstAddr\":\"172.20.0.1\",\"TimeFlowRttNs\":5079000,\"DstPort\":6443,\"SrcPort\":45046,\"PktDropLatestFlags\":16,\"TimeReceived\":1708011870,\"TimeFlowEndMs\":1708011869486,\"DnsErrno\":0,\"Bytes\":66,\"PktDropPackets\":1,\"SrcMac\":\"0A:58:0A:81:00:01\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"AgentIP\":\"10.0.1.137\",\"PktDropBytes\":32,\"SrcK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"DstMac\":\"FE:70:6A:E1:72:17\",\"Etype\":2048,\"Interface\":\"ovn-k8s-mp0\",\"Flags\":16,\"SrcK8S_OwnerType\":\"Deployment\",\"TimeFlowStartMs\":1708011869486}"
-          ],
-          [
-            "1708011865900999936",
-            "{\"Interface\":\"ovn-k8s-mp0\",\"TimeReceived\":1708011870,\"Bytes\":66,\"IfDirection\":0,\"PktDropPackets\":1,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"SrcK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"SrcK8S_Name\":\"console-6bc7bf6577-mw7zj\",\"Dscp\":0,\"SrcMac\":\"0A:58:0A:81:00:01\",\"TimeFlowEndMs\":1708011865901,\"PktDropLatestFlags\":16,\"TimeFlowRttNs\":236000,\"SrcK8S_HostIP\":\"10.0.1.137\",\"Flags\":16,\"DstPort\":6443,\"AgentIP\":\"10.0.1.137\",\"SrcPort\":60482,\"DstAddr\":\"172.20.0.1\",\"SrcAddr\":\"10.129.0.34\",\"Proto\":6,\"PktDropBytes\":32,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DstMac\":\"FE:70:6A:E1:72:17\",\"Packets\":1,\"DnsErrno\":0,\"TimeFlowStartMs\":1708011865901,\"SrcK8S_OwnerType\":\"Deployment\",\"Etype\":2048}"
-          ]
-        ]
-      },
-      {
-        "stream": {
-          "DstK8S_OwnerName": "ip-10-0-1-7.ec2.internal",
+          "DstK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
           "DstK8S_Type": "Node",
-          "FlowDirection": "0",
-          "K8S_FlowLayer": "infra",
-          "SrcK8S_OwnerName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Type": "Node",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
-        },
-        "values": [
-          [
-            "1708011865900999936",
-            "{\"DstAddr\":\"10.0.1.7\",\"DstK8S_OwnerType\":\"Node\",\"DstK8S_HostIP\":\"10.0.1.7\",\"DstK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"Dscp\":0,\"PktDropBytes\":32,\"DnsErrno\":0,\"AgentIP\":\"10.0.1.7\",\"SrcK8S_OwnerType\":\"Node\",\"Interface\":\"br-ex\",\"Bytes\":132,\"Proto\":6,\"TimeReceived\":1708011867,\"Etype\":2048,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"TimeFlowRttNs\":10000,\"SrcK8S_Name\":\"ip-10-0-1-137.ec2.internal\",\"IfDirection\":0,\"TimeFlowEndMs\":1708011865901,\"Flags\":16,\"PktDropLatestFlags\":16,\"SrcK8S_HostIP\":\"10.0.1.137\",\"SrcAddr\":\"10.0.1.137\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"Packets\":2,\"PktDropPackets\":1,\"DstPort\":10250,\"SrcPort\":48142,\"DstMac\":\"02:27:A1:A8:84:B9\",\"TimeFlowStartMs\":1708011865435,\"DstK8S_Name\":\"ip-10-0-1-7.ec2.internal\",\"SrcMac\":\"02:52:C0:6D:70:25\"}"
-          ]
-        ]
-      },
-      {
-        "stream": {
-          "DstK8S_OwnerName": "ip-10-0-1-137.ec2.internal",
-          "DstK8S_Type": "Node",
+          "DstK8S_Zone": "us-east-1d",
           "FlowDirection": "2",
           "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "prometheus-k8s",
+          "SrcK8S_Namespace": "openshift-image-registry",
+          "SrcK8S_OwnerName": "image-registry",
           "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
         },
         "values": [
           [
-            "1708011866414000128",
-            "{\"SrcMac\":\"0A:58:0A:81:00:01\",\"SrcK8S_Name\":\"prometheus-k8s-0\",\"DstPort\":10250,\"PktDropLatestFlags\":16,\"Packets\":2,\"TimeFlowStartMs\":1708011866413,\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"TimeReceived\":1708011870,\"TimeFlowEndMs\":1708011866414,\"SrcAddr\":\"10.129.0.26\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Bytes\":132,\"IfDirection\":0,\"Interface\":\"ovn-k8s-mp0\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"DstK8S_HostIP\":\"10.0.1.137\",\"Dscp\":0,\"DstAddr\":\"10.0.1.137\",\"Proto\":6,\"Flags\":16,\"PktDropPackets\":1,\"TimeFlowRttNs\":10000,\"SrcPort\":60544,\"Etype\":2048,\"SrcK8S_OwnerType\":\"StatefulSet\",\"SrcK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"DstK8S_Name\":\"ip-10-0-1-137.ec2.internal\",\"DstMac\":\"FE:70:6A:E1:72:17\",\"DnsErrno\":0,\"PktDropBytes\":32,\"AgentIP\":\"10.0.1.137\",\"SrcK8S_HostIP\":\"10.0.1.137\",\"DstK8S_OwnerType\":\"Node\"}"
-          ],
-          [
-            "1708011866412999936",
-            "{\"SrcK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"PktDropPackets\":1,\"SrcAddr\":\"10.129.0.26\",\"SrcK8S_OwnerType\":\"StatefulSet\",\"IfDirection\":0,\"Proto\":6,\"DstPort\":10250,\"Flags\":16,\"Etype\":2048,\"Packets\":2,\"TimeReceived\":1708011870,\"DstK8S_OwnerType\":\"Node\",\"SrcMac\":\"0A:58:0A:81:00:01\",\"AgentIP\":\"10.0.1.137\",\"SrcPort\":60540,\"PktDropBytes\":32,\"SrcK8S_Name\":\"prometheus-k8s-0\",\"DstK8S_HostIP\":\"10.0.1.137\",\"DnsErrno\":0,\"PktDropLatestFlags\":16,\"DstK8S_Name\":\"ip-10-0-1-137.ec2.internal\",\"DstAddr\":\"10.0.1.137\",\"Dscp\":0,\"TimeFlowEndMs\":1708011866413,\"DstMac\":\"FE:70:6A:E1:72:17\",\"Interface\":\"ovn-k8s-mp0\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Bytes\":132,\"SrcK8S_HostIP\":\"10.0.1.137\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"TimeFlowRttNs\":10000,\"TimeFlowStartMs\":1708011866413}"
+            "1786460077238000128",
+            "{\"TLSTypes\":[\"ServerHello\",\"AppData\"],\"SrcK8S_HostIP\":\"10.0.1.92\",\"AgentIP\":\"10.0.1.92\",\"Packets\":8,\"TLSVersion\":\"TLS 1.3\",\"DstK8S_Name\":\"ip-10-0-1-92.ec2.internal\",\"SrcMac\":\"0a:58:0a:80:00:2a\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"PktDropLatestFlags\":16,\"Interfaces\":[\"eth0\",\"f24261355253e88\",\"ovn-k8s-mp0\"],\"SrcAddr\":\"10.128.0.42\",\"Flags\":[\"ACK\",\"SYN_ACK\"],\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"TimeFlowStartMs\":1786460077234,\"DstPort\":46892,\"DstK8S_HostIP\":\"10.0.1.92\",\"DstK8S_OwnerType\":\"Node\",\"Bytes\":4272,\"TLSGroup\":\"X25519MLKEM768\",\"DstSubnetLabel\":\"Pods\",\"DstMac\":\"0a:58:0a:80:00:02\",\"Udns\":[\"\",\"default\",\"\"],\"PktDropBytes\":56,\"SrcK8S_OwnerType\":\"Deployment\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_OVERWINDOW\",\"Dscp\":0,\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"SrcSubnetLabel\":\"Pods\",\"Sampling\":1,\"Etype\":2048,\"Proto\":6,\"TimeReceived\":1786460077,\"SrcK8S_Name\":\"image-registry-5d79b46f4c-69f5l\",\"SrcK8S_NetworkName\":\"primary\",\"DstAddr\":\"10.128.0.2\",\"IfDirections\":[1,0,0],\"DstK8S_NetworkName\":\"primary\",\"TimeFlowEndMs\":1786460077238,\"TimeFlowRttNs\":102000,\"PktDropPackets\":1,\"SrcPort\":5000,\"TLSCipherSuite\":\"TLS_AES_128_GCM_SHA256\"}"
           ]
         ]
       },
       {
         "stream": {
-          "DstK8S_OwnerName": "ip-10-0-1-137.ec2.internal",
+          "DstK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
           "DstK8S_Type": "Node",
-          "FlowDirection": "2",
-          "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "prometheus-adapter",
-          "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
-        },
-        "values": [
-          [
-            "1708011866580000000",
-            "{\"TimeFlowRttNs\":129000,\"DstMac\":\"FE:70:6A:E1:72:17\",\"Interface\":\"ovn-k8s-mp0\",\"SrcK8S_HostIP\":\"10.0.1.137\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_NO_SOCKET\",\"PktDropBytes\":20,\"DstPort\":39180,\"Dscp\":0,\"SrcPort\":6443,\"TimeFlowStartMs\":1708011866576,\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"Proto\":6,\"PktDropLatestFlags\":4,\"Packets\":8,\"DstAddr\":\"10.129.0.2\",\"DstK8S_HostIP\":\"10.0.1.137\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"IfDirection\":0,\"PktDropPackets\":1,\"DstK8S_OwnerType\":\"Node\",\"SrcAddr\":\"10.129.0.21\",\"DnsErrno\":0,\"TimeFlowEndMs\":1708011866580,\"SrcK8S_OwnerType\":\"Deployment\",\"SrcMac\":\"0A:58:0A:81:00:15\",\"AgentIP\":\"10.0.1.137\",\"TimeReceived\":1708011870,\"DstK8S_Name\":\"ip-10-0-1-137.ec2.internal\",\"Flags\":788,\"Bytes\":3640,\"Etype\":2048,\"SrcK8S_Name\":\"prometheus-adapter-6949cd4447-5xsrq\"}"
-          ]
-        ]
-      },
-      {
-        "stream": {
-          "DstK8S_OwnerName": "ip-10-0-1-137.ec2.internal",
-          "DstK8S_Type": "Node",
-          "FlowDirection": "0",
-          "K8S_FlowLayer": "infra",
-          "SrcK8S_OwnerName": "ip-10-0-1-7.ec2.internal",
-          "SrcK8S_Type": "Node",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
-        },
-        "values": [
-          [
-            "1708011870041999872",
-            "{\"SrcK8S_Name\":\"ip-10-0-1-7.ec2.internal\",\"IfDirection\":0,\"Proto\":6,\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"Dscp\":0,\"DstPort\":9537,\"SrcK8S_OwnerType\":\"Node\",\"DnsErrno\":0,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Interface\":\"br-ex\",\"AgentIP\":\"10.0.1.137\",\"DstMac\":\"02:52:C0:6D:70:25\",\"SrcK8S_HostIP\":\"10.0.1.7\",\"PktDropBytes\":32,\"SrcAddr\":\"10.0.1.7\",\"TimeFlowEndMs\":1708011870042,\"SrcPort\":48338,\"Flags\":16,\"Packets\":2,\"TimeFlowStartMs\":1708011869997,\"DstK8S_OwnerType\":\"Node\",\"DstK8S_HostIP\":\"10.0.1.137\",\"Bytes\":132,\"PktDropLatestFlags\":16,\"TimeFlowRttNs\":10000,\"PktDropPackets\":1,\"DstAddr\":\"10.0.1.137\",\"Etype\":2048,\"DstK8S_Name\":\"ip-10-0-1-137.ec2.internal\",\"TimeReceived\":1708011870,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"SrcMac\":\"02:27:A1:A8:84:B9\",\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\"}"
-          ],
-          [
-            "1708011869529999872",
-            "{\"PktDropPackets\":1,\"DstK8S_OwnerType\":\"Node\",\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"TimeFlowStartMs\":1708011869486,\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"SrcK8S_OwnerType\":\"Node\",\"TimeFlowRttNs\":10000,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DstK8S_HostIP\":\"10.0.1.137\",\"Bytes\":132,\"Dscp\":0,\"IfDirection\":0,\"PktDropBytes\":32,\"SrcK8S_Name\":\"ip-10-0-1-7.ec2.internal\",\"SrcPort\":45328,\"Etype\":2048,\"DstK8S_Name\":\"ip-10-0-1-137.ec2.internal\",\"AgentIP\":\"10.0.1.137\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"SrcMac\":\"02:27:A1:A8:84:B9\",\"DstAddr\":\"10.0.1.137\",\"TimeFlowEndMs\":1708011869530,\"Flags\":16,\"Interface\":\"br-ex\",\"SrcK8S_HostIP\":\"10.0.1.7\",\"DnsErrno\":0,\"DstMac\":\"02:52:C0:6D:70:25\",\"PktDropLatestFlags\":16,\"Packets\":2,\"Proto\":6,\"DstPort\":10250,\"SrcAddr\":\"10.0.1.7\",\"TimeReceived\":1708011870}"
-          ]
-        ]
-      },
-      {
-        "stream": {
-          "DstK8S_Namespace": "openshift-route-monitor-operator",
-          "DstK8S_OwnerName": "blackbox-exporter",
-          "DstK8S_Type": "Pod",
-          "FlowDirection": "0",
-          "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "prometheus-k8s",
-          "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
-        },
-        "values": [
-          [
-            "1708011867481999872",
-            "{\"Proto\":6,\"DstAddr\":\"10.129.0.15\",\"TimeReceived\":1708011870,\"SrcAddr\":\"10.128.0.29\",\"TimeFlowEndMs\":1708011867482,\"Etype\":2048,\"AgentIP\":\"10.0.1.137\",\"SrcMac\":\"0A:58:0A:81:00:01\",\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"IfDirection\":0,\"TimeFlowStartMs\":1708011867482,\"DstK8S_OwnerType\":\"Deployment\",\"DstK8S_HostIP\":\"10.0.1.137\",\"PktDropBytes\":32,\"Interface\":\"eth0\",\"SrcK8S_HostIP\":\"10.0.1.7\",\"SrcPort\":50068,\"DstPort\":9115,\"Flags\":16,\"PktDropPackets\":1,\"DnsErrno\":0,\"DstK8S_Name\":\"blackbox-exporter-7bf4ff5bbc-f2qjk\",\"DstMac\":\"0A:58:0A:81:00:0F\",\"PktDropLatestFlags\":16,\"SrcK8S_Name\":\"prometheus-k8s-1\",\"Dscp\":0,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"SrcK8S_OwnerType\":\"StatefulSet\"}"
-          ]
-        ]
-      },
-      {
-        "stream": {
-          "DstK8S_Namespace": "openshift-monitoring",
-          "DstK8S_OwnerName": "prometheus-k8s",
-          "DstK8S_Type": "Pod",
-          "FlowDirection": "2",
-          "K8S_FlowLayer": "infra",
-          "SrcK8S_OwnerName": "ip-10-0-1-137.ec2.internal",
-          "SrcK8S_Type": "Node",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
-        },
-        "values": [
-          [
-            "1708011866412999936",
-            "{\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"DnsErrno\":0,\"DstPort\":60544,\"PktDropBytes\":32,\"AgentIP\":\"10.0.1.137\",\"Proto\":6,\"TimeFlowStartMs\":1708011866413,\"Interface\":\"eth0\",\"PktDropPackets\":1,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"IfDirection\":0,\"Dscp\":0,\"Etype\":2048,\"PktDropLatestFlags\":16,\"SrcK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"DstK8S_HostIP\":\"10.0.1.137\",\"DstAddr\":\"10.129.0.26\",\"DstK8S_OwnerType\":\"StatefulSet\",\"Flags\":16,\"SrcAddr\":\"10.0.1.137\",\"SrcK8S_HostIP\":\"10.0.1.137\",\"TimeFlowEndMs\":1708011866413,\"DstK8S_Name\":\"prometheus-k8s-0\",\"Packets\":1,\"SrcMac\":\"FE:70:6A:E1:72:17\",\"SrcPort\":10250,\"DstMac\":\"0A:58:0A:81:00:1A\",\"Bytes\":32,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcK8S_Name\":\"ip-10-0-1-137.ec2.internal\",\"TimeFlowRttNs\":1875000,\"TimeReceived\":1708011870,\"SrcK8S_OwnerType\":\"Node\"}"
-          ],
-          [
-            "1708011866412999936",
-            "{\"DstK8S_HostIP\":\"10.0.1.137\",\"Etype\":2048,\"Interface\":\"eth0\",\"Dscp\":0,\"DnsErrno\":0,\"SrcK8S_HostIP\":\"10.0.1.137\",\"DstK8S_OwnerType\":\"StatefulSet\",\"Proto\":6,\"AgentIP\":\"10.0.1.137\",\"SrcK8S_OwnerType\":\"Node\",\"DstMac\":\"0A:58:0A:81:00:1A\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcAddr\":\"10.0.1.137\",\"DstPort\":60540,\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"PktDropLatestFlags\":16,\"PktDropBytes\":32,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"SrcK8S_Name\":\"ip-10-0-1-137.ec2.internal\",\"Packets\":1,\"IfDirection\":0,\"TimeFlowEndMs\":1708011866413,\"TimeFlowStartMs\":1708011866413,\"DstAddr\":\"10.129.0.26\",\"Bytes\":32,\"SrcMac\":\"FE:70:6A:E1:72:17\",\"SrcPort\":10250,\"DstK8S_Name\":\"prometheus-k8s-0\",\"Flags\":16,\"PktDropPackets\":1,\"SrcK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"TimeFlowRttNs\":5223000,\"TimeReceived\":1708011870}"
-          ]
-        ]
-      },
-      {
-        "stream": {
-          "DstK8S_Namespace": "openshift-monitoring",
-          "DstK8S_OwnerName": "prometheus-k8s",
-          "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
           "FlowDirection": "2",
           "K8S_FlowLayer": "infra",
           "SrcK8S_Namespace": "openshift-dns",
           "SrcK8S_OwnerName": "dns-default",
           "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
         },
         "values": [
           [
-            "1708011865435000064",
-            "{\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Bytes\":32,\"DstK8S_OwnerType\":\"StatefulSet\",\"SrcK8S_HostIP\":\"10.0.1.7\",\"Dscp\":0,\"TimeReceived\":1708011867,\"DstMac\":\"0A:58:0A:80:00:1D\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"DstK8S_Name\":\"prometheus-k8s-1\",\"IfDirection\":0,\"AgentIP\":\"10.0.1.7\",\"PktDropBytes\":32,\"PktDropPackets\":1,\"DstK8S_HostIP\":\"10.0.1.7\",\"DstAddr\":\"10.128.0.29\",\"Packets\":1,\"TimeFlowEndMs\":1708011865435,\"TimeFlowRttNs\":15091000,\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"TimeFlowStartMs\":1708011865435,\"Interface\":\"eth0\",\"DstK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"SrcK8S_OwnerType\":\"DaemonSet\",\"Flags\":16,\"SrcK8S_Name\":\"dns-default-ldfzz\",\"SrcAddr\":\"10.128.0.6\",\"DstPort\":39640,\"SrcPort\":9154,\"SrcMac\":\"0A:58:0A:80:00:06\",\"Etype\":2048,\"Proto\":6,\"PktDropLatestFlags\":16,\"DnsErrno\":0}"
+            "1786460076416999936",
+            "{\"PktDropLatestDropCause\":\"SKB_DROP_UNKNOWN_CAUSE\",\"SrcK8S_OwnerType\":\"DaemonSet\",\"PktDropBytes\":0,\"Sampling\":1,\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"Etype\":2048,\"Proto\":6,\"AgentIP\":\"10.0.1.92\",\"PktDropPackets\":1,\"TimeFlowEndMs\":1786460076417,\"SrcMac\":\"0a:58:0a:80:00:0e\",\"Packets\":5,\"TimeFlowRttNs\":132000,\"Flags\":[\"ACK\",\"SYN_ACK\",\"FIN_ACK\"],\"DstMac\":\"0a:58:0a:80:00:02\",\"Udns\":[\"\",\"default\",\"\"],\"TimeFlowStartMs\":1786460076416,\"DstAddr\":\"10.128.0.2\",\"SrcPort\":8181,\"DstK8S_NetworkName\":\"primary\",\"Interfaces\":[\"eth0\",\"bc05244e3283d55\",\"ovn-k8s-mp0\"],\"Bytes\":475,\"DstK8S_Name\":\"ip-10-0-1-92.ec2.internal\",\"Dscp\":0,\"DstPort\":44904,\"SrcAddr\":\"10.128.0.14\",\"DstK8S_OwnerType\":\"Node\",\"SrcK8S_NetworkName\":\"primary\",\"IfDirections\":[1,0,0],\"DstSubnetLabel\":\"Pods\",\"SrcSubnetLabel\":\"Pods\",\"TimeReceived\":1786460077,\"SrcK8S_Name\":\"dns-default-vbvbz\",\"DstK8S_HostIP\":\"10.0.1.92\",\"PktDropLatestFlags\":512,\"PktDropLatestState\":\"TCP_CLOSE_WAIT\",\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"SrcK8S_HostIP\":\"10.0.1.92\"}"
           ]
         ]
       },
       {
         "stream": {
-          "DstK8S_Namespace": "openshift-monitoring",
-          "DstK8S_OwnerName": "prometheus-k8s",
-          "DstK8S_Type": "Pod",
-          "FlowDirection": "2",
+          "DstK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Type": "Node",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "1",
           "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "openshift-console",
-          "SrcK8S_OwnerName": "console",
-          "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
-        },
-        "values": [
-          [
-            "1708011865436000000",
-            "{\"Bytes\":32,\"Proto\":6,\"PktDropBytes\":32,\"DstK8S_HostIP\":\"10.0.1.7\",\"DstK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"Flags\":16,\"TimeReceived\":1708011867,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DnsErrno\":0,\"AgentIP\":\"10.0.1.7\",\"IfDirection\":0,\"SrcPort\":8443,\"SrcAddr\":\"10.128.0.36\",\"DstPort\":46356,\"PktDropPackets\":1,\"SrcK8S_Name\":\"console-6bc7bf6577-t4m2x\",\"TimeFlowStartMs\":1708011865436,\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"SrcMac\":\"0A:58:0A:80:00:24\",\"Interface\":\"eth0\",\"DstMac\":\"0A:58:0A:80:00:1D\",\"Dscp\":0,\"Etype\":2048,\"TimeFlowEndMs\":1708011865436,\"SrcK8S_HostIP\":\"10.0.1.7\",\"DstAddr\":\"10.128.0.29\",\"DstK8S_OwnerType\":\"StatefulSet\",\"DstK8S_Name\":\"prometheus-k8s-1\",\"SrcK8S_OwnerType\":\"Deployment\",\"TimeFlowRttNs\":2830000,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"PktDropLatestFlags\":16,\"Packets\":1}"
-          ]
-        ]
-      },
-      {
-        "stream": {
-          "DstK8S_Namespace": "openshift-monitoring",
-          "DstK8S_OwnerName": "prometheus-k8s",
-          "DstK8S_Type": "Pod",
-          "FlowDirection": "0",
-          "K8S_FlowLayer": "infra",
-          "SrcK8S_OwnerName": "ip-10-0-1-7.ec2.internal",
+          "SrcK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
           "SrcK8S_Type": "Node",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
         },
         "values": [
           [
-            "1708011865433999872",
-            "{\"Flags\":16,\"Interface\":\"eth0\",\"PktDropBytes\":32,\"DstMac\":\"0A:58:0A:81:00:1A\",\"TimeFlowEndMs\":1708011865434,\"TimeFlowStartMs\":1708011865434,\"SrcMac\":\"0A:58:0A:81:00:01\",\"SrcPort\":10250,\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"SrcK8S_OwnerType\":\"Node\",\"Proto\":6,\"SrcK8S_Name\":\"ip-10-0-1-7.ec2.internal\",\"TimeReceived\":1708011865,\"IfDirection\":0,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"PktDropLatestFlags\":16,\"DnsErrno\":0,\"SrcK8S_HostIP\":\"10.0.1.7\",\"DstK8S_HostIP\":\"10.0.1.137\",\"Etype\":2048,\"DstK8S_OwnerType\":\"StatefulSet\",\"DstPort\":48142,\"DstAddr\":\"10.129.0.26\",\"Dscp\":0,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"AgentIP\":\"10.0.1.137\",\"Packets\":1,\"Bytes\":32,\"SrcAddr\":\"10.0.1.7\",\"TimeFlowRttNs\":22051000,\"PktDropPackets\":1,\"DstK8S_Name\":\"prometheus-k8s-0\"}"
+            "1786460076492000000",
+            "{\"SrcK8S_HostIP\":\"10.0.1.132\",\"PktDropLatestState\":\"TCP_ESTABLISHED\",\"DstK8S_OwnerType\":\"Node\",\"SrcMac\":\"02:a3:65:a2:a1:df\",\"PktDropLatestFlags\":16,\"Etype\":2048,\"DstSubnetLabel\":\"Machines\",\"SrcK8S_Name\":\"ip-10-0-1-132.ec2.internal\",\"DstPort\":9103,\"TimeFlowStartMs\":1786460076384,\"DstK8S_NetworkName\":\"primary\",\"Udns\":[\"\",\"\"],\"SrcK8S_NetworkName\":\"primary\",\"PktDropPackets\":2,\"AgentIP\":\"10.0.1.132\",\"DstK8S_Name\":\"ip-10-0-1-92.ec2.internal\",\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"Bytes\":132,\"SrcK8S_OwnerType\":\"Node\",\"SrcPort\":51063,\"Sampling\":1,\"DstK8S_HostIP\":\"10.0.1.92\",\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"IfDirections\":[1,0],\"TimeReceived\":1786460077,\"SrcSubnetLabel\":\"Machines\",\"PktDropBytes\":104,\"Interfaces\":[\"ens5\",\"br-ex\"],\"PktDropLatestDropCause\":\"SKB_DROP_REASON_IP_RPFILTER\",\"DstMac\":\"02:45:8c:51:5f:b7\",\"Dscp\":0,\"Proto\":6,\"Packets\":2,\"TimeFlowEndMs\":1786460076492,\"Flags\":[\"ACK\"],\"DstAddr\":\"10.0.1.92\",\"SrcAddr\":\"10.0.1.132\"}"
           ]
         ]
       },
       {
         "stream": {
-          "DstK8S_Namespace": "openshift-monitoring",
-          "DstK8S_OwnerName": "prometheus-k8s",
-          "DstK8S_Type": "Pod",
+          "DstK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Type": "Node",
+          "DstK8S_Zone": "us-east-1d",
           "FlowDirection": "0",
           "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "openshift-user-workload-monitoring",
-          "SrcK8S_OwnerName": "prometheus-operator",
-          "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
         },
         "values": [
           [
-            "1708011869017999872",
-            "{\"TimeFlowEndMs\":1708011869018,\"PktDropPackets\":1,\"TimeReceived\":1708011870,\"DstAddr\":\"10.129.0.26\",\"PktDropBytes\":32,\"TimeFlowStartMs\":1708011868974,\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Flags\":16,\"SrcAddr\":\"10.128.0.23\",\"Interface\":\"eth0\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"IfDirection\":0,\"Packets\":1,\"SrcK8S_OwnerType\":\"Deployment\",\"PktDropLatestFlags\":16,\"Proto\":6,\"AgentIP\":\"10.0.1.137\",\"DstPort\":44302,\"DstK8S_Name\":\"prometheus-k8s-0\",\"TimeFlowRttNs\":17377000,\"DstK8S_OwnerType\":\"StatefulSet\",\"SrcK8S_Name\":\"prometheus-operator-6f5f9797ff-5knzj\",\"DstK8S_HostIP\":\"10.0.1.137\",\"Etype\":2048,\"SrcK8S_HostIP\":\"10.0.1.7\",\"SrcMac\":\"0A:58:0A:81:00:01\",\"DstMac\":\"0A:58:0A:81:00:1A\",\"Bytes\":32,\"Dscp\":0,\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"SrcPort\":8443,\"DnsErrno\":0}"
+            "1786460076752999936",
+            "{\"PktDropLatestFlags\":512,\"IfDirections\":[0,0],\"Bytes\":471,\"Udns\":[\"\",\"\"],\"DstSubnetLabel\":\"Machines\",\"DstK8S_Name\":\"ip-10-0-1-92.ec2.internal\",\"SrcPort\":33768,\"PktDropLatestDropCause\":\"SKB_DROP_UNKNOWN_CAUSE\",\"Interfaces\":[\"ens5\",\"br-ex\"],\"DstK8S_NetworkName\":\"primary\",\"TimeReceived\":1786460077,\"DstMac\":\"02:45:8c:51:5f:b7\",\"SrcSubnetLabel\":\"Machines\",\"PktDropLatestState\":\"TCP_CLOSE_WAIT\",\"TimeFlowStartMs\":1786460076752,\"DstK8S_OwnerType\":\"Node\",\"PktDropPackets\":1,\"DstPort\":31470,\"Packets\":5,\"DstK8S_HostIP\":\"10.0.1.92\",\"DstAddr\":\"10.0.1.92\",\"Etype\":2048,\"SrcMac\":\"02:d9:f7:0e:b2:e7\",\"Dscp\":0,\"PktDropBytes\":0,\"Proto\":6,\"TimeFlowRttNs\":623000,\"TimeFlowEndMs\":1786460076753,\"Sampling\":1,\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"SrcAddr\":\"10.0.101.9\",\"Flags\":[\"SYN\",\"ACK\",\"FIN_ACK\"],\"AgentIP\":\"10.0.1.92\"}"
           ]
         ]
       },
       {
         "stream": {
-          "DstK8S_Namespace": "openshift-monitoring",
-          "DstK8S_OwnerName": "prometheus-k8s",
-          "DstK8S_Type": "Pod",
+          "DstK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
+          "DstK8S_Type": "Node",
+          "DstK8S_Zone": "us-east-1d",
           "FlowDirection": "0",
           "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "netobserv",
-          "SrcK8S_OwnerName": "netobserv-controller-manager",
-          "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
-        },
-        "values": [
-          [
-            "1708011865435000064",
-            "{\"DstK8S_HostIP\":\"10.0.1.7\",\"IfDirection\":0,\"AgentIP\":\"10.0.1.7\",\"DnsErrno\":0,\"TimeFlowEndMs\":1708011865435,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"DstMac\":\"0A:58:0A:80:00:1D\",\"TimeFlowRttNs\":4963000,\"SrcK8S_HostIP\":\"10.0.1.137\",\"PktDropBytes\":32,\"DstK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"PktDropLatestFlags\":16,\"DstK8S_Name\":\"prometheus-k8s-1\",\"Proto\":6,\"SrcMac\":\"0A:58:0A:80:00:01\",\"SrcK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"DstAddr\":\"10.128.0.29\",\"SrcK8S_Name\":\"netobserv-controller-manager-54d5d67fdb-pk69f\",\"SrcK8S_OwnerType\":\"Deployment\",\"SrcAddr\":\"10.129.0.30\",\"Dscp\":0,\"Bytes\":32,\"SrcPort\":8443,\"TimeFlowStartMs\":1708011865390,\"PktDropPackets\":1,\"Interface\":\"eth0\",\"DstPort\":35000,\"Packets\":1,\"DstK8S_OwnerType\":\"StatefulSet\",\"Flags\":16,\"TimeReceived\":1708011867,\"Etype\":2048}"
-          ]
-        ]
-      },
-      {
-        "stream": {
-          "DstK8S_Namespace": "openshift-monitoring",
-          "DstK8S_OwnerName": "prometheus-adapter",
-          "DstK8S_Type": "Pod",
-          "FlowDirection": "0",
-          "K8S_FlowLayer": "infra",
-          "SrcK8S_OwnerName": "ip-10-0-1-7.ec2.internal",
+          "SrcK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
           "SrcK8S_Type": "Node",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
         },
         "values": [
           [
-            "1708011869793999872",
-            "{\"Proto\":6,\"PktDropBytes\":20,\"PktDropLatestFlags\":4,\"Interface\":\"eth0\",\"SrcPort\":51492,\"SrcK8S_OwnerType\":\"Node\",\"Etype\":2048,\"PktDropPackets\":1,\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"SrcAddr\":\"10.128.0.2\",\"TimeFlowStartMs\":1708011869794,\"DnsErrno\":0,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Flags\":4,\"AgentIP\":\"10.0.1.137\",\"SrcK8S_HostIP\":\"10.0.1.7\",\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"DstK8S_HostIP\":\"10.0.1.137\",\"SrcK8S_Name\":\"ip-10-0-1-7.ec2.internal\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_RESET\",\"IfDirection\":0,\"DstPort\":6443,\"SrcMac\":\"0A:58:0A:81:00:01\",\"TimeFlowEndMs\":1708011869794,\"DstK8S_OwnerType\":\"Deployment\",\"DstAddr\":\"10.129.0.21\",\"DstK8S_Name\":\"prometheus-adapter-6949cd4447-5xsrq\",\"DstMac\":\"0A:58:0A:81:00:15\",\"TimeReceived\":1708011870,\"Dscp\":0}"
+            "1786460076492000000",
+            "{\"SrcSubnetLabel\":\"Machines\",\"SrcK8S_HostIP\":\"10.0.1.132\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Etype\":2048,\"Bytes\":132,\"IfDirections\":[0,0],\"TimeFlowRttNs\":638000,\"DstMac\":\"02:45:8c:51:5f:b7\",\"Interfaces\":[\"ens5\",\"br-ex\"],\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"Sampling\":1,\"PktDropLatestFlags\":16,\"DstK8S_Name\":\"ip-10-0-1-92.ec2.internal\",\"SrcK8S_NetworkName\":\"primary\",\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"SrcK8S_OwnerType\":\"Node\",\"DstPort\":9103,\"Dscp\":0,\"Packets\":2,\"DstK8S_OwnerType\":\"Node\",\"SrcPort\":51063,\"DstSubnetLabel\":\"Machines\",\"Udns\":[\"\",\"\"],\"SrcK8S_Name\":\"ip-10-0-1-132.ec2.internal\",\"Flags\":[\"ACK\"],\"PktDropPackets\":1,\"TimeFlowEndMs\":1786460076492,\"DstK8S_HostIP\":\"10.0.1.92\",\"Proto\":6,\"TimeFlowStartMs\":1786460076384,\"AgentIP\":\"10.0.1.92\",\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"SrcAddr\":\"10.0.1.132\",\"DstK8S_NetworkName\":\"primary\",\"DstAddr\":\"10.0.1.92\",\"SrcMac\":\"02:a3:65:a2:a1:df\",\"PktDropBytes\":32,\"TimeReceived\":1786460077}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "DstK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Type": "Node",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "2",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_Namespace": "openshift-network-diagnostics",
+          "SrcK8S_OwnerName": "network-check-target",
+          "SrcK8S_Type": "Pod",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786460076832000000",
+            "{\"SrcK8S_Name\":\"network-check-target-jgspg\",\"Etype\":2048,\"TimeFlowEndMs\":1786460076832,\"Sampling\":1,\"SrcK8S_NetworkName\":\"primary\",\"DstK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"DstK8S_OwnerType\":\"Node\",\"Bytes\":550,\"DstK8S_NetworkName\":\"primary\",\"Udns\":[\"\",\"default\",\"\"],\"SrcAddr\":\"10.129.0.5\",\"SrcK8S_OwnerType\":\"DaemonSet\",\"PktDropLatestState\":\"TCP_CLOSE_WAIT\",\"Dscp\":0,\"PktDropPackets\":1,\"TimeReceived\":1786460077,\"DstPort\":39604,\"TimeFlowRttNs\":182000,\"Proto\":6,\"DstK8S_HostIP\":\"10.0.1.132\",\"SrcSubnetLabel\":\"Pods\",\"SrcPort\":8080,\"IfDirections\":[1,0,0],\"AgentIP\":\"10.0.1.132\",\"SrcMac\":\"0a:58:0a:81:00:05\",\"DstSubnetLabel\":\"Pods\",\"DstMac\":\"0a:58:0a:81:00:02\",\"PktDropLatestDropCause\":\"SKB_DROP_UNKNOWN_CAUSE\",\"PktDropLatestFlags\":512,\"DstAddr\":\"10.129.0.2\",\"SrcK8S_HostIP\":\"10.0.1.132\",\"DstK8S_Name\":\"ip-10-0-1-132.ec2.internal\",\"Interfaces\":[\"eth0\",\"66305997886d932\",\"ovn-k8s-mp0\"],\"Flags\":[\"ACK\",\"SYN_ACK\",\"FIN_ACK\"],\"PktDropBytes\":0,\"TimeFlowStartMs\":1786460076831,\"Packets\":5}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "DstK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Type": "Node",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "2",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "monitoring-plugin",
+          "SrcK8S_Type": "Pod",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786460076585999872",
+            "{\"Flags\":[\"ACK\",\"SYN_ACK\"],\"PktDropPackets\":1,\"SrcK8S_OwnerType\":\"Deployment\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcK8S_NetworkName\":\"primary\",\"Interfaces\":[\"eth0\",\"d8c82d0d89f12f3\",\"ovn-k8s-mp0\"],\"Dscp\":0,\"AgentIP\":\"10.0.1.132\",\"TLSVersion\":\"TLS 1.3\",\"DstSubnetLabel\":\"Pods\",\"Sampling\":1,\"Etype\":2048,\"TimeReceived\":1786460077,\"Udns\":[\"\",\"default\",\"\"],\"DstK8S_OwnerType\":\"Node\",\"DstPort\":50306,\"SrcK8S_Name\":\"monitoring-plugin-d5bdf4779-2gvsq\",\"SrcK8S_HostIP\":\"10.0.1.132\",\"PktDropLatestFlags\":16,\"Bytes\":4471,\"DstK8S_HostIP\":\"10.0.1.132\",\"SrcMac\":\"0a:58:0a:81:00:14\",\"SrcAddr\":\"10.129.0.20\",\"TimeFlowEndMs\":1786460076586,\"Packets\":10,\"TLSTypes\":[\"ServerHello\",\"AppData\"],\"DstAddr\":\"10.129.0.2\",\"PktDropBytes\":56,\"TLSGroup\":\"X25519MLKEM768\",\"SrcPort\":9443,\"DstMac\":\"0a:58:0a:81:00:02\",\"DstK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"Proto\":6,\"TimeFlowStartMs\":1786460076582,\"TLSCipherSuite\":\"TLS_AES_128_GCM_SHA256\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_OVERWINDOW\",\"IfDirections\":[1,0,0],\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"SrcSubnetLabel\":\"Pods\",\"DstK8S_NetworkName\":\"primary\",\"TimeFlowRttNs\":154000,\"DstK8S_Name\":\"ip-10-0-1-132.ec2.internal\"}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "DstK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Type": "Node",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "1",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Type": "Node",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786460077238000128",
+            "{\"DstSubnetLabel\":\"Machines\",\"Packets\":227,\"PktDropBytes\":21347,\"DstK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"DstPort\":10250,\"Flags\":[\"ACK\"],\"Dscp\":0,\"PktDropPackets\":227,\"DstK8S_Name\":\"ip-10-0-1-132.ec2.internal\",\"PktDropLatestFlags\":16,\"TimeReceived\":1786460077,\"SrcMac\":\"02:45:8c:51:5f:b7\",\"Proto\":6,\"TimeFlowStartMs\":1786460062560,\"TLSTypes\":[\"AppData\"],\"SrcK8S_NetworkName\":\"primary\",\"DstK8S_HostIP\":\"10.0.1.132\",\"Etype\":2048,\"Interfaces\":[\"ens5\",\"br-ex\"],\"DstAddr\":\"10.0.1.132\",\"SrcPort\":57864,\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"SrcK8S_OwnerType\":\"Node\",\"Bytes\":24525,\"Sampling\":1,\"AgentIP\":\"10.0.1.92\",\"SrcK8S_Name\":\"ip-10-0-1-92.ec2.internal\",\"TimeFlowEndMs\":1786460077238,\"SrcAddr\":\"10.0.1.92\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_IP_RPFILTER\",\"Udns\":[\"\",\"\"],\"DstK8S_OwnerType\":\"Node\",\"SrcSubnetLabel\":\"Machines\",\"DstK8S_NetworkName\":\"primary\",\"PktDropLatestState\":\"TCP_ESTABLISHED\",\"SrcK8S_HostIP\":\"10.0.1.92\",\"IfDirections\":[1,0],\"DstMac\":\"02:a3:65:a2:a1:df\"}"
+          ],
+          [
+            "1786460077003000064",
+            "{\"TimeFlowEndMs\":1786460077003,\"SrcK8S_NetworkName\":\"primary\",\"Proto\":6,\"SrcK8S_OwnerType\":\"Node\",\"SrcSubnetLabel\":\"Machines\",\"Bytes\":132,\"Sampling\":1,\"SrcAddr\":\"10.0.1.92\",\"PktDropPackets\":2,\"Udns\":[\"\",\"\"],\"IfDirections\":[1,0],\"DstAddr\":\"10.0.1.132\",\"DstK8S_OwnerType\":\"Node\",\"SrcMac\":\"02:45:8c:51:5f:b7\",\"SrcPort\":39631,\"Flags\":[\"ACK\"],\"DstK8S_Name\":\"ip-10-0-1-132.ec2.internal\",\"DstK8S_NetworkName\":\"primary\",\"DstPort\":9105,\"DstMac\":\"02:a3:65:a2:a1:df\",\"PktDropBytes\":104,\"Packets\":2,\"DstK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"SrcK8S_Name\":\"ip-10-0-1-92.ec2.internal\",\"TimeFlowStartMs\":1786460076896,\"Etype\":2048,\"Dscp\":0,\"DstK8S_HostIP\":\"10.0.1.132\",\"Interfaces\":[\"ens5\",\"br-ex\"],\"PktDropLatestState\":\"TCP_ESTABLISHED\",\"SrcK8S_HostIP\":\"10.0.1.92\",\"AgentIP\":\"10.0.1.92\",\"TimeReceived\":1786460077,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_IP_RPFILTER\",\"DstSubnetLabel\":\"Machines\",\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"PktDropLatestFlags\":16}"
+          ],
+          [
+            "1786460076491000064",
+            "{\"Interfaces\":[\"ens5\",\"br-ex\"],\"Packets\":2,\"SrcK8S_HostIP\":\"10.0.1.92\",\"TimeFlowEndMs\":1786460076491,\"Bytes\":132,\"Flags\":[\"ACK\"],\"SrcAddr\":\"10.0.1.92\",\"DstMac\":\"02:a3:65:a2:a1:df\",\"Udns\":[\"\",\"\"],\"DstK8S_NetworkName\":\"primary\",\"DstK8S_HostIP\":\"10.0.1.132\",\"DstK8S_OwnerType\":\"Node\",\"TimeFlowStartMs\":1786460076385,\"DstSubnetLabel\":\"Machines\",\"DstK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"DstAddr\":\"10.0.1.132\",\"TimeReceived\":1786460077,\"SrcMac\":\"02:45:8c:51:5f:b7\",\"AgentIP\":\"10.0.1.92\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_IP_RPFILTER\",\"PktDropLatestState\":\"TCP_ESTABLISHED\",\"SrcK8S_Name\":\"ip-10-0-1-92.ec2.internal\",\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"SrcK8S_OwnerType\":\"Node\",\"DstK8S_Name\":\"ip-10-0-1-132.ec2.internal\",\"Proto\":6,\"IfDirections\":[1,0],\"Sampling\":1,\"SrcK8S_NetworkName\":\"primary\",\"SrcPort\":51787,\"Etype\":2048,\"PktDropBytes\":104,\"DstPort\":9637,\"PktDropPackets\":2,\"Dscp\":0,\"PktDropLatestFlags\":16,\"SrcSubnetLabel\":\"Machines\"}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "DstK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
+          "DstK8S_Type": "Node",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "0",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Type": "Node",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786460077238000128",
+            "{\"AgentIP\":\"10.0.1.132\",\"TimeFlowStartMs\":1786460062560,\"DstMac\":\"02:a3:65:a2:a1:df\",\"Bytes\":24525,\"Etype\":2048,\"SrcAddr\":\"10.0.1.92\",\"PktDropPackets\":1,\"TimeFlowRttNs\":250000,\"SrcK8S_HostIP\":\"10.0.1.92\",\"DstK8S_NetworkName\":\"primary\",\"SrcPort\":57864,\"DstK8S_OwnerType\":\"Node\",\"SrcK8S_Name\":\"ip-10-0-1-92.ec2.internal\",\"IfDirections\":[0,0],\"DstPort\":10250,\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"Proto\":6,\"PktDropLatestFlags\":16,\"DstSubnetLabel\":\"Machines\",\"Sampling\":1,\"Dscp\":0,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Packets\":227,\"Interfaces\":[\"ens5\",\"br-ex\"],\"TLSTypes\":[\"AppData\"],\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"PktDropBytes\":32,\"TimeFlowEndMs\":1786460077238,\"SrcSubnetLabel\":\"Machines\",\"DstAddr\":\"10.0.1.132\",\"DstK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"SrcK8S_NetworkName\":\"primary\",\"SrcMac\":\"02:45:8c:51:5f:b7\",\"Udns\":[\"\",\"\"],\"TimeReceived\":1786460077,\"Flags\":[\"ACK\"],\"DstK8S_HostIP\":\"10.0.1.132\",\"DstK8S_Name\":\"ip-10-0-1-132.ec2.internal\",\"SrcK8S_OwnerType\":\"Node\"}"
+          ],
+          [
+            "1786460077003000064",
+            "{\"Etype\":2048,\"Interfaces\":[\"ens5\",\"br-ex\"],\"DstPort\":9105,\"SrcK8S_Name\":\"ip-10-0-1-92.ec2.internal\",\"DstK8S_OwnerType\":\"Node\",\"IfDirections\":[0,0],\"AgentIP\":\"10.0.1.132\",\"Sampling\":1,\"Packets\":2,\"DstMac\":\"02:a3:65:a2:a1:df\",\"DstSubnetLabel\":\"Machines\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"TimeFlowRttNs\":398000,\"Udns\":[\"\",\"\"],\"TimeFlowStartMs\":1786460076896,\"SrcK8S_OwnerType\":\"Node\",\"DstK8S_Name\":\"ip-10-0-1-132.ec2.internal\",\"SrcAddr\":\"10.0.1.92\",\"SrcK8S_HostIP\":\"10.0.1.92\",\"TimeFlowEndMs\":1786460077003,\"DstAddr\":\"10.0.1.132\",\"SrcMac\":\"02:45:8c:51:5f:b7\",\"PktDropPackets\":1,\"SrcPort\":39631,\"SrcK8S_NetworkName\":\"primary\",\"Flags\":[\"ACK\"],\"DstK8S_HostIP\":\"10.0.1.132\",\"DstK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"Bytes\":132,\"TimeReceived\":1786460077,\"PktDropLatestFlags\":16,\"SrcSubnetLabel\":\"Machines\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"DstK8S_NetworkName\":\"primary\",\"Dscp\":0,\"Proto\":6,\"PktDropBytes\":32,\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\"}"
+          ],
+          [
+            "1786460076491000064",
+            "{\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"SrcAddr\":\"10.0.1.92\",\"SrcK8S_Name\":\"ip-10-0-1-92.ec2.internal\",\"DstSubnetLabel\":\"Machines\",\"TimeFlowRttNs\":632000,\"Packets\":2,\"PktDropBytes\":32,\"PktDropPackets\":1,\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"Sampling\":1,\"TimeFlowStartMs\":1786460076385,\"Flags\":[\"ACK\"],\"DstK8S_NetworkName\":\"primary\",\"DstMac\":\"02:a3:65:a2:a1:df\",\"TimeReceived\":1786460077,\"Etype\":2048,\"SrcK8S_NetworkName\":\"primary\",\"SrcSubnetLabel\":\"Machines\",\"DstAddr\":\"10.0.1.132\",\"Dscp\":0,\"SrcMac\":\"02:45:8c:51:5f:b7\",\"IfDirections\":[0,0],\"Interfaces\":[\"ens5\",\"br-ex\"],\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DstK8S_Name\":\"ip-10-0-1-132.ec2.internal\",\"DstK8S_OwnerType\":\"Node\",\"AgentIP\":\"10.0.1.132\",\"TimeFlowEndMs\":1786460076491,\"PktDropLatestFlags\":16,\"SrcK8S_OwnerType\":\"Node\",\"Proto\":6,\"Bytes\":132,\"SrcPort\":51787,\"DstK8S_HostIP\":\"10.0.1.132\",\"DstK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"Udns\":[\"\",\"\"],\"SrcK8S_HostIP\":\"10.0.1.92\",\"DstPort\":9637}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "DstK8S_Namespace": "openshift-network-diagnostics",
+          "DstK8S_OwnerName": "network-check-target",
+          "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "2",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Type": "Node",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786460076832000000",
+            "{\"Etype\":2048,\"DstK8S_OwnerType\":\"DaemonSet\",\"Sampling\":1,\"DstSubnetLabel\":\"Pods\",\"TimeReceived\":1786460077,\"PktDropLatestDropCause\":\"SKB_DROP_UNKNOWN_CAUSE\",\"DstK8S_Name\":\"network-check-target-jgspg\",\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"Flags\":[\"SYN\",\"ACK\",\"FIN_ACK\"],\"DstPort\":8080,\"Packets\":6,\"Proto\":6,\"SrcK8S_NetworkName\":\"primary\",\"TimeFlowStartMs\":1786460076831,\"PktDropLatestFlags\":512,\"SrcMac\":\"0a:58:0a:81:00:02\",\"TimeFlowEndMs\":1786460076832,\"AgentIP\":\"10.0.1.132\",\"SrcSubnetLabel\":\"Pods\",\"DstMac\":\"0a:58:0a:81:00:05\",\"DstAddr\":\"10.129.0.5\",\"DstK8S_NetworkName\":\"primary\",\"SrcK8S_Name\":\"ip-10-0-1-132.ec2.internal\",\"SrcK8S_HostIP\":\"10.0.1.132\",\"Interfaces\":[\"ovn-k8s-mp0\",\"66305997886d932\",\"eth0\"],\"PktDropPackets\":1,\"TimeFlowRttNs\":87000,\"Bytes\":506,\"IfDirections\":[1,1,0],\"SrcPort\":39604,\"SrcK8S_OwnerType\":\"Node\",\"Dscp\":0,\"Udns\":[\"\",\"default\",\"\"],\"DstK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"SrcAddr\":\"10.129.0.2\",\"PktDropLatestState\":\"TCP_CLOSE_WAIT\",\"PktDropBytes\":0,\"DstK8S_HostIP\":\"10.0.1.132\"}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "DstK8S_Namespace": "openshift-network-diagnostics",
+          "DstK8S_OwnerName": "network-check-target",
+          "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "2",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_Namespace": "openshift-network-diagnostics",
+          "SrcK8S_OwnerName": "network-check-source",
+          "SrcK8S_Type": "Pod",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786460077224999936",
+            "{\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"DstK8S_HostIP\":\"10.0.1.92\",\"SrcMac\":\"0a:58:0a:80:00:01\",\"IfDirections\":[1,0],\"SrcPort\":39546,\"TimeFlowRttNs\":556000,\"Etype\":2048,\"DstK8S_OwnerType\":\"DaemonSet\",\"PktDropLatestState\":\"TCP_CLOSE_WAIT\",\"Dscp\":0,\"SrcK8S_NetworkName\":\"primary\",\"SrcAddr\":\"10.128.0.20\",\"DstK8S_Name\":\"network-check-target-sqdnr\",\"DstPort\":8080,\"DstK8S_NetworkName\":\"primary\",\"SrcK8S_Name\":\"network-check-source-5d66fb6458-hjpvk\",\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"Packets\":5,\"PktDropBytes\":0,\"SrcK8S_OwnerType\":\"Deployment\",\"SrcK8S_HostIP\":\"10.0.1.92\",\"Proto\":6,\"AgentIP\":\"10.0.1.92\",\"DstAddr\":\"10.128.0.7\",\"Flags\":[\"SYN\",\"ACK\",\"FIN_ACK\"],\"PktDropPackets\":1,\"PktDropLatestFlags\":512,\"TLSTypes\":[\"ClientHello\"],\"PktDropLatestDropCause\":\"SKB_DROP_UNKNOWN_CAUSE\",\"Udns\":[\"default\",\"\"],\"TLSVersion\":\"TLS 1.3\",\"TimeFlowEndMs\":1786460077225,\"TimeReceived\":1786460077,\"Bytes\":1846,\"DstSubnetLabel\":\"Pods\",\"Sampling\":1,\"Interfaces\":[\"ffb7645069dc201\",\"eth0\"],\"DstMac\":\"0a:58:0a:80:00:07\",\"SrcSubnetLabel\":\"Pods\",\"TimeFlowStartMs\":1786460077224}"
+          ],
+          [
+            "1786460077222000128",
+            "{\"TLSTypes\":[\"ClientHello\"],\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"PktDropBytes\":0,\"SrcAddr\":\"10.128.0.20\",\"DstAddr\":\"10.128.0.7\",\"Sampling\":1,\"Interfaces\":[\"eth0\",\"4532a1c05bf51a4\",\"ffb7645069dc201\"],\"Bytes\":3634,\"Etype\":2048,\"SrcK8S_NetworkName\":\"primary\",\"SrcPort\":58746,\"DstSubnetLabel\":\"Pods\",\"Dscp\":0,\"AgentIP\":\"10.0.1.92\",\"Flags\":[\"SYN\",\"ACK\",\"FIN_ACK\"],\"SrcK8S_OwnerType\":\"Deployment\",\"SrcK8S_HostIP\":\"10.0.1.92\",\"Proto\":6,\"DstPort\":8080,\"SrcMac\":\"0a:58:0a:80:00:14\",\"Packets\":10,\"Udns\":[\"\",\"default\",\"default\"],\"TimeFlowEndMs\":1786460077222,\"SrcSubnetLabel\":\"Pods\",\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"PktDropLatestState\":\"TCP_CLOSE_WAIT\",\"TimeFlowStartMs\":1786460077218,\"DstK8S_Name\":\"network-check-target-sqdnr\",\"PktDropPackets\":1,\"PktDropLatestDropCause\":\"SKB_DROP_UNKNOWN_CAUSE\",\"SrcK8S_Name\":\"network-check-source-5d66fb6458-hjpvk\",\"TimeFlowRttNs\":881000,\"DstK8S_OwnerType\":\"DaemonSet\",\"TimeReceived\":1786460077,\"DstK8S_HostIP\":\"10.0.1.92\",\"DstK8S_NetworkName\":\"primary\",\"DstMac\":\"0a:58:0a:80:00:07\",\"PktDropLatestFlags\":512,\"IfDirections\":[1,0,1],\"TLSVersion\":\"TLS 1.3\"}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "DstK8S_Namespace": "openshift-network-diagnostics",
+          "DstK8S_OwnerName": "network-check-target",
+          "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "0",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_Namespace": "openshift-network-diagnostics",
+          "SrcK8S_OwnerName": "network-check-source",
+          "SrcK8S_Type": "Pod",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786460077223000064",
+            "{\"PktDropLatestFlags\":512,\"DstPort\":8080,\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"SrcK8S_HostIP\":\"10.0.1.92\",\"TLSTypes\":[\"ClientHello\"],\"Proto\":6,\"DstMac\":\"0a:58:64:58:00:03\",\"TLSVersion\":\"TLS 1.3\",\"TimeFlowEndMs\":1786460077223,\"DstK8S_OwnerType\":\"DaemonSet\",\"PktDropLatestState\":\"TCP_CLOSE_WAIT\",\"Sampling\":1,\"IfDirections\":[0,1,0],\"Bytes\":1817,\"PktDropBytes\":0,\"TimeFlowRttNs\":1321000,\"Udns\":[\"\",\"default\",\"\"],\"Interfaces\":[\"genev_sys_6081\",\"66305997886d932\",\"eth0\"],\"TimeReceived\":1786460077,\"SrcK8S_OwnerType\":\"Deployment\",\"SrcSubnetLabel\":\"Pods\",\"DstK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"Packets\":5,\"DstK8S_HostIP\":\"10.0.1.132\",\"DstK8S_NetworkName\":\"primary\",\"DstK8S_Name\":\"network-check-target-jgspg\",\"Flags\":[\"SYN\",\"ACK\",\"FIN_ACK\"],\"PktDropPackets\":1,\"SrcPort\":44986,\"SrcK8S_Name\":\"network-check-source-5d66fb6458-hjpvk\",\"Dscp\":0,\"SrcK8S_NetworkName\":\"primary\",\"DstAddr\":\"10.129.0.5\",\"DstSubnetLabel\":\"Pods\",\"SrcAddr\":\"10.128.0.20\",\"PktDropLatestDropCause\":\"SKB_DROP_UNKNOWN_CAUSE\",\"Etype\":2048,\"SrcMac\":\"0a:58:64:58:00:02\",\"AgentIP\":\"10.0.1.132\",\"TimeFlowStartMs\":1786460077219}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "DstK8S_Namespace": "openshift-network-diagnostics",
+          "DstK8S_OwnerName": "network-check-source",
+          "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "0",
+          "K8S_FlowLayer": "infra",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786460077240999936",
+            "{\"Udns\":[\"default\",\"\"],\"Interfaces\":[\"4532a1c05bf51a4\",\"eth0\"],\"Bytes\":7094,\"TimeReceived\":1786460077,\"Dscp\":0,\"TLSCipherSuite\":\"TLS_AES_128_GCM_SHA256\",\"SrcPort\":443,\"SrcAddr\":\"18.211.116.31\",\"DstSubnetLabel\":\"Pods\",\"TLSGroup\":\"X25519MLKEM768\",\"PktDropPackets\":1,\"SrcMac\":\"0a:58:0a:80:00:01\",\"PktDropLatestFlags\":512,\"PktDropBytes\":32,\"DstAddr\":\"10.128.0.20\",\"Etype\":2048,\"Packets\":8,\"DstK8S_Name\":\"network-check-source-5d66fb6458-hjpvk\",\"TLSVersion\":\"TLS 1.3\",\"DstPort\":40318,\"TLSTypes\":[\"ServerHello\",\"AppData\"],\"DstK8S_NetworkName\":\"primary\",\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"DstK8S_OwnerType\":\"Deployment\",\"TimeFlowStartMs\":1786460077231,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_NO_SOCKET\",\"DstMac\":\"0a:58:0a:80:00:14\",\"Proto\":6,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Sampling\":1,\"IfDirections\":[1,0],\"AgentIP\":\"10.0.1.92\",\"DstK8S_HostIP\":\"10.0.1.92\",\"TimeFlowRttNs\":7996000,\"Flags\":[\"ACK\",\"SYN_ACK\",\"FIN_ACK\"],\"TimeFlowEndMs\":1786460077241}"
           ]
         ]
       },
       {
         "stream": {
           "DstK8S_Namespace": "openshift-monitoring",
-          "DstK8S_OwnerName": "openshift-state-metrics",
+          "DstK8S_OwnerName": "prometheus-k8s",
           "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
           "FlowDirection": "0",
           "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "prometheus-k8s",
-          "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
+          "SrcK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Type": "Node",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
         },
         "values": [
           [
-            "1708011867481999872",
-            "{\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"DstK8S_Name\":\"openshift-state-metrics-7bcb5748d5-mrvmb\",\"TimeReceived\":1708011870,\"TimeFlowEndMs\":1708011867482,\"DstK8S_OwnerType\":\"Deployment\",\"DstK8S_HostIP\":\"10.0.1.137\",\"SrcAddr\":\"10.128.0.29\",\"IfDirection\":0,\"PktDropBytes\":32,\"DnsErrno\":0,\"PktDropPackets\":1,\"AgentIP\":\"10.0.1.137\",\"TimeFlowStartMs\":1708011867482,\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"DstPort\":9443,\"DstMac\":\"0A:58:0A:81:00:14\",\"SrcPort\":39562,\"SrcK8S_Name\":\"prometheus-k8s-1\",\"PktDropLatestFlags\":16,\"DstAddr\":\"10.129.0.20\",\"Dscp\":0,\"SrcMac\":\"0A:58:0A:81:00:01\",\"SrcK8S_OwnerType\":\"StatefulSet\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"Interface\":\"eth0\",\"Flags\":16,\"Proto\":6,\"Etype\":2048,\"SrcK8S_HostIP\":\"10.0.1.7\"}"
+            "1786460076492000000",
+            "{\"DstSubnetLabel\":\"Pods\",\"DstPort\":51132,\"DstK8S_NetworkName\":\"primary\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"Packets\":2,\"TimeFlowStartMs\":1786460076384,\"DstK8S_HostIP\":\"10.0.1.132\",\"SrcK8S_HostIP\":\"10.0.1.92\",\"Interfaces\":[\"e70ff89170d2e24\",\"eth0\"],\"DstK8S_Name\":\"prometheus-k8s-0\",\"SrcSubnetLabel\":\"Machines\",\"DstAddr\":\"10.129.0.21\",\"SrcK8S_Name\":\"ip-10-0-1-92.ec2.internal\",\"SrcK8S_OwnerType\":\"Node\",\"DstK8S_OwnerType\":\"StatefulSet\",\"DstMac\":\"0a:58:0a:81:00:15\",\"Sampling\":1,\"PktDropLatestFlags\":16,\"Flags\":[\"ACK\"],\"Proto\":6,\"TimeFlowRttNs\":21699000,\"SrcPort\":9103,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"PktDropPackets\":1,\"Udns\":[\"default\",\"\"],\"AgentIP\":\"10.0.1.132\",\"TimeReceived\":1786460077,\"SrcAddr\":\"10.0.1.92\",\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"Dscp\":0,\"Etype\":2048,\"SrcK8S_NetworkName\":\"primary\",\"SrcMac\":\"0a:58:0a:81:00:01\",\"Bytes\":132,\"TimeFlowEndMs\":1786460076492,\"DstK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"IfDirections\":[1,0],\"PktDropBytes\":32}"
           ]
         ]
       },
       {
         "stream": {
           "DstK8S_Namespace": "openshift-monitoring",
-          "DstK8S_OwnerName": "kube-state-metrics",
+          "DstK8S_OwnerName": "prometheus-k8s",
           "DstK8S_Type": "Pod",
-          "FlowDirection": "2",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "0",
           "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "prometheus-k8s",
-          "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
+          "SrcK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Type": "Node",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
         },
         "values": [
           [
-            "1708011865388999936",
-            "{\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"SrcK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"SrcPort\":56876,\"TimeFlowStartMs\":1708011865389,\"SrcMac\":\"0A:58:0A:81:00:1A\",\"Flags\":16,\"SrcK8S_HostIP\":\"10.0.1.137\",\"DstK8S_OwnerType\":\"Deployment\",\"DstK8S_Name\":\"kube-state-metrics-6595568c75-h47dq\",\"DstPort\":9443,\"Interface\":\"eth0\",\"DstK8S_HostIP\":\"10.0.1.137\",\"PktDropPackets\":1,\"Etype\":2048,\"DnsErrno\":0,\"SrcK8S_Name\":\"prometheus-k8s-0\",\"SrcAddr\":\"10.129.0.26\",\"PktDropLatestFlags\":16,\"SrcK8S_OwnerType\":\"StatefulSet\",\"DstMac\":\"0A:58:0A:81:00:13\",\"PktDropBytes\":32,\"TimeFlowEndMs\":1708011865389,\"TimeReceived\":1708011865,\"IfDirection\":0,\"Proto\":6,\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"AgentIP\":\"10.0.1.137\",\"Dscp\":0,\"DstAddr\":\"10.129.0.19\",\"PktDropLatestState\":\"TCP_INVALID_STATE\"}"
+            "1786460077238000128",
+            "{\"DstK8S_NetworkName\":\"primary\",\"PktDropPackets\":1,\"SrcMac\":\"0a:58:0a:80:00:01\",\"DstK8S_HostIP\":\"10.0.1.92\",\"SrcK8S_Name\":\"ip-10-0-1-132.ec2.internal\",\"DstK8S_OwnerType\":\"StatefulSet\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"TimeFlowRttNs\":5492000,\"DstSubnetLabel\":\"Pods\",\"Interfaces\":[\"7a4bbd3f8bf13b1\",\"eth0\"],\"TimeFlowStartMs\":1786460062561,\"SrcK8S_NetworkName\":\"primary\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcPort\":10250,\"PktDropLatestFlags\":16,\"IfDirections\":[1,0],\"Udns\":[\"default\",\"\"],\"Bytes\":837309,\"DstMac\":\"0a:58:0a:80:00:29\",\"PktDropBytes\":32,\"SrcAddr\":\"10.0.1.132\",\"Etype\":2048,\"TimeFlowEndMs\":1786460077238,\"SrcK8S_OwnerType\":\"Node\",\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"DstPort\":57280,\"SrcSubnetLabel\":\"Machines\",\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"Sampling\":1,\"TLSTypes\":[\"AppData\"],\"DstAddr\":\"10.128.0.41\",\"Packets\":266,\"DstK8S_Name\":\"prometheus-k8s-1\",\"AgentIP\":\"10.0.1.92\",\"Dscp\":0,\"TimeReceived\":1786460077,\"SrcK8S_HostIP\":\"10.0.1.132\",\"Proto\":6,\"Flags\":[\"ACK\"]}"
+          ],
+          [
+            "1786460077003000064",
+            "{\"SrcSubnetLabel\":\"Machines\",\"PktDropLatestFlags\":16,\"PktDropBytes\":32,\"Packets\":2,\"SrcPort\":9105,\"SrcAddr\":\"10.0.1.132\",\"SrcK8S_OwnerType\":\"Node\",\"SrcK8S_Name\":\"ip-10-0-1-132.ec2.internal\",\"Proto\":6,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"Udns\":[\"default\",\"\"],\"TimeReceived\":1786460077,\"DstK8S_HostIP\":\"10.0.1.92\",\"DstSubnetLabel\":\"Pods\",\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"PktDropPackets\":1,\"SrcK8S_HostIP\":\"10.0.1.132\",\"SrcMac\":\"0a:58:0a:80:00:01\",\"AgentIP\":\"10.0.1.92\",\"IfDirections\":[1,0],\"DstK8S_Name\":\"prometheus-k8s-1\",\"DstK8S_NetworkName\":\"primary\",\"TimeFlowRttNs\":331000,\"DstAddr\":\"10.128.0.41\",\"Etype\":2048,\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"TimeFlowStartMs\":1786460076896,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"TimeFlowEndMs\":1786460077003,\"Bytes\":132,\"DstMac\":\"0a:58:0a:80:00:29\",\"DstK8S_OwnerType\":\"StatefulSet\",\"DstPort\":38404,\"Interfaces\":[\"7a4bbd3f8bf13b1\",\"eth0\"],\"Dscp\":0,\"Sampling\":1,\"Flags\":[\"ACK\"],\"SrcK8S_NetworkName\":\"primary\"}"
+          ],
+          [
+            "1786460076491000064",
+            "{\"SrcPort\":9637,\"SrcK8S_Name\":\"ip-10-0-1-132.ec2.internal\",\"Bytes\":132,\"DstK8S_Name\":\"prometheus-k8s-1\",\"Proto\":6,\"Etype\":2048,\"PktDropBytes\":32,\"SrcSubnetLabel\":\"Machines\",\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"PktDropPackets\":1,\"SrcK8S_HostIP\":\"10.0.1.132\",\"Udns\":[\"default\",\"\"],\"Flags\":[\"ACK\"],\"Packets\":2,\"SrcMac\":\"0a:58:0a:80:00:01\",\"DstPort\":36912,\"TimeFlowEndMs\":1786460076491,\"PktDropLatestFlags\":16,\"IfDirections\":[1,0],\"DstK8S_OwnerType\":\"StatefulSet\",\"AgentIP\":\"10.0.1.92\",\"TimeFlowStartMs\":1786460076385,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Dscp\":0,\"SrcAddr\":\"10.0.1.132\",\"DstMac\":\"0a:58:0a:80:00:29\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"DstK8S_NetworkName\":\"primary\",\"SrcK8S_NetworkName\":\"primary\",\"Sampling\":1,\"DstSubnetLabel\":\"Pods\",\"TimeFlowRttNs\":22048000,\"DstAddr\":\"10.128.0.41\",\"TimeReceived\":1786460077,\"Interfaces\":[\"7a4bbd3f8bf13b1\",\"eth0\"],\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"SrcK8S_OwnerType\":\"Node\",\"DstK8S_HostIP\":\"10.0.1.92\"}"
           ]
         ]
       },
       {
         "stream": {
           "DstK8S_Namespace": "openshift-monitoring",
-          "DstK8S_OwnerName": "kube-state-metrics",
+          "DstK8S_OwnerName": "prometheus-k8s",
           "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
           "FlowDirection": "0",
           "K8S_FlowLayer": "infra",
           "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "prometheus-k8s",
+          "SrcK8S_OwnerName": "kube-state-metrics",
           "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
         },
         "values": [
           [
-            "1708011867483000064",
-            "{\"SrcK8S_OwnerType\":\"StatefulSet\",\"SrcK8S_Name\":\"prometheus-k8s-1\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"DnsErrno\":0,\"TimeFlowStartMs\":1708011867483,\"IfDirection\":0,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Etype\":2048,\"Flags\":16,\"DstK8S_OwnerType\":\"Deployment\",\"PktDropPackets\":1,\"DstAddr\":\"10.129.0.19\",\"AgentIP\":\"10.0.1.137\",\"TimeFlowEndMs\":1708011867483,\"SrcMac\":\"0A:58:0A:81:00:01\",\"DstK8S_HostIP\":\"10.0.1.137\",\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"DstPort\":9443,\"Proto\":6,\"SrcK8S_HostIP\":\"10.0.1.7\",\"DstMac\":\"0A:58:0A:81:00:13\",\"Interface\":\"eth0\",\"DstK8S_Name\":\"kube-state-metrics-6595568c75-h47dq\",\"PktDropLatestFlags\":16,\"SrcAddr\":\"10.128.0.29\",\"PktDropBytes\":32,\"SrcPort\":51418,\"TimeReceived\":1708011870,\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"Dscp\":0}"
+            "1786460077004000000",
+            "{\"Sampling\":1,\"Interfaces\":[\"genev_sys_6081\",\"7a4bbd3f8bf13b1\",\"eth0\"],\"SrcK8S_HostIP\":\"10.0.1.132\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"IfDirections\":[0,1,0],\"SrcK8S_OwnerType\":\"Deployment\",\"SrcK8S_NetworkName\":\"primary\",\"DstK8S_HostIP\":\"10.0.1.92\",\"PktDropBytes\":32,\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"TimeFlowStartMs\":1786460076898,\"SrcMac\":\"0a:58:64:58:00:03\",\"Proto\":6,\"Bytes\":132,\"DstMac\":\"0a:58:64:58:00:02\",\"PktDropLatestFlags\":16,\"PktDropPackets\":1,\"Dscp\":0,\"Etype\":2048,\"DstAddr\":\"10.128.0.41\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"TimeFlowEndMs\":1786460077004,\"TimeReceived\":1786460077,\"SrcK8S_Name\":\"kube-state-metrics-8674ff6589-lcs4s\",\"SrcAddr\":\"10.129.0.16\",\"TimeFlowRttNs\":14748000,\"Packets\":2,\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"DstK8S_OwnerType\":\"StatefulSet\",\"Udns\":[\"\",\"default\",\"\"],\"DstK8S_Name\":\"prometheus-k8s-1\",\"DstPort\":52378,\"SrcPort\":9443,\"SrcSubnetLabel\":\"Pods\",\"Flags\":[\"ACK\"],\"DstK8S_NetworkName\":\"primary\",\"AgentIP\":\"10.0.1.92\",\"DstSubnetLabel\":\"Pods\"}"
           ]
         ]
       },
       {
         "stream": {
           "DstK8S_Namespace": "openshift-monitoring",
-          "DstK8S_OwnerName": "cluster-monitoring-operator",
+          "DstK8S_OwnerName": "prometheus-k8s",
           "DstK8S_Type": "Pod",
-          "FlowDirection": "0",
-          "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "prometheus-k8s",
-          "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
-        },
-        "values": [
-          [
-            "1708011865390000128",
-            "{\"AgentIP\":\"10.0.1.7\",\"Etype\":2048,\"TimeReceived\":1708011867,\"DstPort\":8443,\"SrcK8S_Name\":\"prometheus-k8s-0\",\"SrcK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"SrcPort\":57064,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcK8S_OwnerType\":\"StatefulSet\",\"Flags\":16,\"PktDropPackets\":1,\"DstK8S_HostIP\":\"10.0.1.7\",\"PktDropLatestFlags\":16,\"DnsErrno\":0,\"SrcMac\":\"0A:58:0A:80:00:01\",\"DstK8S_Name\":\"cluster-monitoring-operator-6bc9675865-nvxv2\",\"DstK8S_OwnerType\":\"Deployment\",\"TimeFlowStartMs\":1708011865390,\"Interface\":\"eth0\",\"IfDirection\":0,\"Dscp\":0,\"DstAddr\":\"10.128.0.9\",\"SrcAddr\":\"10.129.0.26\",\"Proto\":6,\"DstK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"DstMac\":\"0A:58:0A:80:00:09\",\"TimeFlowEndMs\":1708011865390,\"PktDropBytes\":32,\"SrcK8S_HostIP\":\"10.0.1.137\"}"
-          ]
-        ]
-      },
-      {
-        "stream": {
-          "DstK8S_Namespace": "openshift-ingress",
-          "DstK8S_OwnerName": "router-default",
-          "DstK8S_Type": "Pod",
-          "FlowDirection": "2",
-          "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "prometheus-k8s",
-          "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
-        },
-        "values": [
-          [
-            "1708011866924999936",
-            "{\"Interface\":\"eth0\",\"SrcMac\":\"0A:58:0A:81:00:1A\",\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"Dscp\":0,\"SrcK8S_OwnerType\":\"StatefulSet\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"DstMac\":\"0A:58:0A:81:00:07\",\"Flags\":16,\"TimeFlowEndMs\":1708011866925,\"TimeFlowStartMs\":1708011866925,\"Proto\":6,\"SrcPort\":40006,\"TimeReceived\":1708011870,\"SrcK8S_Name\":\"prometheus-k8s-0\",\"SrcK8S_HostIP\":\"10.0.1.137\",\"AgentIP\":\"10.0.1.137\",\"DstAddr\":\"10.129.0.7\",\"PktDropPackets\":1,\"IfDirection\":0,\"DstK8S_HostIP\":\"10.0.1.137\",\"PktDropLatestFlags\":16,\"PktDropBytes\":32,\"DstK8S_Name\":\"router-default-759449f6d8-v2f62\",\"DstK8S_OwnerType\":\"Deployment\",\"SrcK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"Etype\":2048,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DnsErrno\":0,\"DstPort\":1936,\"SrcAddr\":\"10.129.0.26\"}"
-          ]
-        ]
-      },
-      {
-        "stream": {
-          "DstK8S_Namespace": "openshift-ingress",
-          "DstK8S_OwnerName": "router-default",
-          "DstK8S_Type": "Pod",
-          "FlowDirection": "2",
-          "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "openshift-console",
-          "SrcK8S_OwnerName": "console",
-          "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
-        },
-        "values": [
-          [
-            "1708011869996999936",
-            "{\"IfDirection\":0,\"PktDropLatestFlags\":16,\"SrcK8S_OwnerType\":\"Deployment\",\"Bytes\":32,\"Etype\":2048,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcMac\":\"0A:58:0A:81:00:22\",\"DstK8S_HostIP\":\"10.0.1.137\",\"SrcK8S_Name\":\"console-6bc7bf6577-mw7zj\",\"SrcPort\":8443,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"AgentIP\":\"10.0.1.137\",\"SrcK8S_HostIP\":\"10.0.1.137\",\"Proto\":6,\"TimeFlowRttNs\":5150000,\"SrcK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"DnsErrno\":0,\"PktDropBytes\":32,\"PktDropPackets\":1,\"DstAddr\":\"10.129.0.7\",\"DstMac\":\"0A:58:0A:81:00:07\",\"DstPort\":37706,\"Dscp\":0,\"SrcAddr\":\"10.129.0.34\",\"TimeReceived\":1708011870,\"Packets\":1,\"TimeFlowStartMs\":1708011869997,\"DstK8S_Name\":\"router-default-759449f6d8-v2f62\",\"Interface\":\"eth0\",\"DstK8S_OwnerType\":\"Deployment\",\"Flags\":16,\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"TimeFlowEndMs\":1708011869997}"
-          ]
-        ]
-      },
-      {
-        "stream": {
-          "DstK8S_Namespace": "openshift-image-registry",
-          "DstK8S_OwnerName": "image-registry",
-          "DstK8S_Type": "Pod",
-          "FlowDirection": "0",
-          "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "prometheus-k8s",
-          "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
-        },
-        "values": [
-          [
-            "1708011867481999872",
-            "{\"AgentIP\":\"10.0.1.137\",\"Proto\":6,\"SrcK8S_Name\":\"prometheus-k8s-1\",\"Interface\":\"eth0\",\"PktDropLatestFlags\":16,\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"PktDropBytes\":32,\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"DnsErrno\":0,\"Etype\":2048,\"DstMac\":\"0A:58:0A:81:00:11\",\"SrcPort\":54838,\"DstK8S_OwnerType\":\"Deployment\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"TimeReceived\":1708011870,\"Flags\":16,\"DstK8S_HostIP\":\"10.0.1.137\",\"SrcK8S_OwnerType\":\"StatefulSet\",\"TimeFlowEndMs\":1708011867482,\"DstK8S_Name\":\"image-registry-647f47596b-lxdv9\",\"DstPort\":5000,\"SrcK8S_HostIP\":\"10.0.1.7\",\"SrcAddr\":\"10.128.0.29\",\"TimeFlowStartMs\":1708011867482,\"IfDirection\":0,\"SrcMac\":\"0A:58:0A:81:00:01\",\"Dscp\":0,\"PktDropPackets\":1,\"DstAddr\":\"10.129.0.17\"}"
-          ]
-        ]
-      },
-      {
-        "stream": {
-          "DstK8S_Namespace": "openshift-dns",
-          "DstK8S_OwnerName": "dns-default",
-          "DstK8S_Type": "Pod",
-          "FlowDirection": "2",
-          "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "prometheus-k8s",
-          "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
-        },
-        "values": [
-          [
-            "1708011865435000064",
-            "{\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"SrcK8S_HostIP\":\"10.0.1.7\",\"TimeReceived\":1708011867,\"DstK8S_OwnerType\":\"DaemonSet\",\"Proto\":6,\"AgentIP\":\"10.0.1.7\",\"PktDropBytes\":32,\"DstPort\":9154,\"Etype\":2048,\"DstK8S_HostIP\":\"10.0.1.7\",\"TimeFlowEndMs\":1708011865435,\"IfDirection\":0,\"SrcK8S_OwnerType\":\"StatefulSet\",\"DnsErrno\":0,\"SrcAddr\":\"10.128.0.29\",\"DstK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"SrcPort\":39640,\"DstK8S_Name\":\"dns-default-ldfzz\",\"PktDropLatestFlags\":16,\"PktDropPackets\":1,\"TimeFlowStartMs\":1708011865435,\"Interface\":\"eth0\",\"SrcK8S_Name\":\"prometheus-k8s-1\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcMac\":\"0A:58:0A:80:00:1D\",\"Dscp\":0,\"DstAddr\":\"10.128.0.6\",\"Flags\":16,\"DstMac\":\"0A:58:0A:80:00:06\"}"
-          ]
-        ]
-      },
-      {
-        "stream": {
-          "DstK8S_Namespace": "openshift-console",
-          "DstK8S_OwnerName": "console",
-          "DstK8S_Type": "Pod",
-          "FlowDirection": "2",
-          "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "openshift-monitoring",
-          "SrcK8S_OwnerName": "prometheus-k8s",
-          "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
-        },
-        "values": [
-          [
-            "1708011865436000000",
-            "{\"DstK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"PktDropBytes\":32,\"TimeReceived\":1708011867,\"PktDropPackets\":1,\"DstK8S_Name\":\"console-6bc7bf6577-t4m2x\",\"DstK8S_OwnerType\":\"Deployment\",\"SrcK8S_Name\":\"prometheus-k8s-1\",\"SrcK8S_OwnerType\":\"StatefulSet\",\"SrcAddr\":\"10.128.0.29\",\"DstK8S_HostIP\":\"10.0.1.7\",\"SrcPort\":46356,\"DstMac\":\"0A:58:0A:80:00:24\",\"TimeFlowEndMs\":1708011865436,\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"DstPort\":8443,\"Etype\":2048,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcMac\":\"0A:58:0A:80:00:1D\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"SrcK8S_HostIP\":\"10.0.1.7\",\"TimeFlowStartMs\":1708011865436,\"DstAddr\":\"10.128.0.36\",\"AgentIP\":\"10.0.1.7\",\"Proto\":6,\"Dscp\":0,\"IfDirection\":0,\"PktDropLatestFlags\":16,\"DnsErrno\":0,\"Flags\":16,\"Interface\":\"eth0\"}"
-          ]
-        ]
-      },
-      {
-        "stream": {
-          "DstK8S_Namespace": "openshift-console",
-          "DstK8S_OwnerName": "console",
-          "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
           "FlowDirection": "0",
           "K8S_FlowLayer": "infra",
           "SrcK8S_Namespace": "openshift-ingress",
           "SrcK8S_OwnerName": "router-default",
           "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
         },
         "values": [
           [
-            "1708011869696999936",
-            "{\"AgentIP\":\"10.0.1.137\",\"DstMac\":\"0A:58:0A:81:00:22\",\"Interface\":\"eth0\",\"SrcAddr\":\"10.128.0.31\",\"DnsErrno\":0,\"DstK8S_OwnerType\":\"Deployment\",\"TimeFlowEndMs\":1708011869697,\"TimeFlowStartMs\":1708011869697,\"SrcK8S_HostIP\":\"10.0.1.7\",\"TimeReceived\":1708011870,\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"PktDropBytes\":20,\"SrcPort\":36978,\"Proto\":6,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"PktDropLatestFlags\":4,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_RESET\",\"SrcK8S_OwnerType\":\"Deployment\",\"DstPort\":8443,\"PktDropPackets\":1,\"Etype\":2048,\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"Dscp\":0,\"DstAddr\":\"10.129.0.34\",\"DstK8S_Name\":\"console-6bc7bf6577-mw7zj\",\"SrcK8S_Name\":\"router-default-759449f6d8-cwcdj\",\"Flags\":4,\"IfDirection\":0,\"DstK8S_HostIP\":\"10.0.1.137\",\"SrcMac\":\"0A:58:0A:81:00:01\"}"
-          ],
-          [
-            "1708011869696999936",
-            "{\"Etype\":2048,\"DstK8S_HostIP\":\"10.0.1.137\",\"SrcMac\":\"0A:58:0A:81:00:01\",\"DnsErrno\":0,\"DstPort\":8443,\"TimeFlowEndMs\":1708011869697,\"DstAddr\":\"10.129.0.34\",\"DstMac\":\"0A:58:0A:81:00:22\",\"DstK8S_OwnerType\":\"Deployment\",\"Dscp\":0,\"SrcPort\":57684,\"SrcK8S_Name\":\"router-default-759449f6d8-cwcdj\",\"PktDropPackets\":2,\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"IfDirection\":0,\"Interface\":\"eth0\",\"PktDropLatestFlags\":4,\"PktDropBytes\":40,\"TimeReceived\":1708011870,\"SrcK8S_HostIP\":\"10.0.1.7\",\"Flags\":4,\"Proto\":6,\"SrcK8S_OwnerType\":\"Deployment\",\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"SrcAddr\":\"10.128.0.31\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_RESET\",\"TimeFlowStartMs\":1708011869697,\"DstK8S_Name\":\"console-6bc7bf6577-mw7zj\",\"AgentIP\":\"10.0.1.137\"}"
+            "1786460077219000064",
+            "{\"SrcK8S_HostIP\":\"10.0.1.92\",\"TimeFlowEndMs\":1786460077219,\"AgentIP\":\"10.0.1.132\",\"TLSVersion\":\"TLS 1.3\",\"Interfaces\":[\"genev_sys_6081\",\"e70ff89170d2e24\",\"eth0\"],\"DstAddr\":\"10.129.0.21\",\"DstK8S_OwnerType\":\"StatefulSet\",\"DstSubnetLabel\":\"Pods\",\"Sampling\":1,\"Dscp\":0,\"DstK8S_HostIP\":\"10.0.1.132\",\"IfDirections\":[0,1,0],\"SrcAddr\":\"10.128.0.15\",\"Flags\":[\"SYN\",\"RST\",\"ACK\",\"RST_ACK\"],\"DstK8S_NetworkName\":\"primary\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Proto\":6,\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"TimeReceived\":1786460077,\"Packets\":5,\"SrcPort\":36142,\"Bytes\":937,\"PktDropBytes\":20,\"Etype\":2048,\"TLSTypes\":[\"ClientHello\",\"ChangeCipher\"],\"TimeFlowRttNs\":333000,\"SrcK8S_Name\":\"router-default-74c56bd696-qtgxw\",\"TimeFlowStartMs\":1786460077215,\"SrcMac\":\"0a:58:64:58:00:02\",\"DstK8S_Name\":\"prometheus-k8s-0\",\"DstK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"SrcK8S_OwnerType\":\"Deployment\",\"PktDropPackets\":1,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_IP_OUTNOROUTES\",\"SrcSubnetLabel\":\"Pods\",\"DstMac\":\"0a:58:64:58:00:03\",\"PktDropLatestFlags\":4,\"Udns\":[\"\",\"default\",\"\"],\"SrcK8S_NetworkName\":\"primary\",\"DstPort\":9091}"
           ]
         ]
       },
       {
         "stream": {
-          "DstK8S_Namespace": "netobserv",
-          "DstK8S_OwnerName": "netobserv-plugin",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "metrics-server",
           "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "2",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Type": "Node",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786460076896000000",
+            "{\"Udns\":[\"\",\"default\",\"\"],\"SrcK8S_NetworkName\":\"primary\",\"Bytes\":66,\"SrcAddr\":\"10.128.0.2\",\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"DstK8S_NetworkName\":\"primary\",\"TimeFlowStartMs\":1786460076896,\"SrcMac\":\"0a:58:0a:80:00:02\",\"PktDropBytes\":32,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"TimeFlowEndMs\":1786460076896,\"DstK8S_Name\":\"metrics-server-98fccfc84-bzkd7\",\"DstK8S_HostIP\":\"10.0.1.92\",\"SrcSubnetLabel\":\"Pods\",\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"Dscp\":0,\"Flags\":[\"ACK\"],\"IfDirections\":[1,1,0],\"SrcK8S_HostIP\":\"10.0.1.92\",\"PktDropPackets\":1,\"DstPort\":10250,\"TimeFlowRttNs\":3960000,\"DstMac\":\"0a:58:0a:80:00:27\",\"TimeReceived\":1786460077,\"DstK8S_OwnerType\":\"Deployment\",\"Sampling\":1,\"Proto\":6,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"SrcK8S_Name\":\"ip-10-0-1-92.ec2.internal\",\"Interfaces\":[\"ovn-k8s-mp0\",\"717259dae24ccb7\",\"eth0\"],\"PktDropLatestFlags\":16,\"SrcK8S_OwnerType\":\"Node\",\"DstAddr\":\"10.128.0.39\",\"AgentIP\":\"10.0.1.92\",\"DstSubnetLabel\":\"Pods\",\"SrcPort\":43736,\"Packets\":1,\"Etype\":2048}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "metrics-server",
+          "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "2",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Type": "Node",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786460077004000000",
+            "{\"TimeFlowStartMs\":1786460077004,\"SrcPort\":48800,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DstK8S_Name\":\"metrics-server-98fccfc84-mc598\",\"TimeFlowRttNs\":11727000,\"DstSubnetLabel\":\"Pods\",\"Interfaces\":[\"ovn-k8s-mp0\",\"6e72828989e9c0e\",\"eth0\"],\"SrcK8S_Name\":\"ip-10-0-1-132.ec2.internal\",\"Packets\":1,\"Bytes\":66,\"AgentIP\":\"10.0.1.132\",\"DstAddr\":\"10.129.0.19\",\"SrcAddr\":\"10.129.0.2\",\"SrcK8S_NetworkName\":\"primary\",\"Dscp\":0,\"Etype\":2048,\"SrcK8S_HostIP\":\"10.0.1.132\",\"DstK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"TimeReceived\":1786460077,\"DstPort\":10250,\"SrcSubnetLabel\":\"Pods\",\"IfDirections\":[1,1,0],\"SrcMac\":\"0a:58:0a:81:00:02\",\"Proto\":6,\"PktDropBytes\":32,\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"SrcK8S_OwnerType\":\"Node\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"DstK8S_HostIP\":\"10.0.1.132\",\"Flags\":[\"ACK\"],\"PktDropLatestFlags\":16,\"DstK8S_NetworkName\":\"primary\",\"PktDropPackets\":1,\"DstK8S_OwnerType\":\"Deployment\",\"Sampling\":1,\"TimeFlowEndMs\":1786460077004,\"DstMac\":\"0a:58:0a:81:00:13\",\"Udns\":[\"\",\"default\",\"\"]}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "metrics-server",
+          "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
           "FlowDirection": "0",
           "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "netobserv",
-          "SrcK8S_OwnerName": "loki",
-          "SrcK8S_Type": "Service",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
+          "SrcK8S_OwnerName": "ip-10-0-1-132.ec2.internal",
+          "SrcK8S_Type": "Node",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
         },
         "values": [
           [
-            "1708011870425999872",
-            "{\"Bytes\":32,\"Interface\":\"eth0\",\"Proto\":6,\"DstK8S_HostIP\":\"10.0.1.137\",\"SrcMac\":\"0A:58:0A:81:00:01\",\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"DstMac\":\"0A:58:0A:81:00:28\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Flags\":16,\"DstPort\":48322,\"TimeFlowStartMs\":1708011870421,\"PktDropPackets\":1,\"DstK8S_Name\":\"netobserv-plugin-867ff4bd6c-8xvfn\",\"TimeFlowEndMs\":1708011870426,\"IfDirection\":0,\"SrcK8S_Name\":\"loki\",\"DstAddr\":\"10.129.0.40\",\"SrcK8S_OwnerType\":\"Service\",\"PktDropLatestFlags\":16,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"DstK8S_OwnerType\":\"Deployment\",\"TimeFlowRttNs\":379000,\"AgentIP\":\"10.0.1.137\",\"TimeReceived\":1708011870,\"Etype\":2048,\"Packets\":1,\"PktDropBytes\":32,\"SrcAddr\":\"172.30.72.14\",\"SrcPort\":3100,\"DnsErrno\":0,\"Dscp\":0}"
+            "1786460077004000000",
+            "{\"Flags\":[\"ACK\"],\"DstAddr\":\"10.128.0.39\",\"Packets\":1,\"TimeFlowRttNs\":213000,\"PktDropBytes\":32,\"DstK8S_HostIP\":\"10.0.1.92\",\"DstMac\":\"0a:58:64:58:00:02\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcK8S_HostIP\":\"10.0.1.132\",\"Proto\":6,\"DstPort\":10250,\"IfDirections\":[0,1,0],\"SrcK8S_Name\":\"ip-10-0-1-132.ec2.internal\",\"SrcSubnetLabel\":\"Pods\",\"Udns\":[\"\",\"default\",\"\"],\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"DstSubnetLabel\":\"Pods\",\"DstK8S_Name\":\"metrics-server-98fccfc84-bzkd7\",\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"Etype\":2048,\"TimeFlowEndMs\":1786460077004,\"Dscp\":0,\"SrcK8S_OwnerType\":\"Node\",\"SrcAddr\":\"10.129.0.2\",\"PktDropPackets\":1,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"Interfaces\":[\"genev_sys_6081\",\"717259dae24ccb7\",\"eth0\"],\"SrcPort\":55592,\"TimeFlowStartMs\":1786460077004,\"DstK8S_OwnerType\":\"Deployment\",\"SrcK8S_NetworkName\":\"primary\",\"AgentIP\":\"10.0.1.92\",\"SrcMac\":\"0a:58:64:58:00:03\",\"Bytes\":66,\"Sampling\":1,\"PktDropLatestFlags\":16,\"TimeReceived\":1786460077,\"DstK8S_NetworkName\":\"primary\"}"
           ],
           [
-            "1708011870188999936",
-            "{\"Proto\":6,\"IfDirection\":0,\"DstK8S_HostIP\":\"10.0.1.137\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DnsErrno\":0,\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"Flags\":16,\"TimeFlowRttNs\":365000,\"TimeReceived\":1708011870,\"Interface\":\"eth0\",\"SrcK8S_Name\":\"loki\",\"DstPort\":48316,\"DstK8S_Name\":\"netobserv-plugin-867ff4bd6c-8xvfn\",\"TimeFlowEndMs\":1708011870189,\"DstMac\":\"0A:58:0A:81:00:28\",\"Packets\":1,\"TimeFlowStartMs\":1708011870170,\"SrcPort\":3100,\"PktDropPackets\":1,\"PktDropBytes\":32,\"PktDropLatestFlags\":16,\"AgentIP\":\"10.0.1.137\",\"DstK8S_OwnerType\":\"Deployment\",\"SrcK8S_OwnerType\":\"Service\",\"SrcAddr\":\"172.30.72.14\",\"DstAddr\":\"10.129.0.40\",\"Bytes\":32,\"Etype\":2048,\"SrcMac\":\"0A:58:0A:81:00:01\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"Dscp\":0}"
-          ],
-          [
-            "1708011869676999936",
-            "{\"IfDirection\":0,\"DstMac\":\"0A:58:0A:81:00:28\",\"SrcPort\":3100,\"DnsErrno\":0,\"TimeFlowStartMs\":1708011869658,\"Flags\":16,\"DstAddr\":\"10.129.0.40\",\"SrcK8S_Name\":\"loki\",\"Packets\":1,\"Etype\":2048,\"SrcMac\":\"0A:58:0A:81:00:01\",\"DstK8S_HostIP\":\"10.0.1.137\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"Bytes\":32,\"SrcAddr\":\"172.30.72.14\",\"SrcK8S_OwnerType\":\"Service\",\"TimeReceived\":1708011870,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"TimeFlowEndMs\":1708011869677,\"TimeFlowRttNs\":359000,\"PktDropLatestFlags\":16,\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"AgentIP\":\"10.0.1.137\",\"PktDropBytes\":32,\"Dscp\":0,\"DstK8S_Name\":\"netobserv-plugin-867ff4bd6c-8xvfn\",\"PktDropPackets\":1,\"Proto\":6,\"DstPort\":33066,\"Interface\":\"eth0\",\"DstK8S_OwnerType\":\"Deployment\"}"
-          ],
-          [
-            "1708011869676999936",
-            "{\"SrcK8S_Name\":\"loki\",\"Flags\":16,\"TimeFlowRttNs\":386000,\"AgentIP\":\"10.0.1.137\",\"Etype\":2048,\"Packets\":1,\"DstAddr\":\"10.129.0.40\",\"DnsErrno\":0,\"PktDropLatestFlags\":16,\"Dscp\":0,\"PktDropPackets\":1,\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"PktDropBytes\":32,\"Bytes\":32,\"SrcK8S_OwnerType\":\"Service\",\"SrcAddr\":\"172.30.72.14\",\"DstMac\":\"0A:58:0A:81:00:28\",\"Proto\":6,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Interface\":\"eth0\",\"TimeFlowEndMs\":1708011869677,\"TimeReceived\":1708011870,\"DstK8S_Name\":\"netobserv-plugin-867ff4bd6c-8xvfn\",\"TimeFlowStartMs\":1708011869658,\"SrcPort\":3100,\"DstK8S_HostIP\":\"10.0.1.137\",\"DstK8S_OwnerType\":\"Deployment\",\"SrcMac\":\"0A:58:0A:81:00:01\",\"IfDirection\":0,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"DstPort\":33056}"
-          ],
-          [
-            "1708011869548999936",
-            "{\"Packets\":1,\"Flags\":16,\"TimeFlowRttNs\":349000,\"DstK8S_Name\":\"netobserv-plugin-867ff4bd6c-8xvfn\",\"SrcAddr\":\"172.30.72.14\",\"DstK8S_OwnerType\":\"Deployment\",\"Bytes\":32,\"Interface\":\"eth0\",\"Proto\":6,\"DstPort\":33044,\"SrcK8S_Name\":\"loki\",\"IfDirection\":0,\"Dscp\":0,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"AgentIP\":\"10.0.1.137\",\"PktDropLatestFlags\":16,\"SrcMac\":\"0A:58:0A:81:00:01\",\"Etype\":2048,\"TimeFlowEndMs\":1708011869549,\"TimeReceived\":1708011870,\"SrcPort\":3100,\"PktDropPackets\":1,\"DnsErrno\":0,\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"DstAddr\":\"10.129.0.40\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DstMac\":\"0A:58:0A:81:00:28\",\"PktDropBytes\":32,\"DstK8S_HostIP\":\"10.0.1.137\",\"SrcK8S_OwnerType\":\"Service\",\"TimeFlowStartMs\":1708011869530}"
-          ],
-          [
-            "1708011869356999936",
-            "{\"DstMac\":\"0A:58:0A:81:00:28\",\"DstK8S_OwnerType\":\"Deployment\",\"DnsErrno\":0,\"DstK8S_HostIP\":\"10.0.1.137\",\"SrcK8S_Name\":\"loki\",\"SrcMac\":\"0A:58:0A:81:00:01\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"SrcPort\":3100,\"PktDropBytes\":32,\"TimeFlowEndMs\":1708011869357,\"DstPort\":33034,\"SrcAddr\":\"172.30.72.14\",\"TimeFlowRttNs\":281000,\"Flags\":16,\"Packets\":1,\"PktDropPackets\":1,\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"DstAddr\":\"10.129.0.40\",\"IfDirection\":0,\"Proto\":6,\"TimeReceived\":1708011870,\"Interface\":\"eth0\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Dscp\":0,\"PktDropLatestFlags\":16,\"Bytes\":32,\"AgentIP\":\"10.0.1.137\",\"TimeFlowStartMs\":1708011869339,\"SrcK8S_OwnerType\":\"Service\",\"Etype\":2048,\"DstK8S_Name\":\"netobserv-plugin-867ff4bd6c-8xvfn\"}"
-          ],
-          [
-            "1708011869292999936",
-            "{\"DstMac\":\"0A:58:0A:81:00:28\",\"PktDropLatestFlags\":16,\"TimeFlowRttNs\":325000,\"DstPort\":33054,\"DstK8S_HostIP\":\"10.0.1.137\",\"Flags\":16,\"SrcPort\":3100,\"DstK8S_Name\":\"netobserv-plugin-867ff4bd6c-8xvfn\",\"DstAddr\":\"10.129.0.40\",\"DstK8S_OwnerType\":\"Deployment\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"DnsErrno\":0,\"TimeFlowStartMs\":1708011869274,\"PktDropBytes\":32,\"SrcAddr\":\"172.30.72.14\",\"TimeReceived\":1708011870,\"AgentIP\":\"10.0.1.137\",\"IfDirection\":0,\"Proto\":6,\"PktDropPackets\":1,\"TimeFlowEndMs\":1708011869293,\"SrcK8S_OwnerType\":\"Service\",\"Dscp\":0,\"SrcMac\":\"0A:58:0A:81:00:01\",\"Interface\":\"eth0\",\"Packets\":1,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcK8S_Name\":\"loki\",\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"Bytes\":32,\"Etype\":2048}"
-          ],
-          [
-            "1708011869164999936",
-            "{\"TimeFlowEndMs\":1708011869165,\"Etype\":2048,\"Flags\":16,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"TimeFlowRttNs\":352000,\"IfDirection\":0,\"DnsErrno\":0,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"SrcPort\":3100,\"TimeFlowStartMs\":1708011869146,\"PktDropLatestFlags\":16,\"TimeReceived\":1708011870,\"DstK8S_Name\":\"netobserv-plugin-867ff4bd6c-8xvfn\",\"DstMac\":\"0A:58:0A:81:00:28\",\"SrcK8S_OwnerType\":\"Service\",\"Proto\":6,\"DstPort\":33032,\"DstK8S_HostIP\":\"10.0.1.137\",\"Interface\":\"eth0\",\"AgentIP\":\"10.0.1.137\",\"SrcK8S_Name\":\"loki\",\"PktDropBytes\":32,\"SrcMac\":\"0A:58:0A:81:00:01\",\"DstK8S_OwnerType\":\"Deployment\",\"DstAddr\":\"10.129.0.40\",\"Packets\":1,\"SrcAddr\":\"172.30.72.14\",\"Dscp\":0,\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"Bytes\":32,\"PktDropPackets\":1}"
-          ],
-          [
-            "1708011869164999936",
-            "{\"DstPort\":32992,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"DstK8S_Name\":\"netobserv-plugin-867ff4bd6c-8xvfn\",\"IfDirection\":0,\"Proto\":6,\"Dscp\":0,\"DnsErrno\":0,\"TimeFlowRttNs\":357000,\"DstK8S_OwnerType\":\"Deployment\",\"SrcAddr\":\"172.30.72.14\",\"Packets\":1,\"TimeFlowStartMs\":1708011869146,\"Interface\":\"eth0\",\"Etype\":2048,\"SrcK8S_OwnerType\":\"Service\",\"PktDropBytes\":32,\"DstK8S_HostIP\":\"10.0.1.137\",\"TimeFlowEndMs\":1708011869165,\"PktDropLatestFlags\":16,\"Flags\":16,\"DstMac\":\"0A:58:0A:81:00:28\",\"AgentIP\":\"10.0.1.137\",\"PktDropPackets\":1,\"SrcPort\":3100,\"SrcK8S_Name\":\"loki\",\"DstAddr\":\"10.129.0.40\",\"Bytes\":32,\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"TimeReceived\":1708011870,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcMac\":\"0A:58:0A:81:00:01\"}"
-          ],
-          [
-            "1708011869164999936",
-            "{\"SrcMac\":\"0A:58:0A:81:00:01\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"IfDirection\":0,\"TimeFlowRttNs\":257000,\"Interface\":\"eth0\",\"PktDropBytes\":32,\"Etype\":2048,\"Bytes\":32,\"DnsErrno\":0,\"SrcPort\":3100,\"TimeFlowStartMs\":1708011869146,\"Flags\":16,\"AgentIP\":\"10.0.1.137\",\"DstK8S_Name\":\"netobserv-plugin-867ff4bd6c-8xvfn\",\"PktDropPackets\":1,\"DstMac\":\"0A:58:0A:81:00:28\",\"TimeFlowEndMs\":1708011869165,\"DstPort\":33014,\"Dscp\":0,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"SrcK8S_OwnerType\":\"Service\",\"Packets\":1,\"Proto\":6,\"SrcAddr\":\"172.30.72.14\",\"DstK8S_OwnerType\":\"Deployment\",\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"DstAddr\":\"10.129.0.40\",\"TimeReceived\":1708011870,\"SrcK8S_Name\":\"loki\",\"DstK8S_HostIP\":\"10.0.1.137\",\"PktDropLatestFlags\":16}"
-          ],
-          [
-            "1708011869100999936",
-            "{\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Bytes\":32,\"DstK8S_Name\":\"netobserv-plugin-867ff4bd6c-8xvfn\",\"DstK8S_OwnerType\":\"Deployment\",\"SrcK8S_Name\":\"loki\",\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"TimeFlowRttNs\":262000,\"PktDropPackets\":1,\"TimeReceived\":1708011870,\"IfDirection\":0,\"PktDropLatestFlags\":16,\"TimeFlowEndMs\":1708011869101,\"SrcMac\":\"0A:58:0A:81:00:01\",\"SrcAddr\":\"172.30.72.14\",\"DstK8S_HostIP\":\"10.0.1.137\",\"TimeFlowStartMs\":1708011869083,\"DstAddr\":\"10.129.0.40\",\"Interface\":\"eth0\",\"AgentIP\":\"10.0.1.137\",\"PktDropBytes\":32,\"DnsErrno\":0,\"Packets\":1,\"DstMac\":\"0A:58:0A:81:00:28\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"Proto\":6,\"SrcPort\":3100,\"Etype\":2048,\"DstPort\":33026,\"Dscp\":0,\"Flags\":16,\"SrcK8S_OwnerType\":\"Service\"}"
-          ],
-          [
-            "1708011869100999936",
-            "{\"DstAddr\":\"10.129.0.40\",\"TimeFlowStartMs\":1708011869082,\"PktDropBytes\":32,\"DstPort\":33002,\"Flags\":16,\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"DstK8S_OwnerType\":\"Deployment\",\"IfDirection\":0,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"DstK8S_HostIP\":\"10.0.1.137\",\"Etype\":2048,\"PktDropLatestFlags\":16,\"TimeFlowRttNs\":310000,\"DstK8S_Name\":\"netobserv-plugin-867ff4bd6c-8xvfn\",\"SrcAddr\":\"172.30.72.14\",\"SrcK8S_OwnerType\":\"Service\",\"SrcK8S_Name\":\"loki\",\"DnsErrno\":0,\"PktDropPackets\":1,\"Dscp\":0,\"Bytes\":32,\"SrcPort\":3100,\"DstMac\":\"0A:58:0A:81:00:28\",\"SrcMac\":\"0A:58:0A:81:00:01\",\"TimeFlowEndMs\":1708011869101,\"Interface\":\"eth0\",\"TimeReceived\":1708011870,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"AgentIP\":\"10.0.1.137\",\"Packets\":1,\"Proto\":6}"
-          ],
-          [
-            "1708011865305999872",
-            "{\"PktDropPackets\":1,\"DstAddr\":\"10.129.0.40\",\"Interface\":\"eth0\",\"Dscp\":0,\"SrcMac\":\"0A:58:0A:81:00:01\",\"TimeFlowStartMs\":1708011865261,\"AgentIP\":\"10.0.1.137\",\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"TimeFlowRttNs\":359000,\"Flags\":16,\"DstK8S_Name\":\"netobserv-plugin-867ff4bd6c-8xvfn\",\"SrcK8S_Name\":\"loki\",\"Proto\":6,\"PktDropLatestFlags\":16,\"TimeFlowEndMs\":1708011865306,\"Packets\":1,\"DstK8S_OwnerType\":\"Deployment\",\"IfDirection\":0,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"DstPort\":32982,\"DstK8S_HostIP\":\"10.0.1.137\",\"Bytes\":32,\"TimeReceived\":1708011865,\"PktDropBytes\":32,\"SrcK8S_OwnerType\":\"Service\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcAddr\":\"172.30.72.14\",\"DstMac\":\"0A:58:0A:81:00:28\",\"SrcPort\":3100,\"Etype\":2048,\"DnsErrno\":0}"
-          ],
-          [
-            "1708011865241999872",
-            "{\"DstK8S_OwnerType\":\"Deployment\",\"IfDirection\":0,\"DstK8S_HostIP\":\"10.0.1.137\",\"Dscp\":0,\"SrcPort\":3100,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"PktDropBytes\":32,\"SrcMac\":\"0A:58:0A:81:00:01\",\"DstK8S_Name\":\"netobserv-plugin-867ff4bd6c-8xvfn\",\"DstMac\":\"0A:58:0A:81:00:28\",\"Bytes\":32,\"SrcAddr\":\"172.30.72.14\",\"Packets\":1,\"PktDropPackets\":1,\"AgentIP\":\"10.0.1.137\",\"TimeFlowStartMs\":1708011865198,\"Etype\":2048,\"SrcK8S_Name\":\"loki\",\"Interface\":\"eth0\",\"Proto\":6,\"DnsErrno\":0,\"Flags\":16,\"TimeReceived\":1708011865,\"TimeFlowEndMs\":1708011865242,\"SrcK8S_OwnerType\":\"Service\",\"DstAddr\":\"10.129.0.40\",\"PktDropLatestFlags\":16,\"TimeFlowRttNs\":566000,\"DstPort\":32968}"
+            "1786460077004000000",
+            "{\"AgentIP\":\"10.0.1.92\",\"DstK8S_Name\":\"metrics-server-98fccfc84-bzkd7\",\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"TimeFlowStartMs\":1786460077003,\"DstK8S_OwnerType\":\"Deployment\",\"SrcK8S_Name\":\"ip-10-0-1-132.ec2.internal\",\"Interfaces\":[\"genev_sys_6081\",\"717259dae24ccb7\",\"eth0\"],\"SrcK8S_NetworkName\":\"primary\",\"DstAddr\":\"10.128.0.39\",\"SrcMac\":\"0a:58:64:58:00:03\",\"Etype\":2048,\"Udns\":[\"\",\"default\",\"\"],\"SrcK8S_OwnerType\":\"Node\",\"SrcAddr\":\"10.129.0.2\",\"Bytes\":66,\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"Flags\":[\"ACK\"],\"PktDropPackets\":1,\"PktDropBytes\":32,\"DstPort\":10250,\"Sampling\":1,\"Dscp\":0,\"TimeReceived\":1786460077,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcSubnetLabel\":\"Pods\",\"TimeFlowRttNs\":9530000,\"Proto\":6,\"DstSubnetLabel\":\"Pods\",\"DstK8S_HostIP\":\"10.0.1.92\",\"SrcPort\":48350,\"Packets\":1,\"SrcK8S_HostIP\":\"10.0.1.132\",\"DstMac\":\"0a:58:64:58:00:02\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"IfDirections\":[0,1,0],\"PktDropLatestFlags\":16,\"DstK8S_NetworkName\":\"primary\",\"TimeFlowEndMs\":1786460077004}"
           ]
         ]
       },
       {
         "stream": {
-          "DstK8S_Namespace": "netobserv",
-          "DstK8S_OwnerName": "netobserv-controller-manager",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "kube-state-metrics",
           "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
           "FlowDirection": "0",
           "K8S_FlowLayer": "infra",
           "SrcK8S_Namespace": "openshift-monitoring",
           "SrcK8S_OwnerName": "prometheus-k8s",
           "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
         },
         "values": [
           [
-            "1708011865435000064",
-            "{\"DstK8S_Name\":\"netobserv-controller-manager-54d5d67fdb-pk69f\",\"SrcK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"AgentIP\":\"10.0.1.137\",\"TimeFlowStartMs\":1708011865435,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Interface\":\"eth0\",\"IfDirection\":0,\"SrcK8S_OwnerType\":\"StatefulSet\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"DstAddr\":\"10.129.0.30\",\"PktDropPackets\":1,\"TimeReceived\":1708011865,\"PktDropLatestFlags\":16,\"SrcMac\":\"0A:58:0A:81:00:01\",\"DstK8S_OwnerType\":\"Deployment\",\"SrcK8S_Name\":\"prometheus-k8s-1\",\"SrcK8S_HostIP\":\"10.0.1.7\",\"DstK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"Proto\":6,\"Etype\":2048,\"DstMac\":\"0A:58:0A:81:00:1E\",\"TimeFlowEndMs\":1708011865435,\"PktDropBytes\":32,\"Dscp\":0,\"SrcAddr\":\"10.128.0.29\",\"SrcPort\":35000,\"DstPort\":8443,\"DstK8S_HostIP\":\"10.0.1.137\",\"Flags\":16,\"DnsErrno\":0}"
+            "1786460077004000000",
+            "{\"Dscp\":0,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"Etype\":2048,\"SrcK8S_OwnerType\":\"StatefulSet\",\"DstK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"DstK8S_NetworkName\":\"primary\",\"Bytes\":132,\"SrcSubnetLabel\":\"Pods\",\"DstSubnetLabel\":\"Pods\",\"PktDropPackets\":1,\"IfDirections\":[0,1,0],\"SrcAddr\":\"10.128.0.41\",\"TimeFlowEndMs\":1786460077004,\"TimeFlowRttNs\":6822000,\"SrcK8S_HostIP\":\"10.0.1.92\",\"AgentIP\":\"10.0.1.132\",\"SrcPort\":52378,\"Interfaces\":[\"genev_sys_6081\",\"7c59afc111fa34c\",\"eth0\"],\"Sampling\":1,\"Proto\":6,\"PktDropBytes\":32,\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"Packets\":2,\"DstAddr\":\"10.129.0.16\",\"DstK8S_OwnerType\":\"Deployment\",\"PktDropLatestFlags\":16,\"SrcK8S_NetworkName\":\"primary\",\"DstK8S_HostIP\":\"10.0.1.132\",\"TimeFlowStartMs\":1786460076897,\"SrcK8S_Name\":\"prometheus-k8s-1\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Udns\":[\"\",\"default\",\"\"],\"DstK8S_Name\":\"kube-state-metrics-8674ff6589-lcs4s\",\"SrcMac\":\"0a:58:64:58:00:02\",\"DstMac\":\"0a:58:64:58:00:03\",\"TimeReceived\":1786460077,\"Flags\":[\"ACK\"],\"DstPort\":9443}"
           ]
         ]
       },
       {
         "stream": {
-          "DstK8S_Namespace": "netobserv",
-          "DstK8S_OwnerName": "loki",
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "control-plane-metrics-forwarder",
           "DstK8S_Type": "Pod",
-          "FlowDirection": "0",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "2",
           "K8S_FlowLayer": "infra",
-          "SrcK8S_Namespace": "netobserv",
-          "SrcK8S_OwnerName": "netobserv-plugin",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "prometheus-k8s",
           "SrcK8S_Type": "Pod",
-          "UdnId": "my-udn",
-          "app": "netobserv-flowcollector"
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
         },
         "values": [
           [
-            "1708011865260999936",
-            "{\"DnsErrno\":0,\"DstK8S_HostIP\":\"10.0.1.7\",\"DstMac\":\"0A:58:0A:80:00:22\",\"AgentIP\":\"10.0.1.7\",\"Proto\":6,\"DstK8S_Name\":\"loki\",\"SrcAddr\":\"10.129.0.40\",\"DstAddr\":\"10.128.0.34\",\"SrcMac\":\"0A:58:0A:80:00:01\",\"SrcK8S_HostName\":\"ip-10-0-1-137.ec2.internal\",\"TimeReceived\":1708011867,\"IfDirection\":0,\"Dscp\":0,\"TimeFlowStartMs\":1708011865261,\"SrcK8S_Name\":\"netobserv-plugin-867ff4bd6c-8xvfn\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"PktDropBytes\":32,\"PktDropLatestFlags\":16,\"DstK8S_OwnerType\":\"Pod\",\"SrcPort\":32982,\"Flags\":16,\"DstPort\":3100,\"TimeFlowEndMs\":1708011865261,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_INVALID_SEQUENCE\",\"Etype\":2048,\"PktDropPackets\":1,\"SrcK8S_HostIP\":\"10.0.1.137\",\"SrcK8S_OwnerType\":\"Deployment\",\"DstK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"Interface\":\"eth0\"}"
+            "1786460077408000000",
+            "{\"SrcK8S_NetworkName\":\"primary\",\"DstK8S_Name\":\"control-plane-metrics-forwarder-58479bb4c9-kmvft\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"TimeReceived\":1786460077,\"SrcK8S_Name\":\"prometheus-k8s-1\",\"SrcSubnetLabel\":\"Pods\",\"SrcAddr\":\"10.128.0.41\",\"DstPort\":9443,\"IfDirections\":[1,0,1],\"SrcK8S_OwnerType\":\"StatefulSet\",\"Etype\":2048,\"DstK8S_NetworkName\":\"primary\",\"DstMac\":\"0a:58:0a:80:00:15\",\"Dscp\":0,\"PktDropPackets\":1,\"Bytes\":132,\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"AgentIP\":\"10.0.1.92\",\"TimeFlowEndMs\":1786460077408,\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"Packets\":2,\"TimeFlowRttNs\":133000,\"TimeFlowStartMs\":1786460077408,\"SrcK8S_HostIP\":\"10.0.1.92\",\"Sampling\":1,\"Proto\":6,\"PktDropLatestFlags\":16,\"SrcMac\":\"0a:58:0a:80:00:29\",\"DstK8S_HostIP\":\"10.0.1.92\",\"PktDropBytes\":32,\"DstSubnetLabel\":\"Pods\",\"DstK8S_OwnerType\":\"Deployment\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Udns\":[\"\",\"default\",\"default\"],\"Flags\":[\"ACK\"],\"Interfaces\":[\"eth0\",\"7a4bbd3f8bf13b1\",\"8a5b3333dfc3787\"],\"SrcPort\":33574,\"DstAddr\":\"10.128.0.21\"}"
+          ],
+          [
+            "1786460077408000000",
+            "{\"DstK8S_NetworkName\":\"primary\",\"Sampling\":1,\"Etype\":2048,\"SrcK8S_HostIP\":\"10.0.1.92\",\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"DstK8S_OwnerType\":\"Deployment\",\"IfDirections\":[1,0,1],\"AgentIP\":\"10.0.1.92\",\"Udns\":[\"\",\"default\",\"default\"],\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"TimeFlowStartMs\":1786460077408,\"PktDropPackets\":1,\"Bytes\":132,\"PktDropLatestFlags\":16,\"DstK8S_Name\":\"control-plane-metrics-forwarder-58479bb4c9-kmvft\",\"Proto\":6,\"SrcPort\":33582,\"DstPort\":9443,\"DstAddr\":\"10.128.0.21\",\"TimeReceived\":1786460077,\"TimeFlowEndMs\":1786460077408,\"SrcK8S_OwnerType\":\"StatefulSet\",\"PktDropBytes\":32,\"Dscp\":0,\"Interfaces\":[\"eth0\",\"7a4bbd3f8bf13b1\",\"8a5b3333dfc3787\"],\"Packets\":2,\"TimeFlowRttNs\":14798000,\"DstMac\":\"0a:58:0a:80:00:15\",\"SrcMac\":\"0a:58:0a:80:00:29\",\"Flags\":[\"ACK\"],\"SrcSubnetLabel\":\"Pods\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcAddr\":\"10.128.0.41\",\"DstSubnetLabel\":\"Pods\",\"DstK8S_HostIP\":\"10.0.1.92\",\"SrcK8S_Name\":\"prometheus-k8s-1\",\"SrcK8S_NetworkName\":\"primary\"}"
+          ],
+          [
+            "1786460076896000000",
+            "{\"DstSubnetLabel\":\"Pods\",\"DstK8S_HostIP\":\"10.0.1.92\",\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"PktDropLatestFlags\":16,\"DstMac\":\"0a:58:0a:80:00:15\",\"DstAddr\":\"10.128.0.21\",\"AgentIP\":\"10.0.1.92\",\"DstPort\":9443,\"Udns\":[\"\",\"default\",\"default\"],\"Flags\":[\"ACK\"],\"Interfaces\":[\"eth0\",\"7a4bbd3f8bf13b1\",\"8a5b3333dfc3787\"],\"DstK8S_Name\":\"control-plane-metrics-forwarder-58479bb4c9-kmvft\",\"SrcK8S_OwnerType\":\"StatefulSet\",\"PktDropBytes\":32,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcAddr\":\"10.128.0.41\",\"SrcSubnetLabel\":\"Pods\",\"DstK8S_OwnerType\":\"Deployment\",\"SrcK8S_NetworkName\":\"primary\",\"Etype\":2048,\"TimeFlowEndMs\":1786460076896,\"DstK8S_NetworkName\":\"primary\",\"SrcPort\":38242,\"PktDropPackets\":1,\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"SrcMac\":\"0a:58:0a:80:00:29\",\"SrcK8S_HostIP\":\"10.0.1.92\",\"Bytes\":132,\"Proto\":6,\"SrcK8S_Name\":\"prometheus-k8s-1\",\"TimeFlowRttNs\":73000,\"Dscp\":0,\"TimeFlowStartMs\":1786460076896,\"TimeReceived\":1786460077,\"IfDirections\":[1,0,1],\"Sampling\":1,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"Packets\":2}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "control-plane-metrics-forwarder",
+          "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "0",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "prometheus-k8s",
+          "SrcK8S_Type": "Pod",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786460077417999872",
+            "{\"Udns\":[\"\",\"default\",\"\"],\"SrcK8S_HostIP\":\"10.0.1.132\",\"DstK8S_Name\":\"control-plane-metrics-forwarder-58479bb4c9-kmvft\",\"TimeFlowEndMs\":1786460077418,\"PktDropBytes\":32,\"SrcK8S_Name\":\"prometheus-k8s-0\",\"Bytes\":825,\"Packets\":9,\"Interfaces\":[\"genev_sys_6081\",\"8a5b3333dfc3787\",\"eth0\"],\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"TimeFlowStartMs\":1786460062667,\"SrcK8S_OwnerType\":\"StatefulSet\",\"DstSubnetLabel\":\"Pods\",\"Etype\":2048,\"Proto\":6,\"SrcSubnetLabel\":\"Pods\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Dscp\":0,\"SrcAddr\":\"10.129.0.21\",\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"PktDropPackets\":1,\"DstAddr\":\"10.128.0.21\",\"TimeReceived\":1786460077,\"DstPort\":9443,\"AgentIP\":\"10.0.1.92\",\"IfDirections\":[0,1,0],\"DstK8S_NetworkName\":\"primary\",\"SrcK8S_NetworkName\":\"primary\",\"TLSTypes\":[\"AppData\"],\"DstMac\":\"0a:58:64:58:00:02\",\"Sampling\":1,\"SrcPort\":52284,\"DstK8S_HostIP\":\"10.0.1.92\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"Flags\":[\"ACK\"],\"SrcMac\":\"0a:58:64:58:00:03\",\"DstK8S_OwnerType\":\"Deployment\",\"TimeFlowRttNs\":293000,\"PktDropLatestFlags\":16}"
+          ],
+          [
+            "1786460077248999936",
+            "{\"Bytes\":237,\"PktDropLatestFlags\":16,\"Dscp\":0,\"Interfaces\":[\"genev_sys_6081\",\"8a5b3333dfc3787\",\"eth0\"],\"DstK8S_HostIP\":\"10.0.1.92\",\"DstPort\":9443,\"SrcPort\":52280,\"PktDropBytes\":32,\"DstK8S_NetworkName\":\"primary\",\"Flags\":[\"ACK\"],\"SrcSubnetLabel\":\"Pods\",\"SrcK8S_NetworkName\":\"primary\",\"DstAddr\":\"10.128.0.21\",\"Udns\":[\"\",\"default\",\"\"],\"TLSTypes\":[\"AppData\"],\"IfDirections\":[0,1,0],\"SrcAddr\":\"10.129.0.21\",\"SrcK8S_HostIP\":\"10.0.1.132\",\"Packets\":3,\"DstK8S_OwnerType\":\"Deployment\",\"PktDropPackets\":1,\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"TimeReceived\":1786460077,\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"AgentIP\":\"10.0.1.92\",\"TimeFlowEndMs\":1786460077249,\"Sampling\":1,\"Proto\":6,\"TimeFlowRttNs\":7030000,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DstMac\":\"0a:58:64:58:00:02\",\"DstSubnetLabel\":\"Pods\",\"TimeFlowStartMs\":1786460062667,\"SrcK8S_OwnerType\":\"StatefulSet\",\"DstK8S_Name\":\"control-plane-metrics-forwarder-58479bb4c9-kmvft\",\"SrcMac\":\"0a:58:64:58:00:03\",\"SrcK8S_Name\":\"prometheus-k8s-0\",\"Etype\":2048}"
+          ],
+          [
+            "1786460076492000000",
+            "{\"DstK8S_NetworkName\":\"primary\",\"TimeReceived\":1786460077,\"SrcAddr\":\"10.129.0.21\",\"SrcK8S_HostIP\":\"10.0.1.132\",\"Proto\":6,\"SrcPort\":44714,\"IfDirections\":[0,1,0],\"AgentIP\":\"10.0.1.92\",\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"SrcK8S_Name\":\"prometheus-k8s-0\",\"DstAddr\":\"10.128.0.21\",\"Interfaces\":[\"genev_sys_6081\",\"8a5b3333dfc3787\",\"eth0\"],\"Packets\":1,\"TimeFlowStartMs\":1786460076492,\"TimeFlowRttNs\":338000,\"Dscp\":0,\"PktDropPackets\":1,\"Flags\":[\"ACK\"],\"Bytes\":66,\"TimeFlowEndMs\":1786460076492,\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"SrcSubnetLabel\":\"Pods\",\"SrcMac\":\"0a:58:64:58:00:03\",\"PktDropLatestFlags\":16,\"DstSubnetLabel\":\"Pods\",\"DstPort\":9443,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"Udns\":[\"\",\"default\",\"\"],\"DstK8S_Name\":\"control-plane-metrics-forwarder-58479bb4c9-kmvft\",\"DstK8S_HostIP\":\"10.0.1.92\",\"PktDropBytes\":32,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Etype\":2048,\"DstK8S_OwnerType\":\"Deployment\",\"SrcK8S_OwnerType\":\"StatefulSet\",\"Sampling\":1,\"DstMac\":\"0a:58:64:58:00:02\",\"SrcK8S_NetworkName\":\"primary\"}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "DstK8S_Namespace": "openshift-monitoring",
+          "DstK8S_OwnerName": "alertmanager-main",
+          "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "2",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_Namespace": "openshift-ingress",
+          "SrcK8S_OwnerName": "router-default",
+          "SrcK8S_Type": "Pod",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786460076481999872",
+            "{\"Packets\":10,\"SrcMac\":\"0a:58:0a:81:00:06\",\"DstPort\":9095,\"SrcAddr\":\"10.129.0.6\",\"Dscp\":0,\"PktDropPackets\":1,\"Bytes\":1874,\"SrcSubnetLabel\":\"Pods\",\"TimeFlowEndMs\":1786460076482,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcK8S_HostIP\":\"10.0.1.132\",\"DstK8S_OwnerType\":\"StatefulSet\",\"DstK8S_Name\":\"alertmanager-main-0\",\"TimeFlowStartMs\":1786460076479,\"PktDropBytes\":20,\"DstK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"TimeFlowRttNs\":269000,\"Proto\":6,\"SrcK8S_NetworkName\":\"primary\",\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"SrcK8S_Name\":\"router-default-74c56bd696-jtvvt\",\"DstSubnetLabel\":\"Pods\",\"SrcK8S_OwnerType\":\"Deployment\",\"DstMac\":\"0a:58:0a:81:00:11\",\"Udns\":[\"\",\"default\",\"default\"],\"TLSTypes\":[\"ClientHello\",\"ChangeCipher\"],\"Interfaces\":[\"eth0\",\"917fa562ac62821\",\"60a59b21da23621\"],\"DstK8S_NetworkName\":\"primary\",\"Sampling\":1,\"PktDropLatestFlags\":4,\"IfDirections\":[1,0,1],\"DstAddr\":\"10.129.0.17\",\"Etype\":2048,\"Flags\":[\"SYN\",\"RST\",\"ACK\",\"RST_ACK\"],\"TimeReceived\":1786460077,\"SrcPort\":52012,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_IPV6DISABLED\",\"AgentIP\":\"10.0.1.132\",\"DstK8S_HostIP\":\"10.0.1.132\",\"TLSVersion\":\"TLS 1.3\"}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "DstK8S_Namespace": "openshift-ingress",
+          "DstK8S_OwnerName": "router-default",
+          "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "2",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "alertmanager-main",
+          "SrcK8S_Type": "Pod",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786460076481999872",
+            "{\"SrcPort\":9095,\"Packets\":8,\"TimeFlowRttNs\":101000,\"SrcK8S_Name\":\"alertmanager-main-0\",\"DstK8S_OwnerType\":\"Deployment\",\"SrcSubnetLabel\":\"Pods\",\"DstSubnetLabel\":\"Pods\",\"PktDropLatestFlags\":16,\"Interfaces\":[\"eth0\",\"60a59b21da23621\",\"917fa562ac62821\"],\"Udns\":[\"\",\"default\",\"default\"],\"PktDropBytes\":176,\"DstAddr\":\"10.129.0.6\",\"TLSTypes\":[\"ServerHello\",\"AppData\"],\"SrcK8S_OwnerType\":\"StatefulSet\",\"Bytes\":5886,\"SrcK8S_NetworkName\":\"primary\",\"DstK8S_NetworkName\":\"primary\",\"TimeFlowStartMs\":1786460076479,\"TimeReceived\":1786460077,\"TLSVersion\":\"TLS 1.3\",\"Dscp\":0,\"Etype\":2048,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_NO_SOCKET\",\"AgentIP\":\"10.0.1.132\",\"Sampling\":1,\"IfDirections\":[1,0,1],\"Flags\":[\"ACK\",\"SYN_ACK\"],\"PktDropPackets\":1,\"TLSGroup\":\"X25519\",\"SrcAddr\":\"10.129.0.17\",\"Proto\":6,\"DstK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"TLSCipherSuite\":\"TLS_AES_128_GCM_SHA256\",\"DstK8S_HostIP\":\"10.0.1.132\",\"SrcMac\":\"0a:58:0a:81:00:11\",\"SrcK8S_HostIP\":\"10.0.1.132\",\"DstMac\":\"0a:58:0a:81:00:06\",\"DstPort\":52012,\"DstK8S_Name\":\"router-default-74c56bd696-jtvvt\",\"TimeFlowEndMs\":1786460076482,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\"}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "DstK8S_Namespace": "openshift-ingress",
+          "DstK8S_OwnerName": "router-default",
+          "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "2",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_Namespace": "openshift-console",
+          "SrcK8S_OwnerName": "console",
+          "SrcK8S_Type": "Pod",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786460077408000000",
+            "{\"DstAddr\":\"10.128.0.15\",\"Sampling\":1,\"SrcK8S_NetworkName\":\"primary\",\"IfDirections\":[1,0,1],\"Flags\":[\"ACK\"],\"Dscp\":0,\"DstK8S_HostIP\":\"10.0.1.92\",\"DstMac\":\"0a:58:0a:80:00:0f\",\"DstK8S_NetworkName\":\"primary\",\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"Etype\":2048,\"TimeFlowRttNs\":865000,\"AgentIP\":\"10.0.1.92\",\"PktDropLatestFlags\":16,\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"Bytes\":132,\"SrcSubnetLabel\":\"Pods\",\"DstSubnetLabel\":\"Pods\",\"TimeReceived\":1786460077,\"SrcK8S_Name\":\"console-68dc8d4f8d-p9nwg\",\"DstK8S_OwnerType\":\"Deployment\",\"SrcK8S_OwnerType\":\"Deployment\",\"SrcMac\":\"0a:58:0a:80:00:35\",\"Interfaces\":[\"eth0\",\"7f2a19d70af0e02\",\"084203f494d3630\"],\"SrcAddr\":\"10.128.0.53\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_ACK_UNSENT_DATA\",\"SrcK8S_HostIP\":\"10.0.1.92\",\"DstK8S_Name\":\"router-default-74c56bd696-qtgxw\",\"SrcPort\":8443,\"TimeFlowStartMs\":1786460077408,\"TimeFlowEndMs\":1786460077408,\"PktDropBytes\":32,\"DstPort\":50480,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"PktDropPackets\":1,\"Proto\":6,\"Packets\":2,\"Udns\":[\"\",\"default\",\"default\"]}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "DstK8S_Namespace": "openshift-ingress",
+          "DstK8S_OwnerName": "router-default",
+          "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "0",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_Namespace": "openshift-monitoring",
+          "SrcK8S_OwnerName": "prometheus-k8s",
+          "SrcK8S_Type": "Pod",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786460077219000064",
+            "{\"AgentIP\":\"10.0.1.92\",\"Interfaces\":[\"genev_sys_6081\",\"084203f494d3630\",\"eth0\"],\"Bytes\":2934,\"Proto\":6,\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"Etype\":2048,\"DstSubnetLabel\":\"Pods\",\"SrcMac\":\"0a:58:64:58:00:03\",\"PktDropBytes\":176,\"DstPort\":36142,\"SrcK8S_NetworkName\":\"primary\",\"TLSCipherSuite\":\"TLS_AES_128_GCM_SHA256\",\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DstK8S_Name\":\"router-default-74c56bd696-qtgxw\",\"TLSVersion\":\"TLS 1.3\",\"PktDropPackets\":1,\"DstK8S_NetworkName\":\"primary\",\"SrcAddr\":\"10.129.0.21\",\"TimeFlowEndMs\":1786460077219,\"DstK8S_OwnerType\":\"Deployment\",\"Dscp\":0,\"TLSGroup\":\"X25519\",\"TimeFlowRttNs\":311000,\"SrcPort\":9091,\"Packets\":4,\"TimeFlowStartMs\":1786460077215,\"SrcSubnetLabel\":\"Pods\",\"Udns\":[\"\",\"default\",\"\"],\"SrcK8S_HostName\":\"ip-10-0-1-132.ec2.internal\",\"PktDropLatestFlags\":16,\"SrcK8S_OwnerType\":\"StatefulSet\",\"SrcK8S_HostIP\":\"10.0.1.132\",\"DstAddr\":\"10.128.0.15\",\"SrcK8S_Name\":\"prometheus-k8s-0\",\"Flags\":[\"ACK\",\"SYN_ACK\"],\"Sampling\":1,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_NO_SOCKET\",\"TimeReceived\":1786460077,\"IfDirections\":[0,1,0],\"DstMac\":\"0a:58:64:58:00:02\",\"DstK8S_HostIP\":\"10.0.1.92\",\"TLSTypes\":[\"ServerHello\",\"AppData\"]}"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "DstK8S_Namespace": "openshift-console",
+          "DstK8S_OwnerName": "console",
+          "DstK8S_Type": "Pod",
+          "DstK8S_Zone": "us-east-1d",
+          "FlowDirection": "2",
+          "K8S_FlowLayer": "infra",
+          "SrcK8S_OwnerName": "ip-10-0-1-92.ec2.internal",
+          "SrcK8S_Type": "Node",
+          "SrcK8S_Zone": "us-east-1d",
+          "app": "netobserv-flowcollector",
+          "detected_level": "unknown",
+          "service_name": "netobserv-flowcollector"
+        },
+        "values": [
+          [
+            "1786460077318000128",
+            "{\"Etype\":2048,\"DstAddr\":\"10.128.0.53\",\"DstPort\":8443,\"TimeFlowEndMs\":1786460077318,\"PktDropBytes\":56,\"SrcK8S_NetworkName\":\"primary\",\"Sampling\":1,\"SrcK8S_HostIP\":\"10.0.1.92\",\"DstK8S_HostIP\":\"10.0.1.92\",\"Proto\":6,\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"DstSubnetLabel\":\"Pods\",\"DstMac\":\"0a:58:0a:80:00:35\",\"DstK8S_NetworkName\":\"primary\",\"IfDirections\":[1,1],\"PktDropLatestFlags\":16,\"Packets\":7,\"DstK8S_Name\":\"console-68dc8d4f8d-p9nwg\",\"Dscp\":0,\"SrcAddr\":\"10.128.0.2\",\"SrcSubnetLabel\":\"Pods\",\"TLSVersion\":\"TLS 1.3\",\"SrcK8S_Name\":\"ip-10-0-1-92.ec2.internal\",\"DstK8S_OwnerType\":\"Deployment\",\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"Interfaces\":[\"ovn-k8s-mp0\",\"7f2a19d70af0e02\"],\"TimeFlowRttNs\":58000,\"AgentIP\":\"10.0.1.92\",\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_OVERWINDOW\",\"TLSTypes\":[\"ClientHello\",\"ChangeCipher\",\"AppData\"],\"SrcMac\":\"0a:58:0a:80:00:02\",\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"SrcK8S_OwnerType\":\"Node\",\"TimeFlowStartMs\":1786460077314,\"PktDropPackets\":1,\"Flags\":[\"SYN\",\"ACK\"],\"Bytes\":2186,\"TimeReceived\":1786460077,\"SrcPort\":58986,\"Udns\":[\"\",\"default\"]}"
+          ],
+          [
+            "1786460077139000064",
+            "{\"SrcAddr\":\"10.128.0.2\",\"Sampling\":1,\"SrcPort\":58972,\"TimeFlowRttNs\":87000,\"DstPort\":8443,\"Dscp\":0,\"PktDropPackets\":1,\"SrcK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"SrcK8S_NetworkName\":\"primary\",\"Udns\":[\"\",\"default\"],\"SrcK8S_Name\":\"ip-10-0-1-92.ec2.internal\",\"DstK8S_Name\":\"console-68dc8d4f8d-p9nwg\",\"Packets\":7,\"Flags\":[\"SYN\",\"ACK\"],\"PktDropLatestState\":\"TCP_INVALID_STATE\",\"Etype\":2048,\"DstK8S_OwnerType\":\"Deployment\",\"TimeFlowEndMs\":1786460077139,\"DstK8S_HostName\":\"ip-10-0-1-92.ec2.internal\",\"PktDropBytes\":56,\"DstK8S_HostIP\":\"10.0.1.92\",\"Bytes\":2186,\"Proto\":6,\"SrcMac\":\"0a:58:0a:80:00:02\",\"DstSubnetLabel\":\"Pods\",\"PktDropLatestFlags\":16,\"SrcK8S_OwnerType\":\"Node\",\"DstK8S_NetworkName\":\"primary\",\"DstMac\":\"0a:58:0a:80:00:35\",\"IfDirections\":[1,1],\"AgentIP\":\"10.0.1.92\",\"SrcK8S_HostIP\":\"10.0.1.92\",\"Interfaces\":[\"ovn-k8s-mp0\",\"7f2a19d70af0e02\"],\"TLSTypes\":[\"ClientHello\",\"ChangeCipher\",\"AppData\"],\"SrcSubnetLabel\":\"Pods\",\"DstAddr\":\"10.128.0.53\",\"TimeFlowStartMs\":1786460077136,\"PktDropLatestDropCause\":\"SKB_DROP_REASON_TCP_OVERWINDOW\",\"TimeReceived\":1786460077,\"TLSVersion\":\"TLS 1.3\"}"
           ]
         ]
       }
     ],
     "stats": {
       "summary": {
-        "bytesProcessedPerSecond": 145594513,
-        "linesProcessedPerSecond": 228843,
-        "totalBytesProcessed": 20993908,
-        "totalLinesProcessed": 32998,
-        "execTime": 0.144194,
-        "queueTime": 0.330112,
+        "bytesProcessedPerSecond": 109427224,
+        "linesProcessedPerSecond": 124698,
+        "totalBytesProcessed": 8164610,
+        "totalLinesProcessed": 9304,
+        "execTime": 0.074612,
+        "queueTime": 0.012531,
         "subqueries": 0,
         "totalEntriesReturned": 50,
         "splits": 1,
-        "shards": 16,
-        "totalPostFilterLines": 691,
-        "totalStructuredMetadataBytesProcessed": 0
+        "shards": 1,
+        "totalPostFilterLines": 1145,
+        "totalStructuredMetadataBytesProcessed": 183156
       },
       "querier": {
         "store": {
           "totalChunksRef": 0,
           "totalChunksDownloaded": 0,
           "chunksDownloadTime": 0,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
             "headChunkBytes": 0,
             "headChunkLines": 0,
@@ -690,29 +828,36 @@
             "postFilterLines": 0,
             "headChunkStructuredMetadataBytes": 0,
             "decompressedStructuredMetadataBytes": 0
-          }
+          },
+          "chunkRefsFetchTime": 0,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "ingester": {
-        "totalReached": 16,
-        "totalChunksMatched": 485,
-        "totalBatches": 30,
-        "totalLinesSent": 383,
+        "totalReached": 1,
+        "totalChunksMatched": 422,
+        "totalBatches": 1,
+        "totalLinesSent": 50,
         "store": {
-          "totalChunksRef": 0,
-          "totalChunksDownloaded": 0,
-          "chunksDownloadTime": 0,
+          "totalChunksRef": 1,
+          "totalChunksDownloaded": 1,
+          "chunksDownloadTime": 338906,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
-            "headChunkBytes": 5873507,
-            "headChunkLines": 8736,
-            "decompressedBytes": 15120401,
-            "decompressedLines": 24262,
-            "compressedBytes": 3299192,
+            "headChunkBytes": 3925017,
+            "headChunkLines": 4362,
+            "decompressedBytes": 4239593,
+            "decompressedLines": 4942,
+            "compressedBytes": 860410,
             "totalDuplicates": 0,
-            "postFilterLines": 691,
-            "headChunkStructuredMetadataBytes": 0,
-            "decompressedStructuredMetadataBytes": 0
-          }
+            "postFilterLines": 1145,
+            "headChunkStructuredMetadataBytes": 34896,
+            "decompressedStructuredMetadataBytes": 148260
+          },
+          "chunkRefsFetchTime": 181470,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "cache": {
@@ -723,7 +868,8 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "index": {
           "entriesFound": 0,
@@ -732,16 +878,18 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "result": {
-          "entriesFound": 15,
-          "entriesRequested": 27,
-          "entriesStored": 0,
-          "bytesReceived": 1680,
+          "entriesFound": 0,
+          "entriesRequested": 55,
+          "entriesStored": 1,
+          "bytesReceived": 0,
           "bytesSent": 0,
-          "requests": 27,
-          "downloadTime": 208063
+          "requests": 56,
+          "downloadTime": 360813,
+          "queryLengthServed": 0
         },
         "statsResult": {
           "entriesFound": 0,
@@ -750,8 +898,55 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "volumeResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "seriesResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "labelResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "instantMetricResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
         }
+      },
+      "index": {
+        "totalChunks": 0,
+        "postFilterChunks": 0,
+        "shardsDuration": 0,
+        "usedBloomFilters": false
       }
     }
   }

@@ -5,392 +5,177 @@
     "result": [
       {
         "metric": {
-          "SrcK8S_NetworkName": "my-udn",
-          "DstK8S_NetworkName": "my-udn-2"
+          "DstK8S_NetworkName": "primary",
+          "SrcK8S_NetworkName": "primary"
         },
         "values": [
           [
-            1708009560,
-            "30.462500000000002"
+            1786459590,
+            "366865.9066666667"
           ],
           [
-            1708009920,
-            "83.63333333333333"
+            1786459620,
+            "835419.6733333333"
           ],
           [
-            1708010280,
-            "106.85972222222223"
+            1786459650,
+            "1247777.9633333334"
           ],
           [
-            1708010640,
-            "107.56805555555555"
+            1786459680,
+            "1651440.56"
           ],
           [
-            1708011000,
-            "106.51805555555556"
+            1786459710,
+            "2028417.7266666666"
           ],
           [
-            1708011360,
-            "109.6125"
+            1786459740,
+            "2409690.3566666665"
           ],
           [
-            1708011720,
-            "110.91944444444444"
+            1786459770,
+            "2785205.3833333333"
+          ],
+          [
+            1786459800,
+            "3169270.9766666666"
+          ],
+          [
+            1786459830,
+            "3542926.553333333"
+          ],
+          [
+            1786459860,
+            "3926019.3833333333"
+          ],
+          [
+            1786459890,
+            "3931667.2"
+          ],
+          [
+            1786459920,
+            "3844073.4066666667"
+          ],
+          [
+            1786459950,
+            "3801300.1666666665"
+          ],
+          [
+            1786459980,
+            "3776407.8566666665"
+          ],
+          [
+            1786460010,
+            "3769627.196666667"
+          ],
+          [
+            1786460040,
+            "3768694.6433333335"
+          ],
+          [
+            1786460070,
+            "3766307.433333333"
           ]
         ]
       },
       {
         "metric": {
-          "SrcK8S_NetworkName": "my-udn",
-          "DstK8S_NetworkName": "my-udn-2"
+          "SrcK8S_NetworkName": "primary"
         },
         "values": [
           [
-            1708009560,
-            "0.004166666666666667"
+            1786459590,
+            "27658.726666666666"
           ],
           [
-            1708009920,
-            "0.016666666666666666"
+            1786459620,
+            "130967.67"
           ],
           [
-            1708010280,
-            "0.034722222222222224"
+            1786459650,
+            "142898.13666666666"
           ],
           [
-            1708010640,
-            "0.041666666666666664"
+            1786459680,
+            "154219.57"
           ],
           [
-            1708011000,
-            "0.06388888888888888"
+            1786459710,
+            "159903.71"
           ],
           [
-            1708011360,
-            "0.04861111111111111"
+            1786459740,
+            "165326.18666666668"
           ],
           [
-            1708011720,
-            "0.02361111111111111"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "UdnId": "my-udn-3"
-        },
-        "values": [
-          [
-            1708009560,
-            "31.53055555555556"
+            1786459770,
+            "173083.3"
           ],
           [
-            1708009920,
-            "83.43611111111112"
+            1786459800,
+            "178973.90666666668"
           ],
           [
-            1708010280,
-            "104.72083333333335"
+            1786459830,
+            "184308.32333333333"
           ],
           [
-            1708010640,
-            "105.5486111111111"
+            1786459860,
+            "189846.99666666667"
           ],
           [
-            1708011000,
-            "104.40833333333333"
+            1786459890,
+            "167313.64666666667"
           ],
           [
-            1708011360,
-            "110.03055555555555"
+            1786459920,
+            "69876.87333333334"
           ],
           [
-            1708011720,
-            "110.98749999999998"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "UdnId": "my-udn-4"
-        },
-        "values": [
-          [
-            1708009560,
-            "0.09444444444444444"
+            1786459950,
+            "62828.34333333333"
           ],
           [
-            1708009920,
-            "0.3902777777777778"
+            1786459980,
+            "56268.53666666667"
           ],
           [
-            1708010280,
-            "0.4361111111111111"
+            1786460010,
+            "56800.95333333333"
           ],
           [
-            1708010640,
-            "0.3138888888888889"
+            1786460040,
+            "57727.60333333333"
           ],
           [
-            1708011000,
-            "0.4388888888888889"
-          ],
-          [
-            1708011360,
-            "0.5305555555555554"
-          ],
-          [
-            1708011720,
-            "0.5791666666666667"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "UdnId": "my-udn-5"
-        },
-        "values": [
-          [
-            1708009560,
-            "28.173611111111114"
-          ],
-          [
-            1708009920,
-            "69.80277777777779"
-          ],
-          [
-            1708010280,
-            "90.45694444444445"
-          ],
-          [
-            1708010640,
-            "98.41944444444445"
-          ],
-          [
-            1708011000,
-            "90.15416666666668"
-          ],
-          [
-            1708011360,
-            "111.44027777777778"
-          ],
-          [
-            1708011720,
-            "113.11527777777778"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "UdnId": "my-udn-6"
-        },
-        "values": [
-          [
-            1708009560,
-            "57.96527777777777"
-          ],
-          [
-            1708009920,
-            "134.44583333333335"
-          ],
-          [
-            1708010280,
-            "147.5902777777778"
-          ],
-          [
-            1708010640,
-            "162.97222222222226"
-          ],
-          [
-            1708011000,
-            "162.59444444444446"
-          ],
-          [
-            1708011360,
-            "175.71666666666664"
-          ],
-          [
-            1708011720,
-            "179.0402777777778"
-          ]
-        ]
-      },
-      {
-        "metric": {},
-        "values": [
-          [
-            1708009560,
-            "1.0333333333333334"
-          ],
-          [
-            1708009920,
-            "2.9722222222222223"
-          ],
-          [
-            1708010280,
-            "3.791666666666667"
-          ],
-          [
-            1708010640,
-            "3.6625"
-          ],
-          [
-            1708011000,
-            "3.808333333333333"
-          ],
-          [
-            1708011360,
-            "3.8805555555555555"
-          ],
-          [
-            1708011720,
-            "3.863888888888889"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstK8S_NetworkName": "production-network",
-          "DstK8S_Type": "UserDefinedNetwork",
-          "SrcAddr": "10.128.0.90",
-          "SrcK8S_Name": "app-pod-1",
-          "SrcK8S_Namespace": "production",
-          "SrcK8S_OwnerName": "app-deployment",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "75.3"
-          ],
-          [
-            1708009920,
-            "82.7"
-          ],
-          [
-            1708010280,
-            "88.1"
-          ],
-          [
-            1708010640,
-            "92.5"
-          ],
-          [
-            1708011000,
-            "89.8"
-          ],
-          [
-            1708011360,
-            "95.2"
-          ],
-          [
-            1708011720,
-            "98.7"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstK8S_NetworkName": "development-network",
-          "DstK8S_Type": "UserDefinedNetwork",
-          "SrcK8S_NetworkName": "production-network",
-          "SrcK8S_Type": "UserDefinedNetwork"
-        },
-        "values": [
-          [
-            1708009560,
-            "35.2"
-          ],
-          [
-            1708009920,
-            "38.9"
-          ],
-          [
-            1708010280,
-            "42.1"
-          ],
-          [
-            1708010640,
-            "44.8"
-          ],
-          [
-            1708011000,
-            "43.5"
-          ],
-          [
-            1708011360,
-            "46.2"
-          ],
-          [
-            1708011720,
-            "48.7"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstK8S_NetworkName": "cluster-network",
-          "DstK8S_Type": "ClusterUserDefinedNetwork",
-          "SrcAddr": "10.128.0.100",
-          "SrcK8S_Name": "cluster-pod",
-          "SrcK8S_Namespace": "kube-system",
-          "SrcK8S_OwnerName": "cluster-deployment",
-          "SrcK8S_OwnerType": "Deployment",
-          "SrcK8S_Type": "Pod"
-        },
-        "values": [
-          [
-            1708009560,
-            "55.8"
-          ],
-          [
-            1708009920,
-            "62.3"
-          ],
-          [
-            1708010280,
-            "68.1"
-          ],
-          [
-            1708010640,
-            "71.5"
-          ],
-          [
-            1708011000,
-            "69.8"
-          ],
-          [
-            1708011360,
-            "74.2"
-          ],
-          [
-            1708011720,
-            "77.9"
+            1786460070,
+            "56579.82666666667"
           ]
         ]
       }
     ],
     "stats": {
       "summary": {
-        "bytesProcessedPerSecond": 328874222,
-        "linesProcessedPerSecond": 500497,
-        "totalBytesProcessed": 211370848,
-        "totalLinesProcessed": 321675,
-        "execTime": 0.642710294,
-        "queueTime": 8.042418995,
+        "bytesProcessedPerSecond": 162343238,
+        "linesProcessedPerSecond": 171696,
+        "totalBytesProcessed": 58469421,
+        "totalLinesProcessed": 61838,
+        "execTime": 0.360159262,
+        "queueTime": 0.064990096,
         "subqueries": 0,
-        "totalEntriesReturned": 10,
-        "splits": 6,
-        "shards": 48,
-        "totalPostFilterLines": 199944,
-        "totalStructuredMetadataBytesProcessed": 0
+        "totalEntriesReturned": 2,
+        "splits": 13,
+        "shards": 13,
+        "totalPostFilterLines": 61698,
+        "totalStructuredMetadataBytesProcessed": 1509916
       },
       "querier": {
         "store": {
           "totalChunksRef": 0,
           "totalChunksDownloaded": 0,
           "chunksDownloadTime": 0,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
             "headChunkBytes": 0,
             "headChunkLines": 0,
@@ -401,29 +186,36 @@
             "postFilterLines": 0,
             "headChunkStructuredMetadataBytes": 0,
             "decompressedStructuredMetadataBytes": 0
-          }
+          },
+          "chunkRefsFetchTime": 0,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "ingester": {
-        "totalReached": 48,
-        "totalChunksMatched": 375,
-        "totalBatches": 394,
-        "totalLinesSent": 168379,
+        "totalReached": 13,
+        "totalChunksMatched": 331,
+        "totalBatches": 119,
+        "totalLinesSent": 53599,
         "store": {
-          "totalChunksRef": 16,
-          "totalChunksDownloaded": 16,
-          "chunksDownloadTime": 13901153,
+          "totalChunksRef": 4,
+          "totalChunksDownloaded": 4,
+          "chunksDownloadTime": 764020,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
-            "headChunkBytes": 18864260,
-            "headChunkLines": 28785,
-            "decompressedBytes": 192506588,
-            "decompressedLines": 292890,
-            "compressedBytes": 43190086,
-            "totalDuplicates": 0,
-            "postFilterLines": 199944,
-            "headChunkStructuredMetadataBytes": 0,
-            "decompressedStructuredMetadataBytes": 0
-          }
+            "headChunkBytes": 15349694,
+            "headChunkLines": 15692,
+            "decompressedBytes": 43119727,
+            "decompressedLines": 46146,
+            "compressedBytes": 9038744,
+            "totalDuplicates": 8050,
+            "postFilterLines": 61698,
+            "headChunkStructuredMetadataBytes": 125536,
+            "decompressedStructuredMetadataBytes": 1384380
+          },
+          "chunkRefsFetchTime": 1062713,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "cache": {
@@ -434,7 +226,8 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "index": {
           "entriesFound": 0,
@@ -443,26 +236,75 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "result": {
-          "entriesFound": 4,
-          "entriesRequested": 6,
-          "entriesStored": 3,
-          "bytesReceived": 3008,
+          "entriesFound": 0,
+          "entriesRequested": 12,
+          "entriesStored": 12,
+          "bytesReceived": 0,
           "bytesSent": 0,
-          "requests": 9,
-          "downloadTime": 59230
+          "requests": 24,
+          "downloadTime": 290033,
+          "queryLengthServed": 0
         },
         "statsResult": {
+          "entriesFound": 11,
+          "entriesRequested": 11,
+          "entriesStored": 9,
+          "bytesReceived": 2893,
+          "bytesSent": 0,
+          "requests": 20,
+          "downloadTime": 72130,
+          "queryLengthServed": 1680000000000
+        },
+        "volumeResult": {
           "entriesFound": 0,
           "entriesRequested": 0,
           "entriesStored": 0,
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "seriesResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "labelResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "instantMetricResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
         }
+      },
+      "index": {
+        "totalChunks": 0,
+        "postFilterChunks": 0,
+        "shardsDuration": 0,
+        "usedBloomFilters": false
       }
     }
   }
