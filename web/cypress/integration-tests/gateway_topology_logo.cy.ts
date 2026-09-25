@@ -1,4 +1,4 @@
-import { netflowPage, topologyPage, topologySelectors } from "@views/netflow-page"
+import { topologyPage, topologySelectors } from "@views/netflow-page"
 import { Operator } from "@views/netobserv"
 import { verifyResourceSVGLogo } from "@views/netobserv-logo"
 import { catalogSources } from "@views/catalog-source"
@@ -31,12 +31,10 @@ describe("(OCP-87215) Gateway API owner metadata", { tags: ['Network_Observabili
 
                 cy.adminCLI('oc apply -f cypress/fixtures/gateway-api.yaml')
 
-                // Wait for pods to be created
-                cy.wait(10000)
-
                 // Wait for pods to be ready
-                cy.adminCLI('oc wait --for=condition=Ready pod -l app=traffic-generator -n netobserv-gateway-test --timeout=120s')
-                cy.adminCLI('oc wait --for=condition=Ready pod -l app=echo-server -n netobserv-gateway-test --timeout=120s')
+                cy.wait(5000)
+                cy.adminCLI('oc wait --for=condition=Ready pod -l app=traffic-generator -n netobserv-gateway-test --timeout=120s', { timeout: 140000 })
+                cy.adminCLI('oc wait --for=condition=Ready pod -l app=echo-server -n netobserv-gateway-test --timeout=120s', { timeout: 140000 })
             }
         })
     })
@@ -57,7 +55,10 @@ describe("(OCP-87215) Gateway API owner metadata", { tags: ['Network_Observabili
     })
 
     afterEach("test", function () {
-        netflowPage.clearAllFilters()
+        // Unmount topology before resetting filters: clearing the namespace on this
+        // page renders the whole cluster graph and can stall the Cypress runner.
+        cy.visit('/')
+        cy.clearNetobservLocalStorage()
     })
 
     after("all tests", function () {
@@ -67,7 +68,7 @@ describe("(OCP-87215) Gateway API owner metadata", { tags: ['Network_Observabili
             return
         }
 
-        cy.adminCLI('oc delete -f cypress/fixtures/gateway-api.yaml --ignore-not-found')
+        cy.adminCLI('oc delete -f cypress/fixtures/gateway-api.yaml --ignore-not-found', { failOnNonZeroExit: false, timeout: 120000 })
         Operator.deleteFlowCollector()
         cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
     })

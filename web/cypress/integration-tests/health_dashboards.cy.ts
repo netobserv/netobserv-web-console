@@ -52,7 +52,6 @@ describe('Network_Observability health dashboards tests', { tags: ['Network_Obse
     it('(OCP-61893, memodi), should have health dashboards', function () {
         // navigate to 'NetObserv / Health' Dashboard page
         // all health panels are visible with default metrics
-        dashboard.visit()
         dashboard.visitDashboard("grafana-dashboard-netobserv-health")
 
         // verify that 'Flows per second', 'Sampling', 'Errors last minute' and 'Dropped flows per second' panels exist and are populated
@@ -64,6 +63,8 @@ describe('Network_Observability health dashboards tests', { tags: ['Network_Obse
         cy.get(dashboardSelectors.flowStatsToggle).should('exist').click()
         cy.get(dashboardSelectors.ebpfStatsToggle).should('exist').click()
         cy.get('#content-scrollable').scrollTo('bottom')
+        // Accordion panels mount lazily after expand; wait for the first eBPF card.
+        cy.get(`[data-test="${eBPFPanels[0]}"]`, { timeout: 120000 }).should('exist')
         cy.wait(1000)
 
         // verify that 'Eviction rate', 'Evicted flows rate', 'Dropped flows rate', 'Ringbuffer / HashMap ratio', 'Buffer size' and 'Errors per minute' panels exist and are populated

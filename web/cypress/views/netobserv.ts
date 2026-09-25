@@ -96,16 +96,17 @@ export const Operator = {
         }
 
         // Check operator status via CLI
-        cy.adminCLI('oc get csv -n openshift-netobserv-operator --no-headers -o custom-columns=":metadata.name" 2>/dev/null || echo "NotFound"')
+        cy.adminCLI('oc get csv -n openshift-netobserv-operator --no-headers -o custom-columns=":metadata.name"',
+            { failOnNonZeroExit: false })
             .then((result: any) => {
                 const stdout = result.stdout ? result.stdout.trim() : ''
                 const csvName = stdout.split('\n').find((line: string) =>
                     line.includes('netobserv-operator') || line.includes('network-observability-operator')
                 )
 
-                if (csvName && !stdout.includes('NotFound') && !stdout.includes('No resources found')) {
+                if (csvName) {
                     // CSV exists, check if it's in Succeeded state
-                    cy.adminCLI(`oc wait csv ${csvName.trim()} -n openshift-netobserv-operator --for=jsonpath='{.status.phase}'=Succeeded --timeout=120s`)
+                    cy.adminCLI(`oc wait csv ${csvName.trim()} -n openshift-netobserv-operator --for=jsonpath='{.status.phase}'=Succeeded --timeout=120s`, { timeout: 140000 })
                         .then(() => {
                             cy.log('NetObserv Operator already installed')
                         })
@@ -123,19 +124,39 @@ export const Operator = {
             })
     },
     visitFlowcollector: () => {
-        cy.adminCLI('oc get csv -n openshift-netobserv-operator --no-headers -o custom-columns=":metadata.name" 2>/dev/null || echo "NotFound"')
+        cy.adminCLI('oc get csv -n openshift-netobserv-operator --no-headers -o custom-columns=":metadata.name"',
+            { failOnNonZeroExit: false })
             .then((result: any) => {
                 const stdout = result.stdout ? result.stdout.trim() : ''
                 const csvName = stdout.split('\n').find((line: string) =>
                     line.includes('netobserv-operator') || line.includes('network-observability-operator')
                 )
 
-                if (csvName && !stdout.includes('NotFound') && !stdout.includes('No resources found')) {
-                    cy.visit(`/k8s/ns/openshift-netobserv-operator/operators.coreos.com~v1alpha1~ClusterServiceVersion/${csvName.trim()}/flows.netobserv.io~v1beta2~FlowCollector`)
-                    cy.get('div.loading-box__loaded', { timeout: 30000 }).should('exist')
-                } else {
-                    throw new Error('NetObserv CSV not found')
+                if (!csvName) {
+                    throw new Error(`NetObserv CSV not found. oc get csv stdout: ${stdout}`)
                 }
+                const csvUrl = `/k8s/ns/openshift-netobserv-operator/operators.coreos.com~v1alpha1~ClusterServiceVersion/${csvName.trim()}/flows.netobserv.io~v1beta2~FlowCollector`
+                const ensureLoaded = (retries = 3): void => {
+                    cy.visit(csvUrl)
+                    // Wait for any page to finish loading (cluster overview
+                    // also has loading-box__loaded, so we check URL after).
+                    cy.get('div.loading-box__loaded', { timeout: 120000 }).should('exist')
+                    cy.url().then(url => {
+                        if (!url.includes('FlowCollector')) {
+                            if (retries > 0) {
+                                cy.log(`Console redirected away from FlowCollector page (${retries} retries left). URL: ${url}`)
+                                cy.wait(10000)
+                                ensureLoaded(retries - 1)
+                            } else {
+                                throw new Error(
+                                    `Console keeps redirecting away from FlowCollector page. ` +
+                                    `Expected URL containing 'FlowCollector', got: ${url}`
+                                )
+                            }
+                        }
+                    })
+                }
+                ensureLoaded()
             })
     },
     createFlowcollector: (parameters?: FlowCollectorParameter) => {
@@ -145,6 +166,13 @@ export const Operator = {
         cy.get("#yaml-create").should('exist').then(() => {
             if ((Cypress.$('td[role="gridcell"]').length > 0) && (parameters != null)) {
                 Operator.deleteFlowCollector()
+                // Wait for old Loki resources to be cleaned up before creating new FC.
+                // Without this, the operator may struggle to recreate Loki resources
+                // because the old PVC is still being finalized (can take up to 6 min on AWS EBS).
+                cy.adminCLI(
+                    `oc wait --for=delete deployment/loki -n ${project} --timeout=120s`,
+                    { failOnNonZeroExit: false, timeout: 140000 }
+                )
                 // come back to flowcollector tab after deletion
                 Operator.visitFlowcollector()
             }
@@ -217,8 +245,65 @@ export const Operator = {
                     cy.log("Console refreshed successfully")
                 }
                 if (parameters !== "LokiDisabled" && parameters !== "WithLokiStack") {
-                    cy.adminCLI(`oc wait --for=condition=Ready pod -l app=loki -n ${project} --timeout=180s`)
+                    // Ensure FlowCollector exists before polling pods (UI Submit is async).
+                    const waitForFlowCollector = (attempt = 0): void => {
+                        const maxAttempts = 24
+                        cy.adminCLI(`oc get flowcollector cluster -o name`, {
+                            failOnNonZeroExit: false
+                        }).then((result: Cypress.Exec) => {
+                            if (result.stdout?.trim()) {
+                                return
+                            }
+                            if (attempt < maxAttempts) {
+                                cy.wait(5000)
+                                waitForFlowCollector(attempt + 1)
+                            } else {
+                                throw new Error(
+                                    `Timed out waiting for flowcollector/cluster ` +
+                                        `(exitCode=${result.exitCode} stderr=${result.stderr?.trim() || '(empty)'})`
+                                )
+                            }
+                        })
+                    }
+                    waitForFlowCollector()
+                    // Demo Loki pods are created async after FlowCollector apply; waiting
+                    // immediately yields "no matching resources".
+                    const waitForLokiPods = (attempt = 0): void => {
+                        // ~10 min: PVC provisioning on AWS EBS + operator reconcile can
+                        // take much longer when Loki resources are recreated from scratch
+                        // (e.g. after FC delete + wizard-based re-create in StaticPlugin)
+                        const maxAttempts = 120
+                        cy.adminCLI(`oc get pods -l app=loki -n ${project} -o name`, {
+                            failOnNonZeroExit: false
+                        }).then((result: Cypress.Exec) => {
+                            const stdout = result.stdout?.trim() || ''
+                            if (stdout.length > 0) {
+                                cy.adminCLI(
+                                    `oc wait --for=condition=Ready pod -l app=loki -n ${project} --timeout=180s`,
+                                    { timeout: 200000 }
+                                )
+                            } else if (attempt < maxAttempts) {
+                                cy.wait(5000)
+                                waitForLokiPods(attempt + 1)
+                            } else {
+                                // Dump Loki deployment state for diagnostics
+                                cy.adminCLI(
+                                    `oc get deployment,pvc,pods -l app=loki -n ${project} -o wide`,
+                                    { failOnNonZeroExit: false, timeout: 30000 }
+                                ).then((diag: Cypress.Exec) => {
+                                    throw new Error(
+                                        `Timed out waiting for Loki pods (app=loki) in ${project} after ${maxAttempts} attempts. ` +
+                                        `Loki resources: ${(diag.stdout || '(empty)').substring(0, 500)}. ` +
+                                        `Check gather-extra artifacts for operator logs and pod state.`
+                                    )
+                                })
+                            }
+                        })
+                    }
+                    waitForLokiPods()
                 }
+
+                // Check FlowCollector status and wait for all components to be Ready
                 if (parameters !== "WithLokiStack") {
                     Operator.visitFlowcollector()
                     cy.byTestID('status-text', { timeout: 120000 }).should('exist').should('contain.text', 'Ready')
@@ -227,9 +312,80 @@ export const Operator = {
                     cy.contains('tr', 'cluster').within(() => {
                         cy.byTestID('status-text', { timeout: 60000 }).should('contain.text', 'Ready')
                     })
-                    cy.adminCLI(`oc wait --for=condition=Ready pod -l app=netobserv-plugin -n ${project} --timeout=180s`)
+                    cy.adminCLI(`oc wait --for=condition=Ready pod -l app=netobserv-plugin -n ${project} --timeout=180s`, { timeout: 200000 })
+
+                    // Wait for eBPF agent and FLP pods to be running.
+                    // FC "Ready" means the operator reconciled, but pods may
+                    // still be starting (DaemonSet rolling out on each node, etc.).
+                    // FLP can be a Deployment (Service/Kafka model) or DaemonSet (Direct model),
+                    // so we wait on pods rather than a specific resource type.
+                    // The eBPF agent DaemonSet is deployed by the operator in the
+                    // privileged namespace (`<namespace>-privileged`), not in the main
+                    // FlowCollector namespace.
+                    cy.adminCLI(
+                        `oc wait --for=condition=Ready pod -l app=netobserv-ebpf-agent -n ${project}-privileged --timeout=180s`,
+                        { failOnNonZeroExit: false, timeout: 200000 }
+                    )
+                    cy.adminCLI(
+                        `oc wait --for=condition=Ready pod -l app=flowlogs-pipeline -n ${project} --timeout=180s`,
+                        { failOnNonZeroExit: false, timeout: 200000 }
+                    )
+
+                    // Wait for the operator to reconcile the frontend ConfigMap
+                    // with the expected eBPF features. Without this, the plugin page
+                    // loads with a stale config and shows wrong/missing panels.
+                    const featureMap: Record<string, string> = {
+                        FlowRTT: 'flowRTT',
+                        DNSTracking: 'dnsTracking',
+                        PacketDrop: 'pktDrop',
+                        TLSTracking: 'tlsTracking',
+                        UDNMapping: 'udnMapping',
+                        NetworkAlertHealth: 'dnsTracking'
+                    }
+                    const expectedFeature = featureMap[parameters || '']
+                    if (expectedFeature) {
+                        const waitForConfig = (attempt = 0): void => {
+                            const maxAttempts = 60
+                            cy.adminCLI(
+                                `oc get configmap console-plugin-config -n ${project} -o jsonpath='{.data.config\\.yaml}'`,
+                                { failOnNonZeroExit: false }
+                            ).then((result: Cypress.Exec) => {
+                                const config = result.stdout || ''
+                                const hasFeature = new RegExp(`^\\s*-\\s+${expectedFeature}\\s*$`, 'm').test(config)
+                                cy.log(`ConfigMap features '${expectedFeature}': ${hasFeature} (attempt ${attempt + 1}/${maxAttempts})`)
+                                if (hasFeature) {
+                                    return
+                                }
+                                if (attempt < maxAttempts) {
+                                    cy.wait(5000)
+                                    waitForConfig(attempt + 1)
+                                } else {
+                                    const featuresMatch = config.match(/features:[\s\S]*?(?=\n\s*[a-z]|\n$|$)/)
+                                    cy.log(
+                                        `WARNING: ConfigMap features list missing '${expectedFeature}' after ${maxAttempts} attempts. ` +
+                                        `Actual features section: ${featuresMatch?.[0]?.trim() || '(empty or not found)'}. ` +
+                                        `Proceeding anyway — checkPanel reload-retry may still recover.`
+                                    )
+                                }
+                            })
+                        }
+                        waitForConfig()
+                    }
+
+                    // Restart the plugin deployment to ensure pods mount the
+                    // updated ConfigMap. The ConfigMap volume mount can lag the
+                    // API object by 60-120s (kubelet sync). Without a restart the
+                    // pod may serve stale config missing the expected feature.
+                    cy.adminCLI(
+                        `oc rollout restart deployment/netobserv-plugin -n ${project}`,
+                        { failOnNonZeroExit: false, timeout: 60000 }
+                    )
+                    cy.adminCLI(
+                        `oc rollout status deployment/netobserv-plugin -n ${project} --timeout=180s`,
+                        { failOnNonZeroExit: false, timeout: 200000 }
+                    )
+
                     // Force reload to ensure console picks up the new ConsolePlugin
-                    // (the copy-login-commands intercept may have caught a delete-triggered reload)
                     cy.reload(true)
                 }
             }
@@ -240,19 +396,126 @@ export const Operator = {
         // Overview tab
         cy.get(pluginSelectors.next).should('exist').click()
         // Processing tab
-        cy.get(pluginSelectors.privilegedToggle).should('exist').click({ force: true })
+        cy.get(pluginSelectors.privilegedToggle).should('exist').check({ force: true })
         // Enable PacketDrop
         cy.get(pluginSelectors.packetDropEnable).should('exist').check()
         cy.get(pluginSelectors.next).should('exist').click()
-        // Loki tab
-        cy.get(pluginSelectors.lokiMode).should('exist').click().then(mode => {
-            cy.get(pluginSelectors.monolithicMode).should('exist').click()
-        })
-        // Install demoLoki
-        cy.get(pluginSelectors.installDemoLoki).should('exist').click({ force: true })
+        // Loki tab — select Monolithic mode, then enable demo Loki.
+        // PF6 Dropdown + Popper can race between menu positioning and click dispatch,
+        // causing the onSelect to silently not fire. Verify the toggle text and retry.
+        const selectMonolithic = (retries = 3): void => {
+            cy.get(pluginSelectors.lokiMode).should('exist').click()
+            cy.get(pluginSelectors.monolithicMode).should('be.visible').click()
+            cy.get(pluginSelectors.lokiMode).then($toggle => {
+                if (!$toggle.text().includes('Monolithic')) {
+                    if (retries > 0) {
+                        cy.log(`Monolithic mode selection did not register, retrying (${retries} retries left)`)
+                        cy.get('body').click(0, 0)
+                        cy.wait(500)
+                        selectMonolithic(retries - 1)
+                    } else {
+                        throw new Error(
+                            `Failed to select Monolithic mode. Toggle text: '${$toggle.text()}'`
+                        )
+                    }
+                }
+            })
+        }
+        selectMonolithic()
+        // Enable demo Loki. The switch is a *controlled* component bound to the wizard's
+        // form data (SwitchWidget renders isChecked={value}), so if React's onChange does
+        // not persist the toggle, the DOM switch is reset to unchecked on the next render.
+        // That makes `be.checked` (when it stays checked) a reliable proxy for the value
+        // actually reaching the submitted data — unlike a blind check({force}) which can
+        // leave the DOM checked while the onChange was swallowed on a busy cluster render.
+        // Click only while unchecked (click toggles) and retry until the state sticks.
+        const enableDemoLoki = (retries = 4): void => {
+            cy.get(pluginSelectors.installDemoLoki).should('exist').then($el => {
+                if (!$el.is(':checked')) {
+                    cy.wrap($el).click({ force: true })
+                }
+            })
+            cy.get(pluginSelectors.installDemoLoki).then($el => {
+                if (!$el.is(':checked')) {
+                    if (retries > 0) {
+                        cy.log(`Demo Loki switch did not stick, retrying (${retries} retries left)`)
+                        cy.wait(500)
+                        enableDemoLoki(retries - 1)
+                    } else {
+                        throw new Error('Failed to enable demo Loki switch after retries')
+                    }
+                }
+            })
+        }
+        enableDemoLoki()
+        // Stabilize before leaving the Loki step: a controlled switch that is still checked
+        // after a beat means the value persisted into form data and will survive submit.
+        cy.get(pluginSelectors.installDemoLoki).should('be.checked')
+        cy.wait(500)
+        cy.get(pluginSelectors.installDemoLoki).should('be.checked')
         cy.get(pluginSelectors.next).should('exist').click()
-        // Consumption tab - final submit
-        cy.get('footer').contains('button', 'Submit').should('exist').click()
+        // Consumption tab — use text-based submit selector (more robust than ID)
+        cy.get('footer').contains('button', 'Submit').should('exist').click({ force: true })
+        // Verify submit by polling the API for the created FlowCollector, NOT by
+        // blindly re-clicking Submit. Re-clicking after the resource is already
+        // created races the wizard re-initialising its form data and overwrites the
+        // just-created config with wizard defaults (LokiStack, no demo Loki) — which
+        // is exactly what made installDemoLoki come back false. Only re-click while
+        // the resource genuinely does not exist yet (first click swallowed by the
+        // PF6 footer race).
+        const verifySubmit = (attempt = 0): void => {
+            const maxAttempts = 12 // ~60s at 5s/attempt
+            cy.adminCLI('oc get flowcollector cluster -o name', {
+                failOnNonZeroExit: false
+            }).then((result: Cypress.Exec) => {
+                if (result.stdout?.trim()) {
+                    cy.log('Wizard submit succeeded - FlowCollector created')
+                    return
+                }
+                // Not created yet — surface any wizard validation errors immediately
+                cy.get('body').then($body => {
+                    const errors = $body.find(
+                        '.pf-v6-c-alert__title, .pf-v6-c-helper-text__item-text.pf-m-error, ' +
+                        '.pf-v5-c-alert__title, .pf-v5-c-helper-text__item-text.pf-m-error'
+                    )
+                    if (errors.length > 0) {
+                        const errorTexts = [...errors].map(e => e.textContent).join('; ')
+                        throw new Error(`Wizard submit failed with errors: ${errorTexts}`)
+                    }
+                    if (attempt >= maxAttempts) {
+                        cy.screenshot('wizard-submit-failure')
+                        throw new Error(
+                            'Wizard submit did not create a FlowCollector and no errors shown. ' +
+                            'Check screenshot for wizard state.'
+                        )
+                    }
+                    // Only re-click while still on the wizard and the resource is absent.
+                    cy.url().then(url => {
+                        if (!url.includes('/status')) {
+                            cy.log(`Wizard submit pending (attempt ${attempt + 1}/${maxAttempts}) - retrying click`)
+                            cy.get('footer').contains('button', 'Submit').click({ force: true })
+                        }
+                    })
+                    cy.wait(5000)
+                    verifySubmit(attempt + 1)
+                })
+            })
+        }
+        cy.wait(3000)
+        verifySubmit()
+
+        // Verify the wizard-created FC actually has installDemoLoki enabled.
+        // If this fails, the wizard checkbox interaction above did not work.
+        cy.adminCLI(
+            'oc get flowcollector cluster -o jsonpath="{.spec.loki.monolithic.installDemoLoki}"',
+            { failOnNonZeroExit: false, timeout: 60000 }
+        ).then((result: Cypress.Exec) => {
+            const val = result.stdout?.replace(/"/g, '').trim() || ''
+            expect(val).to.equal('true',
+                'FlowCollector spec.loki.monolithic.installDemoLoki must be true. ' +
+                'The wizard installDemoLoki checkbox was not properly applied.'
+            )
+        })
     },
     deleteFlowCollector: () => {
         cy.adminCLI(`oc delete flowcollector cluster --ignore-not-found`)

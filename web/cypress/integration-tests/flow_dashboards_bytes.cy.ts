@@ -31,7 +31,6 @@ describe('Network_Observability flow dashboards tests', { tags: ['Network_Observ
 
     it("(OCP-63790, memodi), should have flow dashboards for bytes metrics", function () {
         // navigate to 'NetObserv / Main' Dashboard page
-        dashboard.visit()
         dashboard.visitDashboard("netobserv-main")
 
         // verify that overview panels panels exist and are populated

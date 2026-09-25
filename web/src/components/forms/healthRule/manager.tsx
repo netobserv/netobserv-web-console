@@ -50,7 +50,7 @@ const updateFlowCollectorWithRetry = async (
   model: K8sModel,
   seed: K8sResourceKind,
   transform: (fc: K8sResourceKind) => K8sResourceKind,
-  attempts = 3
+  attempts = 5
 ): Promise<void> => {
   let current = seed;
   for (let attempt = 0; attempt < attempts; attempt++) {
@@ -61,6 +61,7 @@ const updateFlowCollectorWithRetry = async (
       if (attempt === attempts - 1 || !isK8sConflictError(e)) {
         throw e;
       }
+      await new Promise(r => setTimeout(r, 1000));
       current = await k8sGet({ model, name: 'cluster' });
     }
   }

@@ -1,6 +1,5 @@
 import "@views/netobserv"
 import { Operator } from "@views/netobserv"
-import {wait} from "fork-ts-checker-webpack-plugin/lib/utils/async/wait";
 
 const VMI_NAMESPACE = "test-vm"
 const VMI_NAME = "test-vm"
@@ -87,17 +86,19 @@ describe('(OCP-90529) Network Traffic Tab on VMI Page', { tags: ['Network_Observ
             'Running',
             { retries: 30, interval: 20000 }
         )
-
-        // Wait for flows to be ingested into Loki by polling flow-collector logs
-        cy.adminCLI(`oc logs -n netobserv -l app=netobserv-plugin,component=flow-collector --tail=100 2>/dev/null | grep -i "packet\\|flow" || echo "waiting"`, { retries: 120, interval: 5000 })
-        cy.wait(180000)
+        cy.adminCLI(`oc wait --for=condition=Ready vmi/${VMI_NAME} -n ${VMI_NAMESPACE} --timeout=180s`, { timeout: 200000 })
 
     })
 
     it('(OCP-90529, kapjain) Navigate from Search to VMI and verify Network Traffic tab', function () {
         // Navigate to search page with VirtualMachineInstance resource pre-selected
-        const page = `/k8s/ns/${VMI_NAMESPACE}/kubevirt.io~v1~VirtualMachineInstance`
-        cy.visitNetflowTrafficTab(page)
+        const resource = 'kubevirt.io~v1~VirtualMachineInstance'
+        cy.visit(`/search/ns/${VMI_NAMESPACE}?kind=${resource}`)
+        // Select the named VMI; console resource lists can use virtualized rows.
+        cy.get(`a[href="/k8s/ns/${VMI_NAMESPACE}/${resource}/${VMI_NAME}"]`, { timeout: 60000 })
+            .should('be.visible').click()
+        cy.byLegacyTestID('horizontal-link-Network Traffic').should('be.visible').click()
+        cy.checkNetflowTraffic()
         // Verify filter with vm name
         cy.get('[data-test="filter-toolbar-chips"]', { timeout: 30000 }).should('contain', 'test-vm')
     })
@@ -131,7 +132,7 @@ describe('(OCP-90529) Network Traffic Tab on VMI Page', { tags: ['Network_Observ
         // Check if Network Traffic tab is present, scroll into view and click it
         cy.get('[data-test-id="horizontal-link-Network Traffic"]', { timeout: 60000 })
           .should('exist')
-          .scrollIntoView({ behavior: 'smooth', block: 'center' })
+          .scrollIntoView()
           .wait(1000)
           .click({ force: true })
         cy.checkNetflowTraffic()

@@ -39,11 +39,6 @@ Cypress.on('uncaught:exception', (err) => {
   return true; // test fails
 });
 
-Cypress.Commands.overwrite('log', (originalFn, message) => {
-  cy.task('log', `      ${message}`, { log: false });
-  originalFn(message);
-});
-
 const waitForElementToExist = (selector: string) =>
   cy.get(selector, { timeout: 30000 }).should('exist');
 

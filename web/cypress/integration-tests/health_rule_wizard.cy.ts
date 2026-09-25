@@ -167,6 +167,10 @@ describe('(OCP-90524) Network_Observability health rule wizard (write path)', { 
         // The override is written into FlowCollector.spec.processor.metrics.healthRules.
         waitForCLI(dnsErrorsMode, stdout => stdout.includes('Recording'))
 
+        // Let the operator finish reconciling after the override write so the
+        // upcoming reset doesn't race against a stale resourceVersion (409 Conflict).
+        cy.wait(10000)
+
         // Reset the template back to operator defaults via the manager.
         cy.visit('/network-health')
         cy.get(networkHealthSelectors.manageRulesButton, { timeout: 60000 }).click()
@@ -174,10 +178,12 @@ describe('(OCP-90524) Network_Observability health rule wizard (write path)', { 
 
         cy.get(`[data-test="template-health-rule-actions-${TEMPLATE}"]`, { timeout: 60000 })
             .find('button').first().click()
-        cy.contains('[role="menuitem"]', 'Reset to defaults').click()
+        cy.contains('[role="menuitem"]', 'Reset to defaults').should('be.visible').click()
         // Confirmation modal.
         cy.get('#health-rules-manager-confirm').should('be.visible')
         cy.contains('#health-rules-manager-confirm button', 'Reset to defaults').click()
+        // Verify the modal closes (success). If it stays open, the reset hit a conflict error.
+        cy.get('#health-rules-manager-confirm', { timeout: 30000 }).should('not.exist')
 
         // The override is removed from FlowCollector (DNSErrors is back to operator defaults).
         waitForCLI(dnsErrorsMode, stdout => !stdout.includes('Recording'))

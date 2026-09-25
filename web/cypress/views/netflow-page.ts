@@ -8,7 +8,7 @@ declare global {
             openColumnsModal(): Chainable<Element>
             selectAndVerifyColumns(columnSelectors: string[]): Chainable<Element>
             checkPopItems(id: string, names: string[]): Chainable<Element>
-            checkQuerySummary(metric: JQuery<HTMLElement>): Chainable<Element>
+            checkQuerySummary(selector: string, options?: Partial<Cypress.Timeoutable>): Chainable<Element>
             checkPerformance(page: string, loadTime: number, memoryUsage: number): Chainable<Element>
             changeQueryOption(name: string): Chainable<Element>
             visitNetflowTrafficTab(page: string): Chainable<Element>
@@ -39,21 +39,21 @@ export const netflowPage = {
         cy.clearNetobservLocalStorage()
         cy.visit('/netflow-traffic')
 
-        // Retry with reload if console shows 404 (plugin route not registered yet)
-        const waitForPlugin = (retries = 3): void => {
-            cy.wait(5000)
-            cy.get('body').then($body => {
-                if ($body.text().includes('Page Not Found') && retries > 0) {
-                    cy.log('Plugin page not ready, reloading')
-                    cy.wait(15000)
-                    cy.visit('/netflow-traffic')
-                    waitForPlugin(retries - 1)
-                }
-            })
-        }
-        waitForPlugin()
-
-        // Wait for the plugin page before touching filters
+        // Wait for the plugin page to render. On slow CI clusters the Console
+        // may redirect to a login/overview page or the plugin may not register
+        // in time. Retry with a fresh visit if needed.
+        cy.get('body').then($body => {
+            if ($body.find('#overview-container').length === 0) {
+                cy.wait(15000)
+                cy.get('body').then($body2 => {
+                    if ($body2.find('#overview-container').length === 0) {
+                        cy.log('overview-container not found after visit, retrying with fresh visit')
+                        cy.clearNetobservLocalStorage()
+                        cy.visit('/netflow-traffic')
+                    }
+                })
+            }
+        })
         cy.get('#overview-container', { timeout: 60000 }).should('exist')
         // Default filters apply async after frontend-config load; wait until filter
         // UI has settled (either active chips → clear-all, or none → set-default).
@@ -143,9 +143,56 @@ export const netflowPage = {
     waitForLokiQuery: () => {
         cy.get("#refresh-button > span > svg").invoke('attr', 'style').should('contain', '0s linear 0s')
     },
+    /**
+     * Refresh until Traffic flows table has at least minRows.
+     * Empty Loki results render `no-results-found` instead of `table-composable`.
+     */
+    waitForTableRows: (minRows = 1, options?: { attempts?: number; intervalMs?: number }) => {
+        const maxAttempts = options?.attempts ?? 36
+        const intervalMs = options?.intervalMs ?? 5000
+        const attempt = (remaining: number): void => {
+            cy.get('body').then($body => {
+                const $table = $body.find('[data-test="table-composable"]')
+                const rows = Number($table.attr('data-test-rows-count') || 0)
+                if ($table.length > 0 && rows >= minRows) {
+                    cy.byTestID('table-composable')
+                        .should('have.attr', 'data-test-rows-count')
+                        .and('satisfy', (v: string) => Number(v) >= minRows)
+                    return
+                }
+                if (remaining <= 0) {
+                    throw new Error(
+                        `Timed out waiting for table-composable with >= ${minRows} rows ` +
+                            `(found=${$table.length ? rows : 'no-results-found'})`
+                    )
+                }
+                cy.byTestID(genSelectors.refreshBtn).click({ force: true })
+                netflowPage.waitForLokiQuery()
+                cy.wait(intervalMs)
+                attempt(remaining - 1)
+            })
+        }
+        attempt(maxAttempts)
+    },
+    dismissPoppers: () => {
+        // Blur the active element (if any) and press Escape to close any open popper/dropdown.
+        cy.get('body').then($body => {
+            const focused = $body.find(':focus')
+            if (focused.length) {
+                cy.wrap(focused).blur({ force: true })
+            }
+        })
+        cy.get('body').type('{esc}')
+        cy.get('body').click('bottomRight', { force: true })
+        cy.get('#filter-popper').should('not.exist')
+        cy.get('#query-options-popper').should('not.exist')
+        cy.get('#table-display-popper').should('not.exist')
+        cy.get('#overview-display-popper').should('not.exist')
+        cy.get('#topology-display-popper').should('not.exist')
+    },
     selectSourceNS: (project: string) => {
-        // verify Source namespace filter
         cy.get(filterSelectors.filterInput).type("src_namespace=" + project + '{enter}')
+        netflowPage.dismissPoppers()
         cy.get('#src_namespace-0-toggle').should('contain.text', `${project}`)
     }
 }
@@ -243,6 +290,7 @@ export namespace pluginSelectors {
     export const lokiMode = '#root_spec_loki_mode-toggle'
     export const monolithicMode = '#root_spec_loki_mode-Monolithic'
     export const installDemoLoki = '[data-test="root_spec_loki_monolithic_installDemoLoki"]'
+    export const wizardSubmit = '[data-test-id=flowcollector-wizard-consumption-submit]'
 }
 
 export namespace genSelectors {
@@ -440,14 +488,15 @@ export namespace histogramSelectors {
 }
 
 Cypress.Commands.add('checkPanelsNum', (panels = 2) => {
-    cy.get('#overview-flex').find('.overview-card').its('length').should('eq', panels);
+    cy.get('#overview-flex', { timeout: 60000 }).find('.overview-card').its('length').should('eq', panels);
 });
 
 Cypress.Commands.add('checkPanel', (panelName) => {
+    cy.get('#overview-flex', { timeout: 60000 }).should('exist')
     for (let i = 0; i < panelName.length; i++) {
-        cy.get('#overview-flex', { timeout: 60000 }).contains(panelName[i]);
-        cy.get('[data-test-metrics]', { timeout: 120000 }).its('length').should('gt', 0);
+        cy.get('#overview-flex').contains(panelName[i], { timeout: 120000 })
     }
+    cy.get('[data-test-metrics]', { timeout: 120000 }).its('length').should('gt', 0)
 });
 
 Cypress.Commands.add('checkPopItems', (id, names) => {
@@ -490,10 +539,12 @@ Cypress.Commands.add('selectAndVerifyColumns', (columnSelectors: string[]) => {
     });
 });
 
-Cypress.Commands.add('checkQuerySummary', (metric) => {
+Cypress.Commands.add('checkQuerySummary', (selector: string, options?: Partial<Cypress.Timeoutable>) => {
+    // Uses .should() (retryable) so async-populated summary values don't flake.
     // parseFloat handles formats: "123 ms", "123+ ms", "1.5k ms", "1.5k+ ms"
-    const num = parseFloat(metric.text())
-    expect(num).to.be.greaterThan(0)
+    cy.get(selector, options).should($el => {
+        expect(parseFloat($el.text())).to.be.greaterThan(0)
+    })
 });
 
 Cypress.Commands.add('changeQueryOption', (name: string) => {
@@ -514,6 +565,11 @@ Cypress.Commands.add('visitNetflowTrafficTab', (page) => {
 });
 
 Cypress.Commands.add('checkNetflowTraffic', (loki = "Enabled") => {
+    // Ensure auto-refresh is active so Loki queries are retried automatically.
+    // When navigating from another page (e.g. Health → Inspect network traffic)
+    // auto-refresh may not be set, causing Loki startup errors to persist.
+    netflowPage.setAutoRefresh()
+
     // overview panels
     cy.get('#tabs-container').contains('Overview').click({ force: true })
     cy.checkPanel(overviewSelectors.defaultPanels)
@@ -525,8 +581,10 @@ Cypress.Commands.add('checkNetflowTraffic', (loki = "Enabled") => {
     }
     else {
         cy.get('#tabs-container').contains('Traffic flows').click()
-        cy.wait(1000)
-        cy.byTestID("table-composable", { timeout: 60000 }).should('exist')
+        netflowPage.waitForLokiQuery()
+        // Allow extra time: Loki ingester may still be warming up even after
+        // pod Ready; auto-refresh retries queries every 15s so 120s ≈ 8 cycles
+        cy.byTestID("table-composable", { timeout: 120000 }).should('exist')
     }
 
     // topology view

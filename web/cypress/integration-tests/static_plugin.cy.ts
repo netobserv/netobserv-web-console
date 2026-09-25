@@ -62,12 +62,21 @@ describe('(OCP-84156 OCP-88744) StaticPlugin test with Status Check', { tags: ['
         cy.get('#root_spec_agent_ebpf_sampling').clear().type('1')
         cy.get(pluginSelectors.update).click()
 
-        // Wait for flowcollector to get ready
-        cy.wait(20000)
-        cy.get(flowcollectorStatusSelectors.readyRow,{ timeout: 60000 }).should('exist')
+        // Wait for FC reconciliation: first wait for NOT Ready (operator started reconciling),
+        // then wait for Ready again. The first wait may time out if reconciliation is instant.
+        cy.adminCLI(`oc wait --for=condition=Ready=false flowcollector/cluster --timeout=30s`, {
+            failOnNonZeroExit: false
+        })
+        cy.adminCLI(`oc wait --for=condition=Ready flowcollector/cluster --timeout=180s`, { timeout: 200000 })
+        cy.reload(true)
+        cy.get(flowcollectorStatusSelectors.readyRow, { timeout: 60000 }).should('exist')
             .should('have.attr', 'data-test-status', 'True')
             .should('have.attr', 'data-test-reason', 'Ready')
         cy.get(pluginSelectors.openNetworkTraffic).click()
+
+        // Wait for Network Traffic page to fully load after navigation
+        cy.url({ timeout: 30000 }).should('include', '/netflow-traffic')
+        cy.get('#overview-container', { timeout: 60000 }).should('exist')
 
         // Verify PacketDrop data is seen in Packet Drops view
         cy.get('li.overviewTabButton', { timeout: 30000 }).trigger('click')
@@ -82,6 +91,10 @@ describe('(OCP-84156 OCP-88744) StaticPlugin test with Status Check', { tags: ['
     })
 
         it("(OCP-88744 kapjain) Verify status indicator on Network Health page", function () {
+            // Ensure FC is fully ready before checking status on a different page
+            cy.adminCLI(`oc wait --for=condition=Ready flowcollector/cluster --timeout=120s`, {
+                failOnNonZeroExit: false, timeout: 140000
+            })
             cy.visit('/network-health')
 
             cy.get(flowcollectorStatusSelectors.statusIndicator).should('exist')
