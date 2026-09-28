@@ -78,19 +78,7 @@ const defaultPanelIds: Set<OverviewPanelId> = new Set([
   'top_sankey',
   'inbound_region',
   'top_avg_byte_rates',
-  'byte_rates',
-  'top_avg_dropped_packet_rates',
-  'dropped_packet_rates',
-  'state_dropped_packet_rates',
-  'cause_dropped_packet_rates',
-  'top_avg_dns_latency',
-  'top_p90_dns_latency',
-  'dns_name_flows',
-  'dns_rcode_flows',
-  'top_avg_rtt',
-  'top_p90_rtt',
-  'tls_usage_global',
-  'tls_per_version'
+  'byte_rates'
 ]);
 
 // List of available panels with their default selection behavior

@@ -7,7 +7,7 @@ const dnsPanels = overviewSelectors.defaultDNSTrackingPanels
 const rttPanels = overviewSelectors.defaultFlowRTTPanels
 const tlsPanels = overviewSelectors.defaultTLSTrackingPanels
 
-// Generic panel not in any feature preset but default-selected on All Traffic
+// Generic panel not in any feature preset but default-selected on the Default view
 const genericPanel = 'top_avg_byte_rates'
 const genericPanelTitle = 'Top 5 average bytes rates'
 
@@ -34,8 +34,8 @@ describe('(NETOBSERV-2872) Views selector tests', { tags: ['Network_Observabilit
         cy.get(viewSelectors.container).should('exist')
         cy.get(viewSelectors.dropdown).should('exist')
 
-        // Default view is All Traffic
-        cy.get(viewSelectors.dropdown).should('contain.text', 'All Traffic')
+        // Initial view is Default
+        cy.get(viewSelectors.dropdown).should('contain.text', 'Default')
 
         cy.get(viewSelectors.dropdown).click()
         cy.get(viewSelectors.allTraffic).should('exist')
@@ -80,7 +80,7 @@ describe('(NETOBSERV-2872) Views selector tests', { tags: ['Network_Observabilit
             cy.get(colSelectors.dscp).should('exist')
         })
 
-        // Switch to All Traffic — DSCP column should also show
+        // Switch to Default — DSCP column should also show
         cy.get(viewSelectors.dropdown).click()
         cy.get(viewSelectors.allTraffic).click()
         cy.byTestID('table-composable').within(() => {
@@ -108,7 +108,7 @@ describe('(NETOBSERV-2872) Views selector tests', { tags: ['Network_Observabilit
         cy.get(viewSelectors.packetDrops).click()
         cy.get('#overview-flex').contains(genericPanelTitle).should('exist')
 
-        // Switch to All Traffic — generic panel shows there too
+        // Switch to Default — generic panel shows there too
         cy.get(viewSelectors.dropdown).click()
         cy.get(viewSelectors.allTraffic).click()
         cy.get('#overview-flex').contains(genericPanelTitle).should('exist')
@@ -138,7 +138,7 @@ describe('(NETOBSERV-2872) Views selector tests', { tags: ['Network_Observabilit
             cy.get(colSelectors.srcNS).should('not.exist')
         })
 
-        // Switch to All Traffic — srcNS also hidden
+        // Switch to Default — srcNS also hidden
         cy.get(viewSelectors.dropdown).click()
         cy.get(viewSelectors.allTraffic).click()
         cy.byTestID('table-composable').within(() => {
@@ -171,7 +171,7 @@ describe('(NETOBSERV-2872) Views selector tests', { tags: ['Network_Observabilit
         cy.get(viewSelectors.packetDrops).click()
         cy.get('#overview-flex').contains(genericPanelTitle).should('not.exist')
 
-        // Switch to All Traffic — also hidden
+        // Switch to Default — also hidden
         cy.get(viewSelectors.dropdown).click()
         cy.get(viewSelectors.allTraffic).click()
         cy.get('#overview-flex').contains(genericPanelTitle).should('not.exist')
@@ -200,9 +200,9 @@ describe('(NETOBSERV-2872) Views selector tests', { tags: ['Network_Observabilit
         cy.get(`${colSelectors.dnsLatency}[type="checkbox"]`).uncheck()
         cy.byTestID(colSelectors.save).click()
 
-        // Draft created — toggle shows "Custom View: DNS Latency"
+        // Draft created — toggle shows "Custom View: DNS"
         cy.get(viewSelectors.dropdown).should('contain.text', 'Custom')
-        cy.get(viewSelectors.dropdown).should('contain.text', 'DNS Latency')
+        cy.get(viewSelectors.dropdown).should('contain.text', 'DNS')
 
         // Draft column removed from table
         cy.byTestID('table-composable').within(() => {
@@ -256,7 +256,7 @@ describe('(NETOBSERV-2872) Views selector tests', { tags: ['Network_Observabilit
             cy.get(colSelectors.flowRTT).should('not.exist')
         })
 
-        // Switch to All Traffic — RTT not shown
+        // Switch to Default — RTT not shown
         cy.get(viewSelectors.dropdown).click()
         cy.get(viewSelectors.allTraffic).click()
         cy.byTestID('table-composable').within(() => {
@@ -297,24 +297,24 @@ describe('(NETOBSERV-2872) Views selector tests', { tags: ['Network_Observabilit
         cy.get('#tabs-container').contains('Traffic flows').click()
         netflowPage.stopAutoRefresh()
 
-        // Add generic column (DSCP) on All Traffic
+        // Add generic column (DSCP) on Default
         cy.get(viewSelectors.dropdown).click()
         cy.get(viewSelectors.allTraffic).click()
         cy.openColumnsModal()
         cy.get(`${colSelectors.dscp}[type="checkbox"]`).check()
         cy.byTestID(colSelectors.save).click()
 
-        // DSCP shows on All Traffic
+        // DSCP shows on Default
         cy.byTestID('table-composable').within(() => {
             cy.get(colSelectors.dscp).should('exist')
         })
 
-        // Restore default on All Traffic — clears generic prefs
+        // Restore default on Default — clears generic prefs
         cy.openColumnsModal()
         cy.byTestID(colSelectors.resetDefault).click()
         cy.byTestID(colSelectors.save).click()
 
-        // DSCP gone from All Traffic
+        // DSCP gone from Default
         cy.byTestID('table-composable').within(() => {
             cy.get(colSelectors.dscp).should('not.exist')
         })
@@ -332,7 +332,7 @@ describe('(NETOBSERV-2872) Views selector tests', { tags: ['Network_Observabilit
     it("(NETOBSERV-2872, memodi) should set correct topology metric type per view", function () {
         cy.get('#tabs-container').contains('Topology').click()
 
-        // All Traffic — default metric: Bytes
+        // Default — default metric: Bytes
         cy.get(viewSelectors.dropdown).click()
         cy.get(viewSelectors.allTraffic).click()
 
@@ -346,7 +346,7 @@ describe('(NETOBSERV-2872) Views selector tests', { tags: ['Network_Observabilit
         cy.contains('Display options').should('exist').click()
         cy.byTestID(topologySelectors.metricTypeDrop).should('contain.text', 'Dropped packets')
 
-        // DNS Latency — preset metric: DnsLatencyMs
+        // DNS — preset metric: DnsLatencyMs
         cy.get(viewSelectors.dropdown).click()
         cy.get(viewSelectors.dnsLatency).click()
         cy.contains('Display options').should('exist').click()
@@ -359,7 +359,7 @@ describe('(NETOBSERV-2872) Views selector tests', { tags: ['Network_Observabilit
 
         cy.byTestID(topologySelectors.metricTypeDrop).should('contain.text', 'RTT')
 
-        // Return to All Traffic — original Bytes metric restored
+        // Return to Default — original Bytes metric restored
         cy.get(viewSelectors.dropdown).click()
         cy.get(viewSelectors.allTraffic).click()
         cy.contains('Display options').should('exist').click()
@@ -431,7 +431,7 @@ describe('(NETOBSERV-2872) Views selector tests', { tags: ['Network_Observabilit
         // Select DNS view
         cy.get(viewSelectors.dropdown).click()
         cy.get(viewSelectors.dnsLatency).click()
-        cy.get(viewSelectors.dropdown).should('contain.text', 'DNS Latency')
+        cy.get(viewSelectors.dropdown).should('contain.text', 'DNS')
 
         // Reorder columns via native HTML drag on table headers to create draft
         // Table <th> elements have draggable="true" and use data-index for reorder logic
@@ -455,7 +455,7 @@ describe('(NETOBSERV-2872) Views selector tests', { tags: ['Network_Observabilit
         cy.byTestID('columns-save-button').click()
 
         // Verify "Custom" label gone (draft cleared)
-        cy.get(viewSelectors.dropdown).should('contain.text', 'DNS Latency').and('not.contain.text', 'Custom')
+        cy.get(viewSelectors.dropdown).should('contain.text', 'DNS').and('not.contain.text', 'Custom')
     })
 
     afterEach("test", function () {

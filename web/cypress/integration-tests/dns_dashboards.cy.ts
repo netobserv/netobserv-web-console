@@ -1,6 +1,6 @@
-import { Operator } from "@views/netobserv"
-import { netflowPage, querySumSelectors, topologySelectors, filterSelectors } from "@views/netflow-page"
 import { dashboard } from "@views/dashboards-page"
+import { filterSelectors, netflowPage, querySumSelectors, topologySelectors } from "@views/netflow-page"
+import { Operator } from "@views/netobserv"
 
 const metricType = [
     "Bytes",
@@ -36,6 +36,7 @@ describe('(OCP-67087) DNSTracking test', { tags: ['Network_Observability'] }, fu
 
     it("(OCP-67087, aramesha) Validate DNSLatencies edge label and Query Summary stats", function () {
         netflowPage.visit()
+        netflowPage.selectView('dns')
         cy.get('#tabs-container').contains('Topology').click()
         cy.get('#drawer').should('not.be.empty')
         cy.get(filterSelectors.filterInput).type("dns_latency>=0" + '{enter}')

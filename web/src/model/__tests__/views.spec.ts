@@ -58,6 +58,13 @@ describe('getAvailableViews', () => {
     expect(ids).toContain('udn');
   });
 
+  it('udn preset includes Src/Dst Network Name and Udns columns', () => {
+    const preset = getViewPreset('udn');
+    expect(preset?.columns).toEqual(
+      expect.arrayContaining(['SrcNetworkName', 'DstNetworkName', 'Udns', 'Bytes', 'Packets'])
+    );
+  });
+
   it('includes networkEvents view when networkEvents feature enabled', () => {
     const views = getAvailableViews(['networkEvents'] as Feature[]);
     const ids = views.map(v => v.id);

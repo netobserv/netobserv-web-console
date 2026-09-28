@@ -63,6 +63,7 @@ export enum ColumnsId {
   collectiontime = 'CollectionTime',
   collectionlatency = 'CollectionLatency',
   dnsid = 'DNSId',
+  dnsname = 'DNSName',
   dnslatency = 'DNSLatency',
   dnsresponsecode = 'DNSResponseCode',
   dnserrno = 'DNSErrNo',

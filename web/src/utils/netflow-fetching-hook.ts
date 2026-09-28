@@ -7,6 +7,7 @@ import { Config } from '../model/config';
 import { Filters } from '../model/filters';
 import { FlowScope, MetricType, StatFunction } from '../model/flow-query';
 import { TopologyOptions } from '../model/topology';
+import { ViewPresetId } from '../model/views';
 import { Warning } from '../model/warnings';
 import { loadConfig } from './config';
 import { TimeRange } from './datetime';
@@ -168,6 +169,7 @@ export interface UseDataFetchingParams {
   caps: ConfigCapabilities;
   config: Config;
   selectedViewId: ViewId;
+  activeView: ViewPresetId;
   range: number | TimeRange;
   histogramRange: TimeRange | undefined;
   showHistogram: boolean;
@@ -216,6 +218,7 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
     caps,
     config,
     selectedViewId,
+    activeView,
     range,
     histogramRange,
     showHistogram,
@@ -360,7 +363,7 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
 
   usePoll(tick, interval);
 
-  // Init effect: load config and trigger first tick
+  // Load config and refresh when inputs change, including presets that share a metric type.
   React.useEffect(() => {
     if (!initState.current.includes('initDone')) {
       initState.current.push('initDone');
@@ -400,7 +403,7 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
       tick();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters, forcedFilters, config, tick, setConfig]);
+  }, [filters, forcedFilters, config, tick, setConfig, activeView]);
 
   return {
     loading,

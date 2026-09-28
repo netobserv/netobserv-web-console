@@ -1,6 +1,6 @@
-import { Operator } from "@views/netobserv"
-import { netflowPage, querySumSelectors, topologySelectors } from "@views/netflow-page"
 import { dashboard } from "@views/dashboards-page"
+import { netflowPage, querySumSelectors, topologySelectors } from "@views/netflow-page"
+import { Operator } from "@views/netobserv"
 
 const metricType = [
     "Bytes",
@@ -30,6 +30,7 @@ describe('(OCP-66141) PacketDrop dashboards test', { tags: ['Network_Observabili
 
     it("(OCP-66141, aramesha) Validate PacketDrop edge labels and Query Summary stats", function () {
         netflowPage.visit()
+        netflowPage.selectView('pktdrop')
         cy.get('#tabs-container').contains('Topology').click()
         cy.get('#drawer').should('not.be.empty')
 
