@@ -83,7 +83,7 @@ Cypress.Commands.add('dismissWelcomeModal', () => {
           // Find close button
           let $closeBtn = $modal.find('button[aria-label="Close"]');
           if ($closeBtn.length === 0) {
-            $closeBtn = $modal.find('.pf-c-modal-box__close');
+            $closeBtn = $modal.find('.pf-c-modal-box__close, .pf-v6-c-modal-box__close');
           }
 
           if ($closeBtn.length > 0) {

@@ -401,7 +401,10 @@ export const Operator = {
         // causing the onSelect to silently not fire. Verify the toggle text and retry.
         const selectMonolithic = (retries = 3): void => {
             cy.get(pluginSelectors.lokiMode).should('exist').click()
-            cy.get(pluginSelectors.monolithicMode).should('be.visible').click()
+            // Dropdown items can be duplicated by the PF overlay. Click only the
+            // visible option and allow React to commit the controlled value.
+            cy.get(pluginSelectors.monolithicMode).filter(':visible').last().click({ force: true })
+            cy.wait(500)
             cy.get(pluginSelectors.lokiMode).then($toggle => {
                 if (!$toggle.text().includes('Monolithic')) {
                     if (retries > 0) {
@@ -426,13 +429,21 @@ export const Operator = {
         // leave the DOM checked while the onChange was swallowed on a busy cluster render.
         // Click only while unchecked (click toggles) and retry until the state sticks.
         const enableDemoLoki = (retries = 4): void => {
+            // PatternFly may put data-test on the switch wrapper or on its input,
+            // depending on the console version. Always interact with the actual
+            // controlled checkbox so React receives the change event.
             cy.get(pluginSelectors.installDemoLoki).should('exist').then($el => {
-                if (!$el.is(':checked')) {
-                    cy.wrap($el).click({ force: true })
+                const input = $el.is('input') ? $el : $el.find('input[type=checkbox]')
+                if (!input.length) {
+                    throw new Error('Demo Loki switch checkbox was not rendered')
+                }
+                if (!input.is(':checked')) {
+                    cy.wrap(input).click({ force: true })
                 }
             })
             cy.get(pluginSelectors.installDemoLoki).then($el => {
-                if (!$el.is(':checked')) {
+                const input = $el.is('input') ? $el : $el.find('input[type=checkbox]')
+                if (!input.is(':checked')) {
                     if (retries > 0) {
                         cy.log(`Demo Loki switch did not stick, retrying (${retries} retries left)`)
                         cy.wait(500)
@@ -446,9 +457,15 @@ export const Operator = {
         enableDemoLoki()
         // Stabilize before leaving the Loki step: a controlled switch that is still checked
         // after a beat means the value persisted into form data and will survive submit.
-        cy.get(pluginSelectors.installDemoLoki).should('be.checked')
+        cy.get(pluginSelectors.installDemoLoki).then($el => {
+            const input = $el.is('input') ? $el : $el.find('input[type=checkbox]')
+            cy.wrap(input).should('be.checked')
+        })
         cy.wait(500)
-        cy.get(pluginSelectors.installDemoLoki).should('be.checked')
+        cy.get(pluginSelectors.installDemoLoki).then($el => {
+            const input = $el.is('input') ? $el : $el.find('input[type=checkbox]')
+            cy.wrap(input).should('be.checked')
+        })
         cy.get(pluginSelectors.next).should('exist').click()
         // Consumption tab — use text-based submit selector (more robust than ID)
         cy.get('footer').contains('button', 'Submit').should('exist').click({ force: true })
