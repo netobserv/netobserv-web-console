@@ -113,7 +113,7 @@
     "@patternfly/react-core": "4.276.11",
     "@patternfly/react-table": "4.113.0",
     "@patternfly/react-topology": "4.93.6",
-    "axios": "^1.18.0",
+    "axios": "^1.18.1",
     "i18next": "^21.8.14",
     "i18next-http-backend": "^1.0.21",
     "murmurhash-js": "^1.0.0",
