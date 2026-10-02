@@ -20,9 +20,8 @@ describe('Network_Observability networking dashboards tests', { tags: ['Network_
         cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
         cy.uiLogin(Cypress.env('LOGIN_IDP'), Cypress.env('LOGIN_USERNAME'), Cypress.env('LOGIN_PASSWORD'))
 
-        // navigate to 'Networking / Ingress' Dashboard page
-        dashboard.visit()
-        dashboard.visitDashboard("grafana-dashboard-ingress-operator")
+        // navigate to 'Networking / Ingress' Dashboard page (retry-with-reload until registered)
+        dashboard.visitDashboard('grafana-dashboard-ingress-operator')
     })
 
     it('(OCP-69946, aramesha), should have ingress operator dashboards', function () {

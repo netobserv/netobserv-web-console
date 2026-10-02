@@ -39,11 +39,6 @@ Cypress.on('uncaught:exception', (err) => {
   return true; // test fails
 });
 
-Cypress.Commands.overwrite('log', (originalFn, message) => {
-  cy.task('log', `      ${message}`, { log: false });
-  originalFn(message);
-});
-
 const waitForElementToExist = (selector: string) =>
   cy.get(selector, { timeout: 30000 }).should('exist');
 
@@ -88,7 +83,7 @@ Cypress.Commands.add('dismissWelcomeModal', () => {
           // Find close button
           let $closeBtn = $modal.find('button[aria-label="Close"]');
           if ($closeBtn.length === 0) {
-            $closeBtn = $modal.find('.pf-c-modal-box__close');
+            $closeBtn = $modal.find('.pf-c-modal-box__close, .pf-v6-c-modal-box__close');
           }
 
           if ($closeBtn.length > 0) {

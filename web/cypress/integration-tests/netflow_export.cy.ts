@@ -41,7 +41,9 @@ describe('(OCP-72610) Export automation', { tags: ['Network_Observability'] }, f
         cy.get('#export-button').should('exist').click()
         cy.byTestID('export-modal-header').should('be.visible')
         cy.exec("rm -f cypress/downloads/*.csv", { failOnNonZeroExit: false })
-        cy.get('[data-test="export-modal-footer"] > [data-test="export-button"]').click()
+        cy.get('[data-test="export-modal-footer"] > [data-test="export-button"]')
+            .should('be.visible')
+            .then(() => cy.get('[data-test="export-modal-footer"] > [data-test="export-button"]').click({ force: true }))
         const waitForCsv = (retries = 5): void => {
             cy.exec("ls cypress/downloads", { failOnNonZeroExit: false }).then((response) => {
                 const files = (response.stdout || '').trim().split('\n').filter(f => f.endsWith('.csv'))

@@ -38,7 +38,6 @@ describe('Network_Observability networking dashboards tests', { tags: ['Network_
 
     it('(OCP-69944, aramesha), should have OVN (Linux Subsystem Stats) dashboards', function () {
         // navigate to 'Networking / Linux Subsystem Stats' Dashboard page
-        dashboard.visit()
         dashboard.visitDashboard("grafana-dashboard-network-stats")
 
         // verify that 'Current Receive Bandwidth', 'Current Transmit Bandwidth', 'Current Drops' and 'Current Errors' panels exist and are populated

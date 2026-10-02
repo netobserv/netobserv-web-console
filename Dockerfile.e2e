@@ -21,6 +21,28 @@ RUN curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/op
 
 WORKDIR /opt/app-root
 
+# Env must be set before npm ci so the Cypress binary lands in a writable cache path
+ENV HOME=/tmp
+ENV NO_COLOR=1
+ENV WEB_DIR=/opt/app-root/web
+ENV CYPRESS_VERIFY_TIMEOUT=120000
+ENV CYPRESS_CACHE_FOLDER=/opt/app-root/.cache/Cypress
+# OpenShift CI pods have no D-Bus; use a valid empty bus address (bare /dev/null breaks Electron)
+ENV DBUS_SESSION_BUS_ADDRESS=unix:path=/dev/null
+# Keep XDG under /opt/app-root so OpenShift group-0 writability applies
+ENV XDG_CONFIG_HOME=/opt/app-root/.config
+ENV XDG_CACHE_HOME=/opt/app-root/.cache
+ENV XDG_DATA_HOME=/opt/app-root/.local/share
+# Electron (Cypress runner) needs these in restricted OpenShift pods
+ENV ELECTRON_EXTRA_LAUNCH_ARGS=--no-sandbox,--disable-dev-shm-usage,--disable-gpu
+
+RUN mkdir -p /opt/app-root/.cache/Cypress \
+        /opt/app-root/.config \
+        /opt/app-root/.cache/fontconfig \
+        /opt/app-root/.local/share && \
+    chmod 1777 /tmp && \
+    chmod -R g+rwX /opt/app-root/.cache /opt/app-root/.config /opt/app-root/.local
+
 # Copy scripts first
 COPY scripts/run-e2e-tests.sh ./scripts/
 RUN chmod +x ./scripts/run-e2e-tests.sh
@@ -31,7 +53,7 @@ WORKDIR /opt/app-root/web
 # Copy package files first for better layer caching
 COPY web/package.json web/package-lock.json ./
 
-# Install npm dependencies
+# Install npm dependencies (downloads Cypress binary into CYPRESS_CACHE_FOLDER)
 RUN npm --legacy-peer-deps ci
 
 # Copy the rest of the web application
@@ -43,16 +65,10 @@ RUN mkdir -p gui_test_screenshots/cypress/screenshots \
     cypress/results/junit && \
     chmod -R 777 gui_test_screenshots cypress/results
 
-# Set environment variables
-ENV HOME=/tmp
-ENV NO_COLOR=1
-ENV WEB_DIR=/opt/app-root/web
+# Warm/verify the binary now that it was installed into CYPRESS_CACHE_FOLDER
+RUN npx cypress verify
 
-RUN mkdir -p /root/.cache/Cypress /tmp && \
-    chmod 1777 /tmp && \
-    chmod -R g+rwX /root/.cache/Cypress
-
-# Make directories writable for OpenShift arbitrary UIDs (group 0)
+# verify creates config under XDG as root — re-open for OpenShift arbitrary UIDs (group 0)
 RUN chmod -R g+rwX /opt/app-root
 
 WORKDIR /opt/app-root

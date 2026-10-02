@@ -49,15 +49,16 @@ if [ -z "${KUBECONFIG:-}" ]; then
     exit 1
 fi
 
-# Get console URL from the cluster
-echo "Fetching console URL from cluster..."
-CONSOLE_URL=$(oc get route console -n openshift-console -o jsonpath='{.spec.host}' 2>/dev/null || echo "")
-if [ -z "$CONSOLE_URL" ]; then
-    echo "ERROR: Failed to get console URL from cluster"
-    exit 1
+# Get console URL from the cluster (skip if already provided by the CI step)
+if [ -z "${CYPRESS_BASE_URL:-}" ]; then
+    echo "Fetching console URL from cluster..."
+    CONSOLE_URL=$(oc get route console -n openshift-console -o jsonpath='{.spec.host}' 2>/dev/null || echo "")
+    if [ -z "$CONSOLE_URL" ]; then
+        echo "ERROR: Failed to get console URL from cluster"
+        exit 1
+    fi
+    export CYPRESS_BASE_URL="https://${CONSOLE_URL}"
 fi
-
-export CYPRESS_BASE_URL="https://${CONSOLE_URL}"
 echo "Console URL: ${CYPRESS_BASE_URL}"
 
 # Function to provision htpasswd users for testing
@@ -220,6 +221,28 @@ mkdir -p "${RESULTS_DIR}/junit" "${SCREENSHOTS_DIR}/cypress/screenshots" "${SCRE
 # Change to web directory
 cd "${WEB_DIR}"
 
+# Binary is verified at image build time (Dockerfile.e2e). Keep cache/timeout env for cypress run.
+# OpenShift arbitrary UID often has a non-writable HOME; force /tmp for Electron/Fontconfig.
+export HOME="${HOME:-/tmp}"
+if [ ! -w "${HOME}" ]; then
+    export HOME=/tmp
+fi
+export CYPRESS_VERIFY_TIMEOUT="${CYPRESS_VERIFY_TIMEOUT:-120000}"
+export CYPRESS_CACHE_FOLDER="${CYPRESS_CACHE_FOLDER:-/opt/app-root/.cache/Cypress}"
+# Bare "/dev/null" is not a valid D-Bus address and makes Electron abort
+export DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS:-unix:path=/dev/null}"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-/opt/app-root/.config}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-/opt/app-root/.cache}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-/opt/app-root/.local/share}"
+export ELECTRON_EXTRA_LAUNCH_ARGS="${ELECTRON_EXTRA_LAUNCH_ARGS:---no-sandbox,--disable-dev-shm-usage,--disable-gpu}"
+mkdir -p "${HOME}" \
+    "${CYPRESS_CACHE_FOLDER}" \
+    "${XDG_CONFIG_HOME}/Cypress" \
+    "${XDG_CACHE_HOME}/fontconfig" \
+    "${XDG_DATA_HOME}"
+# OpenShift runs as an arbitrary UID; ensure caches stay writable
+chmod -R a+rwX "${CYPRESS_CACHE_FOLDER}" "${XDG_CONFIG_HOME}" "${XDG_CACHE_HOME}" "${XDG_DATA_HOME}" 2>/dev/null || true
+
 # Run Cypress tests
 echo "========================================="
 echo "Running Cypress tests..."
@@ -245,12 +268,24 @@ CYPRESS_ARGS=(
     --reporter-options configFile=reporter-config.json
 )
 
-# Run tests and capture exit code
+# Run tests and capture exit code (tee so SIGTRAP/early crashes leave a trace)
 set +e
-npx cypress run "${CYPRESS_ARGS[@]}"
-
-CYPRESS_EXIT_CODE=$?
+npx cypress run "${CYPRESS_ARGS[@]}" 2>&1 | tee "${RESULTS_DIR}/cypress-console.log"
+CYPRESS_EXIT_CODE=${PIPESTATUS[0]}
 set -e
+
+if [ "${CYPRESS_EXIT_CODE}" -ne 0 ]; then
+    echo "====> Cypress failed with exit ${CYPRESS_EXIT_CODE}"
+    if [ "${CYPRESS_EXIT_CODE}" -eq 133 ] || [ "${CYPRESS_EXIT_CODE}" -eq 139 ] || [ "${CYPRESS_EXIT_CODE}" -eq 134 ]; then
+        echo "====> Signal-style exit (128+n). Dumping environment diagnostics:"
+        echo "uid=$(id -u) gid=$(id -g) HOME=${HOME:-} XDG_CACHE_HOME=${XDG_CACHE_HOME:-}"
+        echo "CYPRESS_CACHE_FOLDER=${CYPRESS_CACHE_FOLDER:-}"
+        echo "ELECTRON_EXTRA_LAUNCH_ARGS=${ELECTRON_EXTRA_LAUNCH_ARGS:-}"
+        ls -la "${CYPRESS_CACHE_FOLDER}" 2>&1 | head -20 || true
+        ls -la "${XDG_CACHE_HOME}/fontconfig" 2>&1 | head -10 || true
+        df -h /dev/shm /tmp 2>&1 || true
+    fi
+fi
 
 # Summary
 echo "========================================="

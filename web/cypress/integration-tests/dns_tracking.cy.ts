@@ -44,9 +44,7 @@ describe('(OCP-67087) DNSTracking test', { tags: ['Network_Observability'] }, fu
         cy.checkPanelsNum(overviewSelectors.defaultDNSTrackingPanels.length);
 
         // verify Query Summary stats for DNSTracking
-        cy.get(querySumSelectors.dnsAvg).should('exist').then(DNSAvg => {
-            cy.checkQuerySummary(DNSAvg)
-        })
+        cy.checkQuerySummary(querySumSelectors.dnsAvg)
     })
 
     it("(OCP-67087, aramesha) Validate DNSTracking columns and DNSName", function () {
@@ -64,12 +62,18 @@ describe('(OCP-67087) DNSTracking test', { tags: ['Network_Observability'] }, fu
         const dns_name = "loki.netobserv.svc.cluster"
         cy.get(filterSelectors.filterInput).type("dst_namespace=" + project + '{enter}')
         cy.get(filterSelectors.filterInput).type("dns_name=" + dns_name + '{enter}')
+        netflowPage.waitForTableRows(1)
 
         // DNS Id / Error are in the DNS Latency preset; add DNS Name for this assertion.
         // Avoid selectAndVerifyColumns (reloads and would drop the draft view).
         cy.openColumnsModal().then(() => {
             cy.get(colSelectors.columnsModal).should('be.visible')
-            cy.get(colSelectors.dnsName).check()
+            // DNSName also exists as a table-header id behind the modal. Filter
+            // the modal first, then scope the checkbox lookup to avoid selecting
+            // that duplicate id.
+            cy.get(`${colSelectors.columnsModal} .custom-chip`).contains('dns').click()
+            cy.get(colSelectors.columnsModal).find(colSelectors.dnsId).check()
+            cy.get(colSelectors.columnsModal).find(colSelectors.dnsName).check()
             cy.byTestID(colSelectors.save).click()
         })
         cy.byTestID('table-composable').within(() => {
