@@ -35,9 +35,9 @@ describe('<MetricsQuerySummary />', () => {
       expect(container.querySelector('#bytesCount')).toBeTruthy();
     });
 
-    expect(container.querySelector('#bytesCount')?.textContent).toBe('6.8 MB');
+    expect(container.querySelector('#bytesCount')?.textContent).toBe('7 MB');
     expect(container.querySelector('#packetsCount')).toBeNull();
-    expect(container.querySelector('#bytesPerSecondsCount')?.textContent).toBe('22.79 kBps');
+    expect(container.querySelector('#bytesPerSecondsCount')?.textContent).toBe('23.2 kBps');
     expect(container.querySelector('#lastRefresh')?.textContent).toBe(now.toLocaleTimeString());
   });
 

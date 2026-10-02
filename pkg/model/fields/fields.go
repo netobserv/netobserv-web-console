@@ -33,6 +33,8 @@ const (
 	Zone                   = "K8S_Zone"
 	SrcZone                = Src + Zone
 	DstZone                = Dst + Zone
+	NetworkName            = "K8S_NetworkName"
+	SubnetLabel            = "SubnetLabel"
 	Cluster                = "K8S_ClusterName"
 	UDN                    = "UDN"
 	Udns                   = "Udns"

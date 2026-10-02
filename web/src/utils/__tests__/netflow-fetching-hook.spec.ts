@@ -17,7 +17,8 @@ describe('canTick', () => {
     isTRModalOpen: false,
     isOverviewModalOpen: false,
     isColModalOpen: false,
-    isExportModalOpen: false
+    isExportModalOpen: false,
+    isMetricsExportModalOpen: false
   };
 
   it('should return true when fully initialized and no modal open', () => {
@@ -68,6 +69,13 @@ describe('canTick', () => {
     expect(canTick(initState as React.MutableRefObject<InitState>, { ...closedModals, isExportModalOpen: true })).toBe(
       false
     );
+  });
+
+  it('should return false when metrics export modal is open', () => {
+    const initState = { current: ['initDone', 'configLoaded', 'forcedFiltersLoaded'] as InitState };
+    expect(
+      canTick(initState as React.MutableRefObject<InitState>, { ...closedModals, isMetricsExportModalOpen: true })
+    ).toBe(false);
   });
 });
 

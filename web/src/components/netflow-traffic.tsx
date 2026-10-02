@@ -192,6 +192,7 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
   const [isOverviewModalOpen, setOverviewModalOpen] = React.useState(false);
   const [isColModalOpen, setColModalOpen] = React.useState(false);
   const [isExportModalOpen, setExportModalOpen] = React.useState(false);
+  const [isMetricsExportModalOpen, setMetricsExportModalOpen] = React.useState(false);
   const [filters, setFilters] = React.useState<Filters>({ list: [], match: 'all' });
   const [packetLoss, setPacketLoss] = React.useState<PacketLoss>(getPacketLossFromURL());
   const [recordType, setRecordType] = React.useState<RecordType>(getRecordTypeFromURL());
@@ -327,6 +328,7 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
     isOverviewModalOpen,
     isColModalOpen,
     isExportModalOpen,
+    isMetricsExportModalOpen,
     filters,
     setFilters,
     parentConfig,
@@ -754,6 +756,7 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
             setTopologyOptions={setTopologyOptions}
             setColModalOpen={setColModalOpen}
             setExportModalOpen={setExportModalOpen}
+            setMetricsExportModalOpen={setMetricsExportModalOpen}
             isViewOptionOverflowMenuOpen={isViewOptionOverflowMenuOpen}
             setViewOptionOverflowMenuOpen={setViewOptionOverflowMenuOpen}
             showDuplicates={showDuplicates}
@@ -822,6 +825,12 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
             setColModalOpen={setColModalOpen}
             isExportModalOpen={isExportModalOpen}
             setExportModalOpen={setExportModalOpen}
+            isMetricsExportModalOpen={isMetricsExportModalOpen}
+            setMetricsExportModalOpen={setMetricsExportModalOpen}
+            allowTopologyEdgesExport={selectedViewId === 'topology'}
+            metrics={metrics}
+            metricScope={metricScope}
+            flowQuery={caps.flowQuery}
             recordType={recordType}
             setColumnSizes={setColumnSizes}
             setColumns={setColumnsWithDraft}
