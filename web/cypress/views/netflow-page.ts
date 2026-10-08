@@ -459,8 +459,8 @@ export const loadTimes = {
 }
 
 export const memoryUsage = {
-    "overview": 350,
-    "table": 500,
+    "overview": 500,
+    "table": 600,
     "topology": 600
 }
 
