@@ -6,7 +6,10 @@ export interface StructuredError {
 
 export class PromUnsupported implements StructuredError {
   promUnsupported: boolean;
-  constructor(public reason?: string, public context?: string) {
+  constructor(
+    public reason?: string,
+    public context?: string
+  ) {
     this.promUnsupported = true;
   }
 
@@ -30,7 +33,10 @@ export class PromUnsupported implements StructuredError {
 
 export class PromDisabledMetrics implements StructuredError {
   promDisabledMetrics: boolean;
-  constructor(public candidates: string[], public context?: string) {
+  constructor(
+    public candidates: string[],
+    public context?: string
+  ) {
     this.promDisabledMetrics = true;
   }
 
@@ -55,7 +61,10 @@ export class PromDisabledMetrics implements StructuredError {
 
 export class PromMissingLabels implements StructuredError {
   promMissingLabels: boolean;
-  constructor(public missing: { [k: string]: string[] }, public context?: string) {
+  constructor(
+    public missing: { [k: string]: string[] },
+    public context?: string
+  ) {
     this.promMissingLabels = true;
   }
 

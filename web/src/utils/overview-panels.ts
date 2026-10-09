@@ -26,12 +26,12 @@ export const getFunctionFromId = (id: string) => {
   return id.includes('_min_')
     ? 'min'
     : id.includes('_max_')
-    ? 'max'
-    : id.includes('_p90_')
-    ? 'p90'
-    : id.includes('_p99_')
-    ? 'p99'
-    : 'avg';
+      ? 'max'
+      : id.includes('_p90_')
+        ? 'p90'
+        : id.includes('_p99_')
+          ? 'p99'
+          : 'avg';
 };
 
 type OverviewPanelRateMetric = 'byte_rates' | 'packet_rates' | 'dropped_byte_rates' | 'dropped_packet_rates';
@@ -173,12 +173,12 @@ export const getOverviewPanelInfo = (
   const metricFunction = id.includes('min_')
     ? t('minimum')
     : id.includes('max_')
-    ? t('maximum')
-    : id.includes('p90_')
-    ? t('90th percentile')
-    : id.includes('p99_')
-    ? t('99th percentile')
-    : t('average');
+      ? t('maximum')
+      : id.includes('p90_')
+        ? t('90th percentile')
+        : id.includes('p99_')
+          ? t('99th percentile')
+          : t('average');
 
   const metricFunctionCaptitalized = metricFunction.charAt(0).toUpperCase() + metricFunction.slice(1);
 

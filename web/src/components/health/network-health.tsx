@@ -239,8 +239,8 @@ export const NetworkHealth: React.FC<{}> = ({}) => {
               ? t('Hide alert information')
               : t('Hide scoring information')
             : isReadonlyContext
-            ? t('Show alert information')
-            : t('Show scoring information')}
+              ? t('Show alert information')
+              : t('Show scoring information')}
         </Button>
       </FlexItem>
     </Flex>

@@ -159,11 +159,11 @@ export const QueryOptionsPanel: React.FC<QueryOptionsProps> = ({
                             'Only available when FlowCollector.prometheus.enable is true for Overview and Topology tabs'
                           )
                         : opt.value === 'loki'
-                        ? t(
-                            // eslint-disable-next-line max-len
-                            'Only available when FlowCollector.loki.enable is true'
-                          )
-                        : undefined
+                          ? t(
+                              // eslint-disable-next-line max-len
+                              'Only available when FlowCollector.loki.enable is true'
+                            )
+                          : undefined
                       : undefined
                   }
                 >

@@ -52,8 +52,8 @@ export const FlowCollectorStatus: FC<FlowCollectorStatusProps> = () => {
           const { status, message } = flowCollectorExists
             ? getFlowCollectorOverallStatus(ctx.data, ctx.loadError)
             : hasLoadError
-            ? { status: 'error' as const }
-            : { status: 'pending' as const };
+              ? { status: 'error' as const }
+              : { status: 'pending' as const };
           const isDeleting = status === 'deleting';
           const showTrafficButton = status === 'ready' || status === 'degraded';
           const configIssue = (

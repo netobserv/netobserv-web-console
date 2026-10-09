@@ -72,8 +72,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       return undefined;
     }
     return selectedColumns.filter(c => c.isSelected && c.field != undefined).map(c => c.field!.name) as
-      | string[]
-      | undefined;
+      string[] | undefined;
   }, [isExportAll, selectedColumns]);
 
   const rangeText = React.useCallback(() => {

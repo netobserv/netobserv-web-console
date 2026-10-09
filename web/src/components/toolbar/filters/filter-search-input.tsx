@@ -277,8 +277,8 @@ export const FilterSearchInput: React.FC<FilterSearchInputProps> = ({
             fd.category === 'source'
               ? `${t('Source')} ${fd.name}`
               : fd.category === 'destination'
-              ? `${t('Destination')} ${fd.name}`
-              : fd.name,
+                ? `${t('Destination')} ${fd.name}`
+                : fd.name,
           value: fd.id,
           validate: false,
           filterDef: fd

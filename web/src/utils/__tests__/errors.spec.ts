@@ -9,7 +9,11 @@ import {
 
 type Response = { data: { [key: string]: string } };
 class CustomError extends Error {
-  constructor(code: number, public msg: string, public response: Response) {
+  constructor(
+    code: number,
+    public msg: string,
+    public response: Response
+  ) {
     super(`[${code}] ${msg}`);
   }
 }
