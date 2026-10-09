@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-import parse from 'parse-duration';
 
 // Conversions between units and milliseconds
 const s = 1000;
@@ -7,12 +6,23 @@ const m = s * 60;
 const h = m * 60;
 const d = h * 24;
 const w = d * 7;
-const units = { w, d, h, m, s };
+const units: { [k: string]: number } = { w, d, h, m, s };
+const durationRE = /\s*(\d+)\s*([smhdw])/y; // sticky flag (y) forces each match to start where the last one ended
 
-// Converts a duration like "1h 10m 23s" to milliseconds or throws an error if the duration could not be
-// parsed
+// Converts a duration like "1h 10m 23s" to milliseconds or throws an error if the duration could not be parsed
 export const parseDuration = (duration: string): number => {
-  return parse(duration, 'ms')!;
+  let result = null,
+    lastSuccessIndex = 0;
+  durationRE.lastIndex = 0;
+  for (let m; (m = durationRE.exec(duration.trim())); ) {
+    result = (result || 0) + +m[1] * units[m[2]];
+    lastSuccessIndex = durationRE.lastIndex;
+  }
+  // Make sure we parsed something and everything
+  if (result == null || lastSuccessIndex !== duration.trim().length) {
+    throw Error(`invalid duration: ${duration}`);
+  }
+  return result;
 };
 
 // Formats a duration in milliseconds like "1h 10m"

@@ -1,4 +1,4 @@
-import { formatDuration, formatDurationAboveMillisecond } from '../duration';
+import { formatDuration, formatDurationAboveMillisecond, parseDuration } from '../duration';
 
 describe('duration', () => {
   it('should format duration', () => {
@@ -31,5 +31,19 @@ describe('duration', () => {
     expect(formatDurationAboveMillisecond(60000)).toBe('1m');
     expect(formatDurationAboveMillisecond(180000)).toBe('3m');
     expect(formatDurationAboveMillisecond(200000)).toBe('3m 20s');
+  });
+
+  it('should parse durations', () => {
+    expect(parseDuration('1s')).toBe(1000);
+    expect(parseDuration('3d1s')).toBe(259201000);
+    expect(parseDuration('1w 1d 1h 1m 1s')).toBe(694861000);
+    expect(parseDuration('  15s ')).toBe(15000);
+  });
+
+  it('should fail to parse durations', () => {
+    expect(() => parseDuration('oops')).toThrow('invalid duration: oops');
+    expect(() => parseDuration('3.15s')).toThrow('invalid duration: 3.15s');
+    expect(() => parseDuration('')).toThrow('invalid duration: ');
+    expect(() => parseDuration('3d foo 1s')).toThrow('invalid duration: 3d foo 1s');
   });
 });
