@@ -1,36 +1,23 @@
 import { TFunction } from 'i18next';
 import _ from 'lodash';
 import percentile from 'percentile';
-import { Field, Flow } from '../api/ipfix';
+import { Field } from '../api/ipfix';
 import {
   GenericMetric,
   GenericMetricTls,
   MetricStats,
   NameAndType,
-  RawTopologyMetrics,
   Stats,
   TopologyMetricPeer,
   TopologyMetrics
 } from '../api/query-response';
-import { FlowScope, MetricFunction, MetricType, topologyTlsVersionAggregateSuffix } from '../model/flow-query';
+import { MetricFunction, MetricType } from '../model/flow-query';
 import { getCustomScopes } from '../model/scope';
 import { NodeData } from '../model/topology';
 import { roundTwoDigits } from './count';
-import { computeStepInterval, rangeToSeconds, TimeRange } from './datetime';
 import { formatDurationAboveMillisecond } from './duration';
 import { valueFormat } from './format';
 import { getPeerId, idUnknown } from './ids';
-
-export type MergedTlsVersionMetricRow = {
-  metric: GenericMetric;
-  /** First raw TLSVersion in the bucket — use for quick-filters so values match Loki labels. */
-  filterValue: string;
-};
-
-// Tolerance, in seconds, to assume presence/emptiness of the last datapoint fetched, when it is
-// close to "now", to accomodate with potential collection latency.
-// Past this tolerance delay, missing datapoints are considered being 0.
-const latencyTolerance = 120;
 
 const shortKindMap: { [k: string]: string } = {
   Service: 'svc',
@@ -42,6 +29,96 @@ const shortKindMap: { [k: string]: string } = {
 };
 
 export const percentileValues = [90, 99];
+
+type PeerDisplayFields = Partial<TopologyMetricPeer> & {
+  resourceKind?: string;
+  isAmbiguous?: boolean;
+};
+
+/**
+ * Attach getDisplayName to a peer deserialized from /api/flow/metrics
+ * (methods cannot round-trip over JSON).
+ */
+export const hydratePeer = (peer: PeerDisplayFields): TopologyMetricPeer => {
+  const hydrated: TopologyMetricPeer = {
+    ...peer,
+    id: peer.id || idUnknown,
+    isAmbiguous: !!peer.isAmbiguous,
+    getDisplayName: () => undefined
+  };
+
+  const setForNameAndType = (nt: NameAndType) => {
+    const { type, name } = nt;
+    hydrated.resourceKind = hydrated.resourceKind || type;
+    hydrated.getDisplayName = (inclNamespace, disambiguate) => {
+      const disamb = disambiguate && hydrated.isAmbiguous ? ` (${shortKindMap[type] || type.toLowerCase()})` : '';
+      return (hydrated.namespace && inclNamespace ? `${hydrated.namespace}.${name}` : name) + disamb;
+    };
+  };
+
+  if (hydrated.resource) {
+    setForNameAndType(hydrated.resource);
+  } else if (hydrated.owner) {
+    setForNameAndType(hydrated.owner);
+  } else {
+    // Scope-only peers from backend enrichment (namespace, host, zone, …)
+    const customs = getCustomScopes();
+    const byKind = customs.find(sc => sc.name === hydrated.resourceKind && hydrated[sc.id]);
+    if (byKind) {
+      const v = hydrated[byKind.id] as string;
+      hydrated.getDisplayName = () => v;
+    } else {
+      customs
+        .slice()
+        .reverse()
+        .forEach(sc => {
+          const v = hydrated[sc.id] as string | undefined;
+          if (v && hydrated.getDisplayName(false, false) === undefined) {
+            if (!hydrated.resourceKind) {
+              hydrated.resourceKind = sc.name;
+            }
+            hydrated.getDisplayName = () => v;
+          }
+        });
+    }
+
+    if (hydrated.getDisplayName(false, false) === undefined) {
+      if (hydrated.subnetLabel && hydrated.addr) {
+        hydrated.getDisplayName = () => `${hydrated.subnetLabel} (${hydrated.addr})`;
+      } else if (hydrated.subnetLabel) {
+        hydrated.getDisplayName = () => hydrated.subnetLabel;
+      } else if (hydrated.addr) {
+        hydrated.getDisplayName = () => hydrated.addr;
+      }
+    }
+  }
+
+  return hydrated;
+};
+
+/** Hydrate topology metrics returned by the backend enrichment path. */
+export const hydrateTopologyMetrics = (metrics: TopologyMetrics[]): TopologyMetrics[] => {
+  return metrics.map(m => ({
+    ...m,
+    source: hydratePeer(m.source),
+    destination: hydratePeer(m.destination)
+  }));
+};
+
+/** Flatten topology rows into GenericMetric when callers expect field-style aggregates. */
+export const genericMetricsFromTopology = (metrics: TopologyMetrics[], aggregateBy: Field): GenericMetric[] => {
+  return metrics.map(m => {
+    const displayName = m.source.getDisplayName(false, false);
+    const fallbackId = m.source.id !== idUnknown ? m.source.id : '';
+    return {
+      name: displayName || fallbackId,
+      values: m.values,
+      stats: m.stats,
+      aggregateBy,
+      ...(m.tls ? { tls: m.tls } : {})
+    };
+  });
+};
 
 /** Merge TLS dimensions from TlsFlows rows (same scope + TLSVersion) into volume topology rows by src/dst peer ids. */
 export const mergeTlsIntoTopologyMetrics = (
@@ -87,362 +164,18 @@ export const mergeTlsIntoTopologyMetrics = (
   });
 };
 
-export const parseTopologyMetrics = (
-  raw: RawTopologyMetrics[],
-  range: number | TimeRange,
-  aggregateBy: FlowScope,
-  unixTimestamp: number,
-  forceZeros: boolean,
-  isMock?: boolean
-): TopologyMetrics[] => {
-  const { start, end, step } = calibrateRange(
-    raw.map(r => r.values),
-    range,
-    unixTimestamp,
-    isMock
-  );
-  const metrics = raw.map(r => parseTopologyMetric(r, start, end, step, aggregateBy, forceZeros));
-
-  const scopeForDisambiguation = aggregateBy.endsWith(topologyTlsVersionAggregateSuffix)
-    ? aggregateBy.slice(0, -topologyTlsVersionAggregateSuffix.length)
-    : aggregateBy;
-
-  // Disambiguate display names with kind when necessary
-  if (scopeForDisambiguation === 'owner' || scopeForDisambiguation === 'resource') {
-    // Define some helpers
-    const addKind = (p: TopologyMetricPeer) => {
-      const name = p.getDisplayName(true, false);
-      if (name) {
-        let existing = nameKinds.get(name);
-        if (!existing) {
-          existing = new Set();
-          nameKinds.set(name, existing);
-        }
-        if (p.resourceKind) {
-          existing.add(p.resourceKind);
-        }
-      }
-    };
-    const checkAmbiguous = (p: TopologyMetricPeer) => {
-      const name = p.getDisplayName(true, false);
-      if (name) {
-        const kinds = nameKinds.get(name);
-        if (kinds && kinds.size > 1 && p.resourceKind) {
-          p.isAmbiguous = true;
-        }
-      }
-    };
-
-    // First pass: extract all names+kind couples
-    const nameKinds = new Map<string, Set<string>>();
-    metrics.forEach((m: TopologyMetrics) => {
-      addKind(m.source);
-      addKind(m.destination);
-    });
-
-    // Second pass: mark if ambiguous
-    metrics.forEach((m: TopologyMetrics) => {
-      checkAmbiguous(m.source);
-      checkAmbiguous(m.destination);
-    });
-  }
-  return metrics;
-};
-
-export const parseGenericMetrics = (
-  raw: RawTopologyMetrics[],
-  range: number | TimeRange,
-  aggregateBy: Field,
-  unixTimestamp: number,
-  forceZeros: boolean,
-  isMock?: boolean
-): GenericMetric[] => {
-  const { start, end, step } = calibrateRange(
-    raw.map(r => r.values),
-    range,
-    unixTimestamp,
-    isMock
-  );
-  return raw.map(r => parseGenericMetric(r, start, end, step, aggregateBy, forceZeros));
-};
-
+/** Build a peer from partial fields (groups, empty nodes, drawer chips, fixtures). */
 export const createPeer = (fields: Partial<TopologyMetricPeer>): TopologyMetricPeer => {
-  const newPeer: TopologyMetricPeer = {
+  const peer: PeerDisplayFields = {
+    ...fields,
     id: getPeerId(fields),
-    addr: fields.addr,
-    resource: fields.resource,
-    owner: fields.owner,
-    subnetLabel: fields.subnetLabel,
-    isAmbiguous: false,
-    getDisplayName: () => undefined
+    isAmbiguous: false
   };
-
-  const setForNameAndType = (nt: NameAndType) => {
-    const { type, name } = nt;
-    newPeer.resourceKind = type;
-    newPeer.getDisplayName = (inclNamespace, disambiguate) => {
-      const disamb = disambiguate && newPeer.isAmbiguous ? ` (${shortKindMap[type] || type.toLowerCase()})` : '';
-      return (newPeer.namespace && inclNamespace ? `${newPeer.namespace}.${name}` : name) + disamb;
-    };
-  };
-
-  if (fields.resource) {
-    // Resource kind
-    setForNameAndType(fields.resource);
-  } else if (fields.owner) {
-    // Owner kind
-    setForNameAndType(fields.owner);
-  }
-
-  // append custom scope fields to peer and set kind + display if not already done
-  getCustomScopes()
-    .reverse()
-    .forEach(sc => {
-      newPeer[sc.id] = fields[sc.id] as string;
-      if (!newPeer.resourceKind && newPeer[sc.id]) {
-        newPeer.resourceKind = sc.name;
-        newPeer.getDisplayName = () => newPeer[sc.id] as string;
-      }
-    });
-
-  // fallback on address and/or subnet label if nothing else available
-  if (!newPeer.resourceKind) {
-    if (fields.subnetLabel && fields.addr) {
-      newPeer.getDisplayName = () => `${fields.subnetLabel} (${fields.addr})`;
-    } else if (fields.subnetLabel) {
-      newPeer.getDisplayName = () => fields.subnetLabel;
-    } else if (fields.addr) {
-      newPeer.getDisplayName = () => fields.addr;
-    }
-  }
-  return newPeer;
-};
-
-const nameAndType = (name?: string, type?: string): NameAndType | undefined => {
-  return name && type ? { name, type } : undefined;
-};
-
-/** Normalize TLS-related metric label values from Loki/Prometheus (arrays, JSON strings, scalars, comma-lists). */
-const normalizeTlsMetricValue = (v: unknown): string | string[] | undefined => {
-  if (v === undefined || v === null) {
-    return undefined;
-  }
-  if (Array.isArray(v)) {
-    return v as string[];
-  }
-  if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
-    return String(v);
-  }
-  return undefined;
-};
-
-/** Parse TLSVersion / TLSGroup from Loki matrix metric JSON (string, JSON array string, or array). */
-const extractTlsListField = (v: string[] | string | undefined | null): string[] => {
-  if (v === undefined || v === null) {
-    return [];
-  }
-  if (Array.isArray(v)) {
-    return _.uniq(v.filter(Boolean).map(String));
-  }
-  if (typeof v === 'string') {
-    const s = v.trim();
-    if (!s || s === '[]' || s === 'null') {
-      return [];
-    }
-    if (s.startsWith('[')) {
-      try {
-        const parsed = JSON.parse(s) as unknown;
-        if (Array.isArray(parsed)) {
-          return _.uniq(parsed.filter(Boolean).map(String));
-        }
-      } catch {
-        return [s];
-      }
-    }
-    // Prometheus / some Loki paths: multi-value as comma-separated label
-    if (s.includes(',')) {
-      return _.uniq(
-        s
-          .split(',')
-          .map(x => x.trim())
-          .filter(Boolean)
-      );
-    }
-    return [s];
-  }
-  return [];
-};
-
-const tlsFromFlowMetricLabels = (metric: Flow): GenericMetricTls | undefined => {
-  const m = metric as Record<string, unknown>;
-  const versionsRaw = extractTlsListField(normalizeTlsMetricValue(m.TLSVersion));
-  const groupsRaw = extractTlsListField(normalizeTlsMetricValue(m.TLSGroup));
-  if (!versionsRaw.length && !groupsRaw.length) {
-    return undefined;
-  }
-  return {
-    ...(versionsRaw.length ? { versions: versionsRaw } : {}),
-    ...(groupsRaw.length ? { groups: groupsRaw } : {})
-  };
-};
-
-const parseTopologyMetric = (
-  raw: RawTopologyMetrics,
-  start: number,
-  end: number,
-  step: number,
-  aggregateBy: FlowScope,
-  forceZeros: boolean
-): TopologyMetrics => {
-  const normalized = normalizeMetrics(raw.values, start, end, step, forceZeros);
-  const stats = computeStats(normalized);
-  const sourceFields: Partial<TopologyMetricPeer> = {
-    addr: raw.metric.SrcAddr,
-    resource: nameAndType(raw.metric.SrcK8S_Name, raw.metric.SrcK8S_Type),
-    owner:
-      raw.metric.SrcK8S_Type !== raw.metric.SrcK8S_OwnerType
-        ? nameAndType(raw.metric.SrcK8S_OwnerName, raw.metric.SrcK8S_OwnerType)
-        : undefined,
-    subnetLabel: raw.metric.SrcSubnetLabel
-  };
-  const destFields: Partial<TopologyMetricPeer> = {
-    addr: raw.metric.DstAddr,
-    resource: nameAndType(raw.metric.DstK8S_Name, raw.metric.DstK8S_Type),
-    owner:
-      raw.metric.DstK8S_Type !== raw.metric.DstK8S_OwnerType
-        ? nameAndType(raw.metric.DstK8S_OwnerName, raw.metric.DstK8S_OwnerType)
-        : undefined,
-    subnetLabel: raw.metric.DstSubnetLabel
-  };
+  // Ensure scope fields are present even when undefined (matches prior createPeer).
   getCustomScopes().forEach(sc => {
-    if (!sc.labels.length) {
-      console.error('invalid scope labels', sc);
-    } else {
-      const srcField = sc.labels.length === 1 ? sc.labels[0] : sc.labels.find(l => l.startsWith('Src'))!;
-      sourceFields[sc.id] = (raw.metric as never)[srcField];
-      const dstField = sc.labels.length === 1 ? sc.labels[0] : sc.labels.find(l => l.startsWith('Dst'))!;
-      destFields[sc.id] = (raw.metric as never)[dstField];
-    }
+    peer[sc.id] = fields[sc.id] as string;
   });
-  const tls = tlsFromFlowMetricLabels(raw.metric as Flow);
-  return {
-    source: createPeer(sourceFields),
-    destination: createPeer(destFields),
-    values: normalized,
-    stats: stats,
-    scope: aggregateBy,
-    ...(tls ? { tls } : {})
-  };
-};
-
-const parseGenericMetric = (
-  raw: RawTopologyMetrics,
-  start: number,
-  end: number,
-  step: number,
-  aggregateBy: Field,
-  forceZeros: boolean
-): GenericMetric => {
-  const values = normalizeMetrics(raw.values, start, end, step, forceZeros);
-  const stats = computeStats(values);
-  const tls = tlsFromFlowMetricLabels(raw.metric as Flow);
-  return {
-    name: String(raw.metric[aggregateBy] || ''),
-    values,
-    stats,
-    aggregateBy,
-    ...(tls ? { tls } : {})
-  };
-};
-
-export const calibrateRange = (
-  raw: [number, unknown][][],
-  range: number | TimeRange,
-  unixTimestamp: number,
-  isMock?: boolean
-): { start: number; end: number; step: number } => {
-  // Extract some info based on range, and apply a tolerance about end range when it is close to "now"
-  const info = computeStepInterval(range);
-  const rangeInSeconds = rangeToSeconds(range);
-  let start: number;
-  let endWithTolerance: number;
-  if (typeof range === 'number') {
-    endWithTolerance = unixTimestamp - latencyTolerance;
-    start = unixTimestamp - rangeInSeconds;
-  } else {
-    start = range.from;
-    endWithTolerance = range.to;
-  }
-
-  let firstTimestamp = start;
-  // Calibrate start date based on actual timestamps, to avoid inaccurate stepping from there
-  //  (which screws up the chart display)
-  const allFirsts = raw.filter(dp => dp.length > 0).map(dp => dp[0][0]);
-  if (allFirsts.length > 0) {
-    firstTimestamp = Math.min(...allFirsts);
-    while (firstTimestamp > start) {
-      firstTimestamp -= info.stepSeconds;
-    }
-  }
-
-  // Extend normalization interval to latest timestamp if bigger than computed endWithTolerance
-  const allLasts = raw.filter(dp => dp.length > 0).map(dp => dp[dp.length - 1][0]);
-  if (allLasts.length > 0) {
-    const lastTimestamp = Math.max(...allLasts);
-    if (lastTimestamp > endWithTolerance) {
-      endWithTolerance = lastTimestamp;
-    }
-  }
-
-  // End time needs to be overridden to avoid huge range since mock is outdated compared to current date
-  if (isMock) {
-    endWithTolerance = Math.max(...raw.filter(dp => dp.length > 0).map(dp => dp[dp.length - 1][0]));
-  }
-
-  return {
-    start: firstTimestamp,
-    end: endWithTolerance,
-    step: info.stepSeconds
-  };
-};
-
-/**
- * normalizeMetrics fills all missing or NaN datapoints with zeros
- */
-export const normalizeMetrics = (
-  values: [number, unknown][],
-  start: number,
-  end: number,
-  step: number,
-  forceZeros: boolean
-): [number, number][] => {
-  let normalized: [number, number][];
-  if (forceZeros) {
-    // Normalize by counting all NaN as zeros
-    normalized = values.map(dp => {
-      let val = Number(dp[1]);
-      if (_.isNaN(val)) {
-        val = 0;
-      }
-      return [dp[0], val];
-    });
-
-    // Normalize by filling missing datapoints with zeros
-    for (let current = start; current < end; current += step) {
-      if (!getValueCloseTo(normalized, current, step)) {
-        normalized.push([current, 0]);
-      }
-    }
-  } else {
-    // skipping NaN
-    normalized = values
-      .filter(dp => !_.isNaN(Number(dp[1])))
-      .map(dp => {
-        return [dp[0], Number(dp[1])];
-      });
-  }
-
-  return normalized.sort((a, b) => a[0] - b[0]);
+  return hydratePeer(peer);
 };
 
 const getValueCloseTo = (values: [number, number][], timestamp: number, step: number): number | undefined => {
@@ -523,14 +256,6 @@ export const matchPeer = (data: NodeData, peer: TopologyMetricPeer): boolean => 
 
 export const isUnknownPeer = (peer: TopologyMetricPeer): boolean => peer.id === idUnknown;
 
-const stepFromGenericValues = (values: [number, number][]): number => {
-  if (values.length < 2) {
-    return 1;
-  }
-  const d = values[1][0] - values[0][0];
-  return Number.isFinite(d) && d > 0 ? d : 1;
-};
-
 const combineValues = (
   values1: [number, number][],
   values2: [number, number][],
@@ -547,68 +272,6 @@ const combineValues = (
     }
     return [t, op(v1, v2)];
   });
-};
-
-/**
- * Merge metrics rows that share the same TLSVersion label (after trim). Preserves raw Loki label strings.
- */
-export const mergeTlsVersionUsageMetrics = (rows: GenericMetric[]): MergedTlsVersionMetricRow[] => {
-  type Bucket = { displayName: string; filterValue: string; rows: GenericMetric[] };
-  const buckets = new Map<string, Bucket>();
-
-  for (const row of rows) {
-    const display = row.name.trim();
-    if (!display) {
-      continue;
-    }
-    let b = buckets.get(display);
-    if (!b) {
-      b = { displayName: display, filterValue: row.name, rows: [] };
-      buckets.set(display, b);
-    }
-    b.rows.push(row);
-  }
-
-  const merged: MergedTlsVersionMetricRow[] = [];
-  for (const b of buckets.values()) {
-    const { rows: group, displayName, filterValue } = b;
-    if (group.length === 1) {
-      const g0 = group[0];
-      merged.push({
-        metric: displayName === g0.name ? g0 : { ...g0, name: displayName },
-        filterValue
-      });
-      continue;
-    }
-    const seedIndex = group.findIndex(row => row.values.length > 0);
-    if (seedIndex < 0) {
-      merged.push({
-        metric: { ...group[0], name: displayName, values: [], stats: computeStats([]) },
-        filterValue
-      });
-      continue;
-    }
-    const step = stepFromGenericValues(group[seedIndex].values);
-    let values = group[seedIndex].values;
-    for (let i = 0; i < group.length; i++) {
-      if (i === seedIndex) {
-        continue;
-      }
-      values = combineValues(values, group[i].values, step, (a, b) => a + b);
-    }
-    merged.push({
-      metric: {
-        ...group[0],
-        name: displayName,
-        values,
-        stats: computeStats(values)
-      },
-      filterValue
-    });
-  }
-
-  merged.sort((a, b) => a.metric.name.localeCompare(b.metric.name));
-  return merged;
 };
 
 const combineMetrics = (

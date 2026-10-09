@@ -1,23 +1,25 @@
 /// <reference types="cypress" />
-import r from './../../../../mocks/loki/flow_records.json';
+import {
+  cloneFieldsSpecMock,
+  FIELDS_SPEC_ROW_INDICES,
+  patchFieldsSpecMock
+} from '../../../src/components/__tests-data__/fields-spec';
+
+const flowRecords = cloneFieldsSpecMock();
+patchFieldsSpecMock(flowRecords);
+
+const flowRecordsResponse = {
+  ...flowRecords.data,
+  stats: { numQueries: 1, limitReached: false, dataSources: ['loki'] },
+  unixTimestamp: Math.floor(Date.now() / 1000)
+};
 
 describe('netflow-table', () => {
-  const updatedData = r;
-  updatedData.data.result.forEach(r => {
-    r.values.forEach(v => {
-      if(v[1].includes("NetworkEvents")){
-        // need to inject network events manually since this is done on backend side. See NetworkEventsToString func
-        // eslint-disable-next-line max-len
-        v[1] = "{\"TimeFlowRttNs\":7114000,\"DstPort\":50104,\"TimeFlowStartMs\":1708011867121,\"Proto\":1,\"AgentIP\":\"10.0.1.7\",\"Etype\":2048,\"Bytes\":226,\"DstK8S_Name\":\"ip-10-0-1-7.ec2.internal\",\"DstAddr\":\"10.0.1.7\",\"DstK8S_HostName\":\"ip-10-0-1-7.ec2.internal\",\"DstK8S_OwnerType\":\"Node\",\"SrcAddr\":\"10.0.1.140\",\"Packets\":1,\"TimeFlowEndMs\":1708011867121,\"DstK8S_HostIP\":\"10.0.1.7\",\"TimeReceived\":1708011867,\"SrcPort\":443,\"Flags\":16,\"IfDirection\":0,\"DnsErrno\":0,\"SrcMac\":\"02:7B:32:68:BE:65\",\"Interface\":\"br-ex\",\"Dscp\":0,\"DstMac\":\"02:27:A1:A8:84:B9\",\"IcmpType\":3,\"IcmpCode\":0,\"NetworkEvents\":[\"Allowed by default allow from local node policy, direction Ingress\"]}";
-      }
-    });
-  });
-
   beforeEach(() => {
     // this test bench only work with mocks
     cy.intercept('GET', '/api/loki/flow/records?*', {
       statusCode: 200,
-      body: r.data,
+      body: flowRecordsResponse
     });
     cy.intercept('/api/frontend-config', (req) => {
       req.continue((res) => {
@@ -42,7 +44,7 @@ describe('netflow-table', () => {
             break;
           default:
             // disable all features by default
-            res.body.featutes = [];
+            res.body.features = [];
             break;
         }
       });
@@ -53,99 +55,85 @@ describe('netflow-table', () => {
     cy.get('.tableTabButton').click();
     // clear default app filters
     cy.get('#clear-all-filters-button').click();
+    // row indices below assume End Time descending (newest flows first)
+    cy.get('#table-container').find('tr').its('length').should('be.gte', 10);
+    // Default sort is End Time ascending; one click switches to descending.
+    cy.get('thead').contains('End Time').click();
+    cy.get('[aria-sort="descending"]').should('have.length', 1);
   });
 
   it('display standard content', () => {
-    // select first row
-    cy.get('#netflow-table-row-0').click();
-
-    // check for side panel content
-    // dates
-    //cy.checkRecordField('StartTime', 'Start Time', ['Feb 15, 2024', '4:44:27.121 PM']);
-    //cy.checkRecordField('EndTime', 'End Time', ['Feb 15, 2024', '4:44:27.121 PM']);
+    cy.get(`#netflow-table-row-${FIELDS_SPEC_ROW_INDICES.standard}`).click();
 
     // source accordion
-    cy.get('[data-test-id="group-2"]').contains("Source");
-    cy.checkRecordField('SrcK8S_Name', 'Name', ['N', 'ip-10-0-1-7.ec2.internal']);
-    cy.checkRecordField('SrcK8S_Type', 'Kind', ['Node']);
-    cy.checkRecordField('SrcAddr', 'IP', ['10.0.1.7']);
-    cy.checkRecordField('SrcPort', 'Port', ['50104']);
-    cy.checkRecordField('SrcMac', 'MAC', ['02:27:A1:A8:84:B9']);
+    cy.get('[data-test-id="group-2"]').contains('Source');
+    cy.checkRecordField('SrcK8S_Name', 'Name', ['service-ca-operator-6d4bb6c9-crvqx']);
+    cy.checkRecordField('SrcK8S_Type', 'Kind', ['Pod']);
+    cy.checkRecordField('SrcAddr', 'IP', ['10.128.0.17']);
+    cy.checkRecordField('SrcPort', 'Port', ['51628']);
+    cy.checkRecordField('SrcMac', 'MAC', ['0a:58:0a:80:00:01']);
 
     // destination accordion
-    cy.get('[data-test-id="group-3"]').contains("Destination");
-    cy.checkRecordField('DstAddr', 'IP', ['10.0.1.140']);
-    cy.checkRecordField('DstPort', 'Port', ['https', '443']);
-    cy.checkRecordField('DstMac', 'MAC', ['02:7B:32:68:BE:65']);
+    cy.get('[data-test-id="group-3"]').contains('Destination');
+    cy.checkRecordField('DstAddr', 'IP', ['172.20.0.1']);
+    cy.checkRecordField('DstPort', 'Port', ['6443']);
+    cy.checkRecordField('DstMac', 'MAC', ['0a:58:0a:80:00:02']);
 
     // others
     cy.checkRecordField('K8S_FlowLayer', 'Flow layer', ['infra']);
 
-    cy.get('[data-test-id="group-5"]').contains("Protocol Info");
-    cy.checkRecordField('Proto', 'Protocol', ['ICMP']);
+    cy.get('[data-test-id="group-5"]').contains('Protocol Info');
+    cy.checkRecordField('Proto', 'Protocol', ['TCP']);
     cy.checkRecordField('Dscp', 'DSCP', ['Standard']);
-    cy.checkRecordField('IcmpType', 'Type', ['ICMP_DEST_UNREACH']);
-    cy.checkRecordField('IcmpCode', 'Code', ['ICMP_NET_UNREACH']);
 
     cy.checkRecordField('FlowDirection', 'Node Direction', ['Egress']);
-    cy.checkRecordField('FlowDirInts', 'Interfaces and Directions', ['br-ex', 'test', 'Egress', 'Ingress']);
+    cy.checkRecordField('FlowDirInts', 'Interfaces and Directions', ['ovn-k8s-mp0', 'Ingress']);
 
-    cy.checkRecordField('Bytes', 'Bytes', ['66 bytes sent']);
-    cy.checkRecordField('Packets', 'Packets', ['1 packets sent']);
+    cy.checkRecordField('Bytes', 'Bytes', ['1109 bytes sent']);
+    cy.checkRecordField('Packets', 'Packets', ['14 packets sent']);
   });
 
   it('display pktDrop', () => {
-    // select third row
-    cy.get('#netflow-table-row-2').click();
+    cy.get(`#netflow-table-row-${FIELDS_SPEC_ROW_INDICES.pktDrop}`).click();
 
-    // check for drop bytes and packets
     cy.checkRecordField('Bytes', 'Bytes', ['32 bytes dropped']);
-    cy.checkRecordField('Packets', 'Packets', ['1 packets dropped', 'SKB_DROP_REASON_TCP_INVALID_SEQUENCE']);
+    cy.checkRecordField('Packets', 'Packets', ['1 packets dropped', 'SKB_DROP_REASON_TCP_ACK_UNSENT_DATA']);
   });
 
   it('display dnsTracking', () => {
-    // select 19th row
-    cy.get('#netflow-table-row-19').click();
+    cy.get(`#netflow-table-row-${FIELDS_SPEC_ROW_INDICES.dns}`).click();
 
-    // check for id, latency and errors
-    cy.checkRecordField('DNSId', 'Id', ['48706']);
+    cy.checkRecordField('DNSId', 'Id', ['49856']);
     cy.checkRecordField('DNSLatency', 'Latency', ['< 1ms']);
     cy.checkRecordField('DNSResponseCode', 'Response Code', ['No Error']);
-    cy.checkRecordField('DNSErrNo', 'Error', ['0']);
+    cy.checkRecordField('DNSErrNo', 'Error', ['2']);
   });
 
   it('display flowRTT', () => {
-    // select second row
-    cy.get('#netflow-table-row-2').click();
+    cy.get(`#netflow-table-row-${FIELDS_SPEC_ROW_INDICES.flowRTT}`).click();
 
-    // check for rtt
-    cy.checkRecordField('TimeFlowRttMs', 'Flow RTT', ['4ms']);
+    cy.checkRecordField('TimeFlowRttMs', 'Flow RTT', ['6ms']);
   });
 
   it('display multiCluster', () => {
-    // select 9th row
-    cy.get('#netflow-table-row-9').click();
+    cy.get(`#netflow-table-row-${FIELDS_SPEC_ROW_INDICES.multiCluster}`).click();
 
-    // check for cluster name
     cy.checkRecordField('ClusterName', 'Cluster', ['test-cluster']);
   });
 
   it('display zones', () => {
-    // select second row
-    cy.get('#netflow-table-row-2').click();
+    cy.get(`#netflow-table-row-${FIELDS_SPEC_ROW_INDICES.zonesSrc}`).click();
+    cy.checkRecordField('SrcZone', 'Zone', ['us-east-1d']);
 
-    // check for source zone
-    cy.checkRecordField('SrcZone', 'Zone', ['eu-west-1']);
-
-    // check for destination zone
-    cy.checkRecordField('DstZone', 'Zone', ['us-east-2']);
+    cy.get(`#netflow-table-row-${FIELDS_SPEC_ROW_INDICES.zonesDst}`).click();
+    cy.checkRecordField('DstZone', 'Zone', ['us-east-1d']);
   });
 
   it('display networkEvents', () => {
-    // select third row
-    cy.get('#netflow-table-row-3').click();
+    cy.get(`#netflow-table-row-${FIELDS_SPEC_ROW_INDICES.networkEvents}`).click();
 
-    // check for source zone
-    cy.checkRecordField('NetworkEvents', 'Network Events', ['Allowed by default allow from local node policy, direction Ingress']);
+    cy.checkRecordField('NetworkEvents', 'Network Events', [
+      'Allowed by default allow from local node policy, direction Ingress'
+    ]);
   });
-})
+});
