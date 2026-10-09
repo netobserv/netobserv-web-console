@@ -124,15 +124,28 @@ describe('(OCP-90529) Network Traffic Tab on VMI Page', { tags: ['Network_Observ
         cy.get('#content', { timeout: 30000 }).should('be.visible')
         cy.wait(3000)
 
-        // Wait for page title to settle and not cover the tabs
+        // Wait for page title to settle and not cover the tabs.
         cy.get('h1', { timeout: 10000 }).should('be.visible')
         cy.wait(1000)
+        // PF6 can load the virtualization welcome dialog asynchronously after
+        // navigation. Dismiss it again and verify no visible welcome dialog can
+        // cover the Network Traffic tab.
+        cy.dismissWelcomeModal()
+        cy.get('body').should($body => {
+          const welcome = $body.find('[role="dialog"]:visible').filter((_, el) =>
+            Cypress.$(el).text().includes('Welcome to OpenShift Virtualization'))
+          expect(welcome).to.have.length(0)
+        })
 
         // Check if Network Traffic tab is present, scroll into view and click it
         cy.get('[data-test-id="horizontal-link-Network Traffic"]', { timeout: 60000 })
           .should('exist')
           .scrollIntoView({ behavior: 'smooth', block: 'center' })
-          .wait(1000)
+        cy.wait(1000)
+        // The virtualization page rerenders its tabs after scrolling; acquire a
+        // fresh subject before clicking to avoid a detached-element failure.
+        cy.get('[data-test-id="horizontal-link-Network Traffic"]', { timeout: 60000 })
+          .should('be.visible')
           .click({ force: true })
         cy.checkNetflowTraffic()
 

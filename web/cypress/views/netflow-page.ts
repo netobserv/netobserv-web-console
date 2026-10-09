@@ -584,7 +584,7 @@ Cypress.Commands.add('checkNetflowTraffic', (loki = "Enabled") => {
         cy.get('li.tableTabButton').should('exist').should('have.class', 'pf-m-disabled')
     }
     else {
-        cy.get('#tabs-container').contains('Traffic flows').click()
+        cy.get('#tabs-container').contains('Traffic flows').click({ force: true })
         netflowPage.waitForLokiQuery()
         // Allow extra time: Loki ingester may still be warming up even after
         // pod Ready; auto-refresh retries queries every 15s so 120s ≈ 8 cycles
@@ -592,7 +592,7 @@ Cypress.Commands.add('checkNetflowTraffic', (loki = "Enabled") => {
     }
 
     // topology view
-    cy.get('#tabs-container').contains('Topology').click()
+    cy.get('#tabs-container').contains('Topology').click({ force: true })
     cy.wait(2000)
     cy.get('#drawer', { timeout: 60000 }).should('not.be.empty')
 });
