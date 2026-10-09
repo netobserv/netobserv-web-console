@@ -345,8 +345,8 @@ export const HealthRulesManager: React.FC<HealthRulesManagerProps> = ({ isOpen, 
             pending?.type === 'reset'
               ? t('Reset template to defaults?')
               : pending?.type === 'delete'
-              ? t('Delete custom rule?')
-              : ''
+                ? t('Delete custom rule?')
+                : ''
           }
           isOpen={Boolean(pending)}
           scrollable={false}

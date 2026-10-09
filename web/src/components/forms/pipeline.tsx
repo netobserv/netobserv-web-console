@@ -199,8 +199,8 @@ export const Pipeline: React.FC<FlowCollectorPipelineProps> = ({ existing, selec
           kafkaCondition.status === 'True'
             ? RunStatus.Succeeded
             : kafkaCondition.status === 'False'
-            ? RunStatus.Failed
-            : RunStatus.Pending;
+              ? RunStatus.Failed
+              : RunStatus.Pending;
       }
       steps.push({
         id: 'kafka',

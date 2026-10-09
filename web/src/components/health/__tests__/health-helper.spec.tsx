@@ -272,7 +272,7 @@ describe('rulesToHealthItems, malformed annotation', () => {
           value: '1'
         }
       ]
-    } as unknown as Rule);
+    }) as unknown as Rule;
 
   it('falls back to default metadata (and logs) instead of throwing on truncated JSON', () => {
     // Regression: a third-party rule with a truncated netobserv_io_network_health value used to throw
