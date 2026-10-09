@@ -107,10 +107,10 @@ export const HealthDrawerContainer: React.FC<HealthDrawerContainerProps> = ({
                                 breakdown.score < 5
                                   ? 'var(--pf-t--global--color--status--danger--default)'
                                   : breakdown.score < 7
-                                  ? 'var(--pf-t--global--color--status--warning--default)'
-                                  : breakdown.score < 9
-                                  ? 'var(--pf-t--global--color--status--info--default)'
-                                  : 'var(--pf-t--global--color--status--success--default)'
+                                    ? 'var(--pf-t--global--color--status--warning--default)'
+                                    : breakdown.score < 9
+                                      ? 'var(--pf-t--global--color--status--info--default)'
+                                      : 'var(--pf-t--global--color--status--success--default)'
                             }}
                           />
                         </div>

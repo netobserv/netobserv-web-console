@@ -350,8 +350,8 @@ export const ResourceStatus: FC<ResourceStatusProps> = ({
                     tone === 'warning'
                       ? { color: 'var(--pf-t--global--text--color--status--warning--default)' }
                       : tone === 'error'
-                      ? { color: 'var(--pf-t--global--text--color--status--danger--default)' }
-                      : undefined
+                        ? { color: 'var(--pf-t--global--text--color--status--danger--default)' }
+                        : undefined
                   }
                 >
                   {condition.message}

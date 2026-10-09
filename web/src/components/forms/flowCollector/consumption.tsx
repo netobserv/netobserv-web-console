@@ -131,8 +131,8 @@ export const Consumption: FC<ResourceCalculatorProps> = ({ flowCollector, setSam
                 {!rpLoaded || !tpLoaded
                   ? loadingComponent()
                   : rpError || tpError
-                  ? errorComponent()
-                  : `${Math.round(value(receivedPackets) + value(transmittedPackets))} pps`}
+                    ? errorComponent()
+                    : `${Math.round(value(receivedPackets) + value(transmittedPackets))} pps`}
               </Td>
               <Td>{labelsCount('node')}</Td>
               <Td>{labelsCount('namespace')}</Td>
