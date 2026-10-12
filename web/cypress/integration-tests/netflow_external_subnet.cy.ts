@@ -4,8 +4,10 @@ import { Operator } from "@views/netobserv"
 describe('(OCP-67615, OCP-72874) Return external traffic and custom subnet labels test', { tags: ['Network_Observability'] }, function () {
 
     before('any test', function () {
-        cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
-        cy.uiLogin(Cypress.env('LOGIN_IDP'), Cypress.env('LOGIN_USERNAME'), Cypress.env('LOGIN_PASSWORD'))
+        cy.env(['LOGIN_IDP', 'LOGIN_USERNAME', 'LOGIN_PASSWORD']).then(({ LOGIN_IDP, LOGIN_USERNAME, LOGIN_PASSWORD }) => {
+            cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${LOGIN_USERNAME}`)
+            cy.uiLogin(LOGIN_IDP, LOGIN_USERNAME, LOGIN_PASSWORD)
+        })
 
         Operator.install()
         cy.checkStorageClass(this)
@@ -56,6 +58,8 @@ describe('(OCP-67615, OCP-72874) Return external traffic and custom subnet label
     after("all tests", function () {
         cy.adminCLI('oc delete -f cypress/fixtures/test-pod.yaml --ignore-not-found')
         Operator.deleteFlowCollector()
-        cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
+        cy.env(['LOGIN_USERNAME']).then(({ LOGIN_USERNAME }) => {
+            cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${LOGIN_USERNAME}`)
+        })
     })
 })
