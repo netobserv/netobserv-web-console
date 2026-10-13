@@ -3,7 +3,7 @@
 
 # cypress/browsers ships browsers but not the Cypress binary, so the Cypress
 # version comes solely from web/package.json (no version mismatch on tag bumps).
-FROM cypress/browsers:24.20.0
+FROM cypress/browsers:24.21.0
 
 # Install additional dependencies
 USER root
