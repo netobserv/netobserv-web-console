@@ -88,17 +88,17 @@ func getLokiError(resp []byte, code int) (int, *apierrors.LokiResponseError) {
 	err := json.Unmarshal(resp, &f)
 	if err != nil {
 		log.WithError(err).Errorf("cannot unmarshal, response was: %v", string(resp))
-		return http.StatusBadRequest, apierrors.NewLokiResponseError(code, fmt.Sprintf("Unknown error from Loki\ncannot unmarshal\n%s", resp))
+		return code, apierrors.NewLokiResponseError(code, fmt.Sprintf("Unknown error from Loki\ncannot unmarshal\n%s", resp))
 	}
 	message, ok := f["error"]
 	if !ok {
 		message, ok = f["message"]
 		if !ok {
 			log.WithError(err).Errorf("unknown Loki error: %v", f)
-			return http.StatusBadRequest, apierrors.NewLokiResponseError(code, "Unknown error from Loki")
+			return http.StatusServiceUnavailable, apierrors.NewLokiResponseError(code, "Unknown error from Loki")
 		}
 	}
-	return http.StatusBadRequest, apierrors.NewLokiResponseError(code, fmt.Sprintf("Loki message: %s", message))
+	return http.StatusServiceUnavailable, apierrors.NewLokiResponseError(code, fmt.Sprintf("Loki message: %s", message))
 }
 
 func (c *Client) Fetch(query string) (model.QueryResponse, int, apierrors.StructuredError) {

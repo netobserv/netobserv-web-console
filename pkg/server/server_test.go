@@ -506,6 +506,15 @@ func (l *httpMock) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	_ = l.Called(w, r)
 }
 
+func (l *httpMock) MockHTTPResponse(code int, resp []byte) {
+	l.On("ServeHTTP", mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		if code != 0 {
+			args.Get(0).(http.ResponseWriter).WriteHeader(code)
+		}
+		_, _ = args.Get(0).(http.ResponseWriter).Write(resp)
+	})
+}
+
 type authMock struct {
 	mock.Mock
 }
