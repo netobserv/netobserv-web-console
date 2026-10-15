@@ -27,6 +27,10 @@ import { isScopeAvailable } from './scopes';
 export interface ConfigCapabilities {
   allowLoki: boolean;
   allowProm: boolean;
+  /** Overview/Topology metrics available via Prometheus and/or Loki. */
+  allowMetrics: boolean;
+  /** Raw flow table available via Loki and/or s3. */
+  allowRawFlows: boolean;
   isFlow: boolean;
   isConnectionTracking: boolean;
   isDNSTracking: boolean;
@@ -96,9 +100,16 @@ export function useConfigCapabilities(params: {
   // Boolean capabilities
   const allowLoki = React.useMemo(() => config.dataSources.some(ds => ds === 'loki'), [config.dataSources]);
 
+  const allowRawFlows = React.useMemo(() => config.dataSources.some(ds => ds === 'loki'), [config.dataSources]);
+
   const allowProm = React.useMemo(
     () => config.dataSources.some(ds => ds === 'prom') && selectedViewId !== 'table',
     [config.dataSources, selectedViewId]
+  );
+
+  const allowMetrics = React.useMemo(
+    () => config.dataSources.some(ds => ds === 'prom' || ds === 'loki'),
+    [config.dataSources]
   );
 
   const isFlow = React.useMemo(() => config.recordTypes.some(rt => rt === 'flowLog'), [config.recordTypes]);
@@ -318,6 +329,8 @@ export function useConfigCapabilities(params: {
   return {
     allowLoki,
     allowProm,
+    allowMetrics,
+    allowRawFlows,
     isFlow,
     isConnectionTracking,
     isDNSTracking,
