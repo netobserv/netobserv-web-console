@@ -39,14 +39,14 @@ func getStartTime(params url.Values) (time.Time, error) {
 func getEndTime(params url.Values) (time.Time, error) {
 	end := params.Get(endTimeKey)
 	var eTime time.Time
-	if len(end) > 0 {
-		r, err := strconv.ParseInt(end, 10, 64)
-		if err != nil {
-			return eTime, errors.New("Could not parse end time: " + err.Error())
-		}
-		eTime = time.Unix(r+1, 0)
+	if len(end) == 0 {
+		return eTime, nil
 	}
-	return eTime, nil
+	r, err := strconv.ParseInt(end, 10, 64)
+	if err != nil {
+		return eTime, errors.New("Could not parse end time: " + err.Error())
+	}
+	return time.Unix(r+1, 0), nil
 }
 
 // getLimit returns limit parsed as int

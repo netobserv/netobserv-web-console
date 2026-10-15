@@ -149,7 +149,7 @@ export const getUDNs = (tenant?: string): Promise<string[]> => {
 };
 
 export const getZones = (tenant?: string): Promise<string[]> => {
-  const params = { namespace: tenant };
+  const params = { tenant: tenant };
   return axios.get(ContextSingleton.getHost() + '/api/resources/zones', { params }).then(r => {
     if (r.status >= 400) {
       throw new Error(`${r.statusText} [code=${r.status}]`);
@@ -159,7 +159,7 @@ export const getZones = (tenant?: string): Promise<string[]> => {
 };
 
 export const getNamespaces = (tenant?: string): Promise<string[]> => {
-  const params = { namespace: tenant };
+  const params = { tenant: tenant };
   return axios.get(ContextSingleton.getHost() + '/api/resources/namespaces', { params }).then(r => {
     if (r.status >= 400) {
       throw new Error(`${r.statusText} [code=${r.status}]`);

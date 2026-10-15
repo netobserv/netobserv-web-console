@@ -31,7 +31,10 @@ func NewTopologyQuery(cfg *config.Loki, kl map[string][]string, p *backend.Metri
 		rt = "flowLog"
 	}
 	startStr, endStr := p.DatesToString()
-	top := strconv.FormatInt(int64(p.Top), 10)
+	var top string
+	if p.Top > 0 {
+		top = strconv.FormatInt(int64(p.Top), 10)
+	}
 
 	fqb := NewFlowQueryBuilder(cfg, startStr, endStr, top, rt, p.PacketLoss)
 	return &TopologyQueryBuilder{

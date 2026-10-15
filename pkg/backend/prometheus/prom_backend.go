@@ -127,7 +127,7 @@ func (b *Backend) GetLabelValues(ctx context.Context, bctx *backend.QueryContext
 				// In case this was a prometheus 401 / 403 error, the query is repeated with Loki
 				// This is because multi-tenancy is currently not managed for prom datasource, hence such queries have to go with Loki
 				// We don't know a safe and generic way to pre-flight check if the user will be authorized
-				return nil, 0, &backend.UnmanagedError{}
+				return nil, code, backend.NewUnmanagedError(err)
 			}
 			return nil, code, apierrors.NewPromClientError(fmt.Errorf("error while fetching label %s values from Prometheus: %w", label, err))
 		}

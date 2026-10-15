@@ -3,6 +3,7 @@ package prometheus
 import (
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/netobserv/network-observability-console-plugin/pkg/backend"
 	"github.com/netobserv/network-observability-console-plugin/pkg/model/filters"
@@ -122,11 +123,15 @@ func (q *QueryBuilder) Build() Query {
 		sb.WriteRune(')') // closes topk(...
 	}
 
+	end := q.params.End
+	if end.IsZero() {
+		end = time.Now()
+	}
 	return Query{
 		PromQL: sb.String(),
 		Range: v1.Range{
 			Start: q.params.Start,
-			End:   q.params.End,
+			End:   end,
 			Step:  q.params.Step,
 		},
 	}
