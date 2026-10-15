@@ -7,6 +7,7 @@ import (
 	"time"
 
 	json "github.com/json-iterator/go"
+	"github.com/netobserv/network-observability-console-plugin/pkg/utils/constants"
 )
 
 type FlowLineMapping = func(string) string
@@ -47,7 +48,7 @@ func (e *Entry) MarshalJSON() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return []byte(fmt.Sprintf("[\"%d\",%s]", e.Timestamp.UnixNano(), l)), nil
+	return fmt.Appendf(nil, "[\"%d\",%s]", e.Timestamp.UnixNano(), l), nil
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -68,4 +69,25 @@ func (e *Entry) UnmarshalJSON(data []byte) error {
 	e.Line = unmarshal[1]
 
 	return nil
+}
+
+func NewAggregatedQueryResponse(from *QueryResponse, ds constants.DataSource) *AggregatedQueryResponse {
+	agg := &AggregatedQueryResponse{
+		ResultType: from.Data.ResultType,
+		Result:     from.Data.Result,
+		Stats: AggregatedStats{
+			NumQueries:   1,
+			LimitReached: from.LimitReached,
+			QueriesStats: []interface{}{from.Data.Stats},
+			DataSources:  []constants.DataSource{ds},
+		},
+	}
+	if from.Data.ResultType == ResultTypeStream {
+		if streams, ok := from.Data.Result.(Streams); ok {
+			for _, stream := range streams {
+				agg.Stats.TotalEntries += len(stream.Entries)
+			}
+		}
+	}
+	return agg
 }
