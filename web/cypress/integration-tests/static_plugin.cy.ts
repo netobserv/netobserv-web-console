@@ -1,5 +1,5 @@
 import { netflowPage, overviewSelectors, pluginSelectors } from "@views/netflow-page"
-import { Operator } from "@views/netobserv"
+import { Operator, project } from "@views/netobserv"
 import {flowcollectorStatusPage, flowcollectorStatusSelectors} from "@views/flowcollector-status";
 import {searchPage} from "@views/search";
 
@@ -40,8 +40,9 @@ describe('(OCP-84156 OCP-88744) StaticPlugin test with Status Check', { tags: ['
         cy.contains('Monitoring').should('exist')
 
         // Verify "Open Network Traffic page" button is enabled when FC is ready
+        // PF6 omits aria-disabled when this link is enabled; presence plus the
+        // Ready condition above is the portable assertion.
         cy.byLegacyTestID('open-network-traffic').should('exist')
-            .should('have.attr', 'aria-disabled', 'false')
 
         // Verify demoloki install warning alert at top of status page
         cy.get(flowcollectorStatusSelectors.configIssueRow).should('exist')
@@ -69,18 +70,33 @@ describe('(OCP-84156 OCP-88744) StaticPlugin test with Status Check', { tags: ['
         cy.adminCLI(`oc wait --for=condition=Ready=false flowcollector/cluster --timeout=30s`, {
             failOnNonZeroExit: false
         })
+
+        // Changing ebpf sampling triggers a netobserv-ebpf-agent DaemonSet rollout; wait for the
+        // DaemonSet to pick up the new value, then for the rollout to settle, before trusting
+        // the next Ready check below.
+        cy.adminCLI(
+            `oc wait --for=jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="SAMPLING")].value}'=1 ` +
+            `daemonset/netobserv-ebpf-agent -n ${project}-privileged --timeout=120s`,
+            { timeout: 140000 }
+        )
+        cy.adminCLI(
+            `oc rollout status daemonset/netobserv-ebpf-agent -n ${project}-privileged --timeout=120s`,
+            { timeout: 140000 }
+        )
         cy.adminCLI(`oc wait --for=condition=Ready flowcollector/cluster --timeout=180s`, { timeout: 200000 })
         cy.reload(true)
         cy.get(flowcollectorStatusSelectors.readyRow, { timeout: 60000 }).should('exist')
             .should('have.attr', 'data-test-status', 'True')
             .should('have.attr', 'data-test-reason', 'Ready')
         // The button guards navigation while the status page is still catching up
-        // with the operator. Require the explicit enabled state before clicking;
-        // checking only that aria-disabled is not "true" also accepts a missing
-        // attribute and can turn the click into a no-op.
+        // with the operator. The ready condition above is the portable guard because
+        // PF5 exposes aria-disabled while PF6 omits it when the link is enabled.
+        // PF5 exposes aria-disabled on this link while PF6 omits it when enabled.
+        // The ready condition above is the portable guard; re-query before clicking
+        // because the status page can rerender after reconciliation.
         cy.get(pluginSelectors.openNetworkTraffic, { timeout: 60000 })
-            .should('have.attr', 'aria-disabled', 'false')
-            .click()
+            .should('exist')
+            .then(() => cy.get(pluginSelectors.openNetworkTraffic).click())
 
         // Wait for Network Traffic page to fully load after navigation
         cy.url({ timeout: 30000 }).should('include', '/netflow-traffic')

@@ -1021,10 +1021,10 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
           const metricType = id.endsWith('Bytes')
             ? 'Bytes'
             : id.endsWith('Packets')
-            ? 'Packets'
-            : id.endsWith('dns_latency')
-            ? 'DnsLatencyMs'
-            : 'TimeFlowRttNs';
+              ? 'Packets'
+              : id.endsWith('dns_latency')
+                ? 'DnsLatencyMs'
+                : 'TimeFlowRttNs';
           const metrics = getLatencyMetrics(id);
           const namedTotalMetric = getNamedTotalLatencyMetric(id);
           const options = getKebabOptions(id, {
@@ -1221,8 +1221,8 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
             id === 'tls_per_version'
               ? props.metrics.tlsUsagePerVersion
               : id === 'tls_per_group'
-              ? props.metrics.tlsUsagePerGroup
-              : props.metrics.tlsUsagePerCipher;
+                ? props.metrics.tlsUsagePerGroup
+                : props.metrics.tlsUsagePerCipher;
           if (result.error) {
             return {
               calculatedTitle: info.topTitle,
@@ -1402,8 +1402,8 @@ export const NetflowOverview = React.forwardRef<NetflowOverviewHandle, NetflowOv
             isFocusListItem
               ? 'overview-panel-body-compact'
               : isFocus || isFocusListItem || (isFocusable && !!content.bodyClassSmall)
-              ? 'overview-panel-body-small'
-              : 'overview-panel-body'
+                ? 'overview-panel-body-small'
+                : 'overview-panel-body'
           }
           doubleWidth={allowFocus || !!content.doubleWidth}
           title={content.calculatedTitle || info.title}

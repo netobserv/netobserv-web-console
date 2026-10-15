@@ -24,6 +24,9 @@ updates:
         applies-to: version-updates
         patterns:
           - "cypress"
+    ignore:
+      - dependency-name: "mobx"
+        update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
 
   - package-ecosystem: "docker"
     directory: "/"

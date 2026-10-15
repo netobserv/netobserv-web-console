@@ -7,7 +7,7 @@ const edgeWith = (partial: { visible?: boolean; role?: string; source?: Node; ta
     getData: () => (partial.role ? { role: partial.role } : {}),
     getSource: () => partial.source ?? null,
     getTarget: () => partial.target ?? null
-  } as unknown as Edge);
+  }) as unknown as Edge;
 
 describe('isLayoutRelevantEdge', () => {
   it('rejects hidden edges', () => {
@@ -34,7 +34,7 @@ describe('collectLayoutLinks', () => {
   it('skips exit/entry, unresolved ends, and self-loops while initializing bendpoints', () => {
     const initBendpoints = jest.fn();
     const createLink = jest.fn(
-      (_edge: Edge, source: LayoutNode, target: LayoutNode) => ({ source, target } as LayoutLink)
+      (_edge: Edge, source: LayoutNode, target: LayoutNode) => ({ source, target }) as LayoutLink
     );
     const getLayoutNode = jest.fn((_nodes: LayoutNode[], node: Node | null) => {
       if (node === sourceNode) {

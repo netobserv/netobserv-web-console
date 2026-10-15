@@ -254,8 +254,8 @@ export const Pipeline: React.FC<FlowCollectorPipelineProps> = ({ existing, selec
           kafkaCondition.status === 'True'
             ? RunStatus.Succeeded
             : kafkaCondition.status === 'False'
-            ? RunStatus.Failed
-            : RunStatus.Pending;
+              ? RunStatus.Failed
+              : RunStatus.Pending;
       }
       steps.push({
         id: 'kafka',
@@ -350,7 +350,7 @@ export const Pipeline: React.FC<FlowCollectorPipelineProps> = ({ existing, selec
           style: {
             padding: [45, 15]
           }
-        } as PipelineNodeModel)
+        }) as PipelineNodeModel
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [

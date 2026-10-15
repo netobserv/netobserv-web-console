@@ -366,12 +366,12 @@ export const FiltersChips: React.FC<FiltersChipsProps> = ({
             match === 'values'
               ? t('the logical OR operator is used between each values of the same filter.')
               : match === 'any'
-              ? t('The logical OR operator is used between filters.')
-              : match === 'bidirectional'
-              ? t(
-                  'The logical AND operator is used between Endpoints and common filters. The traffic is matched in both directions.'
-                )
-              : t('The logical AND operator is used between filters keeping direction source to destination.')
+                ? t('The logical OR operator is used between filters.')
+                : match === 'bidirectional'
+                  ? t(
+                      'The logical AND operator is used between Endpoints and common filters. The traffic is matched in both directions.'
+                    )
+                  : t('The logical AND operator is used between filters keeping direction source to destination.')
           }
         >
           <div className="match-dropdown-container">
