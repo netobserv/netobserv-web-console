@@ -3,37 +3,40 @@ package loki
 import (
 	"fmt"
 	"slices"
+	"strconv"
 	"strings"
 
+	"github.com/netobserv/network-observability-console-plugin/pkg/backend"
 	"github.com/netobserv/network-observability-console-plugin/pkg/config"
 	"github.com/netobserv/network-observability-console-plugin/pkg/utils/constants"
-	"github.com/netobserv/network-observability-console-plugin/pkg/utils/queryparams"
 )
 
 const (
-	topologyDefaultLimit = "100"
+	topologyDefaultLimit = 100
 )
 
 // TopologyQueryBuilder builds LogQL metric queries for topology views.
 type TopologyQueryBuilder struct {
 	*FlowQueryBuilder
-	topology           *queryparams.TopologyInput
+	topology           *backend.MetricsParams
 	aggregateKeyLabels map[string][]string
 }
 
 // NewTopologyQuery creates a new TopologyQueryBuilder for the given Loki config and topology input.
-func NewTopologyQuery(cfg *config.Loki, kl map[string][]string, in *queryparams.TopologyInput) (*TopologyQueryBuilder, error) {
+func NewTopologyQuery(cfg *config.Loki, kl map[string][]string, p *backend.MetricsParams) (*TopologyQueryBuilder, error) {
 	var rt constants.RecordType
-	if slices.Contains(constants.AnyConnectionType, string(in.RecordType)) {
+	if slices.Contains(constants.AnyConnectionType, string(p.RecordType)) {
 		rt = "endConnection"
 	} else {
 		rt = "flowLog"
 	}
+	startStr, endStr := p.DatesToString()
+	top := strconv.FormatInt(int64(p.Top), 10)
 
-	fqb := NewFlowQueryBuilder(cfg, in.Start, in.End, in.Top, rt, in.PacketLoss)
+	fqb := NewFlowQueryBuilder(cfg, startStr, endStr, top, rt, p.PacketLoss)
 	return &TopologyQueryBuilder{
 		FlowQueryBuilder:   fqb,
-		topology:           in,
+		topology:           p,
 		aggregateKeyLabels: kl,
 	}, nil
 }
@@ -74,11 +77,11 @@ func getFactor(metricType string) string {
 // Build constructs the full LogQL topology query URL string.
 func (q *TopologyQueryBuilder) Build() string {
 	top := q.topology.Top
-	if top == "" {
+	if top == 0 {
 		top = topologyDefaultLimit
 	}
 
-	labels, extraFilter := queryparams.GetLabelsAndFilter(q.aggregateKeyLabels, q.topology.Aggregate, q.topology.Groups)
+	labels, extraFilter := backend.GetLabelsAndFilter(q.aggregateKeyLabels, q.topology.Aggregate, q.topology.Groups)
 	if q.config.IsLabel(extraFilter) {
 		extraFilter = ""
 	}
@@ -107,7 +110,7 @@ func (q *TopologyQueryBuilder) Build() string {
 		sb.WriteString("topk")
 	}
 	sb.WriteRune('(')
-	sb.WriteString(top)
+	sb.WriteString(strconv.FormatInt(int64(top), 10))
 	sb.WriteRune(',')
 
 	if sumBy {
@@ -143,7 +146,7 @@ func (q *TopologyQueryBuilder) Build() string {
 
 	q.appendJSON(sb, true)
 
-	dataField := q.topology.GetActualDataField()
+	dataField := backend.GetActualDataField(q.topology.DataField)
 	if len(dataField) > 0 {
 		sb.WriteString("|unwrap ")
 		sb.WriteString(dataField)
@@ -151,7 +154,7 @@ func (q *TopologyQueryBuilder) Build() string {
 	}
 	sb.WriteRune('[')
 	if function != "rate" {
-		sb.WriteString(q.topology.Step)
+		sb.WriteString(q.topology.Step.String())
 	} else {
 		sb.WriteString(q.topology.RateInterval)
 	}
@@ -171,7 +174,7 @@ func (q *TopologyQueryBuilder) Build() string {
 
 	q.appendQueryParams(sb)
 	sb.WriteString("&step=")
-	sb.WriteString(q.topology.Step)
+	sb.WriteString(q.topology.Step.String())
 
 	return sb.String()
 }

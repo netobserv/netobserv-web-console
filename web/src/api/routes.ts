@@ -118,8 +118,8 @@ export const getRole = (): Promise<string> => {
   });
 };
 
-export const getStatus = (forcedNamespace?: string): Promise<Status> => {
-  const params = { namespace: forcedNamespace };
+export const getStatus = (tenant?: string): Promise<Status> => {
+  const params = { tenant: tenant };
   return axios.get(ContextSingleton.getHost() + '/api/status', { params }).then(r => {
     if (r.status >= 400) {
       throw new Error(`${r.statusText} [code=${r.status}]`);
@@ -128,8 +128,8 @@ export const getStatus = (forcedNamespace?: string): Promise<Status> => {
   });
 };
 
-export const getClusters = (forcedNamespace?: string): Promise<string[]> => {
-  const params = { namespace: forcedNamespace };
+export const getClusters = (tenant?: string): Promise<string[]> => {
+  const params = { tenant: tenant };
   return axios.get(ContextSingleton.getHost() + '/api/resources/clusters', { params }).then(r => {
     if (r.status >= 400) {
       throw new Error(`${r.statusText} [code=${r.status}]`);
@@ -138,8 +138,8 @@ export const getClusters = (forcedNamespace?: string): Promise<string[]> => {
   });
 };
 
-export const getUDNs = (forcedNamespace?: string): Promise<string[]> => {
-  const params = { namespace: forcedNamespace };
+export const getUDNs = (tenant?: string): Promise<string[]> => {
+  const params = { tenant: tenant };
   return axios.get(ContextSingleton.getHost() + '/api/resources/udns', { params }).then(r => {
     if (r.status >= 400) {
       throw new Error(`${r.statusText} [code=${r.status}]`);
@@ -148,8 +148,8 @@ export const getUDNs = (forcedNamespace?: string): Promise<string[]> => {
   });
 };
 
-export const getZones = (forcedNamespace?: string): Promise<string[]> => {
-  const params = { namespace: forcedNamespace };
+export const getZones = (tenant?: string): Promise<string[]> => {
+  const params = { namespace: tenant };
   return axios.get(ContextSingleton.getHost() + '/api/resources/zones', { params }).then(r => {
     if (r.status >= 400) {
       throw new Error(`${r.statusText} [code=${r.status}]`);
@@ -158,8 +158,8 @@ export const getZones = (forcedNamespace?: string): Promise<string[]> => {
   });
 };
 
-export const getNamespaces = (forcedNamespace?: string): Promise<string[]> => {
-  const params = { namespace: forcedNamespace };
+export const getNamespaces = (tenant?: string): Promise<string[]> => {
+  const params = { namespace: tenant };
   return axios.get(ContextSingleton.getHost() + '/api/resources/namespaces', { params }).then(r => {
     if (r.status >= 400) {
       throw new Error(`${r.statusText} [code=${r.status}]`);
@@ -168,11 +168,8 @@ export const getNamespaces = (forcedNamespace?: string): Promise<string[]> => {
   });
 };
 
-export const getResources = (namespace: string, kind: string, forcedNamespace?: string): Promise<string[]> => {
-  const params = {
-    namespace: forcedNamespace || namespace,
-    kind
-  };
+export const getResources = (namespace: string, kind: string, tenant?: string): Promise<string[]> => {
+  const params = { tenant, namespace, kind };
   return axios.get(ContextSingleton.getHost() + '/api/resources/names', { params }).then(r => {
     if (r.status >= 400) {
       throw new Error(`${r.statusText} [code=${r.status}]`);

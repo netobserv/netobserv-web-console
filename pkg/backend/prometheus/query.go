@@ -1,20 +1,19 @@
 package prometheus
 
 import (
+	"strconv"
 	"strings"
 
+	"github.com/netobserv/network-observability-console-plugin/pkg/backend"
 	"github.com/netobserv/network-observability-console-plugin/pkg/model/filters"
 	"github.com/netobserv/network-observability-console-plugin/pkg/utils/constants"
-	"github.com/netobserv/network-observability-console-plugin/pkg/utils/queryparams"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 )
 
 type QueryBuilder struct {
 	aggregateKeyLabels map[string][]string
-	in                 *queryparams.TopologyInput
-	filters            filters.SingleQuery
+	params             *backend.MetricsParams
 	orMetrics          []string
-	qRange             v1.Range
 }
 
 type Query struct {
@@ -23,34 +22,28 @@ type Query struct {
 }
 
 // NewQuery creates a new PromQL QueryBuilder for the given topology input.
-func NewQuery(kl map[string][]string, in *queryparams.TopologyInput, qr *v1.Range, filters filters.SingleQuery, orMetrics []string) *QueryBuilder {
-	return &QueryBuilder{
-		aggregateKeyLabels: kl,
-		in:                 in,
-		filters:            filters,
-		orMetrics:          orMetrics,
-		qRange:             *qr,
-	}
+func NewQuery(kl map[string][]string, params *backend.MetricsParams, orMetrics []string) *QueryBuilder {
+	return &QueryBuilder{aggregateKeyLabels: kl, params: params, orMetrics: orMetrics}
 }
 
 func (q *QueryBuilder) Build() Query {
-	labels, extraFilter := GetLabelsAndFilter(q.aggregateKeyLabels, q.in.Aggregate, q.in.Groups)
+	labels, extraFilter := GetLabelsAndFilter(q.aggregateKeyLabels, q.params.Aggregate, q.params.Groups)
 	if extraFilter != "" {
-		q.filters = append(q.filters, filters.NewNotRegexMatch(extraFilter, `""`))
+		q.params.Filters = append(q.params.Filters, filters.NewNotRegexMatch(extraFilter, `""`))
 	}
 	groupBy := strings.Join(labels, ",")
 
 	var factor, quantile string
 	isHisto := false
-	switch q.in.DataField {
+	switch q.params.DataField {
 	case constants.MetricTypeFlowRTT, constants.MetricTypeDNSLatency:
 		factor = "*1000" // seconds to milliseconds
 		isHisto = true
 	}
 	if isHisto {
-		if q.in.MetricFunction == constants.MetricFunctionP90 {
+		if q.params.MetricFunction == constants.MetricFunctionP90 {
 			quantile = "0.9"
-		} else if q.in.MetricFunction == constants.MetricFunctionP99 {
+		} else if q.params.MetricFunction == constants.MetricFunctionP99 {
 			quantile = "0.99"
 		}
 	}
@@ -67,14 +60,14 @@ func (q *QueryBuilder) Build() Query {
 	//		&<query params>&step=<step>
 	sb := strings.Builder{}
 
-	if q.in.Top != "" {
-		if q.in.MetricFunction == constants.MetricFunctionMin {
+	if q.params.Top != 0 {
+		if q.params.MetricFunction == constants.MetricFunctionMin {
 			sb.WriteString("bottomk")
 		} else {
 			sb.WriteString("topk")
 		}
 		sb.WriteRune('(')
-		sb.WriteString(q.in.Top)
+		sb.WriteString(strconv.FormatInt(int64(q.params.Top), 10))
 		sb.WriteRune(',')
 	}
 
@@ -106,14 +99,14 @@ func (q *QueryBuilder) Build() Query {
 		if isHisto {
 			if quantile == "" {
 				// histogram average: sum / count
-				appendRateOrIncrease(&sb, false, metric+"_sum", q.filters, q.in.RateInterval)
+				appendRateOrIncrease(&sb, false, metric+"_sum", q.params.Filters, q.params.RateInterval)
 				sb.WriteRune('/')
-				appendRateOrIncrease(&sb, false, metric+"_count", q.filters, q.in.RateInterval)
+				appendRateOrIncrease(&sb, false, metric+"_count", q.params.Filters, q.params.RateInterval)
 			} else {
-				appendRateOrIncrease(&sb, false, metric+"_bucket", q.filters, q.in.RateInterval)
+				appendRateOrIncrease(&sb, false, metric+"_bucket", q.params.Filters, q.params.RateInterval)
 			}
 		} else {
-			appendRateOrIncrease(&sb, q.in.MetricFunction == constants.MetricFunctionCount, metric, q.filters, q.in.RateInterval)
+			appendRateOrIncrease(&sb, q.params.MetricFunction == constants.MetricFunctionCount, metric, q.params.Filters, q.params.RateInterval)
 		}
 		sb.WriteRune(')') // closes sum(...
 		if isHisto && quantile != "" {
@@ -125,13 +118,17 @@ func (q *QueryBuilder) Build() Query {
 		}
 	}
 
-	if q.in.Top != "" {
+	if q.params.Top != 0 {
 		sb.WriteRune(')') // closes topk(...
 	}
 
 	return Query{
 		PromQL: sb.String(),
-		Range:  q.qRange,
+		Range: v1.Range{
+			Start: q.params.Start,
+			End:   q.params.End,
+			Step:  q.params.Step,
+		},
 	}
 }
 
@@ -170,7 +167,7 @@ func GetLabelsAndFilter(kl map[string][]string, aggregate, groups string) ([]str
 		// ignore app: it's a noop aggregation needed for Loki, not relevant in promQL
 		return nil, ""
 	}
-	return queryparams.GetLabelsAndFilter(kl, aggregate, groups)
+	return backend.GetLabelsAndFilter(kl, aggregate, groups)
 }
 
 // QueryFilters builds a PromQL metric selector string with the given filters applied.

@@ -3,14 +3,16 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strconv"
 	"time"
 
+	"github.com/netobserv/network-observability-console-plugin/pkg/backend"
 	"github.com/netobserv/network-observability-console-plugin/pkg/utils/constants"
 )
 
-func getStartTime(params url.Values) (string, time.Time, error) {
+func getStartTime(params url.Values) (time.Time, error) {
 	start := params.Get(startTimeKey)
 	var sTime time.Time
 	if len(start) == 0 {
@@ -18,49 +20,47 @@ func getStartTime(params url.Values) (string, time.Time, error) {
 		if len(tr) > 0 {
 			r, err := strconv.ParseInt(tr, 10, 64)
 			if err != nil {
-				return "", sTime, errors.New("Could not parse time range: " + err.Error())
+				return sTime, errors.New("Could not parse time range: " + err.Error())
 			}
 			sTime = time.Now().Add(-time.Second * time.Duration(r))
-			start = strconv.FormatInt(sTime.Unix(), 10)
 		}
 	} else {
 		// Make sure it is a valid int
 		s, err := strconv.ParseInt(start, 10, 64)
 		if err != nil {
-			return "", sTime, errors.New("Could not parse start time: " + err.Error())
+			return sTime, errors.New("Could not parse start time: " + err.Error())
 		}
 		sTime = time.Unix(s, 0)
 	}
-	return start, sTime, nil
+	return sTime, nil
 }
 
 // getEndTime will parse end time and ceil it to the next second
-func getEndTime(params url.Values) (string, time.Time, error) {
+func getEndTime(params url.Values) (time.Time, error) {
 	end := params.Get(endTimeKey)
-	eTime := time.Now()
+	var eTime time.Time
 	if len(end) > 0 {
 		r, err := strconv.ParseInt(end, 10, 64)
 		if err != nil {
-			return "", eTime, errors.New("Could not parse end time: " + err.Error())
+			return eTime, errors.New("Could not parse end time: " + err.Error())
 		}
 		eTime = time.Unix(r+1, 0)
-		end = strconv.Itoa(int(r) + 1)
 	}
-	return end, eTime, nil
+	return eTime, nil
 }
 
-// getLimit returns limit as string (used for logQL) and as int (used to check if reached)
-func getLimit(params url.Values) (string, int, error) {
+// getLimit returns limit parsed as int
+func getLimit(params url.Values) (int, error) {
 	limit := params.Get(limitKey)
 	var reqLimit int
 	if len(limit) > 0 {
 		l, err := strconv.ParseInt(limit, 10, 64)
 		if err != nil {
-			return "", 0, errors.New("Could not parse limit: " + err.Error())
+			return 0, errors.New("Could not parse limit: " + err.Error())
 		}
 		reqLimit = int(l)
 	}
-	return limit, reqLimit, nil
+	return reqLimit, nil
 }
 
 func getRecordType(params url.Values) (constants.RecordType, error) {
@@ -154,14 +154,30 @@ func getRateInterval(params url.Values) (string, error) {
 	return rateInterval, nil
 }
 
-func getStep(params url.Values) (string, time.Duration, error) {
+func getStep(params url.Values) (time.Duration, error) {
 	step := params.Get(stepKey)
 	if step == "" {
-		return defaultStep, defaultStepDuration, nil
+		return defaultStepDuration, nil
 	}
 	d, err := time.ParseDuration(step)
 	if err != nil {
-		return "", 0, fmt.Errorf("invalid step %s: %w", step, err)
+		return 0, fmt.Errorf("invalid step %s: %w", step, err)
 	}
-	return step, d, nil
+	return d, nil
+}
+
+func getQueryContext(r *http.Request) (*backend.QueryContext, error) {
+	params := r.URL.Query()
+	tenant := params.Get(tenantKey)
+
+	ds, err := getDatasource(params)
+	if err != nil {
+		return nil, err
+	}
+
+	return &backend.QueryContext{
+		DataSource:    ds,
+		RequestHeader: r.Header,
+		Tenant:        tenant,
+	}, nil
 }

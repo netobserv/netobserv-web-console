@@ -1,6 +1,7 @@
-package loki
+package merger
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -9,10 +10,6 @@ import (
 
 	"github.com/netobserv/network-observability-console-plugin/pkg/model"
 )
-
-func qrData(result model.ResultValue) model.QueryResponseData {
-	return model.QueryResponseData{Result: result}
-}
 
 func TestStreamsMerge(t *testing.T) {
 	now := time.Now()
@@ -26,11 +23,11 @@ func TestStreamsMerge(t *testing.T) {
 			Line:      "{key: value}",
 		}},
 	}
-	_, err := merger.Add(qrData(model.Streams{baseline}))
+	_, err := merger.Add(qr(model.Streams{baseline}), "")
 	require.NoError(t, err)
 
 	// Different label, different line => no dedup
-	merged, err := merger.Add(qrData(model.Streams{{
+	merged, err := merger.Add(qr(model.Streams{{
 		Labels: map[string]string{
 			"foo":  "bar",
 			"foo2": "bar2",
@@ -42,14 +39,14 @@ func TestStreamsMerge(t *testing.T) {
 			Timestamp: now,
 			Line:      "{key2: value2}",
 		}},
-	}}))
+	}}), "")
 	require.NoError(t, err)
 	assert.Len(t, merged, 2)
 	assert.Len(t, merged.(model.Streams)[0].Entries, 2)
 	assert.Len(t, merged.(model.Streams)[1].Entries, 1)
 
 	// Same labels in different order => 3 dedups
-	merged, err = merger.Add(qrData(model.Streams{{
+	merged, err = merger.Add(qr(model.Streams{{
 		Labels: map[string]string{
 			"foo2": "bar2",
 			"foo":  "bar",
@@ -67,7 +64,7 @@ func TestStreamsMerge(t *testing.T) {
 			"foo2": "bar2",
 		},
 		Entries: baseline.Entries,
-	}}))
+	}}), "")
 	require.NoError(t, err)
 	assert.Len(t, merged, 2)
 	assert.Len(t, merged.(model.Streams)[0].Entries, 2)
@@ -75,20 +72,20 @@ func TestStreamsMerge(t *testing.T) {
 	assert.Equal(t, 3, merger.duplicates)
 
 	// Different timestamp => no dedup
-	merged, err = merger.Add(qrData(model.Streams{{
+	merged, err = merger.Add(qr(model.Streams{{
 		Labels: baseline.Labels,
 		Entries: []model.Entry{{
 			Timestamp: now.Add(time.Hour),
 			Line:      "{key: value}",
 		}},
-	}}))
+	}}), "")
 	require.NoError(t, err)
 	assert.Len(t, merged, 2)
 	assert.Len(t, merged.(model.Streams)[0].Entries, 3)
 	assert.Len(t, merged.(model.Streams)[1].Entries, 1)
 
 	// some dedup
-	merged, err = merger.Add(qrData(model.Streams{{
+	merged, err = merger.Add(qr(model.Streams{{
 		// changed line => no dedup
 		Labels: baseline.Labels,
 		Entries: []model.Entry{{
@@ -112,7 +109,7 @@ func TestStreamsMerge(t *testing.T) {
 	},
 		// baseline itself => must be ignored
 		baseline,
-	}))
+	}), "")
 
 	// Different timestamp => no dedup
 	require.NoError(t, err)
@@ -136,12 +133,12 @@ func TestStreamsLimitReached(t *testing.T) {
 			Line:      "{key: value}",
 		}},
 	}
-	_, err := merger.Add(qrData(model.Streams{first}))
+	_, err := merger.Add(qr(model.Streams{first}), "")
 	require.NoError(t, err)
 	assert.False(t, merger.limitReached)
 
 	// Another single entry => limit still not reached (even if total is 2)
-	_, err = merger.Add(qrData(model.Streams{{
+	_, err = merger.Add(qr(model.Streams{{
 		Labels: map[string]string{
 			"foo": "bar",
 		},
@@ -149,12 +146,12 @@ func TestStreamsLimitReached(t *testing.T) {
 			Timestamp: now,
 			Line:      "{key: value}",
 		}},
-	}}))
+	}}), "")
 	require.NoError(t, err)
 	assert.False(t, merger.limitReached)
 
 	// 2 entries => limit reached
-	_, err = merger.Add(qrData(model.Streams{{
+	_, err = merger.Add(qr(model.Streams{{
 		// changed line => no dedup
 		Labels: first.Labels,
 		Entries: []model.Entry{{
@@ -169,12 +166,12 @@ func TestStreamsLimitReached(t *testing.T) {
 			Line:      "{key: value}",
 		}},
 	},
-	}))
+	}), "")
 	require.NoError(t, err)
 	assert.True(t, merger.limitReached)
 
 	// Another single entry => limit still reached
-	_, err = merger.Add(qrData(model.Streams{{
+	_, err = merger.Add(qr(model.Streams{{
 		Labels: map[string]string{
 			"foo": "bar",
 		},
@@ -182,7 +179,7 @@ func TestStreamsLimitReached(t *testing.T) {
 			Timestamp: now,
 			Line:      "{key: value}",
 		}},
-	}}))
+	}}), "")
 	require.NoError(t, err)
 	assert.True(t, merger.limitReached)
 }
@@ -214,9 +211,9 @@ func TestStreamsMerge_SameStream(t *testing.T) {
 			Line:      "{key: value4}",
 		}},
 	}
-	_, err := merger.Add(qrData(model.Streams{s1}))
+	_, err := merger.Add(qr(model.Streams{s1}), "")
 	require.NoError(t, err)
-	_, err = merger.Add(qrData(model.Streams{s2}))
+	_, err = merger.Add(qr(model.Streams{s2}), "")
 	require.NoError(t, err)
 	result := merger.Get()
 
@@ -225,4 +222,41 @@ func TestStreamsMerge_SameStream(t *testing.T) {
 	assert.Equal(t, 4, result.Stats.TotalEntries)
 	assert.Equal(t, 0, result.Stats.Duplicates)
 	assert.Equal(t, 2, result.Stats.NumQueries)
+}
+
+func TestStreamsMerge_Parallel(t *testing.T) {
+	merger := NewStreamMerger(100)
+	wg := sync.WaitGroup{}
+	wg.Add(100)
+	tstamp := time.Now()
+
+	for i := 0; i < 100; i++ {
+		tstamp = tstamp.Add(10 * time.Microsecond)
+		go func(ts time.Time) {
+			defer wg.Done()
+			s := model.Stream{
+				Labels: map[string]string{
+					"foo": "bar",
+				},
+				Entries: []model.Entry{{
+					Timestamp: ts,
+					Line:      "{key: value1}",
+				}, {
+					Timestamp: ts.Add(5 * time.Microsecond),
+					Line:      "{key: value2}",
+				}},
+			}
+			_, err := merger.Add(qr(model.Streams{s}), "")
+			require.NoError(t, err)
+		}(tstamp)
+	}
+
+	wg.Wait()
+	result := merger.Get()
+
+	assert.Len(t, result.Result, 1)
+	assert.Len(t, result.Result.(model.Streams)[0].Entries, 200)
+	assert.Equal(t, 200, result.Stats.TotalEntries)
+	assert.Equal(t, 0, result.Stats.Duplicates)
+	assert.Equal(t, 100, result.Stats.NumQueries)
 }

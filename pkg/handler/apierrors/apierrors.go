@@ -12,7 +12,6 @@ var hlog = logrus.WithField("module", "apierrors")
 
 type StructuredError interface {
 	error
-	Write(w http.ResponseWriter, code int)
 }
 
 type GenericError struct {
@@ -24,20 +23,16 @@ func (e *GenericError) Error() string {
 	return e.Message
 }
 
-func (e *GenericError) Write(w http.ResponseWriter, code int) {
-	WriteStructured(w, code, e)
-}
-
 func Write(w http.ResponseWriter, code int, err error) {
 	var serr StructuredError
 	if errors.As(err, &serr) {
-		WriteStructured(w, code, serr)
+		writeStructured(w, code, serr)
 	} else {
-		WriteStructured(w, code, &GenericError{Message: err.Error()})
+		writeStructured(w, code, &GenericError{Message: err.Error()})
 	}
 }
 
-func WriteStructured(w http.ResponseWriter, code int, httpErr StructuredError) {
+func writeStructured(w http.ResponseWriter, code int, httpErr StructuredError) {
 	r, err := json.Marshal(httpErr)
 	if err != nil {
 		hlog.Errorf("Marshalling error while responding an error: %v (message was: %s)", err, httpErr.Error())
