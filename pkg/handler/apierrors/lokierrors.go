@@ -2,25 +2,20 @@ package apierrors
 
 import (
 	"fmt"
-	"net/http"
 )
 
-type LokiDisabledError struct {
-	StructuredError `json:"-"`
-	LokiDisabled    bool   `json:"lokiDisabled,omitempty"`
-	Message         string `json:"message,omitempty"`
+type DatasourceDisabledError struct {
+	StructuredError    `json:"-"`
+	DatasourceDisabled bool   `json:"datasourceDisabled,omitempty"`
+	Message            string `json:"message,omitempty"`
 }
 
-func NewLokiDisabledError(message string) *LokiDisabledError {
-	return &LokiDisabledError{LokiDisabled: true, Message: message}
+func NewDatasourceDisabledError(message string) *DatasourceDisabledError {
+	return &DatasourceDisabledError{DatasourceDisabled: true, Message: message}
 }
 
-func (e *LokiDisabledError) Error() string {
+func (e *DatasourceDisabledError) Error() string {
 	return e.Message
-}
-
-func (e *LokiDisabledError) Write(w http.ResponseWriter, code int) {
-	WriteStructured(w, code, e)
 }
 
 type LokiResponseError struct {
@@ -38,10 +33,6 @@ func (e *LokiResponseError) Error() string {
 	return e.Message
 }
 
-func (e *LokiResponseError) Write(w http.ResponseWriter, code int) {
-	WriteStructured(w, code, e)
-}
-
 // LokiClientError is used when there is a client error while querying Loki, either on our side, or in the HTTP connection
 type LokiClientError struct {
 	StructuredError `json:"-"`
@@ -55,8 +46,4 @@ func NewLokiClientError(err error) *LokiClientError {
 
 func (e *LokiClientError) Error() string {
 	return e.Message
-}
-
-func (e *LokiClientError) Write(w http.ResponseWriter, code int) {
-	WriteStructured(w, code, e)
 }

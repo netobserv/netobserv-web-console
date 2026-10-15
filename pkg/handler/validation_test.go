@@ -17,16 +17,15 @@ func TestGetStartTime(t *testing.T) {
 	params := url.Values{
 		startTimeKey: []string{strconv.FormatInt(now, 10)},
 	}
-	start, st, err := getStartTime(params)
+	st, err := getStartTime(params)
 	assert.NoError(t, err)
-	assert.Equal(t, strconv.FormatInt(now, 10), start)
 	assert.Equal(t, now, st.Unix())
 
 	// Invalid
 	params = url.Values{
 		startTimeKey: []string{"invalid"},
 	}
-	_, _, err = getStartTime(params)
+	_, err = getStartTime(params)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Could not parse start time")
 }
@@ -38,16 +37,15 @@ func TestGetEndTime(t *testing.T) {
 	params := url.Values{
 		endTimeKey: []string{strconv.FormatInt(now, 10)},
 	}
-	end, et, err := getEndTime(params)
+	et, err := getEndTime(params)
 	assert.NoError(t, err)
-	assert.Equal(t, strconv.FormatInt(now+1, 10), end)
 	assert.Equal(t, now+1, et.Unix())
 
 	// Invalid
 	params = url.Values{
 		endTimeKey: []string{"invalid"},
 	}
-	_, _, err = getEndTime(params)
+	_, err = getEndTime(params)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Could not parse end time")
 }
@@ -143,23 +141,21 @@ func TestGetStep(t *testing.T) {
 	params := url.Values{
 		stepKey: []string{"10s"},
 	}
-	step, sd, err := getStep(params)
+	sd, err := getStep(params)
 	assert.NoError(t, err)
-	assert.Equal(t, "10s", step)
 	assert.Equal(t, 10*time.Second, sd)
 
 	// Invalid
 	params = url.Values{
 		stepKey: []string{"invalid"},
 	}
-	_, _, err = getStep(params)
+	_, err = getStep(params)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "invalid step")
 
 	// Default
 	params = url.Values{}
-	step, sd, err = getStep(params)
+	sd, err = getStep(params)
 	assert.NoError(t, err)
-	assert.Equal(t, defaultStep, step)
 	assert.Equal(t, defaultStepDuration, sd)
 }

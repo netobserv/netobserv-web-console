@@ -1,6 +1,8 @@
 package merger
 
 import (
+	"strconv"
+	"sync"
 	"testing"
 	"time"
 
@@ -11,8 +13,8 @@ import (
 	"github.com/netobserv/network-observability-console-plugin/pkg/model"
 )
 
-func qrData(result model.ResultValue) model.QueryResponseData {
-	return model.QueryResponseData{Result: result}
+func qr(result model.ResultValue) *model.QueryResponse {
+	return &model.QueryResponse{Data: model.QueryResponseData{Result: result}}
 }
 
 func TestMatrixMerge(t *testing.T) {
@@ -27,11 +29,11 @@ func TestMatrixMerge(t *testing.T) {
 			Value:     pmodel.SampleValue(42),
 		}},
 	}
-	_, err := m.Add(qrData(model.Matrix{baseline}))
+	_, err := m.Add(qr(model.Matrix{baseline}), "")
 	require.NoError(t, err)
 
 	// Different metric, different value pair => no dedup
-	_, err = m.Add(qrData(model.Matrix{{
+	_, err = m.Add(qr(model.Matrix{{
 		Metric: pmodel.Metric{
 			"foo":  "bar",
 			"foo2": "bar2",
@@ -43,7 +45,7 @@ func TestMatrixMerge(t *testing.T) {
 			Timestamp: now,
 			Value:     pmodel.SampleValue(12),
 		}},
-	}}))
+	}}), "")
 	require.NoError(t, err)
 	result := m.Get().Result.(model.Matrix)
 	assert.Len(t, result, 2)
@@ -53,7 +55,7 @@ func TestMatrixMerge(t *testing.T) {
 	assert.Equal(t, result[1].Values[0].Value, pmodel.SampleValue(42))
 
 	// Same metrics in different order => no dedup
-	_, err = m.Add(qrData(model.Matrix{{
+	_, err = m.Add(qr(model.Matrix{{
 		Metric: pmodel.Metric{
 			"foo2": "bar2",
 			"foo":  "bar",
@@ -71,7 +73,7 @@ func TestMatrixMerge(t *testing.T) {
 			"foo2": "bar2",
 		},
 		Values: baseline.Values,
-	}}))
+	}}), "")
 	require.NoError(t, err)
 	result = m.Get().Result.(model.Matrix)
 	assert.Len(t, result, 2)
@@ -81,13 +83,13 @@ func TestMatrixMerge(t *testing.T) {
 	assert.Equal(t, result[1].Values[0].Value, pmodel.SampleValue(168))
 
 	// Different timestamp => no dedup
-	_, err = m.Add(qrData(model.Matrix{{
+	_, err = m.Add(qr(model.Matrix{{
 		Metric: baseline.Metric,
 		Values: []pmodel.SamplePair{{
 			Timestamp: now.Add(time.Hour),
 			Value:     pmodel.SampleValue(12),
 		}},
-	}}))
+	}}), "")
 	require.NoError(t, err)
 	result = m.Get().Result.(model.Matrix)
 	assert.Len(t, result, 2)
@@ -98,7 +100,7 @@ func TestMatrixMerge(t *testing.T) {
 	assert.Equal(t, result[1].Values[0].Value, pmodel.SampleValue(168))
 
 	// no dedup
-	_, err = m.Add(qrData(model.Matrix{{
+	_, err = m.Add(qr(model.Matrix{{
 		// changed value => no dedup
 		Metric: baseline.Metric,
 		Values: []pmodel.SamplePair{{
@@ -122,7 +124,7 @@ func TestMatrixMerge(t *testing.T) {
 	},
 		// baseline itself => still added
 		baseline,
-	}))
+	}), "")
 
 	// Different timestamp
 	require.NoError(t, err)
@@ -149,12 +151,12 @@ func TestMatrixLimitReached(t *testing.T) {
 			Value:     pmodel.SampleValue(42),
 		}},
 	}
-	_, err := m.Add(qrData(model.Matrix{first}))
+	_, err := m.Add(qr(model.Matrix{first}), "")
 	require.NoError(t, err)
 	assert.False(t, m.limitReached)
 
 	// Another single entry => limit still not reached (even if total is 2)
-	_, err = m.Add(qrData(model.Matrix{pmodel.SampleStream{
+	_, err = m.Add(qr(model.Matrix{pmodel.SampleStream{
 		Metric: pmodel.Metric{
 			"foo": "bar",
 		},
@@ -162,12 +164,12 @@ func TestMatrixLimitReached(t *testing.T) {
 			Timestamp: now,
 			Value:     pmodel.SampleValue(42),
 		}},
-	}}))
+	}}), "")
 	require.NoError(t, err)
 	assert.False(t, m.limitReached)
 
 	// 2 entries => limit reached
-	_, err = m.Add(qrData(model.Matrix{pmodel.SampleStream{
+	_, err = m.Add(qr(model.Matrix{pmodel.SampleStream{
 		Metric: pmodel.Metric{
 			"foo": "bar",
 		},
@@ -183,12 +185,12 @@ func TestMatrixLimitReached(t *testing.T) {
 			Timestamp: now,
 			Value:     pmodel.SampleValue(42),
 		}},
-	}}))
+	}}), "")
 	require.NoError(t, err)
 	assert.True(t, m.limitReached)
 
 	// Another single entry => limit still reached
-	_, err = m.Add(qrData(model.Matrix{pmodel.SampleStream{
+	_, err = m.Add(qr(model.Matrix{pmodel.SampleStream{
 		Metric: pmodel.Metric{
 			"foo": "bar",
 		},
@@ -196,7 +198,39 @@ func TestMatrixLimitReached(t *testing.T) {
 			Timestamp: now,
 			Value:     pmodel.SampleValue(42),
 		}},
-	}}))
+	}}), "")
 	require.NoError(t, err)
 	assert.True(t, m.limitReached)
+}
+
+func TestMatrixMerge_Parallel(t *testing.T) {
+	merger := NewMatrixMerger(100)
+	wg := sync.WaitGroup{}
+	wg.Add(100)
+	tstamp := pmodel.Now()
+
+	for i := 0; i < 100; i++ {
+		go func(val string) {
+			defer wg.Done()
+			_, err := merger.Add(qr(model.Matrix{pmodel.SampleStream{
+				Metric: pmodel.Metric{
+					"foo": pmodel.LabelValue(val),
+				},
+				Values: []pmodel.SamplePair{{
+					Timestamp: tstamp,
+					Value:     pmodel.SampleValue(42),
+				}},
+			}}), "")
+			require.NoError(t, err)
+		}("bar" + strconv.Itoa(i))
+	}
+
+	wg.Wait()
+	result := merger.Get()
+
+	assert.Len(t, result.Result, 100)
+	assert.Len(t, result.Result.(model.Matrix)[0].Values, 1)
+	assert.Equal(t, 100, result.Stats.TotalEntries)
+	assert.Equal(t, 0, result.Stats.Duplicates)
+	assert.Equal(t, 100, result.Stats.NumQueries)
 }

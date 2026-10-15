@@ -1,11 +1,15 @@
-package loki
+package merger
 
 import (
 	"fmt"
+	"slices"
 	"sort"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/netobserv/network-observability-console-plugin/pkg/model"
+	"github.com/netobserv/network-observability-console-plugin/pkg/utils/constants"
 )
 
 type StreamMerger struct {
@@ -17,6 +21,8 @@ type StreamMerger struct {
 	totalEntries int
 	duplicates   int
 	limitReached bool
+	datasources  []constants.DataSource
+	mu           sync.RWMutex
 }
 
 func NewStreamMerger(reqLimit int) *StreamMerger {
@@ -54,14 +60,20 @@ func uniqueEntry(e *model.Entry) string {
 	return e.Timestamp.String() + e.Line
 }
 
-func (m *StreamMerger) Add(from model.QueryResponseData) (model.ResultValue, error) {
-	streams, ok := from.Result.(model.Streams)
+func (m *StreamMerger) Add(from *model.QueryResponse, ds constants.DataSource) (model.ResultValue, error) {
+	streams, ok := from.Data.Result.(model.Streams)
 	if !ok {
 		return nil, fmt.Errorf("loki returned an unexpected type for StreamMerger: %T", from)
 	}
 
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
 	m.numQueries++
-	m.stats = append(m.stats, from.Stats)
+	if !slices.Contains(m.datasources, ds) {
+		m.datasources = append(m.datasources, ds)
+	}
+	m.stats = append(m.stats, from.Data.Stats)
 	totalEntries := 0
 	for _, stream := range streams {
 		lkey := uniqueStream(&stream)
@@ -98,7 +110,7 @@ func (m *StreamMerger) Add(from model.QueryResponseData) (model.ResultValue, err
 			m.merged[idxStream.index] = idxStream.stream
 		}
 	}
-	if totalEntries >= m.reqLimit {
+	if from.LimitReached || totalEntries >= m.reqLimit {
 		m.limitReached = true
 	}
 	m.totalEntries += totalEntries
@@ -106,6 +118,8 @@ func (m *StreamMerger) Add(from model.QueryResponseData) (model.ResultValue, err
 }
 
 func (m *StreamMerger) Get() *model.AggregatedQueryResponse {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
 	return &model.AggregatedQueryResponse{
 		ResultType: model.ResultTypeStream,
 		Result:     m.merged,
@@ -115,6 +129,8 @@ func (m *StreamMerger) Get() *model.AggregatedQueryResponse {
 			TotalEntries: m.totalEntries,
 			Duplicates:   m.duplicates,
 			QueriesStats: m.stats,
+			DataSources:  m.datasources,
 		},
+		UnixTimestamp: time.Now().Unix(),
 	}
 }
