@@ -210,15 +210,15 @@ const hasHealthDisplayContent = (hd?: RuleHealthDisplay): boolean => {
   }
   return Boolean(
     hd.unit ||
-      hd.upperBound ||
-      hd.threshold ||
-      hd.namespaceLabels ||
-      hd.nodeLabels ||
-      hd.workloadLabels ||
-      hd.kindLabels ||
-      hd.infoThreshold ||
-      hd.warningThreshold ||
-      hd.criticalThreshold
+    hd.upperBound ||
+    hd.threshold ||
+    hd.namespaceLabels ||
+    hd.nodeLabels ||
+    hd.workloadLabels ||
+    hd.kindLabels ||
+    hd.infoThreshold ||
+    hd.warningThreshold ||
+    hd.criticalThreshold
   );
 };
 

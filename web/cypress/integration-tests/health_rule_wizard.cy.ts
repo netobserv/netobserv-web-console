@@ -54,7 +54,10 @@ describe('(OCP-90524) Network_Observability health rule wizard (write path)', { 
         cy.get(networkHealthSelectors.wizard, { timeout: 60000 }).should('exist')
 
         // Step 1 - choose custom alert.
-        cy.get('#health-rule-source-alert').check({ force: true })
+        // PatternFly radios are controlled inputs; clicking the rendered control
+        // dispatches the React onChange that updates the wizard selection.
+        cy.get('#health-rule-source-alert').should('be.visible').click({ force: true })
+        cy.get('#health-rule-source-alert').should('be.checked')
         healthRuleWizard.next()
 
         // Step 2 - configuration via DynamicForm.

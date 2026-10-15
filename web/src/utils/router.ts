@@ -104,12 +104,12 @@ export const getFiltersFromURL = (
               compare: keyValue.includes(FilterCompare.moreThanOrEqual)
                 ? FilterCompare.moreThanOrEqual
                 : keyValue.includes(FilterCompare.notEqual)
-                ? FilterCompare.notEqual
-                : keyValue.includes(FilterCompare.equal)
-                ? FilterCompare.equal
-                : keyValue.includes(FilterCompare.notMatch)
-                ? FilterCompare.notMatch
-                : FilterCompare.match,
+                  ? FilterCompare.notEqual
+                  : keyValue.includes(FilterCompare.equal)
+                    ? FilterCompare.equal
+                    : keyValue.includes(FilterCompare.notMatch)
+                      ? FilterCompare.notMatch
+                      : FilterCompare.match,
               values: filterValues
             };
             return f;

@@ -118,8 +118,8 @@ export const ResourceWatcher: FC<ResourceWatcherProps> = ({
       kind === 'FlowCollector'
         ? 'flowcollectors.flows.netobserv.io'
         : kind === 'FlowCollectorSlice'
-        ? 'flowcollectorslices.flows.netobserv.io'
-        : 'flowmetrics.flows.netobserv.io',
+          ? 'flowcollectorslices.flows.netobserv.io'
+          : 'flowmetrics.flows.netobserv.io',
     isList: false
   });
   const [cr, crLoaded, crLoadError] = useK8sWatchResource<K8sResourceKind>(

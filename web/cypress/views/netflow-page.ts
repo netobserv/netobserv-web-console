@@ -175,7 +175,15 @@ export const netflowPage = {
         attempt(maxAttempts)
     },
     dismissPoppers: () => {
-        // Blur the active element (if any) and press Escape to close any open popper/dropdown.
+        // The filter popper owns its Escape handler on the search input. Send Escape
+        // there before blurring, otherwise its autocomplete suggestions can stay open.
+        cy.get('body').then($body => {
+            if ($body.find('#filter-popper').length > 0) {
+                cy.get(filterSelectors.filterInput).type('{esc}', { force: true })
+            }
+        })
+
+        // Blur any remaining focused control, then close other poppers/dropdowns.
         cy.get('body').then($body => {
             const focused = $body.find(':focus')
             if (focused.length) {
@@ -584,7 +592,7 @@ Cypress.Commands.add('checkNetflowTraffic', (loki = "Enabled") => {
         cy.get('li.tableTabButton').should('exist').should('have.class', 'pf-m-disabled')
     }
     else {
-        cy.get('#tabs-container').contains('Traffic flows').click()
+        cy.get('#tabs-container').contains('Traffic flows').click({ force: true })
         netflowPage.waitForLokiQuery()
         // Allow extra time: Loki ingester may still be warming up even after
         // pod Ready; auto-refresh retries queries every 15s so 120s ≈ 8 cycles
@@ -592,7 +600,7 @@ Cypress.Commands.add('checkNetflowTraffic', (loki = "Enabled") => {
     }
 
     // topology view
-    cy.get('#tabs-container').contains('Topology').click()
+    cy.get('#tabs-container').contains('Topology').click({ force: true })
     cy.wait(2000)
     cy.get('#drawer', { timeout: 60000 }).should('not.be.empty')
 });

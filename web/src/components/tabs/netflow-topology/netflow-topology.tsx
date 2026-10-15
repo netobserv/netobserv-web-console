@@ -137,8 +137,8 @@ export const NetflowTopology = React.forwardRef<NetflowTopologyHandle, NetflowTo
         ? fq.type === 'Bytes'
           ? 'PktDropBytes'
           : fq.type === 'Packets'
-          ? 'PktDropPackets'
-          : undefined
+            ? 'PktDropPackets'
+            : undefined
         : undefined;
       const tlsMetricsClear = !fetchTlsGeneric
         ? {

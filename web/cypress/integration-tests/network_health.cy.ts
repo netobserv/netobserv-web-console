@@ -120,6 +120,7 @@ describe('(OCP-84821) Network Health test', { tags: ['Network_Observability'] },
         //   ~2 min for metrics accumulation + ~5 min for: duration + evaluation intervals.
         waitForAlertsFiring(['DNSNxDomain'], {
             attempts: 60,
+            labels: { namespace: 'dns-traffic' },
             diagnostics: [
                 {
                     // Dump the actual PrometheusRule PromQL to verify if operator has the _count fix

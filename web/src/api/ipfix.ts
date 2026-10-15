@@ -110,12 +110,12 @@ export const getDirectionDisplayString = (value: FlowDirection, t: TFunction) =>
   return value === FlowDirection.Ingress
     ? t('Ingress')
     : value === FlowDirection.Egress
-    ? t('Egress')
-    : value === FlowDirection.Inner
-    ? t('Inner')
-    : value === FlowDirection.Both
-    ? t('Both')
-    : t('n/a');
+      ? t('Egress')
+      : value === FlowDirection.Inner
+        ? t('Inner')
+        : value === FlowDirection.Both
+          ? t('Both')
+          : t('n/a');
 };
 
 export enum IfDirection {

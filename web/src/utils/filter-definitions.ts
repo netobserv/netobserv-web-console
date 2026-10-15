@@ -305,8 +305,7 @@ export const getFilterDefinitions = (
     let validate: (value: string) => { val?: string; err?: string } = rejectEmptyValue;
     let encoder: FiltersEncoder = simpleFiltersEncoder(colConfig?.field as Field);
     let checkCompletion:
-      | ((value: string, selected: string) => { completed: boolean; option: FilterOption })
-      | undefined = undefined;
+      ((value: string, selected: string) => { completed: boolean; option: FilterOption }) | undefined = undefined;
 
     if (d.id.includes('namespace')) {
       autocomplete = autocompleteNamespace;
