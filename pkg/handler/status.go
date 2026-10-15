@@ -25,13 +25,13 @@ func (h *Handlers) Status(ctx context.Context) func(w http.ResponseWriter, r *ht
 		prometheus := model.DatasourceStatus{IsEnabled: h.Cfg.IsPromEnabled()}
 		if prometheus.IsEnabled {
 			wg.Add(1)
-			promCtx := qctx
+			promCtx := *qctx
 			promCtx.DataSource = constants.DataSourceProm
 
 			go func() {
 				defer wg.Done()
 				// Get namespaces using Prom
-				promNamespaces, code, err := h.Backends.GetLabelValues(ctx, qctx, fields.SrcNamespace, fields.DstNamespace)
+				promNamespaces, code, err := h.Backends.GetLabelValues(ctx, &promCtx, fields.SrcNamespace, fields.DstNamespace)
 				if err != nil {
 					prometheus.Error = err.Error()
 					prometheus.ErrorCode = code
@@ -45,7 +45,7 @@ func (h *Handlers) Status(ctx context.Context) func(w http.ResponseWriter, r *ht
 		loki := model.DatasourceStatus{IsEnabled: h.Cfg.IsLokiEnabled()}
 		if loki.IsEnabled {
 			wg.Add(1)
-			lokiCtx := qctx
+			lokiCtx := *qctx
 			lokiCtx.DataSource = constants.DataSourceLoki
 
 			go func() {
@@ -59,7 +59,7 @@ func (h *Handlers) Status(ctx context.Context) func(w http.ResponseWriter, r *ht
 					loki.IsReady = strings.Contains(lokiStatus, "ready")
 
 					// Get namespaces using Loki
-					lokiNamespaces, code, err := h.Backends.GetLabelValues(ctx, lokiCtx, fields.SrcNamespace, fields.DstNamespace)
+					lokiNamespaces, code, err := h.Backends.GetLabelValues(ctx, &lokiCtx, fields.SrcNamespace, fields.DstNamespace)
 					if err != nil {
 						loki.Error = "Error while fetching label namespace values from Loki: " + err.Error()
 						loki.ErrorCode = code

@@ -123,11 +123,11 @@ func (o *Orchestrator) Metrics(ctx context.Context, bctx *backend.QueryContext, 
 		g.Go(func() error {
 			qr, c, err := o.singleCallMetrics(ctx, bctx, &subQ, backends)
 			if err != nil {
-				code.Store(int32(c))
+				code.CompareAndSwap(0, int32(c))
 				return err
 			}
 			if _, err := mm.Merge(qr); err != nil {
-				code.Store(int32(http.StatusInternalServerError))
+				code.CompareAndSwap(0, int32(http.StatusInternalServerError))
 				return err
 			}
 			return nil
