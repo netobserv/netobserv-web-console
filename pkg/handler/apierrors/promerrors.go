@@ -2,27 +2,8 @@ package apierrors
 
 import (
 	"fmt"
-	"net/http"
 	"strings"
 )
-
-type PromDisabledError struct {
-	StructuredError `json:"-"`
-	PromDisabled    bool   `json:"lokiDisabled,omitempty"`
-	Message         string `json:"message,omitempty"`
-}
-
-func NewPromDisabledError(message string) *PromDisabledError {
-	return &PromDisabledError{PromDisabled: true, Message: message}
-}
-
-func (e *PromDisabledError) Error() string {
-	return e.Message
-}
-
-func (e *PromDisabledError) Write(w http.ResponseWriter, code int) {
-	WriteStructured(w, code, e)
-}
 
 // PromClientError is used when there is a client error while querying Prometheus, either on our side, or in the HTTP connection
 type PromClientError struct {
@@ -37,10 +18,6 @@ func NewPromClientError(err error) *PromClientError {
 
 func (e *PromClientError) Error() string {
 	return e.Message
-}
-
-func (e *PromClientError) Write(w http.ResponseWriter, code int) {
-	WriteStructured(w, code, e)
 }
 
 type PromUnsupportedError struct {

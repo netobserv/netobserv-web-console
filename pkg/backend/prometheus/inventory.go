@@ -8,11 +8,6 @@ import (
 	"github.com/netobserv/network-observability-console-plugin/pkg/model/fields"
 	"github.com/netobserv/network-observability-console-plugin/pkg/model/filters"
 	"github.com/netobserv/network-observability-console-plugin/pkg/utils/constants"
-	"github.com/sirupsen/logrus"
-)
-
-var (
-	log = logrus.WithField("module", "prometheus")
 )
 
 type Inventory struct {

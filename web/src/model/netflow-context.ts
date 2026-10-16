@@ -23,6 +23,8 @@ export interface NetflowContextValue {
 const defaultCaps: ConfigCapabilities = {
   allowLoki: false,
   allowProm: false,
+  allowMetrics: false,
+  allowRawFlows: false,
   isFlow: false,
   isConnectionTracking: false,
   isDNSTracking: false,

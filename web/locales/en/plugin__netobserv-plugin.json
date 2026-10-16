@@ -745,6 +745,8 @@
   "Unpin this element": "Unpin this element",
   "Pin this element": "Pin this element",
   "Sorry, 3D view is not implemented anymore.": "Sorry, 3D view is not implemented anymore.",
+  "Only available when Prometheus and/or Loki are enabled in the FlowCollector (Overview and Topology require metrics)": "Only available when Prometheus and/or Loki are enabled in the FlowCollector (Overview and Topology require metrics)",
+  "Only available when Loki is enabled in the FlowCollector": "Only available when Loki is enabled in the FlowCollector",
   "Traffic flows": "Traffic flows",
   "Topology": "Topology",
   "Hide histogram": "Hide histogram",

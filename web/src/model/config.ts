@@ -1,7 +1,7 @@
 import { ColumnConfigDef } from '../utils/columns';
 import { FieldConfig } from '../utils/fields';
 import { FilterConfigDef } from './filters';
-import { RecordType } from './flow-query';
+import { DataSource, RecordType } from './flow-query';
 import { RawQuickFilter } from './quick-filters';
 import { ScopeConfigDef } from './scope';
 
@@ -41,7 +41,7 @@ export type Config = {
   sampling: number;
   features: Feature[];
   fields: FieldConfig[];
-  dataSources: string[];
+  dataSources: DataSource[];
   consoleMode: 'Standalone' | 'OpenShiftPlugin' | 'Mock';
   lokiLabels: string[];
   promLabels: string[];
