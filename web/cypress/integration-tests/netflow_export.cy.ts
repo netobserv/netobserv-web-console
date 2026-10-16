@@ -4,8 +4,10 @@ import { netflowPage } from "@views/netflow-page"
 describe('(OCP-72610) Export automation', { tags: ['Network_Observability'] }, function () {
 
     before('any test', function () {
-        cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
-        cy.uiLogin(Cypress.env('LOGIN_IDP'), Cypress.env('LOGIN_USERNAME'), Cypress.env('LOGIN_PASSWORD'))
+        cy.env(['LOGIN_IDP', 'LOGIN_USERNAME', 'LOGIN_PASSWORD']).then(({ LOGIN_IDP, LOGIN_USERNAME, LOGIN_PASSWORD }) => {
+            cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${LOGIN_USERNAME}`)
+            cy.uiLogin(LOGIN_IDP, LOGIN_USERNAME, LOGIN_PASSWORD)
+        })
 
         Operator.install()
         cy.checkStorageClass(this)
@@ -87,6 +89,8 @@ describe('(OCP-72610) Export automation', { tags: ['Network_Observability'] }, f
     })
 
     after("all tests", function () {
-        cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
+        cy.env(['LOGIN_USERNAME']).then(({ LOGIN_USERNAME }) => {
+            cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${LOGIN_USERNAME}`)
+        })
     })
 })

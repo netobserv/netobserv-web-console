@@ -301,9 +301,10 @@ Cypress.Commands.add("switchPerspective", (perspective: string) => {
 
 // Execute OpenShift CLI commands (from openshift-tests-private/frontend)
 Cypress.Commands.add('adminCLI', (command: string, options?: Partial<Cypress.ExecOptions>) => {
-  const kubeconfig = Cypress.env('KUBECONFIG_PATH');
   cy.log(`Run admin command: ${command}`);
-  return cy.exec(`${command} --kubeconfig ${kubeconfig}`, options);
+  cy.env(['KUBECONFIG_PATH']).then(({ kubeconfig }) => {
+    return cy.exec(`${command} --kubeconfig ${kubeconfig}`, options);
+  });
 });
 
 // to avoid influence from upstream login change
@@ -362,25 +363,26 @@ Cypress.Commands.add('uiLogout', () => {
 });
 
 Cypress.Commands.add("cliLogin", (username?: string, password?: string) => {
-  const kubeconfig = Cypress.env('KUBECONFIG_PATH');
-  const loginUsername = username || Cypress.env('LOGIN_USERNAME');
-  const loginPassword = password || Cypress.env('LOGIN_PASSWORD');
+  cy.env(['KUBECONFIG_PATH', 'LOGIN_USERNAME', 'LOGIN_PASSWORD']).then(({ kubeconfig, envUsername, envPassword }) => {
+    const loginUsername = username || envUsername;
+    const loginPassword = password || envPassword;
 
-  if (!kubeconfig || !loginUsername || !loginPassword) {
-    throw new Error('cliLogin requires KUBECONFIG_PATH, LOGIN_USERNAME, and LOGIN_PASSWORD');
-  }
+    if (!kubeconfig || !loginUsername || !loginPassword) {
+      throw new Error('cliLogin requires KUBECONFIG_PATH, LOGIN_USERNAME, and LOGIN_PASSWORD');
+    }
 
-  cy.exec(`oc whoami --show-server=true --kubeconfig ${escapeShellArg(kubeconfig)}`, { log: false })
-    .then(result => {
-      const hostapi = result.stdout.trim();
-      cy.log(`Server: ${hostapi}`);
-      return cy.exec(
-        `oc login -u ${escapeShellArg(loginUsername)} -p ${escapeShellArg(loginPassword)} ${escapeShellArg(hostapi)} --insecure-skip-tls-verify=true --kubeconfig ${escapeShellArg(kubeconfig)}`,
-        { failOnNonZeroExit: true, log: false }
-      );
-    })
-    .its('code')
-    .should('eq', 0);
+    cy.exec(`oc whoami --show-server=true --kubeconfig ${escapeShellArg(kubeconfig)}`, { log: false })
+      .then(result => {
+        const hostapi = result.stdout.trim();
+        cy.log(`Server: ${hostapi}`);
+        return cy.exec(
+          `oc login -u ${escapeShellArg(loginUsername)} -p ${escapeShellArg(loginPassword)} ${escapeShellArg(hostapi)} --insecure-skip-tls-verify=true --kubeconfig ${escapeShellArg(kubeconfig)}`,
+          { failOnNonZeroExit: true, log: false }
+        );
+      })
+      .its('code')
+      .should('eq', 0);
+  });
 });
 
 Cypress.Commands.add('retryTask', (command, expectedOutput, options?) => {

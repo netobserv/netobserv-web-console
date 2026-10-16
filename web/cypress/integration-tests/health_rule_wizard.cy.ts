@@ -32,8 +32,10 @@ const waitForCLI = (command: string, check: (stdout: string) => boolean, retries
 describe('(OCP-90524) Network_Observability health rule wizard (write path)', { tags: ['Network_Observability'] }, function () {
 
     before('setup', function () {
-        cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
-        cy.uiLogin(Cypress.env('LOGIN_IDP'), Cypress.env('LOGIN_USERNAME'), Cypress.env('LOGIN_PASSWORD'))
+        cy.env(['LOGIN_IDP', 'LOGIN_USERNAME', 'LOGIN_PASSWORD']).then(({ LOGIN_IDP, LOGIN_USERNAME, LOGIN_PASSWORD }) => {
+            cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${LOGIN_USERNAME}`)
+            cy.uiLogin(LOGIN_IDP, LOGIN_USERNAME, LOGIN_PASSWORD)
+        })
 
         Operator.install()
         cy.checkStorageClass(this)
@@ -195,6 +197,8 @@ describe('(OCP-90524) Network_Observability health rule wizard (write path)', { 
     after('all tests', function () {
         cy.adminCLI(`oc delete prometheusrule ${CUSTOM_RULE_NAME} -n ${RULE_NS} --ignore-not-found`)
         Operator.deleteFlowCollector()
-        cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
+        cy.env(['LOGIN_USERNAME']).then(({ LOGIN_USERNAME }) => {
+            cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${LOGIN_USERNAME}`)
+        })
     })
 })

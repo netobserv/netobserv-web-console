@@ -15,5 +15,4 @@ export const availableColumnCount = 57;
 export const defaultColumnGroupCount = 6;
 export const defaultColumnCount = 10;
 
-export const admin_kubeconfig = Cypress.env('KUBECONFIG_PATH');
 export const DEFAULT_RETRY_OPTIONS = { retries: 3, interval: 10000 };
