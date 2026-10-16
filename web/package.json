@@ -121,7 +121,7 @@
     "classnames": "^2.5.1",
     "i18next": "^21.8.14",
     "i18next-http-backend": "^4.0.0",
-    "js-yaml": "^5.2.2",
+    "js-yaml": "^5.4.3",
     "monaco-editor": "^0.56.0",
     "monaco-promql": "1.8.0",
     "murmurhash-js": "^1.0.0",
