@@ -20,7 +20,7 @@ COPY mocks mocks
 
 WORKDIR /opt/app-root/web
 RUN TRANSPILE_ONLY=true FLAVOR=$FLAVOR npm run build$BUILDSCRIPT
-RUN TRANSPILE_ONLY=true npm run build:static
+RUN if [ "$BUILDSCRIPT" != ":standalone" ]; then TRANSPILE_ONLY=true npm run build:static; fi
 
 FROM scratch
 

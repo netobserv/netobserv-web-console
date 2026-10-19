@@ -10,6 +10,15 @@ export const ScopeDefSample: ScopeConfigDef[] = [
     stepInto: 'zone'
   },
   {
+    id: 'network',
+    name: 'Network',
+    description: 'Network name, such as User Defined Network',
+    labels: ['SrcK8S_NetworkName', 'DstK8S_NetworkName'],
+    feature: 'multiNetworks',
+    groups: ['clusters'],
+    stepInto: 'namespace'
+  },
+  {
     id: 'zone',
     name: 'Zone',
     description: 'Availability zone',
@@ -44,7 +53,9 @@ export const ScopeDefSample: ScopeConfigDef[] = [
       'DstK8S_OwnerName',
       'DstK8S_OwnerType',
       'SrcK8S_Namespace',
-      'DstK8S_Namespace'
+      'DstK8S_Namespace',
+      'SrcSubnetLabel',
+      'DstSubnetLabel'
     ],
     groups: [
       'clusters',
@@ -72,13 +83,15 @@ export const ScopeDefSample: ScopeConfigDef[] = [
       'SrcK8S_Namespace',
       'SrcAddr',
       'SrcK8S_HostName',
+      'SrcSubnetLabel',
       'DstK8S_Name',
       'DstK8S_Type',
       'DstK8S_OwnerName',
       'DstK8S_OwnerType',
       'DstK8S_Namespace',
       'DstAddr',
-      'DstK8S_HostName'
+      'DstK8S_HostName',
+      'DstSubnetLabel'
     ],
     groups: [
       'clusters',

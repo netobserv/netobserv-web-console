@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"slices"
 	"strings"
 	"time"
 
@@ -374,7 +375,13 @@ func (c *Frontend) GetAggregateKeyLabels() map[string][]string {
 	const tlsVersionAggSuffix = "__TLSVersion"
 	for i := range c.Scopes {
 		id := c.Scopes[i].ID
-		labs := c.Scopes[i].Labels
+		var labs []string
+		// Ignore labels for disabled features
+		for _, lbl := range c.Scopes[i].Labels {
+			if !c.isLabelForDisabledFeature(lbl) {
+				labs = append(labs, lbl)
+			}
+		}
 		keyLabels[id] = labs
 		// Same src/dst dimensions as topology scope, plus TLSVersion and TLSGroup (per-link TLS breakdown).
 		// TLSTypes is omitted from aggregation (cardinality); TLSGroup is used for PQC-oriented hints.
@@ -384,4 +391,13 @@ func (c *Frontend) GetAggregateKeyLabels() map[string][]string {
 		keyLabels[id+tlsVersionAggSuffix] = withTLS
 	}
 	return keyLabels
+}
+
+func (c *Frontend) isLabelForDisabledFeature(label string) bool {
+	for i := range c.Columns {
+		if c.Columns[i].Field == label && c.Columns[i].Feature != "" && !slices.Contains(c.Features, c.Columns[i].Feature) {
+			return true
+		}
+	}
+	return false
 }
