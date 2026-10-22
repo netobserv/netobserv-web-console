@@ -10,6 +10,8 @@ import FiltersToolbar, { FiltersToolbarProps } from '../../../toolbar/filters-to
 const testCaps = {
   allowLoki: true,
   allowProm: true,
+  allowMetrics: true,
+  allowRawFlows: true,
   isFlow: true,
   isConnectionTracking: true,
   isDNSTracking: false,

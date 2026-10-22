@@ -21,11 +21,15 @@ import (
 	pmod "github.com/prometheus/common/model"
 )
 
-func NewAdminClient(cfg *config.Prometheus, requestHeader http.Header) (api.Client, error) {
+type Client struct {
+	api.Client
+}
+
+func NewAdminClient(cfg *config.Prometheus, requestHeader http.Header) (*Client, error) {
 	return newClient(cfg.Timeout.Duration, cfg.SkipTLS, cfg.CAPath, cfg.ForwardUserToken, cfg.TokenPath, cfg.URL, requestHeader)
 }
 
-func NewDevClient(cfg *config.Prometheus, requestHeader http.Header, namespace string) (api.Client, error) {
+func NewTenantClient(cfg *config.Prometheus, requestHeader http.Header, namespace string) (*Client, error) {
 	var url string
 	if cfg.DevURL == "" {
 		url = cfg.URL
@@ -35,12 +39,13 @@ func NewDevClient(cfg *config.Prometheus, requestHeader http.Header, namespace s
 	return newClient(cfg.Timeout.Duration, cfg.SkipTLS, cfg.CAPath, cfg.ForwardUserToken, cfg.TokenPath, url, requestHeader)
 }
 
-func newClient(timeout time.Duration, skipTLS bool, caPath string, forwardUserToken bool, tokenPath string, url string, requestHeader http.Header) (api.Client, error) {
+func newClient(timeout time.Duration, skipTLS bool, caPath string, forwardUserToken bool, tokenPath string, url string, requestHeader http.Header) (*Client, error) {
 	roundTripper, err := CreateRoundTripper(timeout, skipTLS, caPath, forwardUserToken, tokenPath, requestHeader)
 	if err != nil {
 		return nil, err
 	}
-	return api.NewClient(api.Config{Address: url, RoundTripper: roundTripper})
+	cl, err := api.NewClient(api.Config{Address: url, RoundTripper: roundTripper})
+	return &Client{Client: cl}, err
 }
 
 func CreateRoundTripper(timeout time.Duration, skipTLS bool, caPath string, forwardUserToken bool, tokenPath string, requestHeader http.Header) (http.RoundTripper, error) {
@@ -70,7 +75,7 @@ func CreateRoundTripper(timeout time.Duration, skipTLS bool, caPath string, forw
 	return roundTripper, nil
 }
 
-func executeQueryRange(ctx context.Context, cl api.Client, q *Query) (pmod.Value, int, error) {
+func (c *Client) executeQueryRange(ctx context.Context, q *Query) (pmod.Value, int, error) {
 	var code int
 	startTime := time.Now()
 	defer func() {
@@ -78,7 +83,7 @@ func executeQueryRange(ctx context.Context, cl api.Client, q *Query) (pmod.Value
 	}()
 
 	log.Debugf("executeQueryRange: %v; promQL=%s", q.Range, q.PromQL)
-	v1api := v1.NewAPI(cl)
+	v1api := v1.NewAPI(c.Client)
 	result, warnings, err := v1api.QueryRange(ctx, q.PromQL, q.Range)
 	log.Tracef("Result:\n%v", result)
 	if len(warnings) > 0 {
@@ -94,8 +99,8 @@ func executeQueryRange(ctx context.Context, cl api.Client, q *Query) (pmod.Value
 	return result, code, nil
 }
 
-func QueryMatrix(ctx context.Context, cl api.Client, q *Query) (model.QueryResponse, int, error) {
-	resp, code, err := executeQueryRange(ctx, cl, q)
+func (c *Client) QueryMatrix(ctx context.Context, q *Query) (model.QueryResponse, int, error) {
+	resp, code, err := c.executeQueryRange(ctx, q)
 	if err != nil {
 		log.WithError(err).Error("Error in QueryMatrix")
 		return model.QueryResponse{}, code, err
@@ -120,9 +125,9 @@ func QueryMatrix(ctx context.Context, cl api.Client, q *Query) (model.QueryRespo
 	return qr, code, nil
 }
 
-func GetLabelValues(ctx context.Context, cl api.Client, label string, match []string) ([]string, int, error) {
+func (c *Client) GetLabelValues(ctx context.Context, label string, match []string) ([]string, int, error) {
 	log.Debugf("GetLabelValues: %s", label)
-	v1api := v1.NewAPI(cl)
+	v1api := v1.NewAPI(c.Client)
 	result, warnings, err := v1api.LabelValues(ctx, label, match, time.Now().Add(-3*time.Hour), time.Now())
 	if len(warnings) > 0 {
 		log.Infof("GetLabelValues warnings: %v", warnings)
