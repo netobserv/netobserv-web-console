@@ -1,12 +1,6 @@
 import { colSelectors, netflowPage, overviewSelectors, topologySelectors, viewSelectors } from "@views/netflow-page"
 import { Operator } from "@views/netobserv"
 
-// Feature view preset panels — shared with overviewSelectors (aligned to views.ts)
-const pktDropPanels = overviewSelectors.defaultPacketDropPanels
-const dnsPanels = overviewSelectors.defaultDNSTrackingPanels
-const rttPanels = overviewSelectors.defaultFlowRTTPanels
-const tlsPanels = overviewSelectors.defaultTLSTrackingPanels
-
 // Generic panel not in any feature preset but default-selected on the Default view
 const genericPanel = 'top_avg_byte_rates'
 const genericPanelTitle = 'Top 5 average bytes rates'
@@ -14,15 +8,12 @@ const genericPanelTitle = 'Top 5 average bytes rates'
 describe('(NETOBSERV-2872) Views selector tests', { tags: ['Network_Observability'] }, function () {
 
     before('any test', function () {
-        cy.env(['LOGIN_IDP', 'LOGIN_USERNAME', 'LOGIN_PASSWORD']).then(({ LOGIN_IDP, LOGIN_USERNAME, LOGIN_PASSWORD }) => {
-            cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${LOGIN_USERNAME}`)
-            cy.uiLogin(LOGIN_IDP, LOGIN_USERNAME, LOGIN_PASSWORD)
-        })
-
+        cy.setAsClusterAdmin();
+        cy.uiLoginDefaultUser();
+            
         Operator.install()
         cy.checkStorageClass(this)
         Operator.createFlowcollector("AllFeatures")
-
     })
 
     beforeEach('view selector test', function () {
@@ -464,8 +455,6 @@ describe('(NETOBSERV-2872) Views selector tests', { tags: ['Network_Observabilit
 
     after("all tests", function () {
         Operator.deleteFlowCollector()
-        cy.env(['LOGIN_USERNAME']).then(({ LOGIN_USERNAME }) => {
-            cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${LOGIN_USERNAME}`)
-        })
+        cy.unsetAsClusterAdmin()
     })
 })

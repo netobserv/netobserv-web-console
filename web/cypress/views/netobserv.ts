@@ -34,10 +34,6 @@ type FlowCollectorParameter =
 // Constants
 export const project = "netobserv"
 
-// Environment variables
-const catSrc = Cypress.env('NOO_CATALOG_SOURCE')
-const catSrcImage: string = Cypress.env('NOO_CS_IMAGE')
-
 // Default catalog images
 const DEFAULT_UPSTREAM_IMAGE = 'quay.io/netobserv/network-observability-operator-catalog:v0.0.0-sha-main'
 const DEFAULT_DOWNSTREAM_IMAGE = "quay.io/redhat-user-workloads/ocp-network-observab-tenant/catalog-ystream:latest"
@@ -62,67 +58,41 @@ const FIXTURE_PATHS = {
 } as const
 
 export const Operator = {
-    name: () => {
-        if (`${Cypress.env('NOO_CATALOG_SOURCE')}` === "upstream") {
-            return "NetObserv Operator"
-        }
-        else {
-            return "Network Observability"
-        }
-    },
-    install_catalogsource: () => {
-        let catalogDisplayName = "Production Operators"
-        let catalogImg: string
-        let catalogSource: string
-
-        if (catSrc === "upstream") {
-            catalogImg = catSrcImage ? catSrcImage : DEFAULT_UPSTREAM_IMAGE
-            catalogSource = "netobserv-test"
-            catalogDisplayName = "NetObserv QE"
-            catalogSources.createCustomCatalog(catalogImg, catalogSource, catalogDisplayName)
-        }
-        else {
-            catalogImg = catSrcImage ? catSrcImage : DEFAULT_DOWNSTREAM_IMAGE
-            catalogSource = "netobserv-konflux-fbc"
-            catalogDisplayName = "NetObserv Konflux"
-            catalogSources.createCustomCatalog(catalogImg, catalogSource, catalogDisplayName)
-            // deploy ImageDigetMirrorSet
-            cy.adminCLI('oc apply -f ./cypress/fixtures/image-digest-mirror-set.yaml')
-        }
-        return catalogSource
-    },
     install: () => {
-        if (`${Cypress.env('SKIP_NOO_INSTALL')}` === "true") {
-            return null
-        }
+        cy.env(['SKIP_NOO_INSTALL', 'NOO_CATALOG_SOURCE', 'NOO_CS_IMAGE']).then(({ SKIP_NOO_INSTALL, NOO_CATALOG_SOURCE, NOO_CS_IMAGE }) => {
+            if (SKIP_NOO_INSTALL === "true") {
+                return;
+            }
+            // Check operator status via CLI
+            cy.adminCLI('oc get csv -n openshift-netobserv-operator --no-headers -o custom-columns=":metadata.name"',
+                { failOnNonZeroExit: false })
+                .then((result: any) => {
+                    const stdout = result.stdout ? result.stdout.trim() : ''
+                    const csvName = stdout.split('\n').find((line: string) =>
+                        line.includes('netobserv-operator') || line.includes('network-observability-operator')
+                    )
 
-        // Check operator status via CLI
-        cy.adminCLI('oc get csv -n openshift-netobserv-operator --no-headers -o custom-columns=":metadata.name"',
-            { failOnNonZeroExit: false })
-            .then((result: any) => {
-                const stdout = result.stdout ? result.stdout.trim() : ''
-                const csvName = stdout.split('\n').find((line: string) =>
-                    line.includes('netobserv-operator') || line.includes('network-observability-operator')
-                )
-
-                if (csvName) {
-                    // CSV exists, check if it's in Succeeded state
-                    cy.adminCLI(`oc wait csv ${csvName.trim()} -n openshift-netobserv-operator --for=jsonpath='{.status.phase}'=Succeeded --timeout=120s`, { timeout: 140000 })
-                        .then(() => {
-                            cy.log('NetObserv Operator already installed')
-                        })
-                } else {
-                    cy.log('Installing NetObserv Operator')
-                    var catalogSource = Operator.install_catalogsource()
-
-                    if (catSrc === "upstream") {
-                        // metrics checkbox is not available for upstream operators
-                        operatorHubPage.install("netobserv-operator", catalogSource, false)
+                    if (csvName) {
+                        // CSV exists, check if it's in Succeeded state
+                        cy.adminCLI(`oc wait csv ${csvName.trim()} -n openshift-netobserv-operator --for=jsonpath='{.status.phase}'=Succeeded --timeout=120s`, { timeout: 140000 })
+                            .then(() => {
+                                cy.log('NetObserv Operator already installed')
+                            })
                     } else {
-                        operatorHubPage.install("netobserv-operator", catalogSource, true)
+                        cy.log('Installing NetObserv Operator')
+                        if (NOO_CATALOG_SOURCE === "upstream") {
+                            catalogSources.createCustomCatalog(NOO_CS_IMAGE || DEFAULT_UPSTREAM_IMAGE, "netobserv-test", "NetObserv QE");
+                            // metrics checkbox is not available for upstream operators
+                            operatorHubPage.install("netobserv-operator", "netobserv-test", false)
+                        } else {
+                            catalogSources.createCustomCatalog(NOO_CS_IMAGE || DEFAULT_DOWNSTREAM_IMAGE, "netobserv-konflux-fbc", "NetObserv Konflux");
+                            // deploy ImageDigetMirrorSet
+                            cy.adminCLI('oc apply -f ./cypress/fixtures/image-digest-mirror-set.yaml');
+                            operatorHubPage.install("netobserv-operator", "netobserv-konflux-fbc", true)
+                        }
                     }
-                }
             })
+        })
     },
     visitFlowcollector: () => {
         cy.adminCLI('oc get csv -n openshift-netobserv-operator --no-headers -o custom-columns=":metadata.name"',
@@ -544,8 +514,11 @@ export const Operator = {
     uninstall: () => {
         cy.visit('k8s/all-namespaces/operators.coreos.com~v1alpha1~ClusterServiceVersion')
 
-        cy.contains(Operator.name()).should('exist').invoke('attr', 'href').then(href => {
-            cy.visit(href)
+        cy.env(['NOO_CATALOG_SOURCE']).then(({ NOO_CATALOG_SOURCE }) => {
+            const expectedName = (NOO_CATALOG_SOURCE === "upstream") ? "NetObserv Operator" : "Network Observability";
+            cy.contains(expectedName).should('exist').invoke('attr', 'href').then(href => {
+                cy.visit(href)
+            })
         })
         cy.get('.co-actions-menu > .pf-c-dropdown__toggle').should('exist').click()
         cy.byTestActionID('Uninstall Operator').should('exist').click()
@@ -564,17 +537,18 @@ export const Operator = {
 
 Cypress.Commands.add('checkStorageClass', (context: Mocha.Context) => {
     let storageClassCheck = false
-    const kubeconfig = Cypress.env('KUBECONFIG_PATH');
-    expect(kubeconfig, 'KUBECONFIG_PATH').to.be.a('string').and.not.be.empty
-    cy.exec(`oc get sc --kubeconfig ${JSON.stringify(kubeconfig)}`).then(result => {
-        if (result.stderr.includes('No resources found')) {
-            cy.log('StorageClass not deployed, skipping')
-            storageClassCheck = true
-        }
-        cy.wrap(storageClassCheck).then(scCheck => {
-            if (scCheck) {
-                context.skip()
+    cy.env(['KUBECONFIG_PATH']).then(({ KUBECONFIG_PATH }) => {
+        expect(KUBECONFIG_PATH, 'KUBECONFIG_PATH').to.be.a('string').and.not.be.empty
+        cy.exec(`oc get sc --kubeconfig ${JSON.stringify(KUBECONFIG_PATH)}`).then(result => {
+            if (result.stderr.includes('No resources found')) {
+                cy.log('StorageClass not deployed, skipping')
+                storageClassCheck = true
             }
+            cy.wrap(storageClassCheck).then(scCheck => {
+                if (scCheck) {
+                    context.skip()
+                }
+            })
         })
     })
 });

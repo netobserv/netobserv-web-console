@@ -25,11 +25,52 @@ updates:
         applies-to: version-updates
         patterns:
           - "cypress"
+    ignore:
+      - dependency-name: "mobx"
+        update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
+      - dependency-name: "cypress"
+        update-types: ["version-update:semver-major"] # breaking changes in cypress 16, such as removal of cy.exec
 
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "library/golang"
+    groups:
+      cypress-docker:
+        applies-to: version-updates
+        patterns:
+          - "cypress/*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "npm"
+    directory: "/web"
+    target-branch: "main-pf5"
+    schedule:
+      interval: "monthly"
+    groups:
+      cypress-npm:
+        applies-to: version-updates
+        patterns:
+          - "cypress"
+    ignore:
+      - dependency-name: "mobx"
+        update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
+      - dependency-name: "cypress"
+        update-types: ["version-update:semver-major"] # breaking changes in cypress 16, such as removal of cy.exec
+
+  - package-ecosystem: "docker"
+    directory: "/"
+    target-branch: "main-pf5"
+    schedule:
+      interval: "monthly"
+    ignore:
+      - dependency-name: "library/golang"
     groups:
       cypress-docker:
         applies-to: version-updates

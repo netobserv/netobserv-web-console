@@ -6,10 +6,12 @@ describe.skip('(OCP-67617) User in group with cluster-admin role', { tags: ['Net
     before('any test', function () {
         // create new group, add user to that group and give that group cluster-admin role
         cy.adminCLI(`oc adm groups new netobservadmins`)
-        cy.adminCLI(`oc adm groups add-users netobservadmins ${Cypress.env('LOGIN_USERNAME')}`)
-        cy.adminCLI(`oc adm policy add-cluster-role-to-group cluster-admin netobservadmins`)
-        cy.uiLogin(Cypress.env('LOGIN_IDP'), Cypress.env('LOGIN_USERNAME'), Cypress.env('LOGIN_PASSWORD'))
-
+        cy.env(['LOGIN_USERNAME']).then(({ LOGIN_USERNAME }) => {
+            cy.adminCLI(`oc adm groups add-users netobservadmins ${LOGIN_USERNAME}`)
+            cy.adminCLI(`oc adm policy add-cluster-role-to-group cluster-admin netobservadmins`)
+        })
+        cy.uiLoginDefaultUser();
+        
         Operator.install()
         cy.checkStorageClass(this)
         Operator.createFlowcollector()
@@ -40,7 +42,9 @@ describe.skip('(OCP-67617) User in group with cluster-admin role', { tags: ['Net
     })
 
     after("all tests", function () {
-        cy.adminCLI(`oc adm groups remove-users netobservadmins ${Cypress.env('LOGIN_USERNAME')}`)
-        cy.adminCLI(`oc delete groups netobservadmins`)
+        cy.env(['LOGIN_USERNAME']).then(({ LOGIN_USERNAME }) => {
+            cy.adminCLI(`oc adm groups remove-users netobservadmins ${LOGIN_USERNAME}`)
+            cy.adminCLI(`oc delete groups netobservadmins`)
+        })
     })
 })

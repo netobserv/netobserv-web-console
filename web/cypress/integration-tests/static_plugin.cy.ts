@@ -1,14 +1,13 @@
 import { flowcollectorStatusPage, flowcollectorStatusSelectors } from "@views/flowcollector-status";
 import { netflowPage, overviewSelectors, pluginSelectors } from "@views/netflow-page";
 import { Operator, project } from "@views/netobserv";
-import { searchPage } from "@views/search";
 
 describe('(OCP-84156 OCP-88744) StaticPlugin test with Status Check', { tags: ['Network_Observability'] }, function () {
 
     before('any test', function () {
-        cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
-        cy.uiLogin(Cypress.env('LOGIN_IDP'), Cypress.env('LOGIN_USERNAME'), Cypress.env('LOGIN_PASSWORD'))
-
+        cy.setAsClusterAdmin();
+        cy.uiLoginDefaultUser();
+            
         Operator.install()
         cy.checkStorageClass(this)
         Operator.createFlowcollector("StaticPlugin")
@@ -139,6 +138,6 @@ describe('(OCP-84156 OCP-88744) StaticPlugin test with Status Check', { tags: ['
         })
     after("after all tests", function () {
         Operator.deleteFlowCollector()
-        cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
+        cy.unsetAsClusterAdmin()
     })
 })

@@ -159,8 +159,8 @@ fmt-frontend: i18n ## Run frontend i18n and fmt
 
 .PHONY: lint-frontend
 lint-frontend: ## Lint frontend code
-	@echo "### Linting frontend code"
-	cd web && npm run lint
+	@echo "### Linting frontend code, and make sure cypress code compiles"
+	cd web && npm run lint && npm run cypress:compile
 
 .PHONY: test-frontend
 test-frontend: ## Test frontend using jest

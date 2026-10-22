@@ -17,7 +17,7 @@ const sourceActions = (name: string, action: string) => {
     })
 };
 export const installedOperators = {
-  checkOperatorStatus: (csvName, csvStatus) => {
+  checkOperatorStatus: (csvName: string, csvStatus: string) => {
     cy.get('thead', { timeout: 60000 });
     cy.get('input[data-test="name-filter-input"]')
       .clear()
@@ -30,10 +30,10 @@ export const installedOperators = {
       .children()
       .contains(`${csvStatus}`, { timeout: 120000 });
   },
-  clickCSVName: (csv_name) => {
-    cy.get(`a[data-test-operator-row*="${csv_name}"]`).click();
+  clickCSVName: (csvName: string) => {
+    cy.get(`a[data-test-operator-row*="${csvName}"]`).click();
   },
-  filterByName: (operatorName) => {
+  filterByName: (operatorName: string) => {
     cy.get('input[data-test="name-filter-input"]')
       .clear()
       .type(operatorName)
@@ -69,8 +69,8 @@ export const operatorHubPage = {
         cy.wrap($btn).find(`[data-test="infraFeatures-${name}"] input[type="checkbox"]`).check();
       })
   },
-  clickOperatorTile: (operator_name) => {
-    cy.get(`button[id*="${operator_name}"]`).first().click({ force: true });
+  clickOperatorTile: (operatorName: string) => {
+    cy.get(`button[id*="${operatorName}"]`).first().click({ force: true });
   },
   clickOperatorInstall: () => {
     cy.get('[data-test="install-operator"]').click({ force: true });
@@ -104,7 +104,7 @@ export const operatorHubPage = {
       cy.byTestID("status-text", { timeout: 180000 }).should('have.text', "Succeeded")
     })
   },
-  installOperator: (operatorName, csName, installNamespace?) => {
+  installOperator: (operatorName: string, csName: string, installNamespace?: boolean) => {
     cy.visit(`/operatorhub/subscribe?pkg=${operatorName}&catalog=${csName}&catalogNamespace=openshift-marketplace&targetNamespace=undefined`);
     cy.get('body').should('be.visible');
     if (installNamespace) {
@@ -120,7 +120,7 @@ export const operatorHubPage = {
     }
     cy.get('[data-test="install-operator"]').click();
   },
-  installOperatorWithRecommendNamespace: (operatorName, csName) => {
+  installOperatorWithRecommendNamespace: (operatorName: string, csName: string) => {
     cy.visit(`/operatorhub/subscribe?pkg=${operatorName}&catalog=${csName}&catalogNamespace=openshift-marketplace&targetNamespace=undefined`);
     cy.get('body').should('be.visible');
     cy.get('input#operator-namespace-recommended').click();
@@ -129,7 +129,7 @@ export const operatorHubPage = {
     };
     cy.get('[data-test="install-operator"]').click();
   },
-  removeOperator: (csvName) => {
+  removeOperator: (csvName: string) => {
     listPage.rows.clickKebabAction(`${csvName}`, "Uninstall Operator");
     cy.get('#confirm-action').click();
     cy.get(`[data-test-operator-row*="${csvName}"]`).should('not.exist');
@@ -149,10 +149,10 @@ export const operatorHubPage = {
   checkDeprecationVersionMsg: (message: string) => {
     cy.get('[data-test="deprecated-operator-warning-version"]').contains(message).should('exist');
   },
-  checkWarningInfo: (warningInfo) => {
+  checkWarningInfo: (warningInfo: string) => {
     cy.get('[class*="alert__title"]').should('contain', `${warningInfo}`);
   },
-  checkSTSWarningOnOperator: (operatorName, catalogSource, warningInfo, installNamespace, clusterType) => {
+  checkSTSWarningOnOperator: (operatorName: string, catalogSource: string, warningInfo: string, installNamespace: boolean, clusterType: string) => {
     //Check STS/WIFI warning message on operator details and installation page
     cy.visit(`/catalog/ns/default?keyword=${operatorName}&catalogType=operator&source=["${catalogSource}"]`);
     cy.get('.co-catalog-tile').click();
@@ -192,7 +192,7 @@ export const operatorHubPage = {
   cancel: () => {
     cy.get('button').contains('Cancel').click({ force: true });
   },
-  checkRecommenedMonitoring: (packageName, catalogSource, operatorName, enableStatus) => {
+  checkRecommenedMonitoring: (packageName: string, catalogSource: string, operatorName: string, enableStatus: string) => {
     cy.visit(`/operatorhub/subscribe?pkg=${packageName}&catalog=${catalogSource}&catalogNamespace=openshift-marketplace&targetNamespace=undefined`);
     cy.contains(`${operatorName}`, { timeout: 30000 }).should('exist');
     cy.get('input#enable-monitoring-checkbox').should('have.attr', 'data-checked-state', `${enableStatus}`);
@@ -203,7 +203,7 @@ export const operatorHubModal = {
   clickInstall: () => {
     cy.byLegacyTestID('operator-install-btn').click({ force: true });
   },
-  selectChannel: (channel) => {
+  selectChannel: (channel: string) => {
     cy.get('h5').contains('Channel').parent('div').within(() => {
       // click on button instead of div
       cy.get('button[data-test="operator-channel-select-toggle"]').click({ force: true });
@@ -211,7 +211,7 @@ export const operatorHubModal = {
     cy.get(`li[data-test="channel-option-${channel}"]`).should('be.visible');
     cy.get(`button[id="${channel}"]`).click({ force: true });
   },
-  selectVersion: (version) => {
+  selectVersion: (version: string) => {
     cy.get('h5').contains('Version').parent('div').within(() => {
       cy.get('button[data-test="operator-version-select-toggle"]').click({ force: true });
     });

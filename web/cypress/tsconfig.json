@@ -1,9 +1,9 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "baseUrl": "..",
+    "baseUrl": ".",
     "paths": {
-      "@views/*": ["cypress/views/*"]
+      "@views/*": ["./views/*"]
     },
     "types": ["cypress", "node"]
   },

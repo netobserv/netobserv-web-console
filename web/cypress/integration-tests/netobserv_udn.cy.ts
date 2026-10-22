@@ -6,9 +6,9 @@ describe('(OCP-81751) UDN test', { tags: ['Network_Observability'] }, function (
     let skipTest = false
 
     before('any test', function () {
-        cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
-        cy.uiLogin(Cypress.env('LOGIN_IDP'), Cypress.env('LOGIN_USERNAME'), Cypress.env('LOGIN_PASSWORD'))
-
+        cy.setAsClusterAdmin();
+        cy.uiLoginDefaultUser();
+            
         // UDN is only supported from OCP 4.18 onwards
         catalogSources.getOCPVersion()
         cy.get('@VERSION').then((version) => {
@@ -24,7 +24,7 @@ describe('(OCP-81751) UDN test', { tags: ['Network_Observability'] }, function (
                 Operator.install()
                 cy.checkStorageClass(this)
                 Operator.createFlowcollector("UDNMapping")
-
+            
                 // deploy UDN and CUDN
                 cy.adminCLI('oc apply -f cypress/fixtures/test-udn.yaml')
             }
@@ -85,6 +85,6 @@ describe('(OCP-81751) UDN test', { tags: ['Network_Observability'] }, function (
 
         cy.adminCLI('oc delete -f cypress/fixtures/test-udn.yaml --ignore-not-found')
         Operator.deleteFlowCollector()
-        cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
+        cy.unsetAsClusterAdmin()
     })
 })

@@ -8,9 +8,9 @@ function getTableLimitURL(limit: string): RegExp {
 describe('(OCP-50532, OCP-50531, OCP-50530, OCP-59408) Netflow Table Query Options', { tags: ['Network_Observability'] }, function () {
 
     before('any test', function () {
-        cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
-        cy.uiLogin(Cypress.env('LOGIN_IDP'), Cypress.env('LOGIN_USERNAME'), Cypress.env('LOGIN_PASSWORD'))
-
+        cy.setAsClusterAdmin();
+        cy.uiLoginDefaultUser();
+            
         Operator.install()
         cy.checkStorageClass(this)
         Operator.createFlowcollector()
@@ -44,12 +44,7 @@ describe('(OCP-50532, OCP-50531, OCP-50530, OCP-59408) Netflow Table Query Optio
     })
 
     it("(OCP-50532, memodi) should validate query summary panel", { tags: ['@smoke'] }, function () {
-        let warningExists = false
-        cy.get(querySumSelectors.queryStatsPanel).should('exist').then(qrySum => {
-            if (Cypress.$(querySumSelectors.queryStatsPanel + ' svg.query-summary-warning').length > 0) {
-                warningExists = true
-            }
-        })
+        cy.get(querySumSelectors.queryStatsPanel).should('exist');
 
         cy.get(querySumSelectors.flowsCount).should('exist').then(flowsCnt => {
             // parseFloat handles formats: "123 Flows", "123+ Flows", "1.5k Flows", "1.5k+ Flows"
@@ -104,6 +99,6 @@ describe('(OCP-50532, OCP-50531, OCP-50530, OCP-59408) Netflow Table Query Optio
     })
 
     after("all tests", function () {
-        cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
+        cy.unsetAsClusterAdmin()
     })
 })

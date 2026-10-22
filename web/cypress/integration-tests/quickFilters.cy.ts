@@ -21,13 +21,13 @@ var patch = [{
 describe('(OCP-56222) Quick Filters test', { tags: ['Network_Observability'] }, function () {
 
     before('any test', function () {
-        cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
-        cy.uiLogin(Cypress.env('LOGIN_IDP'), Cypress.env('LOGIN_USERNAME'), Cypress.env('LOGIN_PASSWORD'))
-
+        cy.setAsClusterAdmin();
+        cy.uiLoginDefaultUser();
+            
         Operator.install()
         cy.checkStorageClass(this)
         Operator.createFlowcollector()
-
+        
         // create test server and client pods
         cy.adminCLI('oc apply -f cypress/fixtures/test-server-client.yaml')
 
@@ -99,6 +99,6 @@ describe('(OCP-56222) Quick Filters test', { tags: ['Network_Observability'] }, 
 
     after("all tests", function () {
         cy.adminCLI('oc delete -f cypress/fixtures/test-server-client.yaml --ignore-not-found')
-        cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
+        cy.unsetAsClusterAdmin()
     })
 })

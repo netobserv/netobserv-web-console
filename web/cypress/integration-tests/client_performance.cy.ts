@@ -3,8 +3,8 @@ import { Operator } from "@views/netobserv"
 
 describe("(OCP-67725, memodi) Client Performances", { browser: 'chrome', tags: ['Performance'] }, function () {
     before("tests", function () {
-        cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
-        cy.uiLogin(Cypress.env('LOGIN_IDP'), Cypress.env('LOGIN_USERNAME'), Cypress.env('LOGIN_PASSWORD'))
+        cy.setAsClusterAdmin();
+        cy.uiLoginDefaultUser();
 
         Operator.install()
         cy.checkStorageClass(this)
@@ -86,6 +86,6 @@ describe("(OCP-67725, memodi) Client Performances", { browser: 'chrome', tags: [
     })
 
     after("all tests", function () {
-        cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
+        cy.unsetAsClusterAdmin()
     })
 })

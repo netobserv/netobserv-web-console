@@ -4,9 +4,9 @@ import { flowcollectorStatusPage, flowcollectorStatusSelectors } from "@views/fl
 describe('FlowCollector status error scenario', { tags: ['Network_Observability'] }, function () {
 
     before('setup', function () {
-        cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
-        cy.uiLogin(Cypress.env('LOGIN_IDP'), Cypress.env('LOGIN_USERNAME'), Cypress.env('LOGIN_PASSWORD'))
-
+        cy.setAsClusterAdmin();
+        cy.uiLoginDefaultUser();
+            
         Operator.install()
         cy.checkStorageClass(this)
         Operator.createFlowcollector("WithLokiStack")
@@ -56,6 +56,6 @@ describe('FlowCollector status error scenario', { tags: ['Network_Observability'
 
     after("all tests", function () {
         Operator.deleteFlowCollector()
-        cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
+        cy.unsetAsClusterAdmin()
     })
 })

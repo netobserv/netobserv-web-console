@@ -10,9 +10,9 @@ describe("(OCP-87215) Gateway API owner metadata", { tags: ['Network_Observabili
     let skipTest = false
 
     before('any test', function () {
-        cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
-        cy.uiLogin(Cypress.env('LOGIN_IDP'), Cypress.env('LOGIN_USERNAME'), Cypress.env('LOGIN_PASSWORD'))
-
+        cy.setAsClusterAdmin();
+        cy.uiLoginDefaultUser();
+            
         // Gateway test is only supported from OCP 4.19 onwards
         catalogSources.getOCPVersion()
         cy.get('@VERSION').then((version) => {
@@ -28,7 +28,7 @@ describe("(OCP-87215) Gateway API owner metadata", { tags: ['Network_Observabili
                 Operator.install()
                 cy.checkStorageClass(this)
                 Operator.createFlowcollector("FlowRTT")
-
+        
                 cy.adminCLI('oc apply -f cypress/fixtures/gateway-api.yaml')
 
                 // Wait for pods to be ready
@@ -70,6 +70,6 @@ describe("(OCP-87215) Gateway API owner metadata", { tags: ['Network_Observabili
 
         cy.adminCLI('oc delete -f cypress/fixtures/gateway-api.yaml --ignore-not-found', { failOnNonZeroExit: false, timeout: 120000 })
         Operator.deleteFlowCollector()
-        cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
+        cy.unsetAsClusterAdmin()
     })
 })

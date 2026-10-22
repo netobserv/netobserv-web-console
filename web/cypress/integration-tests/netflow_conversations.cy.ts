@@ -4,9 +4,9 @@ import { netflowPage, colSelectors, querySumSelectors } from "@views/netflow-pag
 describe('(OCP-71787) Conversation tracking test', { tags: ['Network_Observability'] }, function () {
 
     before('any test', function () {
-        cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
-        cy.uiLogin(Cypress.env('LOGIN_IDP'), Cypress.env('LOGIN_USERNAME'), Cypress.env('LOGIN_PASSWORD'))
-
+        cy.setAsClusterAdmin();
+        cy.uiLoginDefaultUser();
+            
         Operator.install()
         cy.checkStorageClass(this)
         Operator.createFlowcollector("Conversations")
@@ -29,12 +29,7 @@ describe('(OCP-71787) Conversation tracking test', { tags: ['Network_Observabili
         cy.changeQueryOption('Conversation')
 
         // validate Query Summary panel
-        let warningExists = false
-        cy.get(querySumSelectors.queryStatsPanel).should('exist').then(qrySum => {
-            if (Cypress.$(querySumSelectors.queryStatsPanel + ' svg.query-summary-warning').length > 0) {
-                warningExists = true
-            }
-        })
+        cy.get(querySumSelectors.queryStatsPanel).should('exist');
 
         cy.get(querySumSelectors.flowsCount).should('exist').then(ConversationsCnt => {
             // parseFloat handles formats: "123 Ended conversations", "123+ Ended conversations"
@@ -50,6 +45,6 @@ describe('(OCP-71787) Conversation tracking test', { tags: ['Network_Observabili
 
     after("all tests", function () {
         Operator.deleteFlowCollector()
-        cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
+        cy.unsetAsClusterAdmin()
     })
 })

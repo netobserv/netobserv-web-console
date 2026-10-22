@@ -11,6 +11,7 @@ declare global {
         options?: Partial<Cypress.VisitOptions>,
         selector?: string,
       ): Chainable<Element>;
+      clickNavLink(path: string[]): Chainable<Element>;
       dismissWelcomeModal(): Chainable<Element>;
     }
   }
@@ -143,13 +144,3 @@ export const editKind = (kind: string, humanizeKind: boolean) =>
 
 export const deleteKind = (kind: string, humanizeKind: boolean) =>
   actionOnKind(actions.delete, kind, humanizeKind);
-
-export const create = (obj) => {
-  const filename = [
-    Cypress.config('screenshotsFolder').toString().replace('/cypress/screenshots', ''),
-    `${obj.metadata.name}.${obj.kind.toLowerCase()}.json`,
-  ].join('/');
-  cy.writeFile(filename, JSON.stringify(obj));
-  cy.exec(`oc create -f ${filename}`);
-  cy.exec(`rm ${filename}`);
-};

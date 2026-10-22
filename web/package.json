@@ -15,6 +15,7 @@
     "i18n": "i18next \"src/**/*.{js,jsx,ts,tsx}\" [-oc] -c i18next-parser.config.js",
     "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'",
     "ts-node-transpile": "ts-node --transpile-only -O '{\"module\":\"commonjs\"}' -I '/node_modules/(?!(@openshift-console)/)/'",
+    "cypress:compile": "tsc --noEmit -p cypress/tsconfig.json",
     "cypress:open": "cypress open",
     "cypress:record": "cypress run --spec \"cypress/e2e/**/*.spec.ts\" --record --headless",
     "cypress:run": "cypress run --spec \"cypress/e2e/**/*.spec.ts\"",

@@ -4,9 +4,9 @@ import { Operator } from "@views/netobserv"
 describe('(OCP-74049, OCP-73875) Prometheus datasource only', { tags: ['Network_Observability'] }, function () {
 
     before('any test', function () {
-        cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
-        cy.uiLogin(Cypress.env('LOGIN_IDP'), Cypress.env('LOGIN_USERNAME'), Cypress.env('LOGIN_PASSWORD'))
-
+        cy.setAsClusterAdmin();
+        cy.uiLoginDefaultUser();
+            
         Operator.install()
         Operator.createFlowcollector("LokiDisabled")
     })
@@ -32,8 +32,9 @@ describe('(OCP-74049, OCP-73875) Prometheus datasource only', { tags: ['Network_
             cy.byTestID('resource').should('not.exist')
         })
     })
+
     after("after all tests", function () {
         Operator.deleteFlowCollector()
-        cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
+        cy.unsetAsClusterAdmin()
     })
 })
