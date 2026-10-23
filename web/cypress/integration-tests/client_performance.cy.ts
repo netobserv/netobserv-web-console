@@ -1,6 +1,23 @@
 import { netflowPage, loadTimes, memoryUsage, overviewSelectors, getMemoryUsageMB, topologyPage } from "@views/netflow-page"
 import { Operator } from "@views/netobserv"
 
+// Console's own shell bundle throws an unhandled "<minified var> is not a function" rejection
+// during the very first page load right after login - reproduced in the `before` hook, before
+// Operator.install() has run, so NetObserv's plugin isn't even registered yet and can't be the
+// cause. The single-letter variable name isn't stable across console builds, so match the shape
+// of the message rather than a literal string. Stack-scoped to Console's own static bundles so a
+// genuine NetObserv regression throwing a similarly-shaped message still fails the test.
+Cypress.on('uncaught:exception', err => {
+    const stack = err?.stack || ''
+    if (
+        /^\w+ is not a function$/.test(err?.message || '') &&
+        (/\/static\/main-bundle/.test(stack) || /main-bundle[^/\s]*\.min\.js/.test(stack) || /vendors~main-chunk/.test(stack))
+    ) {
+        return false
+    }
+    return true
+})
+
 describe("(OCP-67725, memodi) Client Performances", { browser: 'chrome', tags: ['Performance'] }, function () {
     before("tests", function () {
         cy.adminCLI(`oc adm policy add-cluster-role-to-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)
