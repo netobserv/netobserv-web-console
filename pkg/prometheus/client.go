@@ -79,7 +79,7 @@ func executeQueryRange(ctx context.Context, cl api.Client, q *Query) (pmod.Value
 
 	log.Debugf("executeQueryRange: %v; promQL=%s", q.Range, q.PromQL)
 	v1api := v1.NewAPI(cl)
-	result, warnings, err := v1api.QueryRange(ctx, q.PromQL, q.Range)
+	result, warnings, _, err := v1api.QueryRange(ctx, q.PromQL, q.Range)
 	log.Tracef("Result:\n%v", result)
 	if len(warnings) > 0 {
 		log.Infof("executeQueryRange warnings: %v", warnings)
@@ -123,7 +123,7 @@ func QueryMatrix(ctx context.Context, cl api.Client, q *Query) (model.QueryRespo
 func GetLabelValues(ctx context.Context, cl api.Client, label string, match []string) ([]string, int, error) {
 	log.Debugf("GetLabelValues: %s", label)
 	v1api := v1.NewAPI(cl)
-	result, warnings, err := v1api.LabelValues(ctx, label, match, time.Now().Add(-3*time.Hour), time.Now())
+	result, warnings, _, err := v1api.LabelValues(ctx, label, match, time.Now().Add(-3*time.Hour), time.Now())
 	if len(warnings) > 0 {
 		log.Infof("GetLabelValues warnings: %v", warnings)
 	}
