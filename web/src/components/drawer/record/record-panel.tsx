@@ -24,6 +24,7 @@ import _ from 'lodash';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlowDirection, getDirectionDisplayString, Record } from '../../../api/ipfix';
+import { canFindProxyClients } from '../../../api/proxy';
 import {
   doesIncludeFilter,
   Filter,
@@ -34,11 +35,14 @@ import {
   removeFromFilters
 } from '../../../model/filters';
 import { RecordType } from '../../../model/flow-query';
+import { useNetflowContext } from '../../../model/netflow-context';
 import { Column, ColumnGroup, ColumnsId, getColumnGroups, getShortColumnName } from '../../../utils/columns';
+import { ContextSingleton } from '../../../utils/context';
 import { TimeRange } from '../../../utils/datetime';
 import { findFilter } from '../../../utils/filter-definitions';
 import { defaultSize, maxSize, minSize } from '../../../utils/panel';
 import { defaultTimeRange } from '../../../utils/router';
+import { ProxyRecords } from './proxy-records';
 import RecordField, { RecordFieldFilter } from './record-field';
 import './record-panel.css';
 
@@ -76,6 +80,12 @@ export const RecordPanel: React.FC<RecordDrawerProps> = ({
   onClose
 }) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
+  const { config, caps } = useNetflowContext();
+  const showProxyClients =
+    caps.allowLoki &&
+    config.features.includes('proxyCorrelation') &&
+    !ContextSingleton.getForcedNamespace() &&
+    canFindProxyClients(record);
   const [hidden, setHidden] = React.useState<string[]>([]);
   const [activeTab, setActiveTab] = React.useState<string>('details');
 
@@ -481,6 +491,11 @@ export const RecordPanel: React.FC<RecordDrawerProps> = ({
               )}
             </Accordion>
           </Tab>
+          {showProxyClients && (
+            <Tab className="drawer-tab" eventKey="proxy" title={<TabTitleText>{t('Related clients')}</TabTitleText>}>
+              {activeTab === 'proxy' && <ProxyRecords key={record.key} record={record} />}
+            </Tab>
+          )}
           <Tab className="drawer-tab" eventKey={'raw'} title={<TabTitleText>{t('Raw')}</TabTitleText>}>
             <ClipboardCopy
               data-test-id="drawer-json-copy"
