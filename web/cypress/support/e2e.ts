@@ -12,3 +12,43 @@
 // Import types to enable tags in describe/it blocks
 import '@cypress/grep'
 import './commands'
+
+// Global exception handler to suppress known OCP 4.22 console plugin errors
+// These are known bugs in OCP 4.22 EC builds that don't affect NetObserv functionality
+Cypress.on('uncaught:exception', (err) => {
+    const errorMsg = err.message
+    const stack = err.stack || ''
+
+    // Ignore specific networking-console-plugin errors
+    if (errorMsg.includes('networking-console-plugin') || errorMsg.includes('networkingFlags')) {
+        return false
+    }
+
+    // Ignore monitoring-plugin errors
+    if (errorMsg.includes('monitoring-plugin') || errorMsg.includes('MonitoringReducer')) {
+        return false
+    }
+
+    // Transient Console shell auth noise during navigation / dynamic plugin load.
+    // Only suppress when the stack points at Console static bundles — not NetObserv code.
+    if (
+        (errorMsg === 'Unauthorized' || errorMsg.includes('Unauthorized')) &&
+        (/\/static\/main-bundle/.test(stack) ||
+            /main-bundle[^/\s]*\.min\.js/.test(stack) ||
+            /loadDynamicPlugin|getPluginEntry|pluginStore/i.test(stack))
+    ) {
+        return false
+    }
+
+    // Console rollout after FlowCollector apply can crash mid-render.
+    if (
+        /\b[a-zA-Z_$][\w$]{0,2} is not a function\b/.test(errorMsg) &&
+        /\/static\/(main-bundle|vendors~main-chunk)/.test(stack) &&
+        !/netobserv-plugin/i.test(stack)
+    ) {
+        return false
+    }
+
+    // Let other errors fail the test
+    return true
+})
