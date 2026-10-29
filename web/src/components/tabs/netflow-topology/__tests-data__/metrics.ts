@@ -1,7 +1,7 @@
-import { RawTopologyMetrics, TopologyMetrics } from '../../../../api/query-response';
-import { parseTopologyMetrics } from '../../../../utils/metrics';
+import { TopologyMetrics } from '../../../../api/query-response';
+import { topologyFromLabels } from '../../../__tests-data__/topology-from-labels';
 
-export const responseSample = {
+const responseSample = {
   status: 'success',
   data: {
     resultType: 'matrix',
@@ -279,10 +279,9 @@ export const responseSample = {
   }
 };
 
-export const dataSample = parseTopologyMetrics(
-  responseSample.data.result as RawTopologyMetrics[],
-  { from: 1647965100, to: 1647965400 },
-  'resource',
-  0,
-  true
-) as TopologyMetrics[];
+export const dataSample: TopologyMetrics[] = responseSample.data.result.map(row =>
+  topologyFromLabels(row.metric, row.values as [number, string][], 'resource', {
+    from: 1647965100,
+    to: 1647965400
+  })
+);

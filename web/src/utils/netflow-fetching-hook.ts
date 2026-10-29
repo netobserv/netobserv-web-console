@@ -23,7 +23,13 @@ export type InitState = Array<
 
 export function canTick(
   initState: React.MutableRefObject<InitState>,
-  modals: { isTRModalOpen: boolean; isOverviewModalOpen: boolean; isColModalOpen: boolean; isExportModalOpen: boolean }
+  modals: {
+    isTRModalOpen: boolean;
+    isOverviewModalOpen: boolean;
+    isColModalOpen: boolean;
+    isExportModalOpen: boolean;
+    isMetricsExportModalOpen: boolean;
+  }
 ): boolean {
   if (
     !initState.current.includes('forcedFiltersLoaded') ||
@@ -33,7 +39,13 @@ export function canTick(
     console.debug('tick skipped', initState.current);
     return false;
   }
-  if (modals.isTRModalOpen || modals.isOverviewModalOpen || modals.isColModalOpen || modals.isExportModalOpen) {
+  if (
+    modals.isTRModalOpen ||
+    modals.isOverviewModalOpen ||
+    modals.isColModalOpen ||
+    modals.isExportModalOpen ||
+    modals.isMetricsExportModalOpen
+  ) {
     console.debug('tick skipped since modal is open');
     return false;
   }
@@ -183,6 +195,7 @@ export interface UseDataFetchingParams {
   isOverviewModalOpen: boolean;
   isColModalOpen: boolean;
   isExportModalOpen: boolean;
+  isMetricsExportModalOpen: boolean;
   filters: Filters;
   setFilters: React.Dispatch<React.SetStateAction<Filters>>;
   parentConfig?: Config;
@@ -232,6 +245,7 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
     isOverviewModalOpen,
     isColModalOpen,
     isExportModalOpen,
+    isMetricsExportModalOpen,
     filters,
     setFilters,
     parentConfig,
@@ -294,7 +308,7 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
   );
 
   const tick = React.useCallback(() => {
-    const modals = { isTRModalOpen, isOverviewModalOpen, isColModalOpen, isExportModalOpen };
+    const modals = { isTRModalOpen, isOverviewModalOpen, isColModalOpen, isExportModalOpen, isMetricsExportModalOpen };
     if (!canTick(initState, modals)) return;
 
     if (drawerRef.current == null) {
@@ -347,6 +361,7 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
     isOverviewModalOpen,
     isColModalOpen,
     isExportModalOpen,
+    isMetricsExportModalOpen,
     showHistogram,
     range,
     histogramRange,

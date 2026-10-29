@@ -2,18 +2,18 @@ import { render, screen } from '@testing-library/react';
 import * as React from 'react';
 
 import { ShuffledColumnSample } from '../../../components/__tests-data__/columns';
-import ExportModal, { ExportModalProps } from '../export-modal';
+import FlowsExportModal, { FlowsExportModalProps } from '../flows-export-modal';
 
 jest.mock('../../../api/routes', () => ({
-  getExportFlowsURL: jest.fn(() => 'http://localhost/export'),
+  exportFlows: jest.fn(() => Promise.resolve(new Blob(['test']))),
   getConfig: jest.fn(() => Promise.resolve({})),
   getRole: jest.fn(() => Promise.resolve('admin'))
 }));
 
 const emptyFilters = { match: 'all' as const, list: [] };
 
-describe('<ExportModal />', () => {
-  const props: ExportModalProps = {
+describe('<FlowsExportModal />', () => {
+  const props: FlowsExportModalProps = {
     isModalOpen: true,
     setModalOpen: jest.fn(),
     columns: ShuffledColumnSample,
@@ -26,11 +26,11 @@ describe('<ExportModal />', () => {
       structuredFilters: emptyFilters,
       packetLoss: 'all'
     },
-    id: 'export-modal'
+    id: 'flows-export-modal'
   };
 
   it('should render component', async () => {
-    render(<ExportModal {...props} />);
+    render(<FlowsExportModal {...props} />);
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 });
