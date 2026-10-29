@@ -128,8 +128,8 @@ describe('(OCP-90529) Network Traffic Tab on VMI Page', { tags: ['Network_Observ
         cy.get('#content', { timeout: 30000 }).should('be.visible')
         cy.wait(3000)
 
-        // Wait for page title to settle and not cover the tabs
-        cy.get('h1', { timeout: 10000 }).should('be.visible')
+        // Wait for page title to settle and not cover the tab
+        cy.get('h1', { timeout: 60000 }).should('be.visible')
         cy.wait(1000)
 
         // Check if Network Traffic tab is present, scroll into view and click it
@@ -160,6 +160,15 @@ describe('(OCP-90529) Network Traffic Tab on VMI Page', { tags: ['Network_Observ
             cy.adminCLI('oc delete hyperconverged kubevirt-hyperconverged -n openshift-cnv --wait=false', { failOnNonZeroExit: false } as any)
             cy.adminCLI('oc delete cdi cdi-kubevirt-hyperconverged -n openshift-cnv --wait=false', { failOnNonZeroExit: false } as any)
             cy.adminCLI('oc delete configmap cdi-apiserver-signer-bundle -n openshift-cnv --wait=false', { failOnNonZeroExit: false } as any)
+
+            // Strip stale kubevirt-plugin ref left after HyperConverged deletion.
+            cy.adminCLI(`oc get consoles.operator.openshift.io cluster -o jsonpath='{.spec.plugins}'`, { failOnNonZeroExit: false }).then((result: any) => {
+                const current: string[] = JSON.parse(result.stdout?.trim() || '[]')
+                const next = current.filter(p => p !== 'kubevirt-plugin')
+                if (next.length !== current.length) {
+                    cy.adminCLI(`oc patch consoles.operator.openshift.io cluster --type=merge -p '{"spec":{"plugins":${JSON.stringify(next)}}}'`, { failOnNonZeroExit: false })
+                }
+            })
         }
 
         cy.adminCLI(`oc adm policy remove-cluster-role-from-user cluster-admin ${Cypress.env('LOGIN_USERNAME')}`)

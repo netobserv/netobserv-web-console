@@ -307,6 +307,13 @@ Cypress.Commands.add('uiLogin', (provider: string, username: string, password: s
   const baseUrl = Cypress.config('baseUrl');
   const baseOrigin = new URL(baseUrl!).origin;
 
+  // Ensure console is not mid-rollout.
+  cy.checkCommandResult(
+    `oc get co console -o jsonpath='{.status.conditions[?(@.type=="Progressing")].status}'`,
+    'False',
+    { retries: 60, interval: 5000 }
+  );
+
   cy.clearAllCookies();
   cy.visit('/');
 

@@ -40,6 +40,15 @@ Cypress.on('uncaught:exception', (err) => {
         return false
     }
 
+    // Console rollout after FlowCollector apply can crash mid-render.
+    if (
+        /\b[a-zA-Z_$][\w$]{0,2} is not a function\b/.test(errorMsg) &&
+        /\/static\/(main-bundle|vendors~main-chunk)/.test(stack) &&
+        !/netobserv-plugin/i.test(stack)
+    ) {
+        return false
+    }
+
     // Let other errors fail the test
     return true
 })
