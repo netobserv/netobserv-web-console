@@ -77,6 +77,8 @@ func (b *Backend) Metrics(ctx context.Context, bctx *backend.QueryContext, p *ba
 	}
 	qr, code, err := cl.QueryMatrix(ctx, &promQL)
 	if err != nil {
+		// Unlike in GetLabelValues, we don't fallback to the next backend in case of 401/403:
+		// we assume the metrics endpoint should support multi-tenancy, and don't want to hide a rbac issue.
 		return nil, code, apierrors.NewPromClientError(err)
 	}
 	agg := model.NewAggregatedQueryResponse(&qr, b.Name())
@@ -148,6 +150,8 @@ func (b *Backend) MatchLabelValues(ctx context.Context, bctx *backend.QueryConte
 	q := QueryFilters("", filts)
 	values, code, err := cl.GetLabelValues(ctx, label, []string{q})
 	if err != nil {
+		// Unlike in GetLabelValues, we don't fallback to the next backend in case of 401/403:
+		// this endpoint is namespaced so it should support multi-tenancy; we don't want to hide a rbac issue.
 		return values, code, apierrors.NewPromClientError(err)
 	}
 	return values, code, nil
