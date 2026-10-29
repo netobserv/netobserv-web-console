@@ -81,11 +81,11 @@ func (o *Orchestrator) Flows(ctx context.Context, bctx *backend.QueryContext, q 
 		g.Go(func() error {
 			qr, c, err := back.Flows(ctx, bctx, &subQ)
 			if err != nil {
-				code.Store(int32(c))
+				code.CompareAndSwap(0, int32(c))
 				return err
 			}
 			if _, err := sm.Add(qr, back.Name()); err != nil {
-				code.Store(int32(http.StatusInternalServerError))
+				code.CompareAndSwap(0, int32(http.StatusInternalServerError))
 				return err
 			}
 			return nil

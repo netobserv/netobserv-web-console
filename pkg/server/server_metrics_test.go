@@ -15,6 +15,20 @@ import (
 	"github.com/netobserv/network-observability-console-plugin/pkg/model"
 )
 
+var (
+	emptyLabelsResponse, _ = json.Marshal(model.LabelValuesResponse{
+		Status: "",
+		Data:   []string{},
+	})
+	emptyQueryResponse, _ = json.Marshal(model.QueryResponse{
+		Status: "",
+		Data: model.QueryResponseData{
+			ResultType: model.ResultTypeStream,
+			Result:     model.Streams{},
+		},
+	})
+)
+
 func TestGetLabelValues_MultipleBackends(t *testing.T) {
 	prometheusHandledLabels := []string{"SrcK8S_Namespace", "DstK8S_Namespace"}
 	for _, tc := range []struct {
@@ -78,17 +92,123 @@ func TestGetLabelValues_MultipleBackends(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// GIVEN a Loki service
 			lokiMock := httpMock{}
-			emptyResponse, _ := json.Marshal(model.LabelValuesResponse{
-				Status: "",
-				Data:   []string{},
-			})
-			lokiMock.MockHTTPResponse(tc.lokiMockCode, emptyResponse)
+			lokiMock.MockHTTPResponse(tc.lokiMockCode, emptyLabelsResponse)
 			lokiSvc := httptest.NewServer(&lokiMock)
 			defer lokiSvc.Close()
 
 			// AND a Prometheus service
 			promMock := httpMock{}
-			promMock.MockHTTPResponse(tc.promMockCode, emptyResponse)
+			promMock.MockHTTPResponse(tc.promMockCode, emptyLabelsResponse)
+			promSvc := httptest.NewServer(&promMock)
+			defer promSvc.Close()
+
+			// THAT is accessed behind the NOO console plugin backend
+			authM := authMock{}
+			authM.MockGranted()
+			backendRoutes := setupRoutes(context.TODO(), &config.Config{
+				Loki: config.Loki{URL: lokiSvc.URL},
+				Prometheus: config.Prometheus{
+					URL: promSvc.URL,
+					Metrics: []config.MetricInfo{
+						{
+							Enabled: true,
+							Name:    "foo",
+							Labels:  prometheusHandledLabels,
+						},
+					}},
+				Frontend: config.Frontend{},
+			}, &authM)
+			backendSvc := httptest.NewServer(backendRoutes)
+			defer backendSvc.Close()
+
+			// THEN the backend service returns the expected response
+			res, err := backendSvc.Client().Get(backendSvc.URL + "/api/resources" + tc.inputPath)
+			require.NoError(t, err)
+			body, err := io.ReadAll(res.Body)
+			require.NoError(t, err)
+			if tc.expectedCode != 0 {
+				require.Equalf(t, tc.expectedCode, res.StatusCode, "unexpected return %s: %s", res.Status, string(body))
+			} else {
+				require.Equalf(t, http.StatusOK, res.StatusCode, "unexpected return %s: %s", res.Status, string(body))
+			}
+
+			// AND each request has been properly forwarded to Prometheus or Loki
+			lokiURLs := extractCallURLs(&lokiMock)
+			assert.Equal(t, tc.expectedFromLoki, lokiURLs)
+			promURLs := extractCallURLs(&promMock)
+			assert.Equal(t, tc.expectedFromProm, promURLs)
+		})
+	}
+}
+
+func TestMatchLabelValues_MultipleBackends(t *testing.T) {
+	prometheusHandledLabels := []string{"SrcK8S_Namespace", "DstK8S_Namespace", "SrcK8S_Type", "DstK8S_Type", "SrcK8S_OwnerName", "DstK8S_OwnerName"}
+	for _, tc := range []struct {
+		name             string
+		inputPath        string
+		lokiMockCode     int
+		promMockCode     int
+		expectedFromLoki []string
+		expectedFromProm []string
+		expectedCode     int
+	}{
+		{
+			// Prometheus handles namespace labels
+			name:      "Fetch deployments values from Prometheus",
+			inputPath: "/names?namespace=a&kind=Deployment",
+			expectedFromProm: []string{
+				"/api/v1/label/SrcK8S_OwnerName/values",
+				"/api/v1/label/DstK8S_OwnerName/values",
+			},
+		},
+		{
+			// Labels not handled by Prometheus
+			name:      "Fetch pods values from Loki",
+			inputPath: "/names?namespace=a&kind=Pod",
+			expectedFromLoki: []string{
+				"/loki/api/v1/query_range",
+				"/loki/api/v1/query_range",
+			},
+		},
+		{
+			name:         "Prometheus error",
+			inputPath:    "/names?namespace=a&kind=Deployment",
+			promMockCode: 503,
+			expectedCode: 503,
+			expectedFromProm: []string{
+				"/api/v1/label/SrcK8S_OwnerName/values",
+			},
+		},
+		{
+			name:         "Loki error",
+			inputPath:    "/names?namespace=a&kind=Pod",
+			lokiMockCode: 503,
+			expectedCode: 503,
+			expectedFromLoki: []string{
+				"/loki/api/v1/query_range",
+			},
+		},
+		{
+			// Prometheus auth error on label values, should not fallback
+			name:         "Prometheus auth error",
+			inputPath:    "/names?namespace=a&kind=Deployment",
+			promMockCode: 403,
+			expectedCode: 403,
+			expectedFromProm: []string{
+				"/api/v1/label/SrcK8S_OwnerName/values",
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN a Loki service
+			lokiMock := httpMock{}
+			lokiMock.MockHTTPResponse(tc.lokiMockCode, emptyQueryResponse)
+			lokiSvc := httptest.NewServer(&lokiMock)
+			defer lokiSvc.Close()
+
+			// AND a Prometheus service
+			promMock := httpMock{}
+			promMock.MockHTTPResponse(tc.promMockCode, emptyLabelsResponse)
 			promSvc := httptest.NewServer(&promMock)
 			defer promSvc.Close()
 
