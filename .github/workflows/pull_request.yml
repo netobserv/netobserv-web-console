@@ -24,7 +24,7 @@ jobs:
       with:
         persist-credentials: false
     - name: build, lint, test
-      run: make backend && git diff --exit-code
+      run: GO_TEST_FLAGS="-race" make backend && git diff --exit-code
     - name: check clean vendors
       run: go mod vendor
     - name: Report coverage

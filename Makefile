@@ -186,8 +186,11 @@ lint-backend: prereqs ## Lint backend code
 .PHONY: test-backend
 test-backend: ## Test backend using go test
 	@echo "### Testing backend"
-	# Limit to cmd/pkg — scripts/ (e.g. gen-health-rule-defaults) and web/node_modules are not backend packages.
-	go test ./cmd/... ./pkg/... -coverpkg=./cmd/...,./pkg/... -coverprofile cover.out
+	go test $(GO_TEST_FLAGS) ./cmd/... ./pkg/... -coverpkg=./cmd/...,./pkg/... -coverprofile cover.out
+
+.PHONY: test-race-backend
+test-race-backend: GO_TEST_FLAGS=-race
+test-race-backend: test-backend ## Test backend using go test -race
 
 ##@ Performance Testing
 
