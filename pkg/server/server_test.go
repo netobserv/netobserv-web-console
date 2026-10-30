@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -501,6 +502,7 @@ func TestLokiConfiguration_MultiTenant(t *testing.T) {
 
 type httpMock struct {
 	mock.Mock
+	mu        sync.Mutex
 	bodyPosts []string
 }
 
@@ -511,7 +513,9 @@ func (l *httpMock) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			bodyPost, _ = url.QueryUnescape(string(b))
 		}
 	}
+	l.mu.Lock()
 	l.bodyPosts = append(l.bodyPosts, bodyPost)
+	l.mu.Unlock()
 	_ = l.Called(w, r)
 }
 
