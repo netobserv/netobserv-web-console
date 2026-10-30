@@ -22,7 +22,6 @@ spec:
       sampling: 50
       cacheActiveTimeout: 5s
       cacheMaxFlows: 100000
-      privileged: false
       interfaces: []
       excludeInterfaces:
         - lo

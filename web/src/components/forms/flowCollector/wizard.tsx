@@ -34,7 +34,6 @@ const processingPaths = [
   'spec.kafka.address',
   'spec.kafka.topic',
   'spec.kafka.tls',
-  'spec.agent.ebpf.privileged',
   'spec.agent.ebpf.features',
   'spec.processor.clusterName',
   'spec.processor.addZone',
