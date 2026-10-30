@@ -519,6 +519,8 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
     setMetricScope,
     topologyMetricType,
     setTopologyMetricType,
+    selectedViewId,
+    setSelectedViewId,
     setColumns,
     setPanels,
     setFiltersFromURL,
@@ -580,6 +582,10 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
       if (!initState.current.includes('configLoadError')) {
         setError(undefined);
       }
+    }
+    // If raw-flows only: fall back to auto for Overview/Topology (Prom/Loki metrics).
+    if ((view === 'overview' || view === 'topology') && !caps.allowMetrics) {
+      setDataSource('auto');
     }
     setSelectedViewId(view);
   };
