@@ -97,6 +97,11 @@ func NewUnmanagedError(err error) *UnmanagedError {
 	return &UnmanagedError{wrapped: err}
 }
 
+// Implements Unwrap for errors.As support, used in apierrors
+func (e *UnmanagedError) Unwrap() error {
+	return e.wrapped
+}
+
 func (e *UnmanagedError) Error() string {
 	if e.wrapped != nil {
 		return fmt.Sprintf("Unmanaged request: %v", e.wrapped.Error())

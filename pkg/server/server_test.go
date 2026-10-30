@@ -15,6 +15,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"path/filepath"
 	"sort"
@@ -500,9 +501,17 @@ func TestLokiConfiguration_MultiTenant(t *testing.T) {
 
 type httpMock struct {
 	mock.Mock
+	bodyPosts []string
 }
 
 func (l *httpMock) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	var bodyPost string
+	if r.Method == "POST" {
+		if b, _ := io.ReadAll(r.Body); len(b) > 0 {
+			bodyPost, _ = url.QueryUnescape(string(b))
+		}
+	}
+	l.bodyPosts = append(l.bodyPosts, bodyPost)
 	_ = l.Called(w, r)
 }
 

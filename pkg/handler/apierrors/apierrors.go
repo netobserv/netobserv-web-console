@@ -12,12 +12,15 @@ var hlog = logrus.WithField("module", "apierrors")
 
 type StructuredError interface {
 	error
+	structuredError()
 }
 
 type GenericError struct {
 	StructuredError `json:"-"`
 	Message         string `json:"message,omitempty"`
 }
+
+func (*GenericError) structuredError() {}
 
 func (e *GenericError) Error() string {
 	return e.Message
