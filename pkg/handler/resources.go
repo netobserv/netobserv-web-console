@@ -103,7 +103,7 @@ func (h *Handlers) GetNames(ctx context.Context) func(w http.ResponseWriter, r *
 	}
 }
 
-func (h *Handlers) getNamesForPrefix(ctx context.Context, bctx *backend.QueryContext, prefix, kind, namespace string) ([]string, int, apierrors.StructuredError) {
+func (h *Handlers) getNamesForPrefix(ctx context.Context, bctx *backend.QueryContext, prefix, kind, namespace string) ([]string, int, error) {
 	filts := filters.SingleQuery{}
 	if namespace != "" {
 		filts = append(filts, filters.NewRegexMatch(prefix+fields.Namespace, exact(namespace)))

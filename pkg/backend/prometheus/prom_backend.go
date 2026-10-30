@@ -117,7 +117,7 @@ func (b *Backend) GetLabelValues(ctx context.Context, bctx *backend.QueryContext
 	// Fetch and merge values for each label
 	for _, label := range labels {
 		if !b.inventory.LabelExists(label) {
-			return nil, http.StatusNoContent, backend.NewUnmanagedError(apierrors.NewPromMissingLabels(map[string][]string{"": {label}}))
+			return nil, http.StatusBadRequest, backend.NewUnmanagedError(apierrors.NewPromMissingLabels(map[string][]string{"": {label}}))
 		}
 		cl, err := b.NewClient(bctx)
 		if err != nil {
@@ -140,7 +140,7 @@ func (b *Backend) GetLabelValues(ctx context.Context, bctx *backend.QueryContext
 
 func (b *Backend) MatchLabelValues(ctx context.Context, bctx *backend.QueryContext, filts filters.SingleQuery, label string) ([]string, int, error) {
 	if !b.inventory.LabelExists(label) {
-		return nil, http.StatusNoContent, &backend.UnmanagedError{}
+		return nil, http.StatusBadRequest, &backend.UnmanagedError{}
 	}
 	cl, err := b.NewClient(bctx)
 	if err != nil {
