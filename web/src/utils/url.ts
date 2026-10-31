@@ -62,8 +62,16 @@ export const netflowTrafficPath = () => {
 const flowCollectorBasePath = '/k8s/cluster/flows.netobserv.io~v1beta2~FlowCollector';
 
 export const flowCollectorPath = (action: 'new' | 'setup' | 'edit' | 'status') => {
-  if (ContextSingleton.isStandalone() && !ContextSingleton.isMock()) {
-    return undefined;
+  if (ContextSingleton.isStandalone()) {
+    switch (action) {
+      case 'new':
+      case 'edit':
+        return '/console-flowCollector';
+      case 'setup':
+        return '/console-flowCollector-wizard';
+      case 'status':
+        return '/console-flowCollector-status';
+    }
   }
   switch (action) {
     case 'new':
@@ -109,7 +117,15 @@ export const getFlowCollectorResourceName = (pathname: string = window.location.
   }
   return segment;
 };
-export const flowMetricNewPath = '/k8s/cluster/flows.netobserv.io~v1alpha1~FlowMetric/~new';
+
+const flowMetricBasePath = '/k8s/cluster/flows.netobserv.io~v1alpha1~FlowMetric';
+
+export const flowMetricPath = () => {
+  if (ContextSingleton.isStandalone()) {
+    return '/console-flowMetric';
+  }
+  return `${flowMetricBasePath}/~new`;
+};
 
 // React-router query argument (not backend routes)
 export enum URLParam {

@@ -59,7 +59,7 @@ export type ResourceWatcherContext = {
   skipDefaults: boolean;
 };
 
-export const { Provider, Consumer } = React.createContext<ResourceWatcherContext>({
+export const ResourceWatcherContext = React.createContext<ResourceWatcherContext>({
   group: '',
   version: '',
   kind: '' as SupportedKind,
@@ -78,6 +78,11 @@ export const { Provider, Consumer } = React.createContext<ResourceWatcherContext
   },
   skipDefaults: false
 });
+
+export const { Provider, Consumer } = ResourceWatcherContext;
+
+// Allows a wizard rendered inside ResourceForm to reuse the form's watcher.
+export const useResourceWatcher = () => React.useContext(ResourceWatcherContext);
 
 export const ResourceWatcher: FC<ResourceWatcherProps> = ({
   group,

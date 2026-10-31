@@ -4,6 +4,7 @@ import { useNavigate, useParams } from '../../../utils/url';
 import { ResourceForm } from '../resource-form';
 import { ResourceWatcher } from '../resource-watcher';
 import { flowMetricUISchema } from './uiSchema';
+import { FlowMetricWizard } from './wizard';
 
 export type FlowMetricFormProps = {
   name?: string;
@@ -23,7 +24,7 @@ export const FlowMetricForm: FC<FlowMetricFormProps> = props => {
       onSuccess={() => navigate(-1)}
       defaultFrom="CRD"
     >
-      <ResourceForm uiSchema={flowMetricUISchema} />
+      <ResourceForm uiSchema={flowMetricUISchema} wizardChild={<FlowMetricWizard name={params.name || props.name} />} />
     </ResourceWatcher>
   );
 };
