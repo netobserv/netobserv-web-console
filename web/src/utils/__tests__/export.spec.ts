@@ -213,8 +213,20 @@ describe('chart layout readiness', () => {
     `;
 
     const root = document.getElementById('overview-graph-list')!;
-    const startedAt = performance.now();
-    await waitForExportLayout(root);
-    expect(performance.now() - startedAt).toBeLessThan(100);
+    const OriginalRO = window.ResizeObserver;
+    const observe = jest.fn();
+    window.ResizeObserver = jest.fn().mockImplementation(() => ({
+      observe,
+      unobserve: jest.fn(),
+      disconnect: jest.fn()
+    })) as unknown as typeof ResizeObserver;
+
+    try {
+      await waitForExportLayout(root);
+      expect(window.ResizeObserver).not.toHaveBeenCalled();
+      expect(observe).not.toHaveBeenCalled();
+    } finally {
+      window.ResizeObserver = OriginalRO;
+    }
   });
 });

@@ -1,13 +1,15 @@
 import React from 'react';
+import { NetflowMetrics } from '../../api/query-response';
 import { Filter } from '../../model/filters';
-import { RecordType } from '../../model/flow-query';
+import { FlowScope, RecordType, StructuredFlowQuery } from '../../model/flow-query';
 import { useNetflowContext } from '../../model/netflow-context';
 import { GenericPrefs, ViewPresetId } from '../../model/views';
 import { Column, ColumnSizeMap } from '../../utils/columns';
 import { TimeRange } from '../../utils/datetime';
 import { OverviewPanel } from '../../utils/overview-panels';
 import ColumnsModal from './columns-modal';
-import ExportModal from './export-modal';
+import FlowsExportModal from './flows-export-modal';
+import MetricsExportModal from './metrics-export-modal';
 import OverviewPanelsModal from './overview-panels-modal';
 import TimeRangeModal from './time-range-modal';
 
@@ -26,6 +28,12 @@ export interface ModalsProps {
   setColumnSizes: (v: ColumnSizeMap) => void;
   isExportModalOpen: boolean;
   setExportModalOpen: (v: boolean) => void;
+  isMetricsExportModalOpen: boolean;
+  setMetricsExportModalOpen: (v: boolean) => void;
+  allowTopologyEdgesExport?: boolean;
+  metrics: NetflowMetrics;
+  metricScope: FlowScope;
+  flowQuery: StructuredFlowQuery;
   filters: Filter[];
   activeView: ViewPresetId;
   genericColumnPrefs: GenericPrefs;
@@ -92,13 +100,24 @@ export const Modals: React.FC<ModalsProps> = props => {
         setGenericPrefs={props.setGenericColumnPrefs}
         onReset={props.onColumnsReset}
       />
-      <ExportModal
-        id="export-modal"
+      <FlowsExportModal
+        id="flows-export-modal"
         isModalOpen={props.isExportModalOpen}
         setModalOpen={props.setExportModalOpen}
         flowQuery={caps.flowQuery}
         columns={caps.availableColumns.filter(c => c.field && !c.field.name.startsWith('Time'))}
         range={props.range}
+        filters={props.filters}
+      />
+      <MetricsExportModal
+        id="metrics-export-modal"
+        isModalOpen={props.isMetricsExportModalOpen}
+        setModalOpen={props.setMetricsExportModalOpen}
+        allowTopologyEdges={props.allowTopologyEdgesExport}
+        metrics={props.metrics}
+        range={props.range}
+        metricScope={props.metricScope}
+        flowQuery={props.flowQuery}
         filters={props.filters}
       />
     </>
