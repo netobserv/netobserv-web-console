@@ -38,8 +38,8 @@ describe('HAProxy related clients', () => {
     render(<ProxyRecords record={record} />);
     expect(fetchRecords).not.toHaveBeenCalled();
     fireEvent.click(screen.getByText('Find related clients'));
-    await screen.findByText('[192.0.2.1]:40000');
-    expect(screen.getByText('[192.0.2.2]:40001')).toBeInTheDocument();
+    await screen.findByText('192.0.2.1:40000');
+    expect(screen.getByText('192.0.2.2:40001')).toBeInTheDocument();
     expect(screen.getByText('Results may be incomplete')).toBeInTheDocument();
     expect(fetchRecords).toHaveBeenCalledTimes(1);
   });
@@ -53,10 +53,10 @@ describe('HAProxy related clients', () => {
     fetchRecords.mockResolvedValue(response);
     const { rerender } = render(<ProxyRecords record={record} />);
     fireEvent.click(screen.getByText('Find related clients'));
-    await screen.findByText('[192.0.2.1]:40000');
+    await screen.findByText('192.0.2.1:40000');
     const signal = fetchRecords.mock.calls[0][1] as AbortSignal;
     rerender(<ProxyRecords record={{ ...record, key: 2 }} />);
-    await waitFor(() => expect(screen.queryByText('[192.0.2.1]:40000')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText('192.0.2.1:40000')).not.toBeInTheDocument());
     expect(signal.aborted).toBe(true);
   });
 });

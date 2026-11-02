@@ -491,11 +491,6 @@ export const RecordPanel: React.FC<RecordDrawerProps> = ({
               )}
             </Accordion>
           </Tab>
-          {showProxyClients && (
-            <Tab className="drawer-tab" eventKey="proxy" title={<TabTitleText>{t('Related clients')}</TabTitleText>}>
-              {activeTab === 'proxy' && <ProxyRecords key={record.key} record={record} />}
-            </Tab>
-          )}
           <Tab className="drawer-tab" eventKey={'raw'} title={<TabTitleText>{t('Raw')}</TabTitleText>}>
             <ClipboardCopy
               data-test-id="drawer-json-copy"
@@ -509,6 +504,11 @@ export const RecordPanel: React.FC<RecordDrawerProps> = ({
               {getSortedJSON()}
             </ClipboardCopy>
           </Tab>
+          {showProxyClients && (
+            <Tab className="drawer-tab" eventKey="proxy" title={<TabTitleText>{t('Related clients')}</TabTitleText>}>
+              {activeTab === 'proxy' && <ProxyRecords key={record.key} record={record} />}
+            </Tab>
+          )}
         </Tabs>
       </DrawerPanelBody>
     </DrawerPanelContent>

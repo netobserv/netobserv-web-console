@@ -1,8 +1,27 @@
-import { Alert, Button, Content, Spinner, Stack, StackItem } from '@patternfly/react-core';
+import {
+  Alert,
+  Button,
+  Card,
+  CardBody,
+  CardTitle,
+  Content,
+  DescriptionList,
+  DescriptionListDescription,
+  DescriptionListGroup,
+  DescriptionListTerm,
+  Flex,
+  FlexItem,
+  Label,
+  Spinner,
+  Stack,
+  StackItem
+} from '@patternfly/react-core';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Record } from '../../../api/ipfix';
 import { getProxyRecords, ProxyResponse } from '../../../api/proxy';
+import { dateTimeMSFormatter } from '../../../utils/datetime';
+import './proxy-records.css';
 
 export const ProxyRecords: React.FC<{ record: Record }> = ({ record }) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
@@ -42,7 +61,8 @@ export const ProxyRecords: React.FC<{ record: Record }> = ({ record }) => {
   // Keep all observed clients: one backend TCP connection can carry many requests.
   const clients = new Map<string, { count: number; start: number; end: number; routers: Set<string> }>();
   response?.records.forEach(item => {
-    const endpoint = `[${item.ProxyClientAddr}]:${item.ProxyClientPort}`;
+    const address = item.ProxyClientAddr.includes(':') ? `[${item.ProxyClientAddr}]` : item.ProxyClientAddr;
+    const endpoint = `${address}:${item.ProxyClientPort}`;
     const client = clients.get(endpoint) || {
       count: 0,
       start: item.ProxyStartMs,
@@ -56,18 +76,30 @@ export const ProxyRecords: React.FC<{ record: Record }> = ({ record }) => {
     clients.set(endpoint, client);
   });
 
+  const timestamp = (ms: number) => (
+    <time dateTime={new Date(ms).toISOString()}>{dateTimeMSFormatter.format(new Date(ms))}</time>
+  );
+
   return (
-    <Stack hasGutter>
+    <Stack hasGutter className="proxy-records">
       <StackItem>
         <Content>
           {t('Find clients reported by HAProxy for this backend connection. Supports HTTP, edge and reencrypt routes.')}
         </Content>
       </StackItem>
       <StackItem>
-        <Button variant="secondary" onClick={find} isDisabled={loading}>
-          {t('Find related clients')}
-        </Button>
-        {loading && <Spinner size="md" aria-label={t('Loading related clients')} />}
+        <Flex alignItems={{ default: 'alignItemsCenter' }}>
+          <FlexItem>
+            <Button variant="secondary" onClick={find} isDisabled={loading}>
+              {t('Find related clients')}
+            </Button>
+          </FlexItem>
+          {loading && (
+            <FlexItem>
+              <Spinner size="md" aria-label={t('Loading related clients')} />
+            </FlexItem>
+          )}
+        </Flex>
       </StackItem>
       {error && (
         <StackItem>
@@ -78,6 +110,47 @@ export const ProxyRecords: React.FC<{ record: Record }> = ({ record }) => {
       )}
       {response && (
         <>
+          {clients.size === 0 && (
+            <StackItem>
+              <Alert isInline isPlain variant="info" title={t('No matching client records found.')} />
+            </StackItem>
+          )}
+          {Array.from(clients).map(([endpoint, client]) => (
+            <StackItem key={endpoint}>
+              <Card isCompact>
+                <CardTitle>
+                  <Flex alignItems={{ default: 'alignItemsCenter' }}>
+                    <FlexItem flex={{ default: 'flex_1' }}>
+                      <code className="proxy-client-endpoint">{endpoint}</code>
+                    </FlexItem>
+                    <FlexItem>
+                      <Label>{t('Observed requests: {{count}}', { count: client.count })}</Label>
+                    </FlexItem>
+                  </Flex>
+                </CardTitle>
+                <CardBody>
+                  <DescriptionList isCompact isHorizontal>
+                    <DescriptionListGroup>
+                      <DescriptionListTerm>{t('First request')}</DescriptionListTerm>
+                      <DescriptionListDescription>{timestamp(client.start)}</DescriptionListDescription>
+                    </DescriptionListGroup>
+                    <DescriptionListGroup>
+                      <DescriptionListTerm>{t('Last request')}</DescriptionListTerm>
+                      <DescriptionListDescription>{timestamp(client.end)}</DescriptionListDescription>
+                    </DescriptionListGroup>
+                    <DescriptionListGroup>
+                      <DescriptionListTerm>{t('Routers')}</DescriptionListTerm>
+                      <DescriptionListDescription>
+                        {Array.from(client.routers).map(router => (
+                          <div key={router}>{router}</div>
+                        ))}
+                      </DescriptionListDescription>
+                    </DescriptionListGroup>
+                  </DescriptionList>
+                </CardBody>
+              </Card>
+            </StackItem>
+          ))}
           <StackItem>
             <Alert isInline variant="info" title={t('Results may be incomplete')}>
               {t(
@@ -89,31 +162,17 @@ export const ProxyRecords: React.FC<{ record: Record }> = ({ record }) => {
             </Alert>
           </StackItem>
           <StackItem>
-            <Content>
-              {t('Log reception searched from {{start}} to {{end}}', {
-                start: new Date(response.searchStartMs).toLocaleString(),
-                end: new Date(response.searchEndMs).toLocaleString()
-              })}
-            </Content>
+            <DescriptionList isCompact isHorizontal>
+              <DescriptionListGroup>
+                <DescriptionListTerm>{t('Search start')}</DescriptionListTerm>
+                <DescriptionListDescription>{timestamp(response.searchStartMs)}</DescriptionListDescription>
+              </DescriptionListGroup>
+              <DescriptionListGroup>
+                <DescriptionListTerm>{t('Search end')}</DescriptionListTerm>
+                <DescriptionListDescription>{timestamp(response.searchEndMs)}</DescriptionListDescription>
+              </DescriptionListGroup>
+            </DescriptionList>
           </StackItem>
-          {clients.size === 0 && (
-            <StackItem>
-              <Content>{t('No matching client records found.')}</Content>
-            </StackItem>
-          )}
-          {Array.from(clients).map(([endpoint, client]) => (
-            <StackItem key={endpoint}>
-              <Content component="h3">{endpoint}</Content>
-              <Content>{t('Observed requests: {{count}}', { count: client.count })}</Content>
-              <Content>
-                {t('Request interval: {{start}} to {{end}}', {
-                  start: new Date(client.start).toLocaleString(),
-                  end: new Date(client.end).toLocaleString()
-                })}
-              </Content>
-              <Content>{t('Routers: {{routers}}', { routers: Array.from(client.routers).join(', ') })}</Content>
-            </StackItem>
-          ))}
         </>
       )}
     </Stack>
