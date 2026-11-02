@@ -15,7 +15,14 @@ const flowRecordsResponse = {
 };
 
 const selectRow = (rowIndex: number): void => {
-  cy.get(`#netflow-table-row-${rowIndex}`).scrollIntoView().should('be.visible').click();
+  cy.get(`#netflow-table-row-${rowIndex}`)
+    .scrollIntoView()
+    .should('be.visible');
+  // Rows outside the viewport are kept in the DOM without cells until the
+  // table processes the scroll event. Wait for the row contents before
+  // clicking so the selected record can open its drawer reliably in CI.
+  cy.get(`#netflow-table-row-${rowIndex}`).find('td').should('have.length.greaterThan', 0);
+  cy.get(`#netflow-table-row-${rowIndex}`).click();
 };
 
 describe('netflow-table', () => {
