@@ -30,7 +30,7 @@ export const canFindProxyClients = (record: Record): boolean => {
     !!flow.TimeFlowStartMs &&
     !!flow.TimeFlowEndMs &&
     !flow.UdnId &&
-    !flow.Udns?.length
+    !flow.Udns?.some(Boolean)
   );
 };
 
@@ -47,7 +47,7 @@ export const getProxyRecords = (record: Record, signal?: AbortSignal): Promise<P
         startMs: flow.TimeFlowStartMs,
         endMs: flow.TimeFlowEndMs,
         cluster: flow.K8S_ClusterName,
-        udn: flow.UdnId || flow.Udns?.join(',')
+        udn: flow.UdnId || flow.Udns?.filter(Boolean).join(',') || undefined
       }
     })
     .then(response => response.data);
