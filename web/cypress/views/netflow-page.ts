@@ -293,7 +293,6 @@ export namespace pluginSelectors {
     export const openNetworkTraffic = '#open-network-traffic'
     export const editFlowcollector = '#edit-flow-collector'
     export const update = '[data-test-id=update-resource-button]'
-    export const privilegedToggle = '[data-test="root_spec_agent_ebpf_privileged"]'
     export const packetDropEnable = '[data-test-id=root_spec_agent_ebpf_features-PacketDrop]'
     export const lokiMode = '#root_spec_loki_mode-toggle'
     export const monolithicMode = '#root_spec_loki_mode-Monolithic'

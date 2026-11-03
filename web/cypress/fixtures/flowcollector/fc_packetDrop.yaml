@@ -6,7 +6,6 @@ spec:
   agent:
     ebpf:
       sampling: 1
-      privileged: true
       features:
         - PacketDrop
     type: eBPF

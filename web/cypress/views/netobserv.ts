@@ -364,8 +364,7 @@ export const Operator = {
         // Overview tab
         cy.get(pluginSelectors.next).should('exist').click()
         // Processing tab
-        cy.get(pluginSelectors.privilegedToggle).should('exist').click({ force: true })
-        // Enable PacketDrop
+        // PacketDrop should work with the default unprivileged agent.
         cy.get(pluginSelectors.packetDropEnable).should('exist').check()
         cy.get(pluginSelectors.next).should('exist').click()
         // Loki tab — select Monolithic mode, then enable demo Loki.

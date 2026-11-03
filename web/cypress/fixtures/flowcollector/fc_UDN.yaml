@@ -6,9 +6,9 @@ spec:
   agent:
     ebpf:
       sampling: 1
-      privileged: true
       features:
         - UDNMapping
+        - SecondaryNetworks
     type: eBPF
   loki:
     enable: true

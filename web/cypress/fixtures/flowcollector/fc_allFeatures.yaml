@@ -6,7 +6,6 @@ spec:
   agent:
     ebpf:
       sampling: 1
-      privileged: true
       features:
         - PacketDrop
         - DNSTracking
@@ -15,6 +14,7 @@ spec:
         - PacketTranslation
         - UDNMapping
         - TLSTracking
+        - SecondaryNetworks
     type: eBPF
   loki:
     enable: true

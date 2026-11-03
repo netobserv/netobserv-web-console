@@ -39,7 +39,7 @@ export const flowCollectorSchema: RJSFSchema | any = {
                   "description": "`advanced` allows setting some aspects of the internal configuration of the eBPF agent.\nThis section is aimed mostly for debugging and fine-grained performance optimizations,\nsuch as `GOGC` and `GOMAXPROCS` environment variables. Set these values at your own risk. You can also\noverride the default Linux capabilities from there.",
                   "properties": {
                     "capOverride": {
-                      "description": "Linux capabilities override, when not running as privileged. Default capabilities are BPF, PERFMON and NET_ADMIN.",
+                      "description": "Linux capabilities override, when not running as privileged. Default capabilities are BPF, PERFMON and NET_ADMIN.\nSYS_ADMIN may also be used depending on which features are enabled. `capOverride` replaces these defaults.",
                       "items": {
                         "type": "string"
                       },
@@ -883,9 +883,9 @@ export const flowCollectorSchema: RJSFSchema | any = {
                   "type": "array"
                 },
                 "features": {
-                  "description": "List of additional features to enable. They are all disabled by default. Enabling additional features might have performance impacts. Possible values are:<br>\n- `PacketDrop`: Enable the packets drop flows logging feature. This feature requires mounting\nthe kernel debug filesystem, so the eBPF agent pods must run as privileged via `spec.agent.ebpf.privileged`.<br>\n- `DNSTracking`: Enable the DNS tracking feature.<br>\n- `FlowRTT`: Enable flow latency (sRTT) extraction in the eBPF agent from TCP traffic.<br>\n- `NetworkEvents`: Enable the network events monitoring feature, such as correlating flows and network policies.\nThis feature requires mounting the kernel debug filesystem, so the eBPF agent pods must run as privileged via `spec.agent.ebpf.privileged`.\nIt requires using the OVN-Kubernetes network plugin with the Observability feature.\nIMPORTANT: This feature is available as a Technology Preview.<br>\n- `PacketTranslation`: Enable enriching flows with packet translation information, such as Service NAT.<br>\n- `EbpfManager`: [Unsupported (*)]. Use eBPF Manager to manage NetObserv eBPF programs. Pre-requisite: the eBPF Manager operator (or upstream bpfman operator) must be installed.<br>\n- `UDNMapping`: Enable interfaces mapping to User Defined Networks (UDN). <br>\nThis feature requires mounting the kernel debug filesystem, so the eBPF agent pods must run as privileged via `spec.agent.ebpf.privileged`.\nIt requires using the OVN-Kubernetes network plugin with the Observability feature. <br>\n- `IPSec`, to track flows between nodes with IPsec encryption. <br>",
+                  "description": "List of additional features to enable. They are all disabled by default. Enabling additional features might have performance impacts, and may increase permissions granted to the eBPF agent pods. Possible values are:<br>\n- `DNSTracking`: Enable the DNS tracking feature.<br>\n- `EbpfManager`: Use eBPF Manager to manage NetObserv eBPF programs. Pre-requisite: the eBPF Manager operator (or upstream bpfman operator) must be installed.<br>\n- `FlowRTT`: Enable flow latency (sRTT) extraction in the eBPF agent from TCP traffic.<br>\n- `IPSec`, to track flows between nodes with IPsec encryption.<br>\n- `NetworkEvents`: Enable the network events monitoring feature, such as correlating flows and network policies. Additional permissions are granted to the eBPF agent pods: access to\nthe OVS/OVN host filesystems.<br>\nIt requires using the OVN-Kubernetes network plugin with the Observability feature.<br>\n- `PacketDrop`: Enable the packets drop flows logging feature. Additional permissions are granted to the eBPF agent pods: access to\nthe kernel debug host filesystem.<br>\n- `PacketTranslation`: Enable enriching flows with packet translation information, such as Service NAT.<br>\n- `SecondaryNetworks`, to capture flows from all network namespaces. Additional permissions are granted to the eBPF agent pods: CAP_SYS_ADMIN, and access to\nthe network namespaces host filesystem.<br>\n- `TLSTracking`, to track TLS usage.<br>\n- `UDNMapping`: Enable interfaces mapping to User Defined Networks (UDN). Additional permissions are granted to the eBPF agent pods: access to\nthe OVS/OVN host filesystems.<br>\nIt requires using the OVN-Kubernetes network plugin.<br>",
                   "items": {
-                    "description": "Agent feature, can be one of:<br>\n- `PacketDrop`, to track packet drops.<br>\n- `DNSTracking`, to track specific information on DNS traffic.<br>\n- `FlowRTT`, to track TCP latency.<br>\n- `NetworkEvents`, to track network events [Technology Preview].<br>\n- `PacketTranslation`, to enrich flows with packets translation information, such as Service NAT.<br>\n- `EbpfManager`, to enable using eBPF Manager to manage NetObserv eBPF programs. [Unsupported (*)].<br>\n- `UDNMapping`, to enable interfaces mapping to UDN.<br>\n- `IPSec`, to track flows between nodes with IPsec encryption.<br>",
+                    "description": "Agent feature, can be one of:<br>\n- `DNSTracking`, to track specific information on DNS traffic.<br>\n- `EbpfManager`, to enable using eBPF Manager to manage NetObserv eBPF programs.<br>\n- `FlowRTT`, to track TCP latency.<br>\n- `IPSec`, to track flows between nodes with IPsec encryption.<br>\n- `NetworkEvents`, to track network events.<br>\n- `PacketDrop`, to track packet drops.<br>\n- `PacketTranslation`, to enrich flows with packets translation information, such as Service NAT.<br>\n- `SecondaryNetworks`, to capture flows from all network namespaces.<br>\n- `TLSTracking`, to track TLS usage.<br>\n- `UDNMapping`, to enable interfaces mapping to UDN.<br>",
                     "enum": [
                       "PacketDrop",
                       "DNSTracking",
@@ -894,7 +894,9 @@ export const flowCollectorSchema: RJSFSchema | any = {
                       "PacketTranslation",
                       "EbpfManager",
                       "UDNMapping",
-                      "IPSec"
+                      "IPSec",
+                      "TLSTracking",
+                      "SecondaryNetworks"
                     ],
                     "type": "string"
                   },
@@ -1291,7 +1293,7 @@ export const flowCollectorSchema: RJSFSchema | any = {
                   "type": "object"
                 },
                 "privileged": {
-                  "description": "Privileged mode for the eBPF Agent container. When set to `true`, the agent is able to capture more traffic, including from secondary interfaces.\nWhen ignored or set to `false`, the operator sets granular capabilities (BPF, PERFMON, NET_ADMIN) to the container.\nSome agent features require the privileged mode, such as packet drops tracking (see `features`) and SR-IOV support.",
+                  "description": "`privileged` grants full privileges to the eBPF Agent container. As it weakens the security model,\nit should only be enabled as a last resort, if the agents cannot run otherwise.\nWhen unset or set to `false`, the operator sets granular capabilities (BPF, PERFMON, NET_ADMIN and possibly SYS_ADMIN) to the container.\nCapabilities can be overriden through `advanced.capOverride`: this should be preferred over granting full privileges.\nWhen privileged mode is on, the `SecondaryNetworks` feature is also implicitly enabled.",
                   "type": "boolean"
                 },
                 "resources": {
@@ -4926,7 +4928,7 @@ export const flowCollectorSchema: RJSFSchema | any = {
                   "type": "object"
                 },
                 "secondaryNetworks": {
-                  "description": "Defines secondary networks to be checked for resources identification.\nTo guarantee a correct identification, indexed values must form an unique identifier across the cluster.\nIf the same index is used by several resources, those resources might be incorrectly labeled.\nIf not provided and `spec.agent.ebpf.privileged` is `true`, secondary networks are detected automatically.",
+                  "description": "Defines secondary networks to be checked for resources identification.\nTo guarantee a correct identification, indexed values must form an unique identifier across the cluster.\nIf the same index is used by several resources, those resources might be incorrectly labeled.\nIf not provided and the agent feature `SecondaryNetworks` is enabled, secondary networks are detected automatically.",
                   "items": {
                     "properties": {
                       "index": {
