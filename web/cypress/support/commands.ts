@@ -320,11 +320,45 @@ Cypress.Commands.add('uiLogin', (provider: string, username: string, password: s
   const baseUrl = Cypress.config('baseUrl');
   const baseOrigin = new URL(baseUrl!).origin;
 
+  // Ensure console is not mid-rollout.
+  cy.checkCommandResult(
+    `oc get co console -o jsonpath='{.status.conditions[?(@.type=="Progressing")].status}'`,
+    'False',
+    { retries: 60, interval: 5000 }
+  );
+  // co/console can report Progressing=False while pods are still replaced.
+  cy.adminCLI('oc rollout status deploy/console -n openshift-console --timeout=300s', { timeout: 320000 });
+
   cy.clearAllCookies();
-  cy.visit('/');
+
+  // A late rollout can still leave the page stuck on '/', so re-visit.
+  const loginUrl = /\/login|\/oauth\/authorize/;
+  const visitUntilLoginPage = (attemptsLeft = 3): void => {
+    let deadline = 0;
+    cy.visit('/').then(() => {
+      deadline = Date.now() + 30000;
+    });
+    const poll = (): void => {
+      cy.url({ log: false }).then(url => {
+        if (loginUrl.test(url)) {
+          return;
+        }
+        if (Date.now() < deadline) {
+          cy.wait(1000, { log: false }).then(poll);
+        } else if (attemptsLeft > 1) {
+          cy.log(`Not redirected to login (${url}), retrying`);
+          visitUntilLoginPage(attemptsLeft - 1);
+        } else {
+          throw new Error(`Console never redirected to the login page, stuck at ${url}`);
+        }
+      });
+    };
+    poll();
+  };
+  visitUntilLoginPage();
 
   // Wait for redirect to OAuth login page
-  cy.url({ timeout: 30000 }).should('match', /\/login|\/oauth\/authorize/).then((url) => {
+  cy.url().should('match', loginUrl).then((url) => {
     const currentUrl = new URL(url);
 
     cy.log(`Current URL: ${url}`);
