@@ -5,40 +5,310 @@
     "result": [
       {
         "metric": {
+          "PktDropLatestState": "TCP_CLOSE_WAIT"
+        },
+        "values": [
+          [
+            1786459680,
+            "0.03"
+          ],
+          [
+            1786459710,
+            "0.03"
+          ],
+          [
+            1786459740,
+            "0.03"
+          ],
+          [
+            1786459770,
+            "0.03"
+          ],
+          [
+            1786459800,
+            "0.06"
+          ],
+          [
+            1786459830,
+            "0.06"
+          ],
+          [
+            1786459860,
+            "0.08666666666666667"
+          ],
+          [
+            1786459890,
+            "0.08666666666666667"
+          ],
+          [
+            1786459920,
+            "0.08666666666666667"
+          ],
+          [
+            1786459950,
+            "0.08666666666666667"
+          ],
+          [
+            1786459980,
+            "0.08666666666666667"
+          ],
+          [
+            1786460010,
+            "0.08666666666666667"
+          ],
+          [
+            1786460040,
+            "0.08666666666666667"
+          ],
+          [
+            1786460070,
+            "0.08666666666666667"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "PktDropLatestState": "TCP_ESTABLISHED"
+        },
+        "values": [
+          [
+            1786459590,
+            "14.3"
+          ],
+          [
+            1786459620,
+            "31.88"
+          ],
+          [
+            1786459650,
+            "46.77"
+          ],
+          [
+            1786459680,
+            "62.766666666666666"
+          ],
+          [
+            1786459710,
+            "80.36333333333333"
+          ],
+          [
+            1786459740,
+            "96.28333333333333"
+          ],
+          [
+            1786459770,
+            "112.39"
+          ],
+          [
+            1786459800,
+            "127.77333333333333"
+          ],
+          [
+            1786459830,
+            "142.48"
+          ],
+          [
+            1786459860,
+            "158.61666666666667"
+          ],
+          [
+            1786459890,
+            "161.08333333333334"
+          ],
+          [
+            1786459920,
+            "159.39"
+          ],
+          [
+            1786459950,
+            "159.63666666666666"
+          ],
+          [
+            1786459980,
+            "155.51333333333332"
+          ],
+          [
+            1786460010,
+            "152.57"
+          ],
+          [
+            1786460040,
+            "154.12"
+          ],
+          [
+            1786460070,
+            "152.32333333333332"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "PktDropLatestState": "TCP_FIN_WAIT1"
+        },
+        "values": [
+          [
+            1786459620,
+            "0.03"
+          ],
+          [
+            1786459650,
+            "0.03"
+          ],
+          [
+            1786459680,
+            "0.03"
+          ],
+          [
+            1786459710,
+            "0.03"
+          ],
+          [
+            1786459740,
+            "0.06"
+          ],
+          [
+            1786459770,
+            "0.06"
+          ],
+          [
+            1786459800,
+            "0.06"
+          ],
+          [
+            1786459830,
+            "0.06"
+          ],
+          [
+            1786459860,
+            "0.06"
+          ],
+          [
+            1786459890,
+            "0.06"
+          ],
+          [
+            1786459920,
+            "0.06"
+          ],
+          [
+            1786459950,
+            "0.06"
+          ],
+          [
+            1786459980,
+            "0.06"
+          ],
+          [
+            1786460010,
+            "0.06"
+          ],
+          [
+            1786460040,
+            "0.056666666666666664"
+          ],
+          [
+            1786460070,
+            "0.056666666666666664"
+          ]
+        ]
+      },
+      {
+        "metric": {
           "PktDropLatestState": "TCP_INVALID_STATE"
         },
         "values": [
           [
-            1708011360,
-            "0.07777777777777778"
+            1786459590,
+            "0.26666666666666666"
           ],
           [
-            1708011720,
-            "1.1152777777777776"
+            1786459620,
+            "0.56"
+          ],
+          [
+            1786459650,
+            "0.7633333333333333"
+          ],
+          [
+            1786459680,
+            "0.9533333333333334"
+          ],
+          [
+            1786459710,
+            "1.14"
+          ],
+          [
+            1786459740,
+            "1.32"
+          ],
+          [
+            1786459770,
+            "1.5033333333333334"
+          ],
+          [
+            1786459800,
+            "1.66"
+          ],
+          [
+            1786459830,
+            "1.8566666666666667"
+          ],
+          [
+            1786459860,
+            "2.03"
+          ],
+          [
+            1786459890,
+            "1.9266666666666667"
+          ],
+          [
+            1786459920,
+            "1.8033333333333332"
+          ],
+          [
+            1786459950,
+            "1.7866666666666666"
+          ],
+          [
+            1786459980,
+            "1.81"
+          ],
+          [
+            1786460010,
+            "1.79"
+          ],
+          [
+            1786460040,
+            "1.7666666666666666"
+          ],
+          [
+            1786460070,
+            "1.7566666666666666"
           ]
         ]
       }
     ],
     "stats": {
       "summary": {
-        "bytesProcessedPerSecond": 429511343,
-        "linesProcessedPerSecond": 653998,
-        "totalBytesProcessed": 221936446,
-        "totalLinesProcessed": 337933,
-        "execTime": 0.516718474,
-        "queueTime": 5.089247992,
+        "bytesProcessedPerSecond": 279551667,
+        "linesProcessedPerSecond": 294574,
+        "totalBytesProcessed": 60675320,
+        "totalLinesProcessed": 63936,
+        "execTime": 0.217045101,
+        "queueTime": 0.043912097,
         "subqueries": 0,
-        "totalEntriesReturned": 1,
-        "splits": 6,
-        "shards": 48,
-        "totalPostFilterLines": 810,
-        "totalStructuredMetadataBytesProcessed": 0
+        "totalEntriesReturned": 4,
+        "splits": 13,
+        "shards": 13,
+        "totalPostFilterLines": 3100,
+        "totalStructuredMetadataBytesProcessed": 1583856
       },
       "querier": {
         "store": {
           "totalChunksRef": 0,
           "totalChunksDownloaded": 0,
           "chunksDownloadTime": 0,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
             "headChunkBytes": 0,
             "headChunkLines": 0,
@@ -49,29 +319,36 @@
             "postFilterLines": 0,
             "headChunkStructuredMetadataBytes": 0,
             "decompressedStructuredMetadataBytes": 0
-          }
+          },
+          "chunkRefsFetchTime": 0,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "ingester": {
-        "totalReached": 48,
-        "totalChunksMatched": 375,
-        "totalBatches": 56,
-        "totalLinesSent": 802,
+        "totalReached": 13,
+        "totalChunksMatched": 331,
+        "totalBatches": 19,
+        "totalLinesSent": 2685,
         "store": {
-          "totalChunksRef": 16,
-          "totalChunksDownloaded": 16,
-          "chunksDownloadTime": 17705786,
+          "totalChunksRef": 4,
+          "totalChunksDownloaded": 4,
+          "chunksDownloadTime": 756052,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
-            "headChunkBytes": 18755808,
-            "headChunkLines": 28594,
-            "decompressedBytes": 203180638,
-            "decompressedLines": 309339,
-            "compressedBytes": 43253118,
-            "totalDuplicates": 0,
-            "postFilterLines": 810,
-            "headChunkStructuredMetadataBytes": 0,
-            "decompressedStructuredMetadataBytes": 0
-          }
+            "headChunkBytes": 14925060,
+            "headChunkLines": 15192,
+            "decompressedBytes": 45750260,
+            "decompressedLines": 48744,
+            "compressedBytes": 9145813,
+            "totalDuplicates": 403,
+            "postFilterLines": 3100,
+            "headChunkStructuredMetadataBytes": 121536,
+            "decompressedStructuredMetadataBytes": 1462320
+          },
+          "chunkRefsFetchTime": 1096767,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "cache": {
@@ -82,7 +359,8 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "index": {
           "entriesFound": 0,
@@ -91,26 +369,75 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "result": {
-          "entriesFound": 4,
-          "entriesRequested": 6,
-          "entriesStored": 3,
-          "bytesReceived": 1316,
+          "entriesFound": 0,
+          "entriesRequested": 12,
+          "entriesStored": 12,
+          "bytesReceived": 0,
           "bytesSent": 0,
-          "requests": 9,
-          "downloadTime": 66373
+          "requests": 24,
+          "downloadTime": 242112,
+          "queryLengthServed": 0
         },
         "statsResult": {
+          "entriesFound": 11,
+          "entriesRequested": 11,
+          "entriesStored": 2,
+          "bytesReceived": 4785,
+          "bytesSent": 0,
+          "requests": 13,
+          "downloadTime": 68526,
+          "queryLengthServed": 5940000000000
+        },
+        "volumeResult": {
           "entriesFound": 0,
           "entriesRequested": 0,
           "entriesStored": 0,
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "seriesResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "labelResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "instantMetricResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
         }
+      },
+      "index": {
+        "totalChunks": 0,
+        "postFilterChunks": 0,
+        "shardsDuration": 0,
+        "usedBloomFilters": false
       }
     }
   }

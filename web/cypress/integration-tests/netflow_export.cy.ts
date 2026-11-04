@@ -26,7 +26,7 @@ describe('(OCP-72610) Export automation', { tags: ['Network_Observability'] }, f
 
         // Export only Top 5 average bytes rates panel
         cy.get('#panel-kebab-top_avg_byte_rates-container button').should('exist').click()
-        cy.contains("Export panel").should('exist').click()
+        cy.byTestID("top_avg_byte_rates-export").should('exist').click()
         cy.readFile('cypress/downloads/overview_panel_top_avg_byte_rates.png')
         cy.exec('rm cypress/downloads/overview_page.png')
         cy.exec('rm cypress/downloads/overview_panel_top_avg_byte_rates.png')
@@ -39,16 +39,11 @@ describe('(OCP-72610) Export automation', { tags: ['Network_Observability'] }, f
         cy.byTestID("table-composable").should('exist')
         cy.showAdvancedOptions();
         cy.get('#export-button').should('exist').click()
-        cy.byTestID('export-modal').should('be.visible')
+        cy.byTestID('flows-export-modal').should('be.visible')
         cy.exec("rm -f cypress/downloads/*.csv", { failOnNonZeroExit: false })
-        cy.byTestID('export-modal').should('be.visible')
-        // Export modal content can rerender while the CSV is prepared. Re-query
-        // the button after the modal is stable instead of clicking a stale subject.
-        cy.get('[data-test="export-modal"]').find('[data-test="export-button"]')
-            .should('be.visible')
-            .then(() => {
-                cy.get('[data-test="export-modal"]').find('[data-test="export-button"]').click({ force: true })
-            })
+        cy.byTestID('flows-export-modal').within(() => {
+            cy.byTestID('export-button').should('exist').click()
+        })
         const waitForCsv = (retries = 5): void => {
             cy.exec("ls cypress/downloads", { failOnNonZeroExit: false }).then((response) => {
                 const files = (response.stdout || '').trim().split('\n').filter(f => f.endsWith('.csv'))

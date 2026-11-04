@@ -79,8 +79,15 @@ func (h *Handlers) GetTopology(ctx context.Context) func(w http.ResponseWriter, 
 			return
 		}
 
+		enriched, err := enrichTopologyResponse(flows, params, h.Cfg.Frontend.Scopes)
+		if err != nil {
+			code = http.StatusInternalServerError
+			apierrors.Write(w, code, err)
+			return
+		}
+
 		code = http.StatusOK
-		writeJSON(w, code, flows)
+		writeJSON(w, code, enriched)
 	}
 }
 
@@ -279,7 +286,11 @@ func buildTopologyQuery(
 	isDev bool,
 ) (string, *prometheus.Query, int, error) {
 	search, unsupportedReason := getEligiblePromMetric(cfg.Frontend.GetAggregateKeyLabels(), promInventory, filters, in, isDev)
-	if unsupportedReason != "" {
+	if cfg.ConsoleMode == config.Mock {
+		// Mock data is served from Loki fixtures only.
+		search = nil
+		unsupportedReason = ""
+	} else if unsupportedReason != "" {
 		hlog.Debugf("Unsupported Prometheus query; reason: %s.", unsupportedReason)
 	} else if search != nil && len(search.Found) > 0 {
 		// Success, we can use Prometheus

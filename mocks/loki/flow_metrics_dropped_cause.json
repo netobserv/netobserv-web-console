@@ -5,16 +5,253 @@
     "result": [
       {
         "metric": {
+          "PktDropLatestDropCause": "SKB_DROP_REASON_IP_OUTNOROUTES"
+        },
+        "values": [
+          [
+            1786459710,
+            "0.006666666666666667"
+          ],
+          [
+            1786459740,
+            "0.006666666666666667"
+          ],
+          [
+            1786459770,
+            "0.006666666666666667"
+          ],
+          [
+            1786459800,
+            "0.006666666666666667"
+          ],
+          [
+            1786459890,
+            "0.013333333333333334"
+          ],
+          [
+            1786459920,
+            "0.013333333333333334"
+          ],
+          [
+            1786459950,
+            "0.013333333333333334"
+          ],
+          [
+            1786459980,
+            "0.02"
+          ],
+          [
+            1786460010,
+            "0.013333333333333334"
+          ],
+          [
+            1786460040,
+            "0.013333333333333334"
+          ],
+          [
+            1786460070,
+            "0.016666666666666666"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "PktDropLatestDropCause": "SKB_DROP_REASON_IP_RPFILTER"
+        },
+        "values": [
+          [
+            1786459590,
+            "14.3"
+          ],
+          [
+            1786459620,
+            "31.91"
+          ],
+          [
+            1786459650,
+            "46.8"
+          ],
+          [
+            1786459680,
+            "62.82666666666667"
+          ],
+          [
+            1786459710,
+            "80.42333333333333"
+          ],
+          [
+            1786459740,
+            "96.37333333333333"
+          ],
+          [
+            1786459770,
+            "112.48"
+          ],
+          [
+            1786459800,
+            "127.89333333333333"
+          ],
+          [
+            1786459830,
+            "142.6"
+          ],
+          [
+            1786459860,
+            "158.76333333333332"
+          ],
+          [
+            1786459890,
+            "161.23"
+          ],
+          [
+            1786459920,
+            "159.53666666666666"
+          ],
+          [
+            1786459950,
+            "159.78333333333333"
+          ],
+          [
+            1786459980,
+            "155.66"
+          ],
+          [
+            1786460010,
+            "152.71666666666667"
+          ],
+          [
+            1786460040,
+            "154.26333333333332"
+          ],
+          [
+            1786460070,
+            "152.46666666666667"
+          ]
+        ]
+      },
+      {
+        "metric": {
           "PktDropLatestDropCause": "SKB_DROP_REASON_NO_SOCKET"
         },
         "values": [
           [
-            1708011360,
-            "0.001388888888888889"
+            1786459590,
+            "0.006666666666666667"
           ],
           [
-            1708011720,
-            "0.001388888888888889"
+            1786459620,
+            "0.006666666666666667"
+          ],
+          [
+            1786459650,
+            "0.013333333333333334"
+          ],
+          [
+            1786459680,
+            "0.013333333333333334"
+          ],
+          [
+            1786459710,
+            "0.013333333333333334"
+          ],
+          [
+            1786459740,
+            "0.013333333333333334"
+          ],
+          [
+            1786459770,
+            "0.013333333333333334"
+          ],
+          [
+            1786459800,
+            "0.013333333333333334"
+          ],
+          [
+            1786459830,
+            "0.013333333333333334"
+          ],
+          [
+            1786459860,
+            "0.013333333333333334"
+          ],
+          [
+            1786459920,
+            "0.006666666666666667"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "PktDropLatestDropCause": "SKB_DROP_REASON_TCP_ACK_UNSENT_DATA"
+        },
+        "values": [
+          [
+            1786459590,
+            "0.08333333333333333"
+          ],
+          [
+            1786459620,
+            "0.24"
+          ],
+          [
+            1786459650,
+            "0.43666666666666665"
+          ],
+          [
+            1786459680,
+            "0.6266666666666667"
+          ],
+          [
+            1786459710,
+            "0.8066666666666666"
+          ],
+          [
+            1786459740,
+            "0.9866666666666667"
+          ],
+          [
+            1786459770,
+            "1.1633333333333333"
+          ],
+          [
+            1786459800,
+            "1.32"
+          ],
+          [
+            1786459830,
+            "1.5166666666666666"
+          ],
+          [
+            1786459860,
+            "1.68"
+          ],
+          [
+            1786459890,
+            "1.7566666666666666"
+          ],
+          [
+            1786459920,
+            "1.7666666666666666"
+          ],
+          [
+            1786459950,
+            "1.7466666666666666"
+          ],
+          [
+            1786459980,
+            "1.75"
+          ],
+          [
+            1786460010,
+            "1.7366666666666666"
+          ],
+          [
+            1786460040,
+            "1.7066666666666668"
+          ],
+          [
+            1786460070,
+            "1.7"
           ]
         ]
       },
@@ -24,58 +261,162 @@
         },
         "values": [
           [
-            1708011720,
-            "0.001388888888888889"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "PktDropLatestDropCause": "SKB_DROP_REASON_TCP_INVALID_SEQUENCE"
-        },
-        "values": [
-          [
-            1708011360,
-            "0.0763888888888889"
+            1786459950,
+            "0.006666666666666667"
           ],
           [
-            1708011720,
-            "1.1111111111111112"
+            1786459980,
+            "0.02"
+          ],
+          [
+            1786460010,
+            "0.02"
+          ],
+          [
+            1786460040,
+            "0.02"
+          ],
+          [
+            1786460070,
+            "0.02"
           ]
         ]
       },
       {
         "metric": {
-          "PktDropLatestDropCause": "SKB_DROP_REASON_TCP_RESET"
+          "PktDropLatestDropCause": "SKB_DROP_REASON_TCP_OLD_DATA"
         },
         "values": [
           [
-            1708011720,
-            "0.001388888888888889"
+            1786459830,
+            "0.006666666666666667"
+          ],
+          [
+            1786459860,
+            "0.013333333333333334"
+          ],
+          [
+            1786459890,
+            "0.013333333333333334"
+          ],
+          [
+            1786459920,
+            "0.013333333333333334"
+          ],
+          [
+            1786459950,
+            "0.013333333333333334"
+          ],
+          [
+            1786459980,
+            "0.013333333333333334"
+          ],
+          [
+            1786460010,
+            "0.013333333333333334"
+          ],
+          [
+            1786460040,
+            "0.02"
+          ],
+          [
+            1786460070,
+            "0.013333333333333334"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "PktDropLatestDropCause": "SKB_DROP_REASON_TCP_OVERWINDOW"
+        },
+        "values": [
+          [
+            1786459620,
+            "0.0033333333333333335"
+          ],
+          [
+            1786459650,
+            "0.0033333333333333335"
+          ],
+          [
+            1786459680,
+            "0.0033333333333333335"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "PktDropLatestDropCause": "SKB_DROP_REASON_TCP_RFC7323_PAWS"
+        },
+        "values": [
+          [
+            1786459590,
+            "0.17666666666666667"
+          ],
+          [
+            1786459620,
+            "0.31"
+          ],
+          [
+            1786459650,
+            "0.31"
+          ],
+          [
+            1786459680,
+            "0.31"
+          ],
+          [
+            1786459710,
+            "0.31"
+          ],
+          [
+            1786459740,
+            "0.31"
+          ],
+          [
+            1786459770,
+            "0.31"
+          ],
+          [
+            1786459800,
+            "0.31"
+          ],
+          [
+            1786459830,
+            "0.31"
+          ],
+          [
+            1786459860,
+            "0.31"
+          ],
+          [
+            1786459890,
+            "0.13333333333333333"
           ]
         ]
       }
     ],
     "stats": {
       "summary": {
-        "bytesProcessedPerSecond": 475774246,
-        "linesProcessedPerSecond": 724440,
-        "totalBytesProcessed": 221936446,
-        "totalLinesProcessed": 337933,
-        "execTime": 0.466474274,
-        "queueTime": 7.376568998,
+        "bytesProcessedPerSecond": 269886982,
+        "linesProcessedPerSecond": 284390,
+        "totalBytesProcessed": 60675320,
+        "totalLinesProcessed": 63936,
+        "execTime": 0.224817512,
+        "queueTime": 0.049374504,
         "subqueries": 0,
-        "totalEntriesReturned": 4,
-        "splits": 6,
-        "shards": 48,
-        "totalPostFilterLines": 810,
-        "totalStructuredMetadataBytesProcessed": 0
+        "totalEntriesReturned": 8,
+        "splits": 13,
+        "shards": 13,
+        "totalPostFilterLines": 3100,
+        "totalStructuredMetadataBytesProcessed": 1583856
       },
       "querier": {
         "store": {
           "totalChunksRef": 0,
           "totalChunksDownloaded": 0,
           "chunksDownloadTime": 0,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
             "headChunkBytes": 0,
             "headChunkLines": 0,
@@ -86,29 +427,36 @@
             "postFilterLines": 0,
             "headChunkStructuredMetadataBytes": 0,
             "decompressedStructuredMetadataBytes": 0
-          }
+          },
+          "chunkRefsFetchTime": 0,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "ingester": {
-        "totalReached": 48,
-        "totalChunksMatched": 375,
-        "totalBatches": 56,
-        "totalLinesSent": 802,
+        "totalReached": 13,
+        "totalChunksMatched": 331,
+        "totalBatches": 19,
+        "totalLinesSent": 2685,
         "store": {
-          "totalChunksRef": 16,
-          "totalChunksDownloaded": 16,
-          "chunksDownloadTime": 23293962,
+          "totalChunksRef": 4,
+          "totalChunksDownloaded": 4,
+          "chunksDownloadTime": 705300,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
-            "headChunkBytes": 18755808,
-            "headChunkLines": 28594,
-            "decompressedBytes": 203180638,
-            "decompressedLines": 309339,
-            "compressedBytes": 43253118,
-            "totalDuplicates": 0,
-            "postFilterLines": 810,
-            "headChunkStructuredMetadataBytes": 0,
-            "decompressedStructuredMetadataBytes": 0
-          }
+            "headChunkBytes": 14925060,
+            "headChunkLines": 15192,
+            "decompressedBytes": 45750260,
+            "decompressedLines": 48744,
+            "compressedBytes": 9145813,
+            "totalDuplicates": 403,
+            "postFilterLines": 3100,
+            "headChunkStructuredMetadataBytes": 121536,
+            "decompressedStructuredMetadataBytes": 1462320
+          },
+          "chunkRefsFetchTime": 1333414,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "cache": {
@@ -119,7 +467,8 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "index": {
           "entriesFound": 0,
@@ -128,26 +477,75 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "result": {
-          "entriesFound": 4,
-          "entriesRequested": 6,
-          "entriesStored": 3,
-          "bytesReceived": 1332,
+          "entriesFound": 0,
+          "entriesRequested": 12,
+          "entriesStored": 12,
+          "bytesReceived": 0,
           "bytesSent": 0,
-          "requests": 9,
-          "downloadTime": 61490
+          "requests": 24,
+          "downloadTime": 239930,
+          "queryLengthServed": 0
         },
         "statsResult": {
+          "entriesFound": 11,
+          "entriesRequested": 11,
+          "entriesStored": 1,
+          "bytesReceived": 4785,
+          "bytesSent": 0,
+          "requests": 12,
+          "downloadTime": 72574,
+          "queryLengthServed": 5970000000000
+        },
+        "volumeResult": {
           "entriesFound": 0,
           "entriesRequested": 0,
           "entriesStored": 0,
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "seriesResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "labelResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "instantMetricResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
         }
+      },
+      "index": {
+        "totalChunks": 0,
+        "postFilterChunks": 0,
+        "shardsDuration": 0,
+        "usedBloomFilters": false
       }
     }
   }
