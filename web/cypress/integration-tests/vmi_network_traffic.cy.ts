@@ -1,5 +1,6 @@
 import "@views/netobserv"
 import { Operator } from "@views/netobserv"
+import { promQueryCommand } from "../support/prometheus"
 
 const VMI_NAMESPACE = "test-vm"
 const VMI_NAME = "test-vm"
@@ -90,6 +91,13 @@ describe('(OCP-90529) Network Traffic Tab on VMI Page', { tags: ['Network_Observ
             { retries: 30, interval: 20000 }
         )
         cy.adminCLI(`oc wait --for=condition=Ready vmi/${VMI_NAME} -n ${VMI_NAMESPACE} --timeout=180s`, { timeout: 200000 })
+
+        // VM flows take ~3 min after Ready to reach Prometheus.
+        cy.checkCommandResult(
+            promQueryCommand(`sum(rate(netobserv_workload_egress_bytes_total{SrcK8S_Namespace=\\"${VMI_NAMESPACE}\\",SrcK8S_OwnerType=\\"VirtualMachineInstance\\",SrcK8S_OwnerName=\\"${VMI_NAME}\\"}[1m])) > 0`),
+            '"value":[',
+            { retries: 40, interval: 15000 }
+        )
 
     })
 
