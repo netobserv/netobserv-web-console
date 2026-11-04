@@ -56,6 +56,7 @@ func setupRoutes(ctx context.Context, cfg *config.Config, authChecker auth.Check
 		api.HandleFunc("/loki/buildinfo", forceCheckAdmin(authChecker, h.LokiBuildInfos()))
 		api.HandleFunc("/loki/config/limits", forceCheckAdmin(authChecker, h.LokiLimits()))
 		api.HandleFunc("/loki/flow/records", h.GetFlows(ctx))
+		api.HandleFunc("/loki/proxy/records", forceCheckAdmin(authChecker, h.GetProxyRecords(ctx)))
 		api.HandleFunc("/loki/export", h.ExportFlows(ctx))
 
 		// Common endpoints

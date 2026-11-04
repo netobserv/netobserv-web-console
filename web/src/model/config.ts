@@ -6,6 +6,7 @@ import { RawQuickFilter } from './quick-filters';
 import { ScopeConfigDef } from './scope';
 
 export type Feature =
+  | 'proxyCorrelation'
   | 'multiCluster'
   | 'zones'
   | 'pktDrop'
