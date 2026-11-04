@@ -17,14 +17,45 @@ import { Consumer } from './resource-watcher';
 
 export type ResourceFormProps = {
   uiSchema: UiSchema;
+  wizardChild?: JSX.Element;
 };
 
-export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
+export type ResourceEditorContextValue = {
+  data: any;
+  setData: React.Dispatch<React.SetStateAction<any>>;
+  setView: (view: EditorType) => void;
+};
+
+export const ResourceEditorContext = React.createContext<ResourceEditorContextValue | null>(null);
+
+export const useResourceEditor = () => React.useContext(ResourceEditorContext);
+
+export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema, wizardChild }) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
-  const [viewType, setViewType] = React.useState(EditorType.CUSTOM);
+  const [viewType, setViewType] = React.useState(() => {
+    const requestedView = new URLSearchParams(window.location.search).get('view');
+    if (requestedView === EditorType.WIZARD && wizardChild) {
+      return EditorType.WIZARD;
+    }
+    if (requestedView === EditorType.YAML) {
+      return EditorType.YAML;
+    }
+    return EditorType.FORM;
+  });
   const [data, setData] = React.useState<any>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [discard, discardModal] = useDiscardGuard();
+
+  const changeView = React.useCallback((next: EditorType) => {
+    setViewType(next);
+    const url = new URL(window.location.href);
+    if (next === EditorType.FORM) {
+      url.searchParams.delete('view');
+    } else {
+      url.searchParams.set('view', next);
+    }
+    window.history.replaceState(window.history.state, '', url.toString());
+  }, []);
 
   const hasChanged = React.useCallback(
     (existing: any) => {
@@ -53,53 +84,56 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
               </FormHelperText>
             </div>
             <Suspense fallback={<></>}>
-              <EditorToggle
-                type={viewType}
-                updated={hasChanged(ctx.data)}
-                isUpdate={ctx.isUpdate}
-                onReload={() => setData(ctx.data)}
-                onChange={setViewType}
-                onSubmit={() => {
-                  discard.clearDirty();
-                  ctx.onSubmit(data);
-                }}
-                onCancel={() => discard.requestClose(() => window.history.back())}
-                onDelete={() => setDeleteModalOpen(true)}
-                customChild={
-                  ctx.schema ? (
-                    <DynamicForm
-                      showAlert
-                      formData={data}
-                      schema={ctx.schema}
-                      uiSchema={uiSchema}
-                      validator={SchemaValidator}
-                      errors={ctx.errors}
-                      onError={errs => ctx.setErrors(_.map(errs, error => error.stack))}
-                      onChange={event => {
-                        setData(event.formData);
-                        discard.markDirty();
-                      }}
-                      skipDefaults={ctx.skipDefaults}
-                    />
-                  ) : (
-                    <></>
-                  )
-                }
-                yamlChild={
-                  <>
-                    <ResourceYAMLEditor
-                      initialResource={data}
-                      onSave={content => {
-                        const updatedData = safeYAMLToJS(content);
-                        setData(updatedData);
-                        discard.clearDirty();
-                        ctx.onSubmit(updatedData);
-                      }}
-                    />
-                    <>{ctx.errors.length > 0 && <ErrorTemplate errors={ctx.errors} />}</>
-                  </>
-                }
-              />
+              <ResourceEditorContext.Provider value={{ data, setData, setView: changeView }}>
+                <EditorToggle
+                  type={viewType}
+                  updated={hasChanged(ctx.data)}
+                  isUpdate={ctx.isUpdate}
+                  onReload={() => setData(ctx.data)}
+                  onChange={changeView}
+                  onSubmit={() => {
+                    discard.clearDirty();
+                    ctx.onSubmit(data);
+                  }}
+                  onCancel={() => discard.requestClose(() => window.history.back())}
+                  onDelete={() => setDeleteModalOpen(true)}
+                  formChild={
+                    ctx.schema ? (
+                      <DynamicForm
+                        showAlert
+                        formData={data}
+                        schema={ctx.schema}
+                        uiSchema={uiSchema}
+                        validator={SchemaValidator}
+                        errors={ctx.errors}
+                        onError={errs => ctx.setErrors(_.map(errs, error => error.stack))}
+                        onChange={event => {
+                          setData(event.formData);
+                          discard.markDirty();
+                        }}
+                        skipDefaults={ctx.skipDefaults}
+                      />
+                    ) : (
+                      <></>
+                    )
+                  }
+                  wizardChild={wizardChild}
+                  yamlChild={
+                    <>
+                      <ResourceYAMLEditor
+                        initialResource={data}
+                        onSave={content => {
+                          const updatedData = safeYAMLToJS(content);
+                          setData(updatedData);
+                          discard.clearDirty();
+                          ctx.onSubmit(updatedData);
+                        }}
+                      />
+                      <>{ctx.errors.length > 0 && <ErrorTemplate errors={ctx.errors} />}</>
+                    </>
+                  }
+                />
+              </ResourceEditorContext.Provider>
             </Suspense>
             {isDeleteModalOpen && (
               <ResourceDeleteModal
