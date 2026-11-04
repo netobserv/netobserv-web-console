@@ -21,7 +21,12 @@ export const TabsContainer: React.FC<TabsContainerProps> = props => {
   const { t } = useTranslation('plugin__netobserv-plugin');
   const isDarkTheme = useTheme();
   const { caps } = useNetflowContext();
-  const isAllowLoki = caps.allowLoki;
+  const allowRawFlows = caps.allowRawFlows;
+  const allowMetrics = caps.allowMetrics;
+  // Overview/Topology need Prometheus (or Loki) metrics — not S3 raw store alone.
+  const metricsUnavailableTooltip = t(
+    'Only available when Prometheus and/or Loki are enabled in the FlowCollector (Overview and Topology require metrics)'
+  );
 
   return (
     <Flex className="netflow-traffic-tabs-container" style={props.style}>
@@ -36,15 +41,17 @@ export const TabsContainer: React.FC<TabsContainerProps> = props => {
           <Tab
             className="overviewTabButton"
             eventKey={'overview'}
+            isAriaDisabled={!allowMetrics} // required instead of 'disabled' when used with a tooltip
+            tooltip={!allowMetrics ? <Tooltip content={metricsUnavailableTooltip} /> : undefined}
             title={<TabTitleText>{t('Overview')}</TabTitleText>}
           />
           <Tab
             className="tableTabButton"
             eventKey={'table'}
-            isAriaDisabled={!isAllowLoki} // required instead of 'disabled' when used with a tooltip
+            isAriaDisabled={!allowRawFlows} // required instead of 'disabled' when used with a tooltip
             tooltip={
-              !isAllowLoki ? (
-                <Tooltip content={t('Only available when FlowCollector.loki.enable is true')} />
+              !allowRawFlows ? (
+                <Tooltip content={t('Only available when Loki is enabled in the FlowCollector')} />
               ) : undefined
             }
             title={<TabTitleText>{t('Traffic flows')}</TabTitleText>}
@@ -52,6 +59,8 @@ export const TabsContainer: React.FC<TabsContainerProps> = props => {
           <Tab
             className="topologyTabButton"
             eventKey={'topology'}
+            isAriaDisabled={!allowMetrics}
+            tooltip={!allowMetrics ? <Tooltip content={metricsUnavailableTooltip} /> : undefined}
             title={<TabTitleText>{t('Topology')}</TabTitleText>}
           />
         </Tabs>

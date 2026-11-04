@@ -10,8 +10,9 @@ import (
 
 // QueryResponse represents the http json response to a storage query (LogQL or PromQL)
 type QueryResponse struct {
-	Status string            `json:"status"`
-	Data   QueryResponseData `json:"data"`
+	Status       string            `json:"status"`
+	Data         QueryResponseData `json:"data"`
+	LimitReached bool              `json:"limitReached,omitempty"`
 }
 
 // AggregatedQueryResponse represents the aggregated json response to one or more storage queries

@@ -15,10 +15,12 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -500,10 +502,30 @@ func TestLokiConfiguration_MultiTenant(t *testing.T) {
 
 type httpMock struct {
 	mock.Mock
+	mu        sync.Mutex
+	bodyPosts []string
 }
 
 func (l *httpMock) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	var bodyPost string
+	if r.Method == "POST" {
+		if b, _ := io.ReadAll(r.Body); len(b) > 0 {
+			bodyPost, _ = url.QueryUnescape(string(b))
+		}
+	}
+	l.mu.Lock()
+	l.bodyPosts = append(l.bodyPosts, bodyPost)
+	l.mu.Unlock()
 	_ = l.Called(w, r)
+}
+
+func (l *httpMock) MockHTTPResponse(code int, resp []byte) {
+	l.On("ServeHTTP", mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		if code != 0 {
+			args.Get(0).(http.ResponseWriter).WriteHeader(code)
+		}
+		_, _ = args.Get(0).(http.ResponseWriter).Write(resp)
+	})
 }
 
 type authMock struct {
