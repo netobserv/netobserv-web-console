@@ -550,6 +550,51 @@
     height: 33px !important;
 }
 
+.flowcapture-action-button {
+  align-items: center;
+  display: inline-flex;
+  height: 33px !important;
+  justify-content: center;
+  line-height: 1;
+  min-height: 33px !important;
+  padding-block: 0 !important;
+  color: var(--pf-t--global--text--color--on-brand--default, #fff) !important;
+}
+
+.flowcapture-action-button > .pf-v6-c-button__text {
+  align-items: center;
+  align-self: center !important;
+  display: inline-flex;
+  justify-content: center;
+  line-height: 1;
+  text-align: center;
+}
+
+.health-drawer-header {
+    min-width: 0;
+    width: 100%;
+}
+
+.health-drawer-resource {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.health-drawer-resource > * {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.health-drawer-header .flowcapture-action-button {
+    flex: 0 0 auto;
+    margin-left: var(--pf-t--global--spacer--sm);
+}
+
 /*rotate animation for loading icon*/
 @keyframes spin {
     from {

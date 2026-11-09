@@ -112,6 +112,9 @@ export const getExportFlowsURL = (q: StructuredFlowQuery, columns?: string[]): s
   return `${ContextSingleton.getHost()}/api/loki/export?${exportQuery}`;
 };
 
+export const getFlowCaptureOutputURL = (namespace: string, name: string): string =>
+  `${ContextSingleton.getHost()}/api/flowcaptures/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}/output`;
+
 export const getRole = (): Promise<string> => {
   return axios.get(ContextSingleton.getHost() + '/role').then(r => {
     return r.data;

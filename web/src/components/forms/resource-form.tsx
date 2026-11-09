@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import { FormHelperText, PageSection, Title } from '@patternfly/react-core';
-import { UiSchema } from '@rjsf/utils';
+import { CustomValidator, UiSchema } from '@rjsf/utils';
 import _ from 'lodash';
 import React, { FC, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,11 +17,23 @@ import { Consumer } from './resource-watcher';
 
 export type ResourceFormProps = {
   uiSchema: UiSchema;
+  initialViewType?: EditorType;
+  createTitle?: string;
+  formContext?: Record<string, unknown>;
+  customValidate?: CustomValidator;
+  transformData?: (data: any) => any;
 };
 
-export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
+export const ResourceForm: FC<ResourceFormProps> = ({
+  uiSchema,
+  initialViewType = EditorType.CUSTOM,
+  createTitle,
+  formContext,
+  customValidate,
+  transformData
+}) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
-  const [viewType, setViewType] = React.useState(EditorType.CUSTOM);
+  const [viewType, setViewType] = React.useState(initialViewType);
   const [data, setData] = React.useState<any>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [discard, discardModal] = useDiscardGuard();
@@ -44,7 +56,9 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
           <PageSection hasBodyWrapper={false} id="pageSection">
             <div id="pageHeader">
               <Title headingLevel="h1" size="2xl">
-                {ctx.isUpdate ? t('Update {{kind}}', { kind: ctx.kind }) : t('Create {{kind}}', { kind: ctx.kind })}
+                {ctx.isUpdate
+                  ? t('Update {{kind}}', { kind: ctx.kind })
+                  : createTitle || t('Create {{kind}}', { kind: ctx.kind })}
               </Title>
               <FormHelperText style={{ marginTop: 'var(--pf-t--global--spacer--xs)' }}>
                 {ctx.isUpdate
@@ -61,7 +75,7 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
                 onChange={setViewType}
                 onSubmit={() => {
                   discard.clearDirty();
-                  ctx.onSubmit(data);
+                  ctx.onSubmit(transformData ? transformData(data) : data);
                 }}
                 onCancel={() => discard.requestClose(() => window.history.back())}
                 onDelete={() => setDeleteModalOpen(true)}
@@ -70,13 +84,15 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
                     <DynamicForm
                       showAlert
                       formData={data}
+                      formContext={formContext}
                       schema={ctx.schema}
                       uiSchema={uiSchema}
                       validator={SchemaValidator}
+                      customValidate={customValidate}
                       errors={ctx.errors}
                       onError={errs => ctx.setErrors(_.map(errs, error => error.stack))}
                       onChange={event => {
-                        setData(event.formData);
+                        setData(transformData ? transformData(event.formData) : event.formData);
                         discard.markDirty();
                       }}
                       skipDefaults={ctx.skipDefaults}
@@ -91,9 +107,10 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
                       initialResource={data}
                       onSave={content => {
                         const updatedData = safeYAMLToJS(content);
-                        setData(updatedData);
+                        const transformedData = transformData ? transformData(updatedData) : updatedData;
+                        setData(transformedData);
                         discard.clearDirty();
-                        ctx.onSubmit(updatedData);
+                        ctx.onSubmit(transformedData);
                       }}
                     />
                     <>{ctx.errors.length > 0 && <ErrorTemplate errors={ctx.errors} />}</>

@@ -14,6 +14,9 @@ import {
 import { configure } from 'mobx';
 import React from 'react';
 import { BrowserRouter, Navigate, NavLink, Route, Routes } from 'react-router';
+import FlowCaptureForm from '../components/forms/flowCapture/form';
+import FlowCaptureList from '../components/forms/flowCapture/list';
+import FlowCaptureStatus from '../components/forms/flowCapture/status';
 import FlowCollectorForm from '../components/forms/flowCollector/form';
 import FlowCollectorStatus from '../components/forms/flowCollector/status';
 import FlowCollectorWizard from '../components/forms/flowCollector/wizard';
@@ -120,6 +123,11 @@ const allPages = [
     id: 'flowMetric',
     name: 'FlowMetric form',
     content: <FlowMetricForm name="flowmetric-sample" />
+  },
+  {
+    id: 'flow-capture',
+    name: 'FlowCaptures',
+    content: <FlowCaptureList />
   }
 ];
 const endUserPages = allPages.filter(p => p.id === 'netflow-traffic' || p.id === 'network-health');
@@ -199,6 +207,10 @@ export const App: React.FunctionComponent<{ endUser?: boolean }> = ({ endUser })
             }
             return <Route path={`/console-${page.id}`} key={page.id} element={page.content} />;
           })}
+          <Route path="/console-flow-capture/~new" element={<FlowCaptureForm />} />
+          <Route path="/console-flow-capture/:name/edit" element={<FlowCaptureForm />} />
+          <Route path="/console-flow-capture/:name/yaml" element={<FlowCaptureForm />} />
+          <Route path="/console-flow-capture/:name" element={<FlowCaptureStatus />} />
           <Route path="*" element={<Navigate to={`/console-${pages[0].id}`} replace />} />
         </Routes>
       </Page>

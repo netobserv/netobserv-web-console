@@ -16,7 +16,7 @@ import { MaybeTooltip } from '../../tooltip/maybe-tooltip';
 import { jsonSchemaGroupTypes } from './const';
 import { DescriptionField, FieldSet, FormField } from './fields';
 import { UiSchemaOptionsWithDependency } from './types';
-import { isDependencyControlUnset, useSchemaLabel } from './utils';
+import { dependencyMatches, isDependencyControlUnset, useSchemaLabel } from './utils';
 
 export const AtomicFieldTemplate: React.FC<FieldTemplateProps> = ({
   children,
@@ -53,36 +53,13 @@ export const DescriptionFieldTemplate: React.FC<DescriptionFieldProps> = props =
 export const FieldTemplate: React.FC<FieldTemplateProps> = props => {
   const { id, hidden, schema = {}, children, uiSchema = {}, formContext = {} } = props;
   const type = getSchemaType(schema);
-  const [dependencyMet, setDependencyMet] = React.useState(true);
-  React.useEffect(() => {
-    const { dependency } = getUiOptions(uiSchema ?? {}) as UiSchemaOptionsWithDependency; // Type defs for this function are awful
-    if (dependency) {
-      setDependencyMet(() => {
-        if (dependency.matchMode === 'controlUnset') {
-          const spec = _.get(formContext.formData ?? {}, ['spec'], {});
-          return isDependencyControlUnset(spec, dependency.controlFieldPath);
-        }
-
-        let val = _.get(formContext.formData ?? {}, ['spec'], '');
-        dependency.controlFieldPath.forEach(path => {
-          val = _.get(val, [path], '');
-          if (Array.isArray(val)) {
-            // retreive id from path
-            // example root_spec_exporters_4_ipfix will return 4
-            val = val[Number(id.replace(/\D/g, ''))];
-          }
-        });
-
-        return dependency?.controlFieldValue === String(val);
-      });
-    }
-  }, [uiSchema, formContext, id]);
+  const { dependency } = getUiOptions(uiSchema ?? {}) as UiSchemaOptionsWithDependency;
+  const dependencyMet = dependencyMatches(formContext.formData, dependency, id);
 
   if (hidden) {
     return null;
   }
 
-  const { dependency } = getUiOptions(uiSchema ?? {}) as UiSchemaOptionsWithDependency;
   const disableBecauseControlUnset = dependency?.matchMode === 'controlUnset' && String(type) === 'array';
 
   if (dependency && !dependencyMet && !disableBecauseControlUnset) {
@@ -96,9 +73,55 @@ export const FieldTemplate: React.FC<FieldTemplateProps> = props => {
 };
 
 export const ObjectFieldTemplate: React.FC<ObjectFieldTemplateProps> = props => {
-  const { idSchema, formData, properties, required, schema, title, uiSchema } = props;
-  const { flat } = getUiOptions(uiSchema ?? {});
+  const { idSchema, formContext, formData, properties, required, schema, title, uiSchema } = props;
+  const { flat, flowCaptureFiltersGroup } = getUiOptions(uiSchema ?? {}) as UiSchemaOptionsWithDependency;
+  const { t } = useTranslation('plugin__netobserv-plugin');
+  const flowCaptureFilterFields = new Set(['filters', 'queries', 'interfaces', 'excludeInterfaces', 'nodeSelector']);
   if (flat === 'true') {
+    if (flowCaptureFiltersGroup) {
+      const allProperties = properties || [];
+      const firstGroupedIndex = allProperties.findIndex(property => flowCaptureFilterFields.has(property.name));
+      const groupedProperties = allProperties.filter(property => flowCaptureFilterFields.has(property.name));
+      if (firstGroupedIndex >= 0 && groupedProperties.length > 0) {
+        const before = allProperties.slice(0, firstGroupedIndex);
+        const after = allProperties.filter(
+          (property, index) => index > firstGroupedIndex && !flowCaptureFilterFields.has(property.name)
+        );
+        const autofilled = Boolean(
+          (formContext as { flowCaptureAutofilled?: boolean } | undefined)?.flowCaptureAutofilled
+        );
+        return (
+          <>
+            {before.map(property => property.content)}
+            <FieldSet
+              defaultLabel={t('Filters')}
+              defaultExpanded={true}
+              idSchema={idSchema}
+              required={false}
+              schema={schema}
+              uiSchema={uiSchema}
+            >
+              {autofilled && (
+                <Alert
+                  isInline
+                  variant="info"
+                  className="flowcapture-prefill-notice"
+                  title={t('Review automatically filled capture settings')}
+                >
+                  {t(
+                    'Review the automatically filled Filters, Queries, Interfaces, and Node selector values before creating the capture.'
+                  )}
+                </Alert>
+              )}
+              <div className="co-dynamic-form__field-group-content">
+                {groupedProperties.map(property => property.content)}
+              </div>
+            </FieldSet>
+            {after.map(property => property.content)}
+          </>
+        );
+      }
+    }
     return <>{_.map(properties || [], p => p.content)}</>;
   }
 
@@ -116,6 +139,7 @@ export const ObjectFieldTemplate: React.FC<ObjectFieldTemplateProps> = props => 
       labelOverride={labelOverride}
       idSchema={idSchema}
       required={required}
+      formData={formData}
       schema={schema}
       uiSchema={uiSchema}
     >
@@ -197,6 +221,7 @@ export const ArrayFieldTemplate: React.FC<ArrayFieldTemplateProps> = ({
       labelOverride={arrayLabelOverride}
       idSchema={idSchema}
       required={required}
+      formData={formData}
       schema={schema}
       suppressDescription={pauseArrayEdit}
       uiSchema={uiSchema}

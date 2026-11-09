@@ -152,9 +152,15 @@ export type FlowCollectorPipelineProps = {
   existing: K8sResourceKind | null;
   selectedTypes: string[];
   setSelectedTypes: (types: string[]) => void;
+  flowCapture?: boolean;
 };
 
-export const Pipeline: React.FC<FlowCollectorPipelineProps> = ({ existing, selectedTypes, setSelectedTypes }) => {
+export const Pipeline: React.FC<FlowCollectorPipelineProps> = ({
+  existing,
+  selectedTypes,
+  setSelectedTypes,
+  flowCapture = false
+}) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
 
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -231,8 +237,49 @@ export const Pipeline: React.FC<FlowCollectorPipelineProps> = ({ existing, selec
   const monitoringStatus: ComponentStatus | undefined = existing?.status?.integrations?.monitoring;
   const exporterStatuses: ExporterStatus[] = existing?.status?.integrations?.exporters || EMPTY_EXPORTERS;
 
+  const toPipelineNodes = (steps: Step[]) =>
+    steps.map(
+      s =>
+        ({
+          ...s,
+          type: s.type || taskNodeType,
+          width: 180,
+          height: 32,
+          style: {
+            padding: [45, 15]
+          }
+        }) as PipelineNodeModel
+    );
+
   const getSteps = React.useCallback(() => {
     const steps: Step[] = [];
+
+    if (flowCapture) {
+      if (agentStatus) {
+        steps.push({
+          id: 'agent',
+          label: replicaLabel(agentStatus, t('Agents')),
+          data: {
+            status: stateToRunStatus(agentStatus),
+            selected: selectedTypes.includes('agent'),
+            onSelect: () => setSelectedTypes(['agent'])
+          }
+        });
+      }
+      if (processorStatus) {
+        steps.push({
+          id: 'collector',
+          label: replicaLabel(processorStatus, t('Collector')),
+          runAfterTasks: steps.length ? ['agent'] : [],
+          data: {
+            status: stateToRunStatus(processorStatus),
+            selected: selectedTypes.includes('collector'),
+            onSelect: () => setSelectedTypes(['collector'])
+          }
+        });
+      }
+      return toPipelineNodes(steps);
+    }
 
     if (existing?.spec?.agent?.type === 'eBPF') {
       steps.push({
@@ -340,18 +387,7 @@ export const Pipeline: React.FC<FlowCollectorPipelineProps> = ({ existing, selec
     }
 
     // Spread step fields first so width, height, and style are never overridden by ...s.
-    return steps.map(
-      s =>
-        ({
-          ...s,
-          type: s.type || taskNodeType,
-          width: 180,
-          height: 32,
-          style: {
-            padding: [45, 15]
-          }
-        }) as PipelineNodeModel
-    );
+    return toPipelineNodes(steps);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     existing?.spec,
@@ -361,6 +397,7 @@ export const Pipeline: React.FC<FlowCollectorPipelineProps> = ({ existing, selec
     lokiStatus,
     monitoringStatus,
     exporterStatuses,
+    flowCapture,
     selectedTypes,
     setSelectedTypes
   ]);

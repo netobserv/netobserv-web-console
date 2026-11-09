@@ -1,12 +1,9 @@
 import _ from 'lodash';
-import { flowCollectorSchema, flowMetricSchema, flowCollectorSliceSchema } from '../schemas';
-import { getFlowCollectorJS, getFlowMetricJS, getFlowCollectorSliceJS } from '../templates';
+import { flowCaptureSchema, flowCollectorSchema, flowCollectorSliceSchema, flowMetricSchema } from '../schemas';
+import { getFlowCollectorJS, getFlowCollectorSliceJS, getFlowMetricJS } from '../templates';
 
 /** Sample custom PrometheusRule for Network Health manager / edit flows in mock mode. */
-export const mockCustomPrometheusRule = (
-  name = 'netobserv-custom-surge',
-  namespace = 'openshift-monitoring'
-) => ({
+export const mockCustomPrometheusRule = (name = 'netobserv-custom-surge', namespace = 'openshift-monitoring') => ({
   apiVersion: 'monitoring.coreos.com/v1',
   kind: 'PrometheusRule',
   metadata: {
@@ -45,100 +42,100 @@ export const mockCustomPrometheusRule = (
 const mockFlowCollector = () => {
   const fc = _.cloneDeep(getFlowCollectorJS());
   fc.spec!.loki.enable = false;
-  fc.spec!.exporters = [{ type: "Kafka" }, { type: "OpenTelemetry" }]
+  fc.spec!.exporters = [{ type: 'Kafka' }, { type: 'OpenTelemetry' }];
   fc.status = {
-    "conditions": [
+    conditions: [
       {
-        "lastTransitionTime": "2025-04-08T09:01:44Z",
-        "message": "4 ready components, 0 with failure, 1 pending",
-        "reason": "Ready,Degraded",
-        "status": "True",
-        "type": "Ready"
+        lastTransitionTime: '2025-04-08T09:01:44Z',
+        message: '4 ready components, 0 with failure, 1 pending',
+        reason: 'Ready,Degraded',
+        status: 'True',
+        type: 'Ready'
       },
       {
-        "lastTransitionTime": "2025-04-08T09:01:43Z",
-        "message": "",
-        "reason": "Valid",
-        "status": "False",
-        "type": "ConfigurationIssue"
+        lastTransitionTime: '2025-04-08T09:01:43Z',
+        message: '',
+        reason: 'Valid',
+        status: 'False',
+        type: 'ConfigurationIssue'
       },
       {
-        "lastTransitionTime": "2025-04-08T09:01:44Z",
-        "message": "",
-        "reason": "Ready",
-        "status": "True",
-        "type": "AgentReady"
+        lastTransitionTime: '2025-04-08T09:01:44Z',
+        message: '',
+        reason: 'Ready',
+        status: 'True',
+        type: 'AgentReady'
       },
       {
-        "lastTransitionTime": "2025-04-08T09:01:45Z",
-        "message": "",
-        "reason": "Ready",
-        "status": "True",
-        "type": "ProcessorReady"
+        lastTransitionTime: '2025-04-08T09:01:45Z',
+        message: '',
+        reason: 'Ready',
+        status: 'True',
+        type: 'ProcessorReady'
       },
       {
-        "lastTransitionTime": "2025-04-08T09:01:44Z",
+        lastTransitionTime: '2025-04-08T09:01:44Z',
         // eslint-disable-next-line max-len
-        "message": "Deployment netobserv-plugin not ready: 1/1 (Deployment does not have minimum availability.)",
-        "reason": "DeploymentNotReady",
-        "status": "False",
-        "type": "PluginReady"
+        message: 'Deployment netobserv-plugin not ready: 1/1 (Deployment does not have minimum availability.)',
+        reason: 'DeploymentNotReady',
+        status: 'False',
+        type: 'PluginReady'
       },
       {
-        "lastTransitionTime": "2025-04-08T09:01:44Z",
-        "message": "",
-        "reason": "Ready",
-        "status": "True",
-        "type": "MonitoringReady"
+        lastTransitionTime: '2025-04-08T09:01:44Z',
+        message: '',
+        reason: 'Ready',
+        status: 'True',
+        type: 'MonitoringReady'
       },
       {
-        "lastTransitionTime": "2026-01-15T16:05:26Z",
+        lastTransitionTime: '2026-01-15T16:05:26Z',
         // eslint-disable-next-line max-len
-        "message": "LokiStack has warnings [name: loki, namespace: netobserv]: Warning: schema needs update",
-        "reason": "LokiStackWarnings",
-        "status": "True",
-        "type": "LokiWarning"
+        message: 'LokiStack has warnings [name: loki, namespace: netobserv]: Warning: schema needs update',
+        reason: 'LokiStackWarnings',
+        status: 'True',
+        type: 'LokiWarning'
       }
     ],
-    "components": {
-      "agent": {
-        "state": "Ready",
-        "desiredReplicas": 3,
-        "readyReplicas": 3
+    components: {
+      agent: {
+        state: 'Ready',
+        desiredReplicas: 3,
+        readyReplicas: 3
       },
-      "processor": {
-        "state": "Ready",
-        "desiredReplicas": 1,
-        "readyReplicas": 1
+      processor: {
+        state: 'Ready',
+        desiredReplicas: 1,
+        readyReplicas: 1
       },
-      "plugin": {
-        "state": "InProgress",
-        "reason": "DeploymentNotReady",
+      plugin: {
+        state: 'InProgress',
+        reason: 'DeploymentNotReady',
         // eslint-disable-next-line max-len
-        "message": "Deployment netobserv-plugin not ready: 1/1",
-        "desiredReplicas": 1,
-        "readyReplicas": 0
+        message: 'Deployment netobserv-plugin not ready: 1/1',
+        desiredReplicas: 1,
+        readyReplicas: 0
       }
     },
-    "integrations": {
-      "monitoring": {
-        "state": "Ready"
+    integrations: {
+      monitoring: {
+        state: 'Ready'
       },
-      "loki": {
-        "state": "Unused"
+      loki: {
+        state: 'Unused'
       },
-      "exporters": [
+      exporters: [
         {
-          "name": "kafka-exporter",
-          "type": "Kafka",
-          "state": "Ready",
-          "reason": "Configured"
+          name: 'kafka-exporter',
+          type: 'Kafka',
+          state: 'Ready',
+          reason: 'Configured'
         },
         {
-          "name": "otel-exporter",
-          "type": "OpenTelemetry",
-          "state": "Ready",
-          "reason": "Configured"
+          name: 'otel-exporter',
+          type: 'OpenTelemetry',
+          state: 'Ready',
+          reason: 'Configured'
         }
       ]
     }
@@ -147,7 +144,13 @@ const mockFlowCollector = () => {
 };
 
 // File only used in tests console
-export function mockK8SResource(req: any, setResource: (r: any) => void, setLoaded: (r: boolean) => void, isReload: boolean, onChange: () => void) {
+export function mockK8SResource(
+  req: any,
+  setResource: (r: any) => void,
+  setLoaded: (r: boolean) => void,
+  isReload: boolean,
+  onChange: () => void
+) {
   const kind = req.kind || req.groupVersionKind.kind;
   // simulate a loading
   if (!isReload) {
@@ -168,14 +171,16 @@ export function mockK8SResource(req: any, setResource: (r: any) => void, setLoad
                   plural: 'flowcollectors'
                 },
                 scope: 'Cluster',
-                versions: [{
-                  name: 'v1beta2',
-                  served: true,
-                  storage: true,
-                  schema: {
-                    openAPIV3Schema: flowCollectorSchema,
+                versions: [
+                  {
+                    name: 'v1beta2',
+                    served: true,
+                    storage: true,
+                    schema: {
+                      openAPIV3Schema: flowCollectorSchema
+                    }
                   }
-                }]
+                ]
               }
             });
           } else if (req.name === 'flowcollectorslices.flows.netobserv.io') {
@@ -192,14 +197,35 @@ export function mockK8SResource(req: any, setResource: (r: any) => void, setLoad
                   plural: 'flowcollectorslices'
                 },
                 scope: 'Namespaced',
-                versions: [{
-                  name: 'v1alpha1',
-                  served: true,
-                  storage: true,
-                  schema: {
-                    openAPIV3Schema: flowCollectorSliceSchema
+                versions: [
+                  {
+                    name: 'v1alpha1',
+                    served: true,
+                    storage: true,
+                    schema: {
+                      openAPIV3Schema: flowCollectorSliceSchema
+                    }
                   }
-                }]
+                ]
+              }
+            });
+          } else if (req.name === 'flowcaptures.flows.netobserv.io') {
+            setResource({
+              apiVersion: 'apiextensions.k8s.io/v1',
+              kind: 'CustomResourceDefinition',
+              metadata: { name: req.name },
+              spec: {
+                group: 'flows.netobserv.io',
+                names: { kind: 'FlowCapture', plural: 'flowcaptures' },
+                scope: 'Namespaced',
+                versions: [
+                  {
+                    name: 'v1alpha1',
+                    served: true,
+                    storage: true,
+                    schema: { openAPIV3Schema: flowCaptureSchema }
+                  }
+                ]
               }
             });
           } else {
@@ -216,14 +242,16 @@ export function mockK8SResource(req: any, setResource: (r: any) => void, setLoad
                   plural: 'flowmetrics'
                 },
                 scope: 'Namespaced',
-                versions: [{
-                  name: 'v1alpha1',
-                  served: true,
-                  storage: true,
-                  schema: {
-                    openAPIV3Schema: flowMetricSchema
+                versions: [
+                  {
+                    name: 'v1alpha1',
+                    served: true,
+                    storage: true,
+                    schema: {
+                      openAPIV3Schema: flowMetricSchema
+                    }
                   }
-                }]
+                ]
               }
             });
           }
@@ -244,6 +272,28 @@ export function mockK8SResource(req: any, setResource: (r: any) => void, setLoad
             fm.spec!.metricName = 'test_metric';
             setResource(fm);
           }
+          break;
+        case 'FlowCapture':
+          setResource({
+            apiVersion: 'flows.netobserv.io/v1alpha1',
+            kind: 'FlowCapture',
+            metadata: { name: req.name || 'flowcapture-sample', namespace: req.namespace || 'default' },
+            spec: { outputType: 'flows' },
+            status: {
+              phase: 'Completed',
+              reason: 'CaptureCompleted',
+              message: 'Mock capture completed',
+              conditions: [
+                {
+                  type: 'Completed',
+                  status: 'True',
+                  reason: 'CaptureCompleted',
+                  message: 'Mock capture completed',
+                  lastTransitionTime: new Date().toISOString()
+                }
+              ]
+            }
+          });
           break;
         case 'PrometheusRule':
           if (req.isList) {

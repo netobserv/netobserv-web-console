@@ -55,7 +55,11 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [discard, discardModal] = useDiscardGuard();
-  const isSetupRoute = window.location.pathname.startsWith(flowCollectorPath('setup')!);
+  // The Console's initialization-resource flow uses the ~new route with an
+  // empty `useInitializationResource` query parameter. It is still the
+  // FlowCollector setup wizard and must receive the same defaults as /setup.
+  const isSetupRoute =
+    window.location.pathname.startsWith(flowCollectorPath('setup')!) || searchParams.has('useInitializationResource');
 
   const validSteps = Object.keys(stepPaths);
   const initialTab = searchParams.get('tab');
@@ -120,6 +124,15 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
       if (!data) {
         return;
       }
+      if (!data.spec) {
+        data.spec = {};
+      }
+      if (!data.spec.agent) {
+        data.spec.agent = {};
+      }
+      if (!data.spec.agent.ebpf) {
+        data.spec.agent.ebpf = {};
+      }
       data.spec.agent.ebpf.sampling = sampling;
       setData({ ...data });
     },
@@ -153,12 +166,28 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
           if (data == null) {
             // when on /setup route, use existing FC data as-is
             if (isSetupRoute || params.name === 'cluster') {
-              setData(ctx.data);
+              const setupData = _.cloneDeep(ctx.data) as any;
+              setupData.metadata = { ...(setupData.metadata ?? {}), name: setupData.metadata?.name || 'cluster' };
+              setupData.spec = { ...(setupData.spec ?? {}) };
+              setupData.spec.deploymentModel = setupData.spec.deploymentModel || 'Service';
+              setupData.spec.agent = { ...(setupData.spec.agent ?? {}), type: setupData.spec.agent?.type || 'eBPF' };
+              setupData.spec.agent.ebpf = { ...(setupData.spec.agent.ebpf ?? {}) };
+              if (setupData.spec.agent.ebpf.sampling === undefined) {
+                setupData.spec.agent.ebpf.sampling = 50;
+              }
+              setData(setupData);
             } else {
               // slightly modify default example when creating a new resource
               const updatedData = _.cloneDeep(ctx.data) as any;
+              updatedData.metadata = { ...(updatedData.metadata ?? {}), name: updatedData.metadata?.name || 'cluster' };
               if (!updatedData.spec) {
                 updatedData.spec = {};
+              }
+              updatedData.spec.deploymentModel = updatedData.spec.deploymentModel || 'Service';
+              updatedData.spec.agent = { ...(updatedData.spec.agent ?? {}), type: updatedData.spec.agent?.type || 'eBPF' };
+              updatedData.spec.agent.ebpf = { ...(updatedData.spec.agent.ebpf ?? {}) };
+              if (updatedData.spec.agent.ebpf.sampling === undefined) {
+                updatedData.spec.agent.ebpf.sampling = 50;
               }
               if (!updatedData.spec.loki) {
                 updatedData.spec.loki = {};
