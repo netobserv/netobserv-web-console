@@ -29,6 +29,12 @@ updates:
         update-types: ["version-update:semver-major"] # must stay aligned with openshift console
       - dependency-name: "react"
         update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
+      - dependency-name: "@patternfly/patternfly"
+        update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
+      - dependency-name: "@patternfly/react-core"
+        update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
+      - dependency-name: "@patternfly/react-drag-drop"
+        update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
       - dependency-name: "mobx"
         update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
       - dependency-name: "cypress"
@@ -65,6 +71,12 @@ updates:
       - dependency-name: "@openshift-console/dynamic-plugin-sdk"
         update-types: ["version-update:semver-major"] # must stay aligned with openshift console
       - dependency-name: "react"
+        update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
+      - dependency-name: "@patternfly/patternfly"
+        update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
+      - dependency-name: "@patternfly/react-core"
+        update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
+      - dependency-name: "@patternfly/react-drag-drop"
         update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
       - dependency-name: "mobx"
         update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
