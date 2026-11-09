@@ -32,7 +32,7 @@ var flowCaptureGVR = schema.GroupVersionResource{
 
 // DownloadFlowCaptureOutput streams the collector's output directory as a gzip archive.
 // The pod and path are resolved server-side from the FlowCapture; neither is accepted from the client.
-func (h *Handlers) DownloadFlowCaptureOutput(ctx context.Context) func(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) DownloadFlowCaptureOutput(_ context.Context) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		namespace, name := vars["namespace"], vars["name"]
@@ -105,7 +105,7 @@ func (h *Handlers) DownloadFlowCaptureOutput(ctx context.Context) func(w http.Re
 				Container: container,
 				// A running capture may not have created its output directory yet. In
 				// that case return an empty, valid archive instead of failing the exec.
-				Command: []string{"sh", "-c", "if [ -d output ]; then exec tar -C output -cf - .; fi"},
+				Command: []string{"sh", "-c", fmt.Sprintf("if [ -d %s ]; then exec tar -C %s -cf - .; fi", flowCaptureOutputDirectory, flowCaptureOutputDirectory)},
 				Stdout:  true,
 				Stderr:  true,
 			}, scheme.ParameterCodec)
@@ -152,9 +152,9 @@ func selectFlowCaptureCollector(pods []corev1.Pod) *corev1.Pod {
 }
 
 func flowCaptureCollectorContainer(pod *corev1.Pod) string {
-	for _, container := range pod.Spec.Containers {
-		if container.Name == "collector" {
-			return container.Name
+	for i := range pod.Spec.Containers {
+		if pod.Spec.Containers[i].Name == "collector" {
+			return pod.Spec.Containers[i].Name
 		}
 	}
 	if len(pod.Spec.Containers) > 0 {
