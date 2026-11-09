@@ -25,6 +25,10 @@ updates:
         patterns:
           - "cypress"
     ignore:
+      - dependency-name: "@openshift-console/dynamic-plugin-sdk"
+        update-types: ["version-update:semver-major"] # must stay aligned with openshift console
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
       - dependency-name: "mobx"
         update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
       - dependency-name: "cypress"
@@ -58,6 +62,10 @@ updates:
         patterns:
           - "cypress"
     ignore:
+      - dependency-name: "@openshift-console/dynamic-plugin-sdk"
+        update-types: ["version-update:semver-major"] # must stay aligned with openshift console
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
       - dependency-name: "mobx"
         update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
       - dependency-name: "cypress"
