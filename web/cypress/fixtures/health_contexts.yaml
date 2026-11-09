@@ -1,0 +1,40 @@
+# OVN context tab
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: qe-health-context-ovn
+  namespace: openshift-monitoring
+spec:
+  groups:
+    - name: cluster-network-operator-ovn.rules
+      rules:
+        - alert: NodeWithoutOVNKubeNodePodRunning
+          expr: vector(1)
+          for: 0s
+          labels:
+            severity: warning
+            node: qe-synthetic-node
+          annotations:
+            summary: "QE synthetic OVN platform alert"
+            description: "Synthetic alert used to assert the OVN context tab renders."
+---
+# Third-party context tab
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: qe-health-context-thirdparty
+  namespace: openshift-monitoring
+spec:
+  groups:
+    - name: qe-thirdparty.rules
+      rules:
+        - alert: QEThirdPartyContextProbe
+          expr: vector(1)
+          for: 0s
+          labels:
+            severity: critical
+            netobserv: "true"
+          annotations:
+            summary: "QE third-party context probe"
+            description: "Synthetic alert used to assert an annotation-routed context tab renders."
+            netobserv_io_network_health: '{"contextTab":"qe","displayName":"QE Platform"}'
