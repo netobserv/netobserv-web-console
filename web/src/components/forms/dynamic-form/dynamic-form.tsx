@@ -4,6 +4,9 @@ import Form, { FormProps } from '@rjsf/core';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
+import { FlowCaptureFiltersField } from '../flowCapture/filters-widget';
+import { NodeSelectorField } from '../flowCapture/node-selector-widget';
+import { TLSPlaintextField } from '../flowCapture/tls-plaintext-field';
 import { getUpdatedCR } from '../utils';
 import { K8sUISchema } from './const';
 import './dynamic-form.css';
@@ -75,7 +78,13 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
             {...restProps}
             className="co-dynamic-form"
             noValidate={noValidate}
-            fields={{ ...defaultFields, ...fields }}
+            fields={{
+              ...defaultFields,
+              flowCaptureFilters: FlowCaptureFiltersField,
+              nodeSelector: NodeSelectorField,
+              flowCaptureTLSPlaintext: TLSPlaintextField,
+              ...fields
+            }}
             formContext={{ ...formContext, formData }}
             formData={formData}
             experimental_defaultFormStateBehavior={

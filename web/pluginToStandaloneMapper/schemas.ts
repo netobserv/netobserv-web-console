@@ -5,6781 +5,6872 @@
 /* eslint-disable max-len */
 import { RJSFSchema } from '@rjsf/utils';
 
+// FlowCapture schema used by the standalone mock form.
+export const flowCaptureSchema: RJSFSchema | any = {
+  type: 'object',
+  properties: {
+    apiVersion: { type: 'string' },
+    kind: { type: 'string' },
+    metadata: {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        namespace: { type: 'string' }
+      }
+    },
+    spec: {
+      type: 'object',
+      properties: {
+        outputType: { type: 'string', enum: ['flows', 'packets', 'metrics'] },
+        maxTime: { type: 'string', default: '1h' },
+        maxBytes: { type: 'integer', minimum: 0, default: 0 },
+        sampling: { type: 'integer', minimum: 1, default: 1 },
+        interfaces: { type: 'array', items: { type: 'string' } },
+        excludeInterfaces: { type: 'array', items: { type: 'string' } },
+        features: {
+          type: 'array',
+          items: {
+            type: 'string',
+            enum: [
+              'PacketDrop',
+              'DNSTracking',
+              'FlowRTT',
+              'NetworkEvents',
+              'PacketTranslation',
+              'UDNMapping',
+              'IPSec',
+              'TLSTracking',
+              'SecondaryNetworks'
+            ]
+          }
+        },
+        filters: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              direction: { type: 'string', enum: ['ingress', 'egress'] },
+              ip_cidr: { type: 'string' },
+              protocol: { type: 'string' },
+              source_port: { type: 'integer' },
+              destination_port: { type: 'integer' },
+              port: { type: 'integer' },
+              peer_ip: { type: 'string' },
+              peer_cidr: { type: 'string' },
+              action: { type: 'string' },
+              tcp_flags: { type: 'string' }
+            }
+          }
+        },
+        queries: {
+          type: 'array',
+          items: { type: 'string' }
+        },
+        getSubnets: { type: 'boolean' },
+        tlsPlaintext: {
+          type: 'object',
+          properties: {
+            minBytes: { type: 'integer', minimum: 0 },
+            previewBytes: { type: 'integer', minimum: 0 },
+            processAllowlist: { type: 'array', items: { type: 'string' } }
+          }
+        },
+        nodeSelector: { type: 'object', additionalProperties: { type: 'string' } }
+      }
+    }
+  }
+};
+
 // flowCollectorSchema is only used in tests or dev console
 export const flowCollectorSchema: RJSFSchema | any = {
-  "description": "`FlowCollector` is the schema for the network flows collection API, which pilots and configures the underlying deployments.",
-  "properties": {
-    "apiVersion": {
-      "description": "APIVersion defines the versioned schema of this representation of an object.\nServers should convert recognized schemas to the latest internal value, and\nmay reject unrecognized values.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-      "type": "string"
+  description:
+    '`FlowCollector` is the schema for the network flows collection API, which pilots and configures the underlying deployments.',
+  properties: {
+    apiVersion: {
+      description:
+        'APIVersion defines the versioned schema of this representation of an object.\nServers should convert recognized schemas to the latest internal value, and\nmay reject unrecognized values.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources',
+      type: 'string'
     },
-    "kind": {
-      "description": "Kind is a string value representing the REST resource this object represents.\nServers may infer this from the endpoint the client submits requests to.\nCannot be updated.\nIn CamelCase.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-      "type": "string"
+    kind: {
+      description:
+        'Kind is a string value representing the REST resource this object represents.\nServers may infer this from the endpoint the client submits requests to.\nCannot be updated.\nIn CamelCase.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds',
+      type: 'string'
     },
-    "metadata": {
-      "properties": {
-        "name": {
-          "pattern": "^cluster$",
-          "type": "string"
+    metadata: {
+      properties: {
+        name: {
+          pattern: '^cluster$',
+          type: 'string'
         }
       },
-      "type": "object"
+      type: 'object'
     },
-    "spec": {
-      "description": "Defines the desired state of the FlowCollector resource.\n<br><br>\n*: the mention of \"unsupported\" or \"deprecated\" for a feature throughout this document means that this feature\nis not officially supported by Red Hat. It might have been, for example, contributed by the community\nand accepted without a formal agreement for maintenance. The product maintainers might provide some support\nfor these features as a best effort only.",
-      "properties": {
-        "agent": {
-          "description": "Agent configuration for flows extraction.",
-          "properties": {
-            "ebpf": {
-              "description": "`ebpf` describes the settings related to the eBPF-based flow reporter when `spec.agent.type`\nis set to `eBPF`.",
-              "properties": {
-                "advanced": {
-                  "description": "`advanced` allows setting some aspects of the internal configuration of the eBPF agent.\nThis section is aimed mostly for debugging and fine-grained performance optimizations,\nsuch as `GOGC` and `GOMAXPROCS` environment variables. Set these values at your own risk. You can also\noverride the default Linux capabilities from there.",
-                  "properties": {
-                    "capOverride": {
-                      "description": "Linux capabilities override, when not running as privileged. Default capabilities are BPF, PERFMON and NET_ADMIN.\nSYS_ADMIN may also be used depending on which features are enabled. `capOverride` replaces these defaults.",
-                      "items": {
-                        "type": "string"
+    spec: {
+      description:
+        'Defines the desired state of the FlowCollector resource.\n<br><br>\n*: the mention of "unsupported" or "deprecated" for a feature throughout this document means that this feature\nis not officially supported by Red Hat. It might have been, for example, contributed by the community\nand accepted without a formal agreement for maintenance. The product maintainers might provide some support\nfor these features as a best effort only.',
+      properties: {
+        agent: {
+          description: 'Agent configuration for flows extraction.',
+          properties: {
+            ebpf: {
+              description:
+                '`ebpf` describes the settings related to the eBPF-based flow reporter when `spec.agent.type`\nis set to `eBPF`.',
+              properties: {
+                advanced: {
+                  description:
+                    '`advanced` allows setting some aspects of the internal configuration of the eBPF agent.\nThis section is aimed mostly for debugging and fine-grained performance optimizations,\nsuch as `GOGC` and `GOMAXPROCS` environment variables. Set these values at your own risk. You can also\noverride the default Linux capabilities from there.',
+                  properties: {
+                    capOverride: {
+                      description:
+                        'Linux capabilities override, when not running as privileged. Default capabilities are BPF, PERFMON and NET_ADMIN.\nSYS_ADMIN may also be used depending on which features are enabled. `capOverride` replaces these defaults.',
+                      items: {
+                        type: 'string'
                       },
-                      "type": "array"
+                      type: 'array'
                     },
-                    "env": {
-                      "additionalProperties": {
-                        "type": "string"
+                    env: {
+                      additionalProperties: {
+                        type: 'string'
                       },
-                      "description": "`env` allows passing custom environment variables to underlying components. Useful for passing\nsome very concrete performance-tuning options, such as `GOGC` and `GOMAXPROCS`, that should not be\npublicly exposed as part of the FlowCollector descriptor, as they are only useful\nin edge debug or support scenarios.",
-                      "type": "object"
+                      description:
+                        '`env` allows passing custom environment variables to underlying components. Useful for passing\nsome very concrete performance-tuning options, such as `GOGC` and `GOMAXPROCS`, that should not be\npublicly exposed as part of the FlowCollector descriptor, as they are only useful\nin edge debug or support scenarios.',
+                      type: 'object'
                     },
-                    "scheduling": {
-                      "description": "scheduling controls how the pods are scheduled on nodes.",
-                      "properties": {
-                        "affinity": {
-                          "description": "If specified, the pod's scheduling constraints. For documentation, refer to https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling.",
-                          "properties": {
-                            "nodeAffinity": {
-                              "description": "Describes node affinity scheduling rules for the pod.",
-                              "properties": {
-                                "preferredDuringSchedulingIgnoredDuringExecution": {
-                                  "description": "The scheduler will prefer to schedule pods to nodes that satisfy\nthe affinity expressions specified by this field, but it may choose\na node that violates one or more of the expressions. The node that is\nmost preferred is the one with the greatest sum of weights, i.e.\nfor each node that meets all of the scheduling requirements (resource\nrequest, requiredDuringScheduling affinity expressions, etc.),\ncompute a sum by iterating through the elements of this field and adding\n\"weight\" to the sum if the node matches the corresponding matchExpressions; the\nnode(s) with the highest sum are the most preferred.",
-                                  "items": {
-                                    "description": "An empty preferred scheduling term matches all objects with implicit weight 0\n(i.e. it's a no-op). A null preferred scheduling term matches no objects (i.e. is also a no-op).",
-                                    "properties": {
-                                      "preference": {
-                                        "description": "A node selector term, associated with the corresponding weight.",
-                                        "properties": {
-                                          "matchExpressions": {
-                                            "description": "A list of node selector requirements by node's labels.",
-                                            "items": {
-                                              "description": "A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.",
-                                              "properties": {
-                                                "key": {
-                                                  "description": "The label key that the selector applies to.",
-                                                  "type": "string"
+                    scheduling: {
+                      description: 'scheduling controls how the pods are scheduled on nodes.',
+                      properties: {
+                        affinity: {
+                          description:
+                            "If specified, the pod's scheduling constraints. For documentation, refer to https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling.",
+                          properties: {
+                            nodeAffinity: {
+                              description: 'Describes node affinity scheduling rules for the pod.',
+                              properties: {
+                                preferredDuringSchedulingIgnoredDuringExecution: {
+                                  description:
+                                    'The scheduler will prefer to schedule pods to nodes that satisfy\nthe affinity expressions specified by this field, but it may choose\na node that violates one or more of the expressions. The node that is\nmost preferred is the one with the greatest sum of weights, i.e.\nfor each node that meets all of the scheduling requirements (resource\nrequest, requiredDuringScheduling affinity expressions, etc.),\ncompute a sum by iterating through the elements of this field and adding\n"weight" to the sum if the node matches the corresponding matchExpressions; the\nnode(s) with the highest sum are the most preferred.',
+                                  items: {
+                                    description:
+                                      "An empty preferred scheduling term matches all objects with implicit weight 0\n(i.e. it's a no-op). A null preferred scheduling term matches no objects (i.e. is also a no-op).",
+                                    properties: {
+                                      preference: {
+                                        description: 'A node selector term, associated with the corresponding weight.',
+                                        properties: {
+                                          matchExpressions: {
+                                            description: "A list of node selector requirements by node's labels.",
+                                            items: {
+                                              description:
+                                                'A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.',
+                                              properties: {
+                                                key: {
+                                                  description: 'The label key that the selector applies to.',
+                                                  type: 'string'
                                                 },
-                                                "operator": {
-                                                  "description": "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
-                                                  "type": "string"
+                                                operator: {
+                                                  description:
+                                                    "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
+                                                  type: 'string'
                                                 },
-                                                "values": {
-                                                  "description": "An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.",
-                                                  "items": {
-                                                    "type": "string"
+                                                values: {
+                                                  description:
+                                                    'An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.',
+                                                  items: {
+                                                    type: 'string'
                                                   },
-                                                  "type": "array",
-                                                  "x-kubernetes-list-type": "atomic"
+                                                  type: 'array',
+                                                  'x-kubernetes-list-type': 'atomic'
                                                 }
                                               },
-                                              "required": [
-                                                "key",
-                                                "operator"
-                                              ],
-                                              "type": "object"
+                                              required: ['key', 'operator'],
+                                              type: 'object'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "matchFields": {
-                                            "description": "A list of node selector requirements by node's fields.",
-                                            "items": {
-                                              "description": "A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.",
-                                              "properties": {
-                                                "key": {
-                                                  "description": "The label key that the selector applies to.",
-                                                  "type": "string"
+                                          matchFields: {
+                                            description: "A list of node selector requirements by node's fields.",
+                                            items: {
+                                              description:
+                                                'A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.',
+                                              properties: {
+                                                key: {
+                                                  description: 'The label key that the selector applies to.',
+                                                  type: 'string'
                                                 },
-                                                "operator": {
-                                                  "description": "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
-                                                  "type": "string"
+                                                operator: {
+                                                  description:
+                                                    "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
+                                                  type: 'string'
                                                 },
-                                                "values": {
-                                                  "description": "An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.",
-                                                  "items": {
-                                                    "type": "string"
+                                                values: {
+                                                  description:
+                                                    'An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.',
+                                                  items: {
+                                                    type: 'string'
                                                   },
-                                                  "type": "array",
-                                                  "x-kubernetes-list-type": "atomic"
+                                                  type: 'array',
+                                                  'x-kubernetes-list-type': 'atomic'
                                                 }
                                               },
-                                              "required": [
-                                                "key",
-                                                "operator"
-                                              ],
-                                              "type": "object"
+                                              required: ['key', 'operator'],
+                                              type: 'object'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           }
                                         },
-                                        "type": "object",
-                                        "x-kubernetes-map-type": "atomic"
+                                        type: 'object',
+                                        'x-kubernetes-map-type': 'atomic'
                                       },
-                                      "weight": {
-                                        "description": "Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.",
-                                        "format": "int32",
-                                        "type": "integer"
+                                      weight: {
+                                        description:
+                                          'Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.',
+                                        format: 'int32',
+                                        type: 'integer'
                                       }
                                     },
-                                    "required": [
-                                      "preference",
-                                      "weight"
-                                    ],
-                                    "type": "object"
+                                    required: ['preference', 'weight'],
+                                    type: 'object'
                                   },
-                                  "type": "array",
-                                  "x-kubernetes-list-type": "atomic"
+                                  type: 'array',
+                                  'x-kubernetes-list-type': 'atomic'
                                 },
-                                "requiredDuringSchedulingIgnoredDuringExecution": {
-                                  "description": "If the affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to an update), the system\nmay or may not try to eventually evict the pod from its node.",
-                                  "properties": {
-                                    "nodeSelectorTerms": {
-                                      "description": "Required. A list of node selector terms. The terms are ORed.",
-                                      "items": {
-                                        "description": "A null or empty node selector term matches no objects. The requirements of\nthem are ANDed.\nThe TopologySelectorTerm type implements a subset of the NodeSelectorTerm.",
-                                        "properties": {
-                                          "matchExpressions": {
-                                            "description": "A list of node selector requirements by node's labels.",
-                                            "items": {
-                                              "description": "A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.",
-                                              "properties": {
-                                                "key": {
-                                                  "description": "The label key that the selector applies to.",
-                                                  "type": "string"
+                                requiredDuringSchedulingIgnoredDuringExecution: {
+                                  description:
+                                    'If the affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to an update), the system\nmay or may not try to eventually evict the pod from its node.',
+                                  properties: {
+                                    nodeSelectorTerms: {
+                                      description: 'Required. A list of node selector terms. The terms are ORed.',
+                                      items: {
+                                        description:
+                                          'A null or empty node selector term matches no objects. The requirements of\nthem are ANDed.\nThe TopologySelectorTerm type implements a subset of the NodeSelectorTerm.',
+                                        properties: {
+                                          matchExpressions: {
+                                            description: "A list of node selector requirements by node's labels.",
+                                            items: {
+                                              description:
+                                                'A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.',
+                                              properties: {
+                                                key: {
+                                                  description: 'The label key that the selector applies to.',
+                                                  type: 'string'
                                                 },
-                                                "operator": {
-                                                  "description": "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
-                                                  "type": "string"
+                                                operator: {
+                                                  description:
+                                                    "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
+                                                  type: 'string'
                                                 },
-                                                "values": {
-                                                  "description": "An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.",
-                                                  "items": {
-                                                    "type": "string"
+                                                values: {
+                                                  description:
+                                                    'An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.',
+                                                  items: {
+                                                    type: 'string'
                                                   },
-                                                  "type": "array",
-                                                  "x-kubernetes-list-type": "atomic"
+                                                  type: 'array',
+                                                  'x-kubernetes-list-type': 'atomic'
                                                 }
                                               },
-                                              "required": [
-                                                "key",
-                                                "operator"
-                                              ],
-                                              "type": "object"
+                                              required: ['key', 'operator'],
+                                              type: 'object'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "matchFields": {
-                                            "description": "A list of node selector requirements by node's fields.",
-                                            "items": {
-                                              "description": "A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.",
-                                              "properties": {
-                                                "key": {
-                                                  "description": "The label key that the selector applies to.",
-                                                  "type": "string"
+                                          matchFields: {
+                                            description: "A list of node selector requirements by node's fields.",
+                                            items: {
+                                              description:
+                                                'A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.',
+                                              properties: {
+                                                key: {
+                                                  description: 'The label key that the selector applies to.',
+                                                  type: 'string'
                                                 },
-                                                "operator": {
-                                                  "description": "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
-                                                  "type": "string"
+                                                operator: {
+                                                  description:
+                                                    "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
+                                                  type: 'string'
                                                 },
-                                                "values": {
-                                                  "description": "An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.",
-                                                  "items": {
-                                                    "type": "string"
+                                                values: {
+                                                  description:
+                                                    'An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.',
+                                                  items: {
+                                                    type: 'string'
                                                   },
-                                                  "type": "array",
-                                                  "x-kubernetes-list-type": "atomic"
+                                                  type: 'array',
+                                                  'x-kubernetes-list-type': 'atomic'
                                                 }
                                               },
-                                              "required": [
-                                                "key",
-                                                "operator"
-                                              ],
-                                              "type": "object"
+                                              required: ['key', 'operator'],
+                                              type: 'object'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           }
                                         },
-                                        "type": "object",
-                                        "x-kubernetes-map-type": "atomic"
+                                        type: 'object',
+                                        'x-kubernetes-map-type': 'atomic'
                                       },
-                                      "type": "array",
-                                      "x-kubernetes-list-type": "atomic"
+                                      type: 'array',
+                                      'x-kubernetes-list-type': 'atomic'
                                     }
                                   },
-                                  "required": [
-                                    "nodeSelectorTerms"
-                                  ],
-                                  "type": "object",
-                                  "x-kubernetes-map-type": "atomic"
+                                  required: ['nodeSelectorTerms'],
+                                  type: 'object',
+                                  'x-kubernetes-map-type': 'atomic'
                                 }
                               },
-                              "type": "object"
+                              type: 'object'
                             },
-                            "podAffinity": {
-                              "description": "Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).",
-                              "properties": {
-                                "preferredDuringSchedulingIgnoredDuringExecution": {
-                                  "description": "The scheduler will prefer to schedule pods to nodes that satisfy\nthe affinity expressions specified by this field, but it may choose\na node that violates one or more of the expressions. The node that is\nmost preferred is the one with the greatest sum of weights, i.e.\nfor each node that meets all of the scheduling requirements (resource\nrequest, requiredDuringScheduling affinity expressions, etc.),\ncompute a sum by iterating through the elements of this field and adding\n\"weight\" to the sum if the node has pods which matches the corresponding podAffinityTerm; the\nnode(s) with the highest sum are the most preferred.",
-                                  "items": {
-                                    "description": "The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)",
-                                    "properties": {
-                                      "podAffinityTerm": {
-                                        "description": "Required. A pod affinity term, associated with the corresponding weight.",
-                                        "properties": {
-                                          "labelSelector": {
-                                            "description": "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
-                                            "properties": {
-                                              "matchExpressions": {
-                                                "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                                "items": {
-                                                  "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                                  "properties": {
-                                                    "key": {
-                                                      "description": "key is the label key that the selector applies to.",
-                                                      "type": "string"
+                            podAffinity: {
+                              description:
+                                'Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).',
+                              properties: {
+                                preferredDuringSchedulingIgnoredDuringExecution: {
+                                  description:
+                                    'The scheduler will prefer to schedule pods to nodes that satisfy\nthe affinity expressions specified by this field, but it may choose\na node that violates one or more of the expressions. The node that is\nmost preferred is the one with the greatest sum of weights, i.e.\nfor each node that meets all of the scheduling requirements (resource\nrequest, requiredDuringScheduling affinity expressions, etc.),\ncompute a sum by iterating through the elements of this field and adding\n"weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the\nnode(s) with the highest sum are the most preferred.',
+                                  items: {
+                                    description:
+                                      'The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)',
+                                    properties: {
+                                      podAffinityTerm: {
+                                        description:
+                                          'Required. A pod affinity term, associated with the corresponding weight.',
+                                        properties: {
+                                          labelSelector: {
+                                            description:
+                                              "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
+                                            properties: {
+                                              matchExpressions: {
+                                                description:
+                                                  'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                                items: {
+                                                  description:
+                                                    'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                                  properties: {
+                                                    key: {
+                                                      description: 'key is the label key that the selector applies to.',
+                                                      type: 'string'
                                                     },
-                                                    "operator": {
-                                                      "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                                      "type": "string"
+                                                    operator: {
+                                                      description:
+                                                        "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                                      type: 'string'
                                                     },
-                                                    "values": {
-                                                      "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                                      "items": {
-                                                        "type": "string"
+                                                    values: {
+                                                      description:
+                                                        'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                                      items: {
+                                                        type: 'string'
                                                       },
-                                                      "type": "array",
-                                                      "x-kubernetes-list-type": "atomic"
+                                                      type: 'array',
+                                                      'x-kubernetes-list-type': 'atomic'
                                                     }
                                                   },
-                                                  "required": [
-                                                    "key",
-                                                    "operator"
-                                                  ],
-                                                  "type": "object"
+                                                  required: ['key', 'operator'],
+                                                  type: 'object'
                                                 },
-                                                "type": "array",
-                                                "x-kubernetes-list-type": "atomic"
+                                                type: 'array',
+                                                'x-kubernetes-list-type': 'atomic'
                                               },
-                                              "matchLabels": {
-                                                "additionalProperties": {
-                                                  "type": "string"
+                                              matchLabels: {
+                                                additionalProperties: {
+                                                  type: 'string'
                                                 },
-                                                "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                                "type": "object"
+                                                description:
+                                                  'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                                type: 'object'
                                               }
                                             },
-                                            "type": "object",
-                                            "x-kubernetes-map-type": "atomic"
+                                            type: 'object',
+                                            'x-kubernetes-map-type': 'atomic'
                                           },
-                                          "matchLabelKeys": {
-                                            "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
-                                            "items": {
-                                              "type": "string"
+                                          matchLabelKeys: {
+                                            description:
+                                              "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
+                                            items: {
+                                              type: 'string'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "mismatchLabelKeys": {
-                                            "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
-                                            "items": {
-                                              "type": "string"
+                                          mismatchLabelKeys: {
+                                            description:
+                                              "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
+                                            items: {
+                                              type: 'string'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "namespaceSelector": {
-                                            "description": "A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means \"this pod's namespace\".\nAn empty selector ({}) matches all namespaces.",
-                                            "properties": {
-                                              "matchExpressions": {
-                                                "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                                "items": {
-                                                  "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                                  "properties": {
-                                                    "key": {
-                                                      "description": "key is the label key that the selector applies to.",
-                                                      "type": "string"
+                                          namespaceSelector: {
+                                            description:
+                                              'A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means "this pod\'s namespace".\nAn empty selector ({}) matches all namespaces.',
+                                            properties: {
+                                              matchExpressions: {
+                                                description:
+                                                  'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                                items: {
+                                                  description:
+                                                    'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                                  properties: {
+                                                    key: {
+                                                      description: 'key is the label key that the selector applies to.',
+                                                      type: 'string'
                                                     },
-                                                    "operator": {
-                                                      "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                                      "type": "string"
+                                                    operator: {
+                                                      description:
+                                                        "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                                      type: 'string'
                                                     },
-                                                    "values": {
-                                                      "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                                      "items": {
-                                                        "type": "string"
+                                                    values: {
+                                                      description:
+                                                        'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                                      items: {
+                                                        type: 'string'
                                                       },
-                                                      "type": "array",
-                                                      "x-kubernetes-list-type": "atomic"
+                                                      type: 'array',
+                                                      'x-kubernetes-list-type': 'atomic'
                                                     }
                                                   },
-                                                  "required": [
-                                                    "key",
-                                                    "operator"
-                                                  ],
-                                                  "type": "object"
+                                                  required: ['key', 'operator'],
+                                                  type: 'object'
                                                 },
-                                                "type": "array",
-                                                "x-kubernetes-list-type": "atomic"
+                                                type: 'array',
+                                                'x-kubernetes-list-type': 'atomic'
                                               },
-                                              "matchLabels": {
-                                                "additionalProperties": {
-                                                  "type": "string"
+                                              matchLabels: {
+                                                additionalProperties: {
+                                                  type: 'string'
                                                 },
-                                                "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                                "type": "object"
+                                                description:
+                                                  'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                                type: 'object'
                                               }
                                             },
-                                            "type": "object",
-                                            "x-kubernetes-map-type": "atomic"
+                                            type: 'object',
+                                            'x-kubernetes-map-type': 'atomic'
                                           },
-                                          "namespaces": {
-                                            "description": "namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means \"this pod's namespace\".",
-                                            "items": {
-                                              "type": "string"
+                                          namespaces: {
+                                            description:
+                                              'namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means "this pod\'s namespace".',
+                                            items: {
+                                              type: 'string'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "topologyKey": {
-                                            "description": "This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.",
-                                            "type": "string"
+                                          topologyKey: {
+                                            description:
+                                              'This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.',
+                                            type: 'string'
                                           }
                                         },
-                                        "required": [
-                                          "topologyKey"
-                                        ],
-                                        "type": "object"
+                                        required: ['topologyKey'],
+                                        type: 'object'
                                       },
-                                      "weight": {
-                                        "description": "weight associated with matching the corresponding podAffinityTerm,\nin the range 1-100.",
-                                        "format": "int32",
-                                        "type": "integer"
+                                      weight: {
+                                        description:
+                                          'weight associated with matching the corresponding podAffinityTerm,\nin the range 1-100.',
+                                        format: 'int32',
+                                        type: 'integer'
                                       }
                                     },
-                                    "required": [
-                                      "podAffinityTerm",
-                                      "weight"
-                                    ],
-                                    "type": "object"
+                                    required: ['podAffinityTerm', 'weight'],
+                                    type: 'object'
                                   },
-                                  "type": "array",
-                                  "x-kubernetes-list-type": "atomic"
+                                  type: 'array',
+                                  'x-kubernetes-list-type': 'atomic'
                                 },
-                                "requiredDuringSchedulingIgnoredDuringExecution": {
-                                  "description": "If the affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to a pod label update), the\nsystem may or may not try to eventually evict the pod from its node.\nWhen there are multiple elements, the lists of nodes corresponding to each\npodAffinityTerm are intersected, i.e. all terms must be satisfied.",
-                                  "items": {
-                                    "description": "Defines a set of pods (namely those matching the labelSelector\nrelative to the given namespace(s)) that this pod should be\nco-located (affinity) or not co-located (anti-affinity) with,\nwhere co-located is defined as running on a node whose value of\nthe label with key <topologyKey> matches that of any node on which\na pod of the set of pods is running",
-                                    "properties": {
-                                      "labelSelector": {
-                                        "description": "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
-                                        "properties": {
-                                          "matchExpressions": {
-                                            "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                            "items": {
-                                              "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                              "properties": {
-                                                "key": {
-                                                  "description": "key is the label key that the selector applies to.",
-                                                  "type": "string"
+                                requiredDuringSchedulingIgnoredDuringExecution: {
+                                  description:
+                                    'If the affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to a pod label update), the\nsystem may or may not try to eventually evict the pod from its node.\nWhen there are multiple elements, the lists of nodes corresponding to each\npodAffinityTerm are intersected, i.e. all terms must be satisfied.',
+                                  items: {
+                                    description:
+                                      'Defines a set of pods (namely those matching the labelSelector\nrelative to the given namespace(s)) that this pod should be\nco-located (affinity) or not co-located (anti-affinity) with,\nwhere co-located is defined as running on a node whose value of\nthe label with key <topologyKey> matches that of any node on which\na pod of the set of pods is running',
+                                    properties: {
+                                      labelSelector: {
+                                        description:
+                                          "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
+                                        properties: {
+                                          matchExpressions: {
+                                            description:
+                                              'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                            items: {
+                                              description:
+                                                'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                              properties: {
+                                                key: {
+                                                  description: 'key is the label key that the selector applies to.',
+                                                  type: 'string'
                                                 },
-                                                "operator": {
-                                                  "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                                  "type": "string"
+                                                operator: {
+                                                  description:
+                                                    "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                                  type: 'string'
                                                 },
-                                                "values": {
-                                                  "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                                  "items": {
-                                                    "type": "string"
+                                                values: {
+                                                  description:
+                                                    'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                                  items: {
+                                                    type: 'string'
                                                   },
-                                                  "type": "array",
-                                                  "x-kubernetes-list-type": "atomic"
+                                                  type: 'array',
+                                                  'x-kubernetes-list-type': 'atomic'
                                                 }
                                               },
-                                              "required": [
-                                                "key",
-                                                "operator"
-                                              ],
-                                              "type": "object"
+                                              required: ['key', 'operator'],
+                                              type: 'object'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "matchLabels": {
-                                            "additionalProperties": {
-                                              "type": "string"
+                                          matchLabels: {
+                                            additionalProperties: {
+                                              type: 'string'
                                             },
-                                            "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                            "type": "object"
+                                            description:
+                                              'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                            type: 'object'
                                           }
                                         },
-                                        "type": "object",
-                                        "x-kubernetes-map-type": "atomic"
+                                        type: 'object',
+                                        'x-kubernetes-map-type': 'atomic'
                                       },
-                                      "matchLabelKeys": {
-                                        "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
-                                        "items": {
-                                          "type": "string"
+                                      matchLabelKeys: {
+                                        description:
+                                          "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
+                                        items: {
+                                          type: 'string'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "mismatchLabelKeys": {
-                                        "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
-                                        "items": {
-                                          "type": "string"
+                                      mismatchLabelKeys: {
+                                        description:
+                                          "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
+                                        items: {
+                                          type: 'string'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "namespaceSelector": {
-                                        "description": "A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means \"this pod's namespace\".\nAn empty selector ({}) matches all namespaces.",
-                                        "properties": {
-                                          "matchExpressions": {
-                                            "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                            "items": {
-                                              "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                              "properties": {
-                                                "key": {
-                                                  "description": "key is the label key that the selector applies to.",
-                                                  "type": "string"
+                                      namespaceSelector: {
+                                        description:
+                                          'A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means "this pod\'s namespace".\nAn empty selector ({}) matches all namespaces.',
+                                        properties: {
+                                          matchExpressions: {
+                                            description:
+                                              'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                            items: {
+                                              description:
+                                                'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                              properties: {
+                                                key: {
+                                                  description: 'key is the label key that the selector applies to.',
+                                                  type: 'string'
                                                 },
-                                                "operator": {
-                                                  "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                                  "type": "string"
+                                                operator: {
+                                                  description:
+                                                    "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                                  type: 'string'
                                                 },
-                                                "values": {
-                                                  "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                                  "items": {
-                                                    "type": "string"
+                                                values: {
+                                                  description:
+                                                    'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                                  items: {
+                                                    type: 'string'
                                                   },
-                                                  "type": "array",
-                                                  "x-kubernetes-list-type": "atomic"
+                                                  type: 'array',
+                                                  'x-kubernetes-list-type': 'atomic'
                                                 }
                                               },
-                                              "required": [
-                                                "key",
-                                                "operator"
-                                              ],
-                                              "type": "object"
+                                              required: ['key', 'operator'],
+                                              type: 'object'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "matchLabels": {
-                                            "additionalProperties": {
-                                              "type": "string"
+                                          matchLabels: {
+                                            additionalProperties: {
+                                              type: 'string'
                                             },
-                                            "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                            "type": "object"
+                                            description:
+                                              'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                            type: 'object'
                                           }
                                         },
-                                        "type": "object",
-                                        "x-kubernetes-map-type": "atomic"
+                                        type: 'object',
+                                        'x-kubernetes-map-type': 'atomic'
                                       },
-                                      "namespaces": {
-                                        "description": "namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means \"this pod's namespace\".",
-                                        "items": {
-                                          "type": "string"
+                                      namespaces: {
+                                        description:
+                                          'namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means "this pod\'s namespace".',
+                                        items: {
+                                          type: 'string'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "topologyKey": {
-                                        "description": "This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.",
-                                        "type": "string"
+                                      topologyKey: {
+                                        description:
+                                          'This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.',
+                                        type: 'string'
                                       }
                                     },
-                                    "required": [
-                                      "topologyKey"
-                                    ],
-                                    "type": "object"
+                                    required: ['topologyKey'],
+                                    type: 'object'
                                   },
-                                  "type": "array",
-                                  "x-kubernetes-list-type": "atomic"
+                                  type: 'array',
+                                  'x-kubernetes-list-type': 'atomic'
                                 }
                               },
-                              "type": "object"
+                              type: 'object'
                             },
-                            "podAntiAffinity": {
-                              "description": "Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).",
-                              "properties": {
-                                "preferredDuringSchedulingIgnoredDuringExecution": {
-                                  "description": "The scheduler will prefer to schedule pods to nodes that satisfy\nthe anti-affinity expressions specified by this field, but it may choose\na node that violates one or more of the expressions. The node that is\nmost preferred is the one with the greatest sum of weights, i.e.\nfor each node that meets all of the scheduling requirements (resource\nrequest, requiredDuringScheduling anti-affinity expressions, etc.),\ncompute a sum by iterating through the elements of this field and subtracting\n\"weight\" from the sum if the node has pods which matches the corresponding podAffinityTerm; the\nnode(s) with the highest sum are the most preferred.",
-                                  "items": {
-                                    "description": "The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)",
-                                    "properties": {
-                                      "podAffinityTerm": {
-                                        "description": "Required. A pod affinity term, associated with the corresponding weight.",
-                                        "properties": {
-                                          "labelSelector": {
-                                            "description": "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
-                                            "properties": {
-                                              "matchExpressions": {
-                                                "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                                "items": {
-                                                  "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                                  "properties": {
-                                                    "key": {
-                                                      "description": "key is the label key that the selector applies to.",
-                                                      "type": "string"
+                            podAntiAffinity: {
+                              description:
+                                'Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).',
+                              properties: {
+                                preferredDuringSchedulingIgnoredDuringExecution: {
+                                  description:
+                                    'The scheduler will prefer to schedule pods to nodes that satisfy\nthe anti-affinity expressions specified by this field, but it may choose\na node that violates one or more of the expressions. The node that is\nmost preferred is the one with the greatest sum of weights, i.e.\nfor each node that meets all of the scheduling requirements (resource\nrequest, requiredDuringScheduling anti-affinity expressions, etc.),\ncompute a sum by iterating through the elements of this field and subtracting\n"weight" from the sum if the node has pods which matches the corresponding podAffinityTerm; the\nnode(s) with the highest sum are the most preferred.',
+                                  items: {
+                                    description:
+                                      'The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)',
+                                    properties: {
+                                      podAffinityTerm: {
+                                        description:
+                                          'Required. A pod affinity term, associated with the corresponding weight.',
+                                        properties: {
+                                          labelSelector: {
+                                            description:
+                                              "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
+                                            properties: {
+                                              matchExpressions: {
+                                                description:
+                                                  'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                                items: {
+                                                  description:
+                                                    'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                                  properties: {
+                                                    key: {
+                                                      description: 'key is the label key that the selector applies to.',
+                                                      type: 'string'
                                                     },
-                                                    "operator": {
-                                                      "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                                      "type": "string"
+                                                    operator: {
+                                                      description:
+                                                        "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                                      type: 'string'
                                                     },
-                                                    "values": {
-                                                      "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                                      "items": {
-                                                        "type": "string"
+                                                    values: {
+                                                      description:
+                                                        'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                                      items: {
+                                                        type: 'string'
                                                       },
-                                                      "type": "array",
-                                                      "x-kubernetes-list-type": "atomic"
+                                                      type: 'array',
+                                                      'x-kubernetes-list-type': 'atomic'
                                                     }
                                                   },
-                                                  "required": [
-                                                    "key",
-                                                    "operator"
-                                                  ],
-                                                  "type": "object"
+                                                  required: ['key', 'operator'],
+                                                  type: 'object'
                                                 },
-                                                "type": "array",
-                                                "x-kubernetes-list-type": "atomic"
+                                                type: 'array',
+                                                'x-kubernetes-list-type': 'atomic'
                                               },
-                                              "matchLabels": {
-                                                "additionalProperties": {
-                                                  "type": "string"
+                                              matchLabels: {
+                                                additionalProperties: {
+                                                  type: 'string'
                                                 },
-                                                "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                                "type": "object"
+                                                description:
+                                                  'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                                type: 'object'
                                               }
                                             },
-                                            "type": "object",
-                                            "x-kubernetes-map-type": "atomic"
+                                            type: 'object',
+                                            'x-kubernetes-map-type': 'atomic'
                                           },
-                                          "matchLabelKeys": {
-                                            "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
-                                            "items": {
-                                              "type": "string"
+                                          matchLabelKeys: {
+                                            description:
+                                              "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
+                                            items: {
+                                              type: 'string'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "mismatchLabelKeys": {
-                                            "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
-                                            "items": {
-                                              "type": "string"
+                                          mismatchLabelKeys: {
+                                            description:
+                                              "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
+                                            items: {
+                                              type: 'string'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "namespaceSelector": {
-                                            "description": "A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means \"this pod's namespace\".\nAn empty selector ({}) matches all namespaces.",
-                                            "properties": {
-                                              "matchExpressions": {
-                                                "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                                "items": {
-                                                  "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                                  "properties": {
-                                                    "key": {
-                                                      "description": "key is the label key that the selector applies to.",
-                                                      "type": "string"
+                                          namespaceSelector: {
+                                            description:
+                                              'A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means "this pod\'s namespace".\nAn empty selector ({}) matches all namespaces.',
+                                            properties: {
+                                              matchExpressions: {
+                                                description:
+                                                  'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                                items: {
+                                                  description:
+                                                    'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                                  properties: {
+                                                    key: {
+                                                      description: 'key is the label key that the selector applies to.',
+                                                      type: 'string'
                                                     },
-                                                    "operator": {
-                                                      "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                                      "type": "string"
+                                                    operator: {
+                                                      description:
+                                                        "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                                      type: 'string'
                                                     },
-                                                    "values": {
-                                                      "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                                      "items": {
-                                                        "type": "string"
+                                                    values: {
+                                                      description:
+                                                        'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                                      items: {
+                                                        type: 'string'
                                                       },
-                                                      "type": "array",
-                                                      "x-kubernetes-list-type": "atomic"
+                                                      type: 'array',
+                                                      'x-kubernetes-list-type': 'atomic'
                                                     }
                                                   },
-                                                  "required": [
-                                                    "key",
-                                                    "operator"
-                                                  ],
-                                                  "type": "object"
+                                                  required: ['key', 'operator'],
+                                                  type: 'object'
                                                 },
-                                                "type": "array",
-                                                "x-kubernetes-list-type": "atomic"
+                                                type: 'array',
+                                                'x-kubernetes-list-type': 'atomic'
                                               },
-                                              "matchLabels": {
-                                                "additionalProperties": {
-                                                  "type": "string"
+                                              matchLabels: {
+                                                additionalProperties: {
+                                                  type: 'string'
                                                 },
-                                                "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                                "type": "object"
+                                                description:
+                                                  'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                                type: 'object'
                                               }
                                             },
-                                            "type": "object",
-                                            "x-kubernetes-map-type": "atomic"
+                                            type: 'object',
+                                            'x-kubernetes-map-type': 'atomic'
                                           },
-                                          "namespaces": {
-                                            "description": "namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means \"this pod's namespace\".",
-                                            "items": {
-                                              "type": "string"
+                                          namespaces: {
+                                            description:
+                                              'namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means "this pod\'s namespace".',
+                                            items: {
+                                              type: 'string'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "topologyKey": {
-                                            "description": "This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.",
-                                            "type": "string"
+                                          topologyKey: {
+                                            description:
+                                              'This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.',
+                                            type: 'string'
                                           }
                                         },
-                                        "required": [
-                                          "topologyKey"
-                                        ],
-                                        "type": "object"
+                                        required: ['topologyKey'],
+                                        type: 'object'
                                       },
-                                      "weight": {
-                                        "description": "weight associated with matching the corresponding podAffinityTerm,\nin the range 1-100.",
-                                        "format": "int32",
-                                        "type": "integer"
+                                      weight: {
+                                        description:
+                                          'weight associated with matching the corresponding podAffinityTerm,\nin the range 1-100.',
+                                        format: 'int32',
+                                        type: 'integer'
                                       }
                                     },
-                                    "required": [
-                                      "podAffinityTerm",
-                                      "weight"
-                                    ],
-                                    "type": "object"
+                                    required: ['podAffinityTerm', 'weight'],
+                                    type: 'object'
                                   },
-                                  "type": "array",
-                                  "x-kubernetes-list-type": "atomic"
+                                  type: 'array',
+                                  'x-kubernetes-list-type': 'atomic'
                                 },
-                                "requiredDuringSchedulingIgnoredDuringExecution": {
-                                  "description": "If the anti-affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the anti-affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to a pod label update), the\nsystem may or may not try to eventually evict the pod from its node.\nWhen there are multiple elements, the lists of nodes corresponding to each\npodAffinityTerm are intersected, i.e. all terms must be satisfied.",
-                                  "items": {
-                                    "description": "Defines a set of pods (namely those matching the labelSelector\nrelative to the given namespace(s)) that this pod should be\nco-located (affinity) or not co-located (anti-affinity) with,\nwhere co-located is defined as running on a node whose value of\nthe label with key <topologyKey> matches that of any node on which\na pod of the set of pods is running",
-                                    "properties": {
-                                      "labelSelector": {
-                                        "description": "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
-                                        "properties": {
-                                          "matchExpressions": {
-                                            "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                            "items": {
-                                              "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                              "properties": {
-                                                "key": {
-                                                  "description": "key is the label key that the selector applies to.",
-                                                  "type": "string"
+                                requiredDuringSchedulingIgnoredDuringExecution: {
+                                  description:
+                                    'If the anti-affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the anti-affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to a pod label update), the\nsystem may or may not try to eventually evict the pod from its node.\nWhen there are multiple elements, the lists of nodes corresponding to each\npodAffinityTerm are intersected, i.e. all terms must be satisfied.',
+                                  items: {
+                                    description:
+                                      'Defines a set of pods (namely those matching the labelSelector\nrelative to the given namespace(s)) that this pod should be\nco-located (affinity) or not co-located (anti-affinity) with,\nwhere co-located is defined as running on a node whose value of\nthe label with key <topologyKey> matches that of any node on which\na pod of the set of pods is running',
+                                    properties: {
+                                      labelSelector: {
+                                        description:
+                                          "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
+                                        properties: {
+                                          matchExpressions: {
+                                            description:
+                                              'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                            items: {
+                                              description:
+                                                'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                              properties: {
+                                                key: {
+                                                  description: 'key is the label key that the selector applies to.',
+                                                  type: 'string'
                                                 },
-                                                "operator": {
-                                                  "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                                  "type": "string"
+                                                operator: {
+                                                  description:
+                                                    "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                                  type: 'string'
                                                 },
-                                                "values": {
-                                                  "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                                  "items": {
-                                                    "type": "string"
+                                                values: {
+                                                  description:
+                                                    'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                                  items: {
+                                                    type: 'string'
                                                   },
-                                                  "type": "array",
-                                                  "x-kubernetes-list-type": "atomic"
+                                                  type: 'array',
+                                                  'x-kubernetes-list-type': 'atomic'
                                                 }
                                               },
-                                              "required": [
-                                                "key",
-                                                "operator"
-                                              ],
-                                              "type": "object"
+                                              required: ['key', 'operator'],
+                                              type: 'object'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "matchLabels": {
-                                            "additionalProperties": {
-                                              "type": "string"
+                                          matchLabels: {
+                                            additionalProperties: {
+                                              type: 'string'
                                             },
-                                            "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                            "type": "object"
+                                            description:
+                                              'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                            type: 'object'
                                           }
                                         },
-                                        "type": "object",
-                                        "x-kubernetes-map-type": "atomic"
+                                        type: 'object',
+                                        'x-kubernetes-map-type': 'atomic'
                                       },
-                                      "matchLabelKeys": {
-                                        "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
-                                        "items": {
-                                          "type": "string"
+                                      matchLabelKeys: {
+                                        description:
+                                          "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
+                                        items: {
+                                          type: 'string'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "mismatchLabelKeys": {
-                                        "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
-                                        "items": {
-                                          "type": "string"
+                                      mismatchLabelKeys: {
+                                        description:
+                                          "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
+                                        items: {
+                                          type: 'string'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "namespaceSelector": {
-                                        "description": "A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means \"this pod's namespace\".\nAn empty selector ({}) matches all namespaces.",
-                                        "properties": {
-                                          "matchExpressions": {
-                                            "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                            "items": {
-                                              "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                              "properties": {
-                                                "key": {
-                                                  "description": "key is the label key that the selector applies to.",
-                                                  "type": "string"
+                                      namespaceSelector: {
+                                        description:
+                                          'A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means "this pod\'s namespace".\nAn empty selector ({}) matches all namespaces.',
+                                        properties: {
+                                          matchExpressions: {
+                                            description:
+                                              'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                            items: {
+                                              description:
+                                                'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                              properties: {
+                                                key: {
+                                                  description: 'key is the label key that the selector applies to.',
+                                                  type: 'string'
                                                 },
-                                                "operator": {
-                                                  "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                                  "type": "string"
+                                                operator: {
+                                                  description:
+                                                    "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                                  type: 'string'
                                                 },
-                                                "values": {
-                                                  "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                                  "items": {
-                                                    "type": "string"
+                                                values: {
+                                                  description:
+                                                    'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                                  items: {
+                                                    type: 'string'
                                                   },
-                                                  "type": "array",
-                                                  "x-kubernetes-list-type": "atomic"
+                                                  type: 'array',
+                                                  'x-kubernetes-list-type': 'atomic'
                                                 }
                                               },
-                                              "required": [
-                                                "key",
-                                                "operator"
-                                              ],
-                                              "type": "object"
+                                              required: ['key', 'operator'],
+                                              type: 'object'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "matchLabels": {
-                                            "additionalProperties": {
-                                              "type": "string"
+                                          matchLabels: {
+                                            additionalProperties: {
+                                              type: 'string'
                                             },
-                                            "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                            "type": "object"
+                                            description:
+                                              'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                            type: 'object'
                                           }
                                         },
-                                        "type": "object",
-                                        "x-kubernetes-map-type": "atomic"
+                                        type: 'object',
+                                        'x-kubernetes-map-type': 'atomic'
                                       },
-                                      "namespaces": {
-                                        "description": "namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means \"this pod's namespace\".",
-                                        "items": {
-                                          "type": "string"
+                                      namespaces: {
+                                        description:
+                                          'namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means "this pod\'s namespace".',
+                                        items: {
+                                          type: 'string'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "topologyKey": {
-                                        "description": "This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.",
-                                        "type": "string"
+                                      topologyKey: {
+                                        description:
+                                          'This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.',
+                                        type: 'string'
                                       }
                                     },
-                                    "required": [
-                                      "topologyKey"
-                                    ],
-                                    "type": "object"
+                                    required: ['topologyKey'],
+                                    type: 'object'
                                   },
-                                  "type": "array",
-                                  "x-kubernetes-list-type": "atomic"
+                                  type: 'array',
+                                  'x-kubernetes-list-type': 'atomic'
                                 }
                               },
-                              "type": "object"
+                              type: 'object'
                             }
                           },
-                          "type": "object"
+                          type: 'object'
                         },
-                        "nodeSelector": {
-                          "additionalProperties": {
-                            "type": "string"
+                        nodeSelector: {
+                          additionalProperties: {
+                            type: 'string'
                           },
-                          "description": "`nodeSelector` allows scheduling of pods only onto nodes that have each of the specified labels.\nFor documentation, refer to https://kubernetes.io/docs/concepts/configuration/assign-pod-node/.",
-                          "type": "object",
-                          "x-kubernetes-map-type": "atomic"
+                          description:
+                            '`nodeSelector` allows scheduling of pods only onto nodes that have each of the specified labels.\nFor documentation, refer to https://kubernetes.io/docs/concepts/configuration/assign-pod-node/.',
+                          type: 'object',
+                          'x-kubernetes-map-type': 'atomic'
                         },
-                        "priorityClassName": {
-                          "description": "If specified, indicates the pod's priority. For documentation, refer to https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#how-to-use-priority-and-preemption.\nIf not specified, default priority is used, or zero if there is no default.",
-                          "type": "string"
+                        priorityClassName: {
+                          description:
+                            "If specified, indicates the pod's priority. For documentation, refer to https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#how-to-use-priority-and-preemption.\nIf not specified, default priority is used, or zero if there is no default.",
+                          type: 'string'
                         },
-                        "tolerations": {
-                          "description": "`tolerations` is a list of tolerations that allow the pod to schedule onto nodes with matching taints.\nFor documentation, refer to https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling.",
-                          "items": {
-                            "description": "The pod this Toleration is attached to tolerates any taint that matches\nthe triple <key,value,effect> using the matching operator <operator>.",
-                            "properties": {
-                              "effect": {
-                                "description": "Effect indicates the taint effect to match. Empty means match all taint effects.\nWhen specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.",
-                                "type": "string"
+                        tolerations: {
+                          description:
+                            '`tolerations` is a list of tolerations that allow the pod to schedule onto nodes with matching taints.\nFor documentation, refer to https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling.',
+                          items: {
+                            description:
+                              'The pod this Toleration is attached to tolerates any taint that matches\nthe triple <key,value,effect> using the matching operator <operator>.',
+                            properties: {
+                              effect: {
+                                description:
+                                  'Effect indicates the taint effect to match. Empty means match all taint effects.\nWhen specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.',
+                                type: 'string'
                               },
-                              "key": {
-                                "description": "Key is the taint key that the toleration applies to. Empty means match all taint keys.\nIf the key is empty, operator must be Exists; this combination means to match all values and all keys.",
-                                "type": "string"
+                              key: {
+                                description:
+                                  'Key is the taint key that the toleration applies to. Empty means match all taint keys.\nIf the key is empty, operator must be Exists; this combination means to match all values and all keys.',
+                                type: 'string'
                               },
-                              "operator": {
-                                "description": "Operator represents a key's relationship to the value.\nValid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.\nExists is equivalent to wildcard for value, so that a pod can\ntolerate all taints of a particular category.\nLt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).",
-                                "type": "string"
+                              operator: {
+                                description:
+                                  "Operator represents a key's relationship to the value.\nValid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.\nExists is equivalent to wildcard for value, so that a pod can\ntolerate all taints of a particular category.\nLt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).",
+                                type: 'string'
                               },
-                              "tolerationSeconds": {
-                                "description": "TolerationSeconds represents the period of time the toleration (which must be\nof effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,\nit is not set, which means tolerate the taint forever (do not evict). Zero and\nnegative values will be treated as 0 (evict immediately) by the system.",
-                                "format": "int64",
-                                "type": "integer"
+                              tolerationSeconds: {
+                                description:
+                                  'TolerationSeconds represents the period of time the toleration (which must be\nof effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,\nit is not set, which means tolerate the taint forever (do not evict). Zero and\nnegative values will be treated as 0 (evict immediately) by the system.',
+                                format: 'int64',
+                                type: 'integer'
                               },
-                              "value": {
-                                "description": "Value is the taint value the toleration matches to.\nIf the operator is Exists, the value should be empty, otherwise just a regular string.",
-                                "type": "string"
+                              value: {
+                                description:
+                                  'Value is the taint value the toleration matches to.\nIf the operator is Exists, the value should be empty, otherwise just a regular string.',
+                                type: 'string'
                               }
                             },
-                            "type": "object"
+                            type: 'object'
                           },
-                          "type": "array"
+                          type: 'array'
                         }
                       },
-                      "type": "object"
+                      type: 'object'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 },
-                "cacheActiveTimeout": {
-                  "default": "15s",
-                  "description": "`cacheActiveTimeout` is the period during which the agent aggregates flows before sending.\nIncreasing `cacheMaxFlows` and `cacheActiveTimeout` can decrease the network traffic overhead and the CPU load,\nhowever you can expect higher memory consumption and an increased latency in the flow collection.",
-                  "pattern": "^\\d+(ns|ms|s|m)?$",
-                  "type": "string"
+                cacheActiveTimeout: {
+                  default: '15s',
+                  description:
+                    '`cacheActiveTimeout` is the period during which the agent aggregates flows before sending.\nIncreasing `cacheMaxFlows` and `cacheActiveTimeout` can decrease the network traffic overhead and the CPU load,\nhowever you can expect higher memory consumption and an increased latency in the flow collection.',
+                  pattern: '^\\d+(ns|ms|s|m)?$',
+                  type: 'string'
                 },
-                "cacheMaxFlows": {
-                  "default": 120000,
-                  "description": "`cacheMaxFlows` is the maximum number of flows in an aggregate; when reached, the reporter sends the flows.\nIncreasing `cacheMaxFlows` and `cacheActiveTimeout` can decrease the network traffic overhead and the CPU load,\nhowever you can expect higher memory consumption and an increased latency in the flow collection.",
-                  "format": "int32",
-                  "minimum": 1,
-                  "type": "integer"
+                cacheMaxFlows: {
+                  default: 120000,
+                  description:
+                    '`cacheMaxFlows` is the maximum number of flows in an aggregate; when reached, the reporter sends the flows.\nIncreasing `cacheMaxFlows` and `cacheActiveTimeout` can decrease the network traffic overhead and the CPU load,\nhowever you can expect higher memory consumption and an increased latency in the flow collection.',
+                  format: 'int32',
+                  minimum: 1,
+                  type: 'integer'
                 },
-                "excludeInterfaces": {
-                  "default": [
-                    "lo"
-                  ],
-                  "description": "`excludeInterfaces` contains the interface names that are excluded from flow tracing.\nAn entry enclosed by slashes, such as `/br-/`, is matched as a regular expression.\nOtherwise it is matched as a case-sensitive string.",
-                  "items": {
-                    "type": "string"
+                excludeInterfaces: {
+                  default: ['lo'],
+                  description:
+                    '`excludeInterfaces` contains the interface names that are excluded from flow tracing.\nAn entry enclosed by slashes, such as `/br-/`, is matched as a regular expression.\nOtherwise it is matched as a case-sensitive string.',
+                  items: {
+                    type: 'string'
                   },
-                  "type": "array"
+                  type: 'array'
                 },
-                "features": {
-                  "description": "List of additional features to enable. They are all disabled by default. Enabling additional features might have performance impacts, and may increase permissions granted to the eBPF agent pods. Possible values are:<br>\n- `DNSTracking`: Enable the DNS tracking feature.<br>\n- `EbpfManager`: Use eBPF Manager to manage NetObserv eBPF programs. Pre-requisite: the eBPF Manager operator (or upstream bpfman operator) must be installed.<br>\n- `FlowRTT`: Enable flow latency (sRTT) extraction in the eBPF agent from TCP traffic.<br>\n- `IPSec`, to track flows between nodes with IPsec encryption.<br>\n- `NetworkEvents`: Enable the network events monitoring feature, such as correlating flows and network policies. Additional permissions are granted to the eBPF agent pods: access to\nthe OVS/OVN host filesystems.<br>\nIt requires using the OVN-Kubernetes network plugin with the Observability feature.<br>\n- `PacketDrop`: Enable the packets drop flows logging feature. Additional permissions are granted to the eBPF agent pods: access to\nthe kernel debug host filesystem.<br>\n- `PacketTranslation`: Enable enriching flows with packet translation information, such as Service NAT.<br>\n- `SecondaryNetworks`, to capture flows from all network namespaces. Additional permissions are granted to the eBPF agent pods: CAP_SYS_ADMIN, and access to\nthe network namespaces host filesystem.<br>\n- `TLSTracking`, to track TLS usage.<br>\n- `UDNMapping`: Enable interfaces mapping to User Defined Networks (UDN). Additional permissions are granted to the eBPF agent pods: access to\nthe OVS/OVN host filesystems.<br>\nIt requires using the OVN-Kubernetes network plugin.<br>",
-                  "items": {
-                    "description": "Agent feature, can be one of:<br>\n- `DNSTracking`, to track specific information on DNS traffic.<br>\n- `EbpfManager`, to enable using eBPF Manager to manage NetObserv eBPF programs.<br>\n- `FlowRTT`, to track TCP latency.<br>\n- `IPSec`, to track flows between nodes with IPsec encryption.<br>\n- `NetworkEvents`, to track network events.<br>\n- `PacketDrop`, to track packet drops.<br>\n- `PacketTranslation`, to enrich flows with packets translation information, such as Service NAT.<br>\n- `SecondaryNetworks`, to capture flows from all network namespaces.<br>\n- `TLSTracking`, to track TLS usage.<br>\n- `UDNMapping`, to enable interfaces mapping to UDN.<br>",
-                    "enum": [
-                      "PacketDrop",
-                      "DNSTracking",
-                      "FlowRTT",
-                      "NetworkEvents",
-                      "PacketTranslation",
-                      "EbpfManager",
-                      "UDNMapping",
-                      "IPSec",
-                      "TLSTracking",
-                      "SecondaryNetworks"
+                features: {
+                  description:
+                    'List of additional features to enable. They are all disabled by default. Enabling additional features might have performance impacts, and may increase permissions granted to the eBPF agent pods. Possible values are:<br>\n- `DNSTracking`: Enable the DNS tracking feature.<br>\n- `EbpfManager`: Use eBPF Manager to manage NetObserv eBPF programs. Pre-requisite: the eBPF Manager operator (or upstream bpfman operator) must be installed.<br>\n- `FlowRTT`: Enable flow latency (sRTT) extraction in the eBPF agent from TCP traffic.<br>\n- `IPSec`, to track flows between nodes with IPsec encryption.<br>\n- `NetworkEvents`: Enable the network events monitoring feature, such as correlating flows and network policies. Additional permissions are granted to the eBPF agent pods: access to\nthe OVS/OVN host filesystems.<br>\nIt requires using the OVN-Kubernetes network plugin with the Observability feature.<br>\n- `PacketDrop`: Enable the packets drop flows logging feature. Additional permissions are granted to the eBPF agent pods: access to\nthe kernel debug host filesystem.<br>\n- `PacketTranslation`: Enable enriching flows with packet translation information, such as Service NAT.<br>\n- `SecondaryNetworks`, to capture flows from all network namespaces. Additional permissions are granted to the eBPF agent pods: CAP_SYS_ADMIN, and access to\nthe network namespaces host filesystem.<br>\n- `TLSTracking`, to track TLS usage.<br>\n- `UDNMapping`: Enable interfaces mapping to User Defined Networks (UDN). Additional permissions are granted to the eBPF agent pods: access to\nthe OVS/OVN host filesystems.<br>\nIt requires using the OVN-Kubernetes network plugin.<br>',
+                  items: {
+                    description:
+                      'Agent feature, can be one of:<br>\n- `DNSTracking`, to track specific information on DNS traffic.<br>\n- `EbpfManager`, to enable using eBPF Manager to manage NetObserv eBPF programs.<br>\n- `FlowRTT`, to track TCP latency.<br>\n- `IPSec`, to track flows between nodes with IPsec encryption.<br>\n- `NetworkEvents`, to track network events.<br>\n- `PacketDrop`, to track packet drops.<br>\n- `PacketTranslation`, to enrich flows with packets translation information, such as Service NAT.<br>\n- `SecondaryNetworks`, to capture flows from all network namespaces.<br>\n- `TLSTracking`, to track TLS usage.<br>\n- `UDNMapping`, to enable interfaces mapping to UDN.<br>',
+                    enum: [
+                      'PacketDrop',
+                      'DNSTracking',
+                      'FlowRTT',
+                      'NetworkEvents',
+                      'PacketTranslation',
+                      'EbpfManager',
+                      'UDNMapping',
+                      'IPSec',
+                      'TLSTracking',
+                      'SecondaryNetworks'
                     ],
-                    "type": "string"
+                    type: 'string'
                   },
-                  "type": "array"
+                  type: 'array'
                 },
-                "flowFilter": {
-                  "description": "`flowFilter` defines the eBPF agent configuration regarding flow filtering.",
-                  "properties": {
-                    "action": {
-                      "description": "`action` defines the action to perform on the flows that match the filter. The available options are `Accept`, which is the default, and `Reject`.",
-                      "enum": [
-                        "Accept",
-                        "Reject"
-                      ],
-                      "type": "string"
+                flowFilter: {
+                  description: '`flowFilter` defines the eBPF agent configuration regarding flow filtering.',
+                  properties: {
+                    action: {
+                      description:
+                        '`action` defines the action to perform on the flows that match the filter. The available options are `Accept`, which is the default, and `Reject`.',
+                      enum: ['Accept', 'Reject'],
+                      type: 'string'
                     },
-                    "cidr": {
-                      "description": "`cidr` defines the IP CIDR to filter flows by.\nExamples: `10.10.10.0/24` or `100:100:100:100::/64`",
-                      "type": "string"
+                    cidr: {
+                      description:
+                        '`cidr` defines the IP CIDR to filter flows by.\nExamples: `10.10.10.0/24` or `100:100:100:100::/64`',
+                      type: 'string'
                     },
-                    "destPorts": {
-                      "anyOf": [
+                    destPorts: {
+                      anyOf: [
                         {
-                          "type": "integer"
+                          type: 'integer'
                         },
                         {
-                          "type": "string"
+                          type: 'string'
                         }
                       ],
-                      "description": "`destPorts` optionally defines the destination ports to filter flows by.\nTo filter a single port, set a single port as an integer value. For example, `destPorts: 80`.\nTo filter a range of ports, use a \"start-end\" range in string format. For example, `destPorts: \"80-100\"`.\nTo filter two ports, use a \"port1,port2\" in string format. For example, `ports: \"80,100\"`.",
-                      "x-kubernetes-int-or-string": true
+                      description:
+                        '`destPorts` optionally defines the destination ports to filter flows by.\nTo filter a single port, set a single port as an integer value. For example, `destPorts: 80`.\nTo filter a range of ports, use a "start-end" range in string format. For example, `destPorts: "80-100"`.\nTo filter two ports, use a "port1,port2" in string format. For example, `ports: "80,100"`.',
+                      'x-kubernetes-int-or-string': true
                     },
-                    "direction": {
-                      "description": "`direction` optionally defines a direction to filter flows by. The available options are `Ingress` and `Egress`.",
-                      "enum": [
-                        "Ingress",
-                        "Egress"
-                      ],
-                      "type": "string"
+                    direction: {
+                      description:
+                        '`direction` optionally defines a direction to filter flows by. The available options are `Ingress` and `Egress`.',
+                      enum: ['Ingress', 'Egress'],
+                      type: 'string'
                     },
-                    "enable": {
-                      "description": "Set `enable` to `true` to enable the eBPF flow filtering feature.",
-                      "type": "boolean"
+                    enable: {
+                      description: 'Set `enable` to `true` to enable the eBPF flow filtering feature.',
+                      type: 'boolean'
                     },
-                    "icmpCode": {
-                      "description": "`icmpCode`, for Internet Control Message Protocol (ICMP) traffic, optionally defines the ICMP code to filter flows by.",
-                      "type": "integer"
+                    icmpCode: {
+                      description:
+                        '`icmpCode`, for Internet Control Message Protocol (ICMP) traffic, optionally defines the ICMP code to filter flows by.',
+                      type: 'integer'
                     },
-                    "icmpType": {
-                      "description": "`icmpType`, for ICMP traffic, optionally defines the ICMP type to filter flows by.",
-                      "type": "integer"
+                    icmpType: {
+                      description: '`icmpType`, for ICMP traffic, optionally defines the ICMP type to filter flows by.',
+                      type: 'integer'
                     },
-                    "peerCIDR": {
-                      "description": "`peerCIDR` defines the Peer IP CIDR to filter flows by.\nExamples: `10.10.10.0/24` or `100:100:100:100::/64`",
-                      "type": "string"
+                    peerCIDR: {
+                      description:
+                        '`peerCIDR` defines the Peer IP CIDR to filter flows by.\nExamples: `10.10.10.0/24` or `100:100:100:100::/64`',
+                      type: 'string'
                     },
-                    "peerIP": {
-                      "description": "`peerIP` optionally defines the remote IP address to filter flows by.\nExample: `10.10.10.10`.",
-                      "type": "string"
+                    peerIP: {
+                      description:
+                        '`peerIP` optionally defines the remote IP address to filter flows by.\nExample: `10.10.10.10`.',
+                      type: 'string'
                     },
-                    "pktDrops": {
-                      "description": "`pktDrops` optionally filters only flows containing packet drops.",
-                      "type": "boolean"
+                    pktDrops: {
+                      description: '`pktDrops` optionally filters only flows containing packet drops.',
+                      type: 'boolean'
                     },
-                    "ports": {
-                      "anyOf": [
+                    ports: {
+                      anyOf: [
                         {
-                          "type": "integer"
+                          type: 'integer'
                         },
                         {
-                          "type": "string"
+                          type: 'string'
                         }
                       ],
-                      "description": "`ports` optionally defines the ports to filter flows by. It is used both for source and destination ports.\nTo filter a single port, set a single port as an integer value. For example, `ports: 80`.\nTo filter a range of ports, use a \"start-end\" range in string format. For example, `ports: \"80-100\"`.\nTo filter two ports, use a \"port1,port2\" in string format. For example, `ports: \"80,100\"`.",
-                      "x-kubernetes-int-or-string": true
+                      description:
+                        '`ports` optionally defines the ports to filter flows by. It is used both for source and destination ports.\nTo filter a single port, set a single port as an integer value. For example, `ports: 80`.\nTo filter a range of ports, use a "start-end" range in string format. For example, `ports: "80-100"`.\nTo filter two ports, use a "port1,port2" in string format. For example, `ports: "80,100"`.',
+                      'x-kubernetes-int-or-string': true
                     },
-                    "protocol": {
-                      "description": "`protocol` optionally defines a protocol to filter flows by. The available options are `TCP`, `UDP`, `ICMP`, `ICMPv6`, and `SCTP`.",
-                      "enum": [
-                        "TCP",
-                        "UDP",
-                        "ICMP",
-                        "ICMPv6",
-                        "SCTP"
-                      ],
-                      "type": "string"
+                    protocol: {
+                      description:
+                        '`protocol` optionally defines a protocol to filter flows by. The available options are `TCP`, `UDP`, `ICMP`, `ICMPv6`, and `SCTP`.',
+                      enum: ['TCP', 'UDP', 'ICMP', 'ICMPv6', 'SCTP'],
+                      type: 'string'
                     },
-                    "rules": {
-                      "description": "`rules` defines a list of filtering rules on the eBPF Agents.\nWhen filtering is enabled, by default, flows that don't match any rule are rejected.\nTo change the default, you can define a rule that accepts everything: `{ action: \"Accept\", cidr: \"0.0.0.0/0\" }`, and then refine with rejecting rules.",
-                      "items": {
-                        "description": "`EBPFFlowFilterRule` defines the desired eBPF agent configuration regarding flow filtering rule.",
-                        "properties": {
-                          "action": {
-                            "description": "`action` defines the action to perform on the flows that match the filter. The available options are `Accept`, which is the default, and `Reject`.",
-                            "enum": [
-                              "Accept",
-                              "Reject"
-                            ],
-                            "type": "string"
+                    rules: {
+                      description:
+                        '`rules` defines a list of filtering rules on the eBPF Agents.\nWhen filtering is enabled, by default, flows that don\'t match any rule are rejected.\nTo change the default, you can define a rule that accepts everything: `{ action: "Accept", cidr: "0.0.0.0/0" }`, and then refine with rejecting rules.',
+                      items: {
+                        description:
+                          '`EBPFFlowFilterRule` defines the desired eBPF agent configuration regarding flow filtering rule.',
+                        properties: {
+                          action: {
+                            description:
+                              '`action` defines the action to perform on the flows that match the filter. The available options are `Accept`, which is the default, and `Reject`.',
+                            enum: ['Accept', 'Reject'],
+                            type: 'string'
                           },
-                          "cidr": {
-                            "description": "`cidr` defines the IP CIDR to filter flows by.\nExamples: `10.10.10.0/24` or `100:100:100:100::/64`",
-                            "type": "string"
+                          cidr: {
+                            description:
+                              '`cidr` defines the IP CIDR to filter flows by.\nExamples: `10.10.10.0/24` or `100:100:100:100::/64`',
+                            type: 'string'
                           },
-                          "destPorts": {
-                            "anyOf": [
+                          destPorts: {
+                            anyOf: [
                               {
-                                "type": "integer"
+                                type: 'integer'
                               },
                               {
-                                "type": "string"
+                                type: 'string'
                               }
                             ],
-                            "description": "`destPorts` optionally defines the destination ports to filter flows by.\nTo filter a single port, set a single port as an integer value. For example, `destPorts: 80`.\nTo filter a range of ports, use a \"start-end\" range in string format. For example, `destPorts: \"80-100\"`.\nTo filter two ports, use a \"port1,port2\" in string format. For example, `ports: \"80,100\"`.",
-                            "x-kubernetes-int-or-string": true
+                            description:
+                              '`destPorts` optionally defines the destination ports to filter flows by.\nTo filter a single port, set a single port as an integer value. For example, `destPorts: 80`.\nTo filter a range of ports, use a "start-end" range in string format. For example, `destPorts: "80-100"`.\nTo filter two ports, use a "port1,port2" in string format. For example, `ports: "80,100"`.',
+                            'x-kubernetes-int-or-string': true
                           },
-                          "direction": {
-                            "description": "`direction` optionally defines a direction to filter flows by. The available options are `Ingress` and `Egress`.",
-                            "enum": [
-                              "Ingress",
-                              "Egress"
-                            ],
-                            "type": "string"
+                          direction: {
+                            description:
+                              '`direction` optionally defines a direction to filter flows by. The available options are `Ingress` and `Egress`.',
+                            enum: ['Ingress', 'Egress'],
+                            type: 'string'
                           },
-                          "icmpCode": {
-                            "description": "`icmpCode`, for Internet Control Message Protocol (ICMP) traffic, optionally defines the ICMP code to filter flows by.",
-                            "type": "integer"
+                          icmpCode: {
+                            description:
+                              '`icmpCode`, for Internet Control Message Protocol (ICMP) traffic, optionally defines the ICMP code to filter flows by.',
+                            type: 'integer'
                           },
-                          "icmpType": {
-                            "description": "`icmpType`, for ICMP traffic, optionally defines the ICMP type to filter flows by.",
-                            "type": "integer"
+                          icmpType: {
+                            description:
+                              '`icmpType`, for ICMP traffic, optionally defines the ICMP type to filter flows by.',
+                            type: 'integer'
                           },
-                          "peerCIDR": {
-                            "description": "`peerCIDR` defines the Peer IP CIDR to filter flows by.\nExamples: `10.10.10.0/24` or `100:100:100:100::/64`",
-                            "type": "string"
+                          peerCIDR: {
+                            description:
+                              '`peerCIDR` defines the Peer IP CIDR to filter flows by.\nExamples: `10.10.10.0/24` or `100:100:100:100::/64`',
+                            type: 'string'
                           },
-                          "peerIP": {
-                            "description": "`peerIP` optionally defines the remote IP address to filter flows by.\nExample: `10.10.10.10`.",
-                            "type": "string"
+                          peerIP: {
+                            description:
+                              '`peerIP` optionally defines the remote IP address to filter flows by.\nExample: `10.10.10.10`.',
+                            type: 'string'
                           },
-                          "pktDrops": {
-                            "description": "`pktDrops` optionally filters only flows containing packet drops.",
-                            "type": "boolean"
+                          pktDrops: {
+                            description: '`pktDrops` optionally filters only flows containing packet drops.',
+                            type: 'boolean'
                           },
-                          "ports": {
-                            "anyOf": [
+                          ports: {
+                            anyOf: [
                               {
-                                "type": "integer"
+                                type: 'integer'
                               },
                               {
-                                "type": "string"
+                                type: 'string'
                               }
                             ],
-                            "description": "`ports` optionally defines the ports to filter flows by. It is used both for source and destination ports.\nTo filter a single port, set a single port as an integer value. For example, `ports: 80`.\nTo filter a range of ports, use a \"start-end\" range in string format. For example, `ports: \"80-100\"`.\nTo filter two ports, use a \"port1,port2\" in string format. For example, `ports: \"80,100\"`.",
-                            "x-kubernetes-int-or-string": true
+                            description:
+                              '`ports` optionally defines the ports to filter flows by. It is used both for source and destination ports.\nTo filter a single port, set a single port as an integer value. For example, `ports: 80`.\nTo filter a range of ports, use a "start-end" range in string format. For example, `ports: "80-100"`.\nTo filter two ports, use a "port1,port2" in string format. For example, `ports: "80,100"`.',
+                            'x-kubernetes-int-or-string': true
                           },
-                          "protocol": {
-                            "description": "`protocol` optionally defines a protocol to filter flows by. The available options are `TCP`, `UDP`, `ICMP`, `ICMPv6`, and `SCTP`.",
-                            "enum": [
-                              "TCP",
-                              "UDP",
-                              "ICMP",
-                              "ICMPv6",
-                              "SCTP"
-                            ],
-                            "type": "string"
+                          protocol: {
+                            description:
+                              '`protocol` optionally defines a protocol to filter flows by. The available options are `TCP`, `UDP`, `ICMP`, `ICMPv6`, and `SCTP`.',
+                            enum: ['TCP', 'UDP', 'ICMP', 'ICMPv6', 'SCTP'],
+                            type: 'string'
                           },
-                          "sampling": {
-                            "description": "`sampling` is the sampling interval for the matched packets, overriding the global sampling defined at `spec.agent.ebpf.sampling`.",
-                            "format": "int32",
-                            "type": "integer"
+                          sampling: {
+                            description:
+                              '`sampling` is the sampling interval for the matched packets, overriding the global sampling defined at `spec.agent.ebpf.sampling`.',
+                            format: 'int32',
+                            type: 'integer'
                           },
-                          "sourcePorts": {
-                            "anyOf": [
+                          sourcePorts: {
+                            anyOf: [
                               {
-                                "type": "integer"
+                                type: 'integer'
                               },
                               {
-                                "type": "string"
+                                type: 'string'
                               }
                             ],
-                            "description": "`sourcePorts` optionally defines the source ports to filter flows by.\nTo filter a single port, set a single port as an integer value. For example, `sourcePorts: 80`.\nTo filter a range of ports, use a \"start-end\" range in string format. For example, `sourcePorts: \"80-100\"`.\nTo filter two ports, use a \"port1,port2\" in string format. For example, `ports: \"80,100\"`.",
-                            "x-kubernetes-int-or-string": true
+                            description:
+                              '`sourcePorts` optionally defines the source ports to filter flows by.\nTo filter a single port, set a single port as an integer value. For example, `sourcePorts: 80`.\nTo filter a range of ports, use a "start-end" range in string format. For example, `sourcePorts: "80-100"`.\nTo filter two ports, use a "port1,port2" in string format. For example, `ports: "80,100"`.',
+                            'x-kubernetes-int-or-string': true
                           },
-                          "tcpFlags": {
-                            "description": "`tcpFlags` optionally defines TCP flags to filter flows by.\nIn addition to the standard flags (RFC-9293), you can also filter by one of the three following combinations: `SYN-ACK`, `FIN-ACK`, and `RST-ACK`.",
-                            "enum": [
-                              "SYN",
-                              "SYN-ACK",
-                              "ACK",
-                              "FIN",
-                              "RST",
-                              "URG",
-                              "ECE",
-                              "CWR",
-                              "FIN-ACK",
-                              "RST-ACK"
-                            ],
-                            "type": "string"
+                          tcpFlags: {
+                            description:
+                              '`tcpFlags` optionally defines TCP flags to filter flows by.\nIn addition to the standard flags (RFC-9293), you can also filter by one of the three following combinations: `SYN-ACK`, `FIN-ACK`, and `RST-ACK`.',
+                            enum: ['SYN', 'SYN-ACK', 'ACK', 'FIN', 'RST', 'URG', 'ECE', 'CWR', 'FIN-ACK', 'RST-ACK'],
+                            type: 'string'
                           }
                         },
-                        "type": "object"
+                        type: 'object'
                       },
-                      "maxItems": 16,
-                      "minItems": 1,
-                      "type": "array"
+                      maxItems: 16,
+                      minItems: 1,
+                      type: 'array'
                     },
-                    "sampling": {
-                      "description": "`sampling` is the sampling interval for the matched packets, overriding the global sampling defined at `spec.agent.ebpf.sampling`.",
-                      "format": "int32",
-                      "type": "integer"
+                    sampling: {
+                      description:
+                        '`sampling` is the sampling interval for the matched packets, overriding the global sampling defined at `spec.agent.ebpf.sampling`.',
+                      format: 'int32',
+                      type: 'integer'
                     },
-                    "sourcePorts": {
-                      "anyOf": [
+                    sourcePorts: {
+                      anyOf: [
                         {
-                          "type": "integer"
+                          type: 'integer'
                         },
                         {
-                          "type": "string"
+                          type: 'string'
                         }
                       ],
-                      "description": "`sourcePorts` optionally defines the source ports to filter flows by.\nTo filter a single port, set a single port as an integer value. For example, `sourcePorts: 80`.\nTo filter a range of ports, use a \"start-end\" range in string format. For example, `sourcePorts: \"80-100\"`.\nTo filter two ports, use a \"port1,port2\" in string format. For example, `ports: \"80,100\"`.",
-                      "x-kubernetes-int-or-string": true
+                      description:
+                        '`sourcePorts` optionally defines the source ports to filter flows by.\nTo filter a single port, set a single port as an integer value. For example, `sourcePorts: 80`.\nTo filter a range of ports, use a "start-end" range in string format. For example, `sourcePorts: "80-100"`.\nTo filter two ports, use a "port1,port2" in string format. For example, `ports: "80,100"`.',
+                      'x-kubernetes-int-or-string': true
                     },
-                    "tcpFlags": {
-                      "description": "`tcpFlags` optionally defines TCP flags to filter flows by.\nIn addition to the standard flags (RFC-9293), you can also filter by one of the three following combinations: `SYN-ACK`, `FIN-ACK`, and `RST-ACK`.",
-                      "enum": [
-                        "SYN",
-                        "SYN-ACK",
-                        "ACK",
-                        "FIN",
-                        "RST",
-                        "URG",
-                        "ECE",
-                        "CWR",
-                        "FIN-ACK",
-                        "RST-ACK"
-                      ],
-                      "type": "string"
+                    tcpFlags: {
+                      description:
+                        '`tcpFlags` optionally defines TCP flags to filter flows by.\nIn addition to the standard flags (RFC-9293), you can also filter by one of the three following combinations: `SYN-ACK`, `FIN-ACK`, and `RST-ACK`.',
+                      enum: ['SYN', 'SYN-ACK', 'ACK', 'FIN', 'RST', 'URG', 'ECE', 'CWR', 'FIN-ACK', 'RST-ACK'],
+                      type: 'string'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 },
-                "imagePullPolicy": {
-                  "default": "IfNotPresent",
-                  "description": "`imagePullPolicy` is the Kubernetes pull policy for the image defined above",
-                  "enum": [
-                    "IfNotPresent",
-                    "Always",
-                    "Never"
-                  ],
-                  "type": "string"
+                imagePullPolicy: {
+                  default: 'IfNotPresent',
+                  description: '`imagePullPolicy` is the Kubernetes pull policy for the image defined above',
+                  enum: ['IfNotPresent', 'Always', 'Never'],
+                  type: 'string'
                 },
-                "interfaces": {
-                  "description": "`interfaces` contains the interface names from where flows are collected. If empty, the agent\nfetches all the interfaces in the system, excepting the ones listed in `excludeInterfaces`.\nAn entry enclosed by slashes, such as `/br-/`, is matched as a regular expression.\nOtherwise it is matched as a case-sensitive string.",
-                  "items": {
-                    "type": "string"
+                interfaces: {
+                  description:
+                    '`interfaces` contains the interface names from where flows are collected. If empty, the agent\nfetches all the interfaces in the system, excepting the ones listed in `excludeInterfaces`.\nAn entry enclosed by slashes, such as `/br-/`, is matched as a regular expression.\nOtherwise it is matched as a case-sensitive string.',
+                  items: {
+                    type: 'string'
                   },
-                  "type": "array"
+                  type: 'array'
                 },
-                "kafkaBatchSize": {
-                  "default": 1048576,
-                  "description": "`kafkaBatchSize` limits the maximum size of a request in bytes before being sent to a partition. Ignored when not using Kafka. Default: 1MB.",
-                  "type": "integer"
+                kafkaBatchSize: {
+                  default: 1048576,
+                  description:
+                    '`kafkaBatchSize` limits the maximum size of a request in bytes before being sent to a partition. Ignored when not using Kafka. Default: 1MB.',
+                  type: 'integer'
                 },
-                "logLevel": {
-                  "default": "info",
-                  "description": "`logLevel` defines the log level for the NetObserv eBPF Agent",
-                  "enum": [
-                    "trace",
-                    "debug",
-                    "info",
-                    "warn",
-                    "error",
-                    "fatal",
-                    "panic"
-                  ],
-                  "type": "string"
+                logLevel: {
+                  default: 'info',
+                  description: '`logLevel` defines the log level for the NetObserv eBPF Agent',
+                  enum: ['trace', 'debug', 'info', 'warn', 'error', 'fatal', 'panic'],
+                  type: 'string'
                 },
-                "metrics": {
-                  "description": "`metrics` defines the eBPF agent configuration regarding metrics.",
-                  "properties": {
-                    "disableAlerts": {
-                      "description": "`disableAlerts` is a list of alerts that should be disabled.\nPossible values are:<br>\n`NetObservDroppedFlows`, which is triggered when the eBPF agent is missing packets or flows, such as when the BPF hashmap is busy or full, or the capacity limiter is being triggered.<br>",
-                      "items": {
-                        "description": "Name of an eBPF agent alert.\nPossible values are:<br>\n`NetObservDroppedFlows`, which is triggered when the eBPF agent is missing packets or flows, such as when the BPF hashmap is busy or full, or the capacity limiter is being triggered.<br>",
-                        "enum": [
-                          "NetObservDroppedFlows"
-                        ],
-                        "type": "string"
+                metrics: {
+                  description: '`metrics` defines the eBPF agent configuration regarding metrics.',
+                  properties: {
+                    disableAlerts: {
+                      description:
+                        '`disableAlerts` is a list of alerts that should be disabled.\nPossible values are:<br>\n`NetObservDroppedFlows`, which is triggered when the eBPF agent is missing packets or flows, such as when the BPF hashmap is busy or full, or the capacity limiter is being triggered.<br>',
+                      items: {
+                        description:
+                          'Name of an eBPF agent alert.\nPossible values are:<br>\n`NetObservDroppedFlows`, which is triggered when the eBPF agent is missing packets or flows, such as when the BPF hashmap is busy or full, or the capacity limiter is being triggered.<br>',
+                        enum: ['NetObservDroppedFlows'],
+                        type: 'string'
                       },
-                      "type": "array"
+                      type: 'array'
                     },
-                    "enable": {
-                      "description": "Set `enable` to `false` to disable eBPF agent metrics collection. It is enabled by default.",
-                      "type": "boolean"
+                    enable: {
+                      description:
+                        'Set `enable` to `false` to disable eBPF agent metrics collection. It is enabled by default.',
+                      type: 'boolean'
                     },
-                    "server": {
-                      "description": "Metrics server endpoint configuration for the Prometheus scraper.",
-                      "properties": {
-                        "port": {
-                          "description": "The metrics server HTTP port.",
-                          "format": "int32",
-                          "maximum": 65535,
-                          "minimum": 1,
-                          "type": "integer"
+                    server: {
+                      description: 'Metrics server endpoint configuration for the Prometheus scraper.',
+                      properties: {
+                        port: {
+                          description: 'The metrics server HTTP port.',
+                          format: 'int32',
+                          maximum: 65535,
+                          minimum: 1,
+                          type: 'integer'
                         },
-                        "tls": {
-                          "description": "TLS configuration.",
-                          "properties": {
-                            "insecureSkipVerify": {
-                              "default": false,
-                              "description": "`insecureSkipVerify` allows skipping client-side verification of the provided certificate.\nIf set to `true`, the `providedCaFile` field is ignored.",
-                              "type": "boolean"
+                        tls: {
+                          description: 'TLS configuration.',
+                          properties: {
+                            insecureSkipVerify: {
+                              default: false,
+                              description:
+                                '`insecureSkipVerify` allows skipping client-side verification of the provided certificate.\nIf set to `true`, the `providedCaFile` field is ignored.',
+                              type: 'boolean'
                             },
-                            "provided": {
-                              "description": "TLS configuration when `type` is set to `Provided`.",
-                              "properties": {
-                                "certFile": {
-                                  "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                                  "type": "string"
+                            provided: {
+                              description: 'TLS configuration when `type` is set to `Provided`.',
+                              properties: {
+                                certFile: {
+                                  description:
+                                    '`certFile` defines the path to the certificate file name within the config map or secret.',
+                                  type: 'string'
                                 },
-                                "certKey": {
-                                  "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                                  "type": "string"
+                                certKey: {
+                                  description:
+                                    '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                                  type: 'string'
                                 },
-                                "name": {
-                                  "description": "Name of the config map or secret containing certificates.",
-                                  "type": "string"
+                                name: {
+                                  description: 'Name of the config map or secret containing certificates.',
+                                  type: 'string'
                                 },
-                                "namespace": {
-                                  "default": "",
-                                  "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                                  "type": "string"
+                                namespace: {
+                                  default: '',
+                                  description:
+                                    'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                                  type: 'string'
                                 },
-                                "type": {
-                                  "description": "Type for the certificate reference: `configmap` or `secret`.",
-                                  "enum": [
-                                    "configmap",
-                                    "secret"
-                                  ],
-                                  "type": "string"
+                                type: {
+                                  description: 'Type for the certificate reference: `configmap` or `secret`.',
+                                  enum: ['configmap', 'secret'],
+                                  type: 'string'
                                 }
                               },
-                              "type": "object"
+                              type: 'object'
                             },
-                            "providedCaFile": {
-                              "description": "Reference to the CA file when `type` is set to `Provided`.",
-                              "properties": {
-                                "file": {
-                                  "description": "File name within the config map or secret.",
-                                  "type": "string"
+                            providedCaFile: {
+                              description: 'Reference to the CA file when `type` is set to `Provided`.',
+                              properties: {
+                                file: {
+                                  description: 'File name within the config map or secret.',
+                                  type: 'string'
                                 },
-                                "name": {
-                                  "description": "Name of the config map or secret containing the file.",
-                                  "type": "string"
+                                name: {
+                                  description: 'Name of the config map or secret containing the file.',
+                                  type: 'string'
                                 },
-                                "namespace": {
-                                  "default": "",
-                                  "description": "Namespace of the config map or secret containing the file. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                                  "type": "string"
+                                namespace: {
+                                  default: '',
+                                  description:
+                                    'Namespace of the config map or secret containing the file. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                                  type: 'string'
                                 },
-                                "type": {
-                                  "description": "Type for the file reference: `configmap` or `secret`.",
-                                  "enum": [
-                                    "configmap",
-                                    "secret"
-                                  ],
-                                  "type": "string"
+                                type: {
+                                  description: 'Type for the file reference: `configmap` or `secret`.',
+                                  enum: ['configmap', 'secret'],
+                                  type: 'string'
                                 }
                               },
-                              "type": "object"
+                              type: 'object'
                             },
-                            "type": {
-                              "default": "Disabled",
-                              "description": "Select the type of TLS configuration:<br>\n- `Disabled` (default) to not configure TLS for the endpoint.\n- `Provided` to manually provide cert file and a key file. [Unsupported (*)].\n- `Auto` to use OpenShift auto generated certificate using annotations.",
-                              "enum": [
-                                "Disabled",
-                                "Provided",
-                                "Auto"
-                              ],
-                              "type": "string"
+                            type: {
+                              default: 'Disabled',
+                              description:
+                                'Select the type of TLS configuration:<br>\n- `Disabled` (default) to not configure TLS for the endpoint.\n- `Provided` to manually provide cert file and a key file. [Unsupported (*)].\n- `Auto` to use OpenShift auto generated certificate using annotations.',
+                              enum: ['Disabled', 'Provided', 'Auto'],
+                              type: 'string'
                             }
                           },
-                          "required": [
-                            "type"
-                          ],
-                          "type": "object"
+                          required: ['type'],
+                          type: 'object'
                         }
                       },
-                      "type": "object"
+                      type: 'object'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 },
-                "privileged": {
-                  "description": "`privileged` grants full privileges to the eBPF Agent container. As it weakens the security model,\nit should only be enabled as a last resort, if the agents cannot run otherwise.\nWhen unset or set to `false`, the operator sets granular capabilities (BPF, PERFMON, NET_ADMIN and possibly SYS_ADMIN) to the container.\nCapabilities can be overriden through `advanced.capOverride`: this should be preferred over granting full privileges.\nWhen privileged mode is on, the `SecondaryNetworks` feature is also implicitly enabled.",
-                  "type": "boolean"
+                privileged: {
+                  description:
+                    '`privileged` grants full privileges to the eBPF Agent container. As it weakens the security model,\nit should only be enabled as a last resort, if the agents cannot run otherwise.\nWhen unset or set to `false`, the operator sets granular capabilities (BPF, PERFMON, NET_ADMIN and possibly SYS_ADMIN) to the container.\nCapabilities can be overriden through `advanced.capOverride`: this should be preferred over granting full privileges.\nWhen privileged mode is on, the `SecondaryNetworks` feature is also implicitly enabled.',
+                  type: 'boolean'
                 },
-                "resources": {
-                  "default": {
-                    "limits": {
-                      "memory": "800Mi"
+                resources: {
+                  default: {
+                    limits: {
+                      memory: '800Mi'
                     },
-                    "requests": {
-                      "cpu": "100m",
-                      "memory": "50Mi"
+                    requests: {
+                      cpu: '100m',
+                      memory: '50Mi'
                     }
                   },
-                  "description": "`resources` are the compute resources required by this container.\nFor more information, see https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
-                  "properties": {
-                    "claims": {
-                      "description": "Claims lists the names of resources, defined in spec.resourceClaims,\nthat are used by this container.\n\nThis field depends on the\nDynamicResourceAllocation feature gate.\n\nThis field is immutable. It can only be set for containers.",
-                      "items": {
-                        "description": "ResourceClaim references one entry in PodSpec.ResourceClaims.",
-                        "properties": {
-                          "name": {
-                            "description": "Name must match the name of one entry in pod.spec.resourceClaims of\nthe Pod where this field is used. It makes that resource available\ninside a container.",
-                            "type": "string"
+                  description:
+                    '`resources` are the compute resources required by this container.\nFor more information, see https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/',
+                  properties: {
+                    claims: {
+                      description:
+                        'Claims lists the names of resources, defined in spec.resourceClaims,\nthat are used by this container.\n\nThis field depends on the\nDynamicResourceAllocation feature gate.\n\nThis field is immutable. It can only be set for containers.',
+                      items: {
+                        description: 'ResourceClaim references one entry in PodSpec.ResourceClaims.',
+                        properties: {
+                          name: {
+                            description:
+                              'Name must match the name of one entry in pod.spec.resourceClaims of\nthe Pod where this field is used. It makes that resource available\ninside a container.',
+                            type: 'string'
                           },
-                          "request": {
-                            "description": "Request is the name chosen for a request in the referenced claim.\nIf empty, everything from the claim is made available, otherwise\nonly the result of this request.",
-                            "type": "string"
+                          request: {
+                            description:
+                              'Request is the name chosen for a request in the referenced claim.\nIf empty, everything from the claim is made available, otherwise\nonly the result of this request.',
+                            type: 'string'
                           }
                         },
-                        "required": [
-                          "name"
-                        ],
-                        "type": "object"
+                        required: ['name'],
+                        type: 'object'
                       },
-                      "type": "array",
-                      "x-kubernetes-list-map-keys": [
-                        "name"
-                      ],
-                      "x-kubernetes-list-type": "map"
+                      type: 'array',
+                      'x-kubernetes-list-map-keys': ['name'],
+                      'x-kubernetes-list-type': 'map'
                     },
-                    "limits": {
-                      "additionalProperties": {
-                        "anyOf": [
+                    limits: {
+                      additionalProperties: {
+                        anyOf: [
                           {
-                            "type": "integer"
+                            type: 'integer'
                           },
                           {
-                            "type": "string"
+                            type: 'string'
                           }
                         ],
-                        "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                        "x-kubernetes-int-or-string": true
+                        pattern:
+                          '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                        'x-kubernetes-int-or-string': true
                       },
-                      "description": "Limits describes the maximum amount of compute resources allowed.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
-                      "type": "object"
+                      description:
+                        'Limits describes the maximum amount of compute resources allowed.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/',
+                      type: 'object'
                     },
-                    "requests": {
-                      "additionalProperties": {
-                        "anyOf": [
+                    requests: {
+                      additionalProperties: {
+                        anyOf: [
                           {
-                            "type": "integer"
+                            type: 'integer'
                           },
                           {
-                            "type": "string"
+                            type: 'string'
                           }
                         ],
-                        "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                        "x-kubernetes-int-or-string": true
+                        pattern:
+                          '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                        'x-kubernetes-int-or-string': true
                       },
-                      "description": "Requests describes the minimum amount of compute resources required.\nIf Requests is omitted for a container, it defaults to Limits if that is explicitly specified,\notherwise to an implementation-defined value. Requests cannot exceed Limits.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
-                      "type": "object"
+                      description:
+                        'Requests describes the minimum amount of compute resources required.\nIf Requests is omitted for a container, it defaults to Limits if that is explicitly specified,\notherwise to an implementation-defined value. Requests cannot exceed Limits.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/',
+                      type: 'object'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 },
-                "sampling": {
-                  "default": 50,
-                  "description": "Sampling interval of the eBPF probe. 100 means one packet on 100 is sent. 0 or 1 means all packets are sampled.",
-                  "format": "int32",
-                  "minimum": 0,
-                  "type": "integer"
+                sampling: {
+                  default: 50,
+                  description:
+                    'Sampling interval of the eBPF probe. 100 means one packet on 100 is sent. 0 or 1 means all packets are sampled.',
+                  format: 'int32',
+                  minimum: 0,
+                  type: 'integer'
                 }
               },
-              "type": "object"
+              type: 'object'
             },
-            "ipfix": {
-              "description": "`ipfix` [deprecated (*)] - describes the settings related to the IPFIX-based flow reporter when `spec.agent.type`\nis set to `IPFIX`.",
-              "properties": {
-                "cacheActiveTimeout": {
-                  "default": "20s",
-                  "description": "`cacheActiveTimeout` is the max period during which the reporter aggregates flows before sending.",
-                  "pattern": "^\\d+(ns|ms|s|m)?$",
-                  "type": "string"
+            ipfix: {
+              description:
+                '`ipfix` [deprecated (*)] - describes the settings related to the IPFIX-based flow reporter when `spec.agent.type`\nis set to `IPFIX`.',
+              properties: {
+                cacheActiveTimeout: {
+                  default: '20s',
+                  description:
+                    '`cacheActiveTimeout` is the max period during which the reporter aggregates flows before sending.',
+                  pattern: '^\\d+(ns|ms|s|m)?$',
+                  type: 'string'
                 },
-                "cacheMaxFlows": {
-                  "default": 400,
-                  "description": "`cacheMaxFlows` is the max number of flows in an aggregate; when reached, the reporter sends the flows.",
-                  "format": "int32",
-                  "minimum": 0,
-                  "type": "integer"
+                cacheMaxFlows: {
+                  default: 400,
+                  description:
+                    '`cacheMaxFlows` is the max number of flows in an aggregate; when reached, the reporter sends the flows.',
+                  format: 'int32',
+                  minimum: 0,
+                  type: 'integer'
                 },
-                "clusterNetworkOperator": {
-                  "description": "`clusterNetworkOperator` defines the settings related to the OpenShift Cluster Network Operator, when available.",
-                  "properties": {
-                    "namespace": {
-                      "default": "openshift-network-operator",
-                      "description": "Namespace  where the config map is going to be deployed.",
-                      "type": "string"
+                clusterNetworkOperator: {
+                  description:
+                    '`clusterNetworkOperator` defines the settings related to the OpenShift Cluster Network Operator, when available.',
+                  properties: {
+                    namespace: {
+                      default: 'openshift-network-operator',
+                      description: 'Namespace  where the config map is going to be deployed.',
+                      type: 'string'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 },
-                "forceSampleAll": {
-                  "default": false,
-                  "description": "`forceSampleAll` allows disabling sampling in the IPFIX-based flow reporter.\nIt is not recommended to sample all the traffic with IPFIX, as it might generate cluster instability.\nIf you REALLY want to do that, set this flag to `true`. Use at your own risk.\nWhen it is set to `true`, the value of `sampling` is ignored.",
-                  "type": "boolean"
+                forceSampleAll: {
+                  default: false,
+                  description:
+                    '`forceSampleAll` allows disabling sampling in the IPFIX-based flow reporter.\nIt is not recommended to sample all the traffic with IPFIX, as it might generate cluster instability.\nIf you REALLY want to do that, set this flag to `true`. Use at your own risk.\nWhen it is set to `true`, the value of `sampling` is ignored.',
+                  type: 'boolean'
                 },
-                "ovnKubernetes": {
-                  "description": "`ovnKubernetes` defines the settings of the OVN-Kubernetes network plugin, when available. This configuration is used when using OVN's IPFIX exports, without OpenShift. When using OpenShift, refer to the `clusterNetworkOperator` property instead.",
-                  "properties": {
-                    "containerName": {
-                      "default": "ovnkube-node",
-                      "description": "`containerName` defines the name of the container to configure for IPFIX.",
-                      "type": "string"
+                ovnKubernetes: {
+                  description:
+                    "`ovnKubernetes` defines the settings of the OVN-Kubernetes network plugin, when available. This configuration is used when using OVN's IPFIX exports, without OpenShift. When using OpenShift, refer to the `clusterNetworkOperator` property instead.",
+                  properties: {
+                    containerName: {
+                      default: 'ovnkube-node',
+                      description: '`containerName` defines the name of the container to configure for IPFIX.',
+                      type: 'string'
                     },
-                    "daemonSetName": {
-                      "default": "ovnkube-node",
-                      "description": "`daemonSetName` defines the name of the DaemonSet controlling the OVN-Kubernetes pods.",
-                      "type": "string"
+                    daemonSetName: {
+                      default: 'ovnkube-node',
+                      description:
+                        '`daemonSetName` defines the name of the DaemonSet controlling the OVN-Kubernetes pods.',
+                      type: 'string'
                     },
-                    "namespace": {
-                      "default": "ovn-kubernetes",
-                      "description": "Namespace where OVN-Kubernetes pods are deployed.",
-                      "type": "string"
+                    namespace: {
+                      default: 'ovn-kubernetes',
+                      description: 'Namespace where OVN-Kubernetes pods are deployed.',
+                      type: 'string'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 },
-                "sampling": {
-                  "default": 400,
-                  "description": "`sampling` is the sampling interval on the reporter. 100 means one flow on 100 is sent.\nTo ensure cluster stability, it is not possible to set a value below 2.\nIf you really want to sample every packet, which might impact the cluster stability,\nrefer to `forceSampleAll`. Alternatively, you can use the eBPF Agent instead of IPFIX.",
-                  "format": "int32",
-                  "minimum": 2,
-                  "type": "integer"
+                sampling: {
+                  default: 400,
+                  description:
+                    '`sampling` is the sampling interval on the reporter. 100 means one flow on 100 is sent.\nTo ensure cluster stability, it is not possible to set a value below 2.\nIf you really want to sample every packet, which might impact the cluster stability,\nrefer to `forceSampleAll`. Alternatively, you can use the eBPF Agent instead of IPFIX.',
+                  format: 'int32',
+                  minimum: 2,
+                  type: 'integer'
                 }
               },
-              "type": "object"
+              type: 'object'
             },
-            "type": {
-              "default": "eBPF",
-              "description": "`type` [deprecated (*)] selects the flows tracing agent. Previously, this field allowed to select between `eBPF` or `IPFIX`.\nOnly `eBPF` is allowed now, so this field is deprecated and is planned for removal in a future version of the API.",
-              "enum": [
-                "eBPF",
-                "IPFIX"
-              ],
-              "type": "string"
+            type: {
+              default: 'eBPF',
+              description:
+                '`type` [deprecated (*)] selects the flows tracing agent. Previously, this field allowed to select between `eBPF` or `IPFIX`.\nOnly `eBPF` is allowed now, so this field is deprecated and is planned for removal in a future version of the API.',
+              enum: ['eBPF', 'IPFIX'],
+              type: 'string'
             }
           },
-          "type": "object"
+          type: 'object'
         },
-        "consolePlugin": {
-          "description": "`consolePlugin` defines the settings related to the OpenShift Console plugin, when available.",
-          "properties": {
-            "advanced": {
-              "description": "`advanced` allows setting some aspects of the internal configuration of the console plugin.\nThis section is aimed mostly for debugging and fine-grained performance optimizations,\nsuch as `GOGC` and `GOMAXPROCS` environment variables. Set these values at your own risk.",
-              "properties": {
-                "args": {
-                  "description": "`args` allows passing custom arguments to underlying components. Useful for overriding\nsome parameters, such as a URL or a configuration path, that should not be\npublicly exposed as part of the FlowCollector descriptor, as they are only useful\nin edge debug or support scenarios.",
-                  "items": {
-                    "type": "string"
+        consolePlugin: {
+          description: '`consolePlugin` defines the settings related to the OpenShift Console plugin, when available.',
+          properties: {
+            advanced: {
+              description:
+                '`advanced` allows setting some aspects of the internal configuration of the console plugin.\nThis section is aimed mostly for debugging and fine-grained performance optimizations,\nsuch as `GOGC` and `GOMAXPROCS` environment variables. Set these values at your own risk.',
+              properties: {
+                args: {
+                  description:
+                    '`args` allows passing custom arguments to underlying components. Useful for overriding\nsome parameters, such as a URL or a configuration path, that should not be\npublicly exposed as part of the FlowCollector descriptor, as they are only useful\nin edge debug or support scenarios.',
+                  items: {
+                    type: 'string'
                   },
-                  "type": "array"
+                  type: 'array'
                 },
-                "env": {
-                  "additionalProperties": {
-                    "type": "string"
+                env: {
+                  additionalProperties: {
+                    type: 'string'
                   },
-                  "description": "`env` allows passing custom environment variables to underlying components. Useful for passing\nsome very concrete performance-tuning options, such as `GOGC` and `GOMAXPROCS`, that should not be\npublicly exposed as part of the FlowCollector descriptor, as they are only useful\nin edge debug or support scenarios.",
-                  "type": "object"
+                  description:
+                    '`env` allows passing custom environment variables to underlying components. Useful for passing\nsome very concrete performance-tuning options, such as `GOGC` and `GOMAXPROCS`, that should not be\npublicly exposed as part of the FlowCollector descriptor, as they are only useful\nin edge debug or support scenarios.',
+                  type: 'object'
                 },
-                "port": {
-                  "default": 9001,
-                  "description": "`port` is the plugin service port. Do not use 9002, which is reserved for metrics.",
-                  "format": "int32",
-                  "maximum": 65535,
-                  "minimum": 1,
-                  "type": "integer"
+                port: {
+                  default: 9001,
+                  description: '`port` is the plugin service port. Do not use 9002, which is reserved for metrics.',
+                  format: 'int32',
+                  maximum: 65535,
+                  minimum: 1,
+                  type: 'integer'
                 },
-                "register": {
-                  "default": true,
-                  "description": "`register` allows, when set to `true`, to automatically register the provided console plugin with the OpenShift Console operator.\nWhen set to `false`, you can still register it manually by editing console.operator.openshift.io/cluster with the following command:\n`oc patch console.operator.openshift.io cluster --type='json' -p '[{\"op\": \"add\", \"path\": \"/spec/plugins/-\", \"value\": \"netobserv-plugin\"}]'`",
-                  "type": "boolean"
+                register: {
+                  default: true,
+                  description:
+                    '`register` allows, when set to `true`, to automatically register the provided console plugin with the OpenShift Console operator.\nWhen set to `false`, you can still register it manually by editing console.operator.openshift.io/cluster with the following command:\n`oc patch console.operator.openshift.io cluster --type=\'json\' -p \'[{"op": "add", "path": "/spec/plugins/-", "value": "netobserv-plugin"}]\'`',
+                  type: 'boolean'
                 },
-                "scheduling": {
-                  "description": "`scheduling` controls how the pods are scheduled on nodes.",
-                  "properties": {
-                    "affinity": {
-                      "description": "If specified, the pod's scheduling constraints. For documentation, refer to https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling.",
-                      "properties": {
-                        "nodeAffinity": {
-                          "description": "Describes node affinity scheduling rules for the pod.",
-                          "properties": {
-                            "preferredDuringSchedulingIgnoredDuringExecution": {
-                              "description": "The scheduler will prefer to schedule pods to nodes that satisfy\nthe affinity expressions specified by this field, but it may choose\na node that violates one or more of the expressions. The node that is\nmost preferred is the one with the greatest sum of weights, i.e.\nfor each node that meets all of the scheduling requirements (resource\nrequest, requiredDuringScheduling affinity expressions, etc.),\ncompute a sum by iterating through the elements of this field and adding\n\"weight\" to the sum if the node matches the corresponding matchExpressions; the\nnode(s) with the highest sum are the most preferred.",
-                              "items": {
-                                "description": "An empty preferred scheduling term matches all objects with implicit weight 0\n(i.e. it's a no-op). A null preferred scheduling term matches no objects (i.e. is also a no-op).",
-                                "properties": {
-                                  "preference": {
-                                    "description": "A node selector term, associated with the corresponding weight.",
-                                    "properties": {
-                                      "matchExpressions": {
-                                        "description": "A list of node selector requirements by node's labels.",
-                                        "items": {
-                                          "description": "A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.",
-                                          "properties": {
-                                            "key": {
-                                              "description": "The label key that the selector applies to.",
-                                              "type": "string"
+                scheduling: {
+                  description: '`scheduling` controls how the pods are scheduled on nodes.',
+                  properties: {
+                    affinity: {
+                      description:
+                        "If specified, the pod's scheduling constraints. For documentation, refer to https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling.",
+                      properties: {
+                        nodeAffinity: {
+                          description: 'Describes node affinity scheduling rules for the pod.',
+                          properties: {
+                            preferredDuringSchedulingIgnoredDuringExecution: {
+                              description:
+                                'The scheduler will prefer to schedule pods to nodes that satisfy\nthe affinity expressions specified by this field, but it may choose\na node that violates one or more of the expressions. The node that is\nmost preferred is the one with the greatest sum of weights, i.e.\nfor each node that meets all of the scheduling requirements (resource\nrequest, requiredDuringScheduling affinity expressions, etc.),\ncompute a sum by iterating through the elements of this field and adding\n"weight" to the sum if the node matches the corresponding matchExpressions; the\nnode(s) with the highest sum are the most preferred.',
+                              items: {
+                                description:
+                                  "An empty preferred scheduling term matches all objects with implicit weight 0\n(i.e. it's a no-op). A null preferred scheduling term matches no objects (i.e. is also a no-op).",
+                                properties: {
+                                  preference: {
+                                    description: 'A node selector term, associated with the corresponding weight.',
+                                    properties: {
+                                      matchExpressions: {
+                                        description: "A list of node selector requirements by node's labels.",
+                                        items: {
+                                          description:
+                                            'A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.',
+                                          properties: {
+                                            key: {
+                                              description: 'The label key that the selector applies to.',
+                                              type: 'string'
                                             },
-                                            "operator": {
-                                              "description": "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
-                                              "type": "string"
+                                            operator: {
+                                              description:
+                                                "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
+                                              type: 'string'
                                             },
-                                            "values": {
-                                              "description": "An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.",
-                                              "items": {
-                                                "type": "string"
+                                            values: {
+                                              description:
+                                                'An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.',
+                                              items: {
+                                                type: 'string'
                                               },
-                                              "type": "array",
-                                              "x-kubernetes-list-type": "atomic"
+                                              type: 'array',
+                                              'x-kubernetes-list-type': 'atomic'
                                             }
                                           },
-                                          "required": [
-                                            "key",
-                                            "operator"
-                                          ],
-                                          "type": "object"
+                                          required: ['key', 'operator'],
+                                          type: 'object'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "matchFields": {
-                                        "description": "A list of node selector requirements by node's fields.",
-                                        "items": {
-                                          "description": "A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.",
-                                          "properties": {
-                                            "key": {
-                                              "description": "The label key that the selector applies to.",
-                                              "type": "string"
+                                      matchFields: {
+                                        description: "A list of node selector requirements by node's fields.",
+                                        items: {
+                                          description:
+                                            'A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.',
+                                          properties: {
+                                            key: {
+                                              description: 'The label key that the selector applies to.',
+                                              type: 'string'
                                             },
-                                            "operator": {
-                                              "description": "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
-                                              "type": "string"
+                                            operator: {
+                                              description:
+                                                "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
+                                              type: 'string'
                                             },
-                                            "values": {
-                                              "description": "An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.",
-                                              "items": {
-                                                "type": "string"
+                                            values: {
+                                              description:
+                                                'An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.',
+                                              items: {
+                                                type: 'string'
                                               },
-                                              "type": "array",
-                                              "x-kubernetes-list-type": "atomic"
+                                              type: 'array',
+                                              'x-kubernetes-list-type': 'atomic'
                                             }
                                           },
-                                          "required": [
-                                            "key",
-                                            "operator"
-                                          ],
-                                          "type": "object"
+                                          required: ['key', 'operator'],
+                                          type: 'object'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       }
                                     },
-                                    "type": "object",
-                                    "x-kubernetes-map-type": "atomic"
+                                    type: 'object',
+                                    'x-kubernetes-map-type': 'atomic'
                                   },
-                                  "weight": {
-                                    "description": "Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.",
-                                    "format": "int32",
-                                    "type": "integer"
+                                  weight: {
+                                    description:
+                                      'Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.',
+                                    format: 'int32',
+                                    type: 'integer'
                                   }
                                 },
-                                "required": [
-                                  "preference",
-                                  "weight"
-                                ],
-                                "type": "object"
+                                required: ['preference', 'weight'],
+                                type: 'object'
                               },
-                              "type": "array",
-                              "x-kubernetes-list-type": "atomic"
+                              type: 'array',
+                              'x-kubernetes-list-type': 'atomic'
                             },
-                            "requiredDuringSchedulingIgnoredDuringExecution": {
-                              "description": "If the affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to an update), the system\nmay or may not try to eventually evict the pod from its node.",
-                              "properties": {
-                                "nodeSelectorTerms": {
-                                  "description": "Required. A list of node selector terms. The terms are ORed.",
-                                  "items": {
-                                    "description": "A null or empty node selector term matches no objects. The requirements of\nthem are ANDed.\nThe TopologySelectorTerm type implements a subset of the NodeSelectorTerm.",
-                                    "properties": {
-                                      "matchExpressions": {
-                                        "description": "A list of node selector requirements by node's labels.",
-                                        "items": {
-                                          "description": "A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.",
-                                          "properties": {
-                                            "key": {
-                                              "description": "The label key that the selector applies to.",
-                                              "type": "string"
+                            requiredDuringSchedulingIgnoredDuringExecution: {
+                              description:
+                                'If the affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to an update), the system\nmay or may not try to eventually evict the pod from its node.',
+                              properties: {
+                                nodeSelectorTerms: {
+                                  description: 'Required. A list of node selector terms. The terms are ORed.',
+                                  items: {
+                                    description:
+                                      'A null or empty node selector term matches no objects. The requirements of\nthem are ANDed.\nThe TopologySelectorTerm type implements a subset of the NodeSelectorTerm.',
+                                    properties: {
+                                      matchExpressions: {
+                                        description: "A list of node selector requirements by node's labels.",
+                                        items: {
+                                          description:
+                                            'A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.',
+                                          properties: {
+                                            key: {
+                                              description: 'The label key that the selector applies to.',
+                                              type: 'string'
                                             },
-                                            "operator": {
-                                              "description": "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
-                                              "type": "string"
+                                            operator: {
+                                              description:
+                                                "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
+                                              type: 'string'
                                             },
-                                            "values": {
-                                              "description": "An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.",
-                                              "items": {
-                                                "type": "string"
+                                            values: {
+                                              description:
+                                                'An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.',
+                                              items: {
+                                                type: 'string'
                                               },
-                                              "type": "array",
-                                              "x-kubernetes-list-type": "atomic"
+                                              type: 'array',
+                                              'x-kubernetes-list-type': 'atomic'
                                             }
                                           },
-                                          "required": [
-                                            "key",
-                                            "operator"
-                                          ],
-                                          "type": "object"
+                                          required: ['key', 'operator'],
+                                          type: 'object'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "matchFields": {
-                                        "description": "A list of node selector requirements by node's fields.",
-                                        "items": {
-                                          "description": "A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.",
-                                          "properties": {
-                                            "key": {
-                                              "description": "The label key that the selector applies to.",
-                                              "type": "string"
+                                      matchFields: {
+                                        description: "A list of node selector requirements by node's fields.",
+                                        items: {
+                                          description:
+                                            'A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.',
+                                          properties: {
+                                            key: {
+                                              description: 'The label key that the selector applies to.',
+                                              type: 'string'
                                             },
-                                            "operator": {
-                                              "description": "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
-                                              "type": "string"
+                                            operator: {
+                                              description:
+                                                "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
+                                              type: 'string'
                                             },
-                                            "values": {
-                                              "description": "An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.",
-                                              "items": {
-                                                "type": "string"
+                                            values: {
+                                              description:
+                                                'An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.',
+                                              items: {
+                                                type: 'string'
                                               },
-                                              "type": "array",
-                                              "x-kubernetes-list-type": "atomic"
+                                              type: 'array',
+                                              'x-kubernetes-list-type': 'atomic'
                                             }
                                           },
-                                          "required": [
-                                            "key",
-                                            "operator"
-                                          ],
-                                          "type": "object"
+                                          required: ['key', 'operator'],
+                                          type: 'object'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       }
                                     },
-                                    "type": "object",
-                                    "x-kubernetes-map-type": "atomic"
+                                    type: 'object',
+                                    'x-kubernetes-map-type': 'atomic'
                                   },
-                                  "type": "array",
-                                  "x-kubernetes-list-type": "atomic"
+                                  type: 'array',
+                                  'x-kubernetes-list-type': 'atomic'
                                 }
                               },
-                              "required": [
-                                "nodeSelectorTerms"
-                              ],
-                              "type": "object",
-                              "x-kubernetes-map-type": "atomic"
+                              required: ['nodeSelectorTerms'],
+                              type: 'object',
+                              'x-kubernetes-map-type': 'atomic'
                             }
                           },
-                          "type": "object"
+                          type: 'object'
                         },
-                        "podAffinity": {
-                          "description": "Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).",
-                          "properties": {
-                            "preferredDuringSchedulingIgnoredDuringExecution": {
-                              "description": "The scheduler will prefer to schedule pods to nodes that satisfy\nthe affinity expressions specified by this field, but it may choose\na node that violates one or more of the expressions. The node that is\nmost preferred is the one with the greatest sum of weights, i.e.\nfor each node that meets all of the scheduling requirements (resource\nrequest, requiredDuringScheduling affinity expressions, etc.),\ncompute a sum by iterating through the elements of this field and adding\n\"weight\" to the sum if the node has pods which matches the corresponding podAffinityTerm; the\nnode(s) with the highest sum are the most preferred.",
-                              "items": {
-                                "description": "The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)",
-                                "properties": {
-                                  "podAffinityTerm": {
-                                    "description": "Required. A pod affinity term, associated with the corresponding weight.",
-                                    "properties": {
-                                      "labelSelector": {
-                                        "description": "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
-                                        "properties": {
-                                          "matchExpressions": {
-                                            "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                            "items": {
-                                              "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                              "properties": {
-                                                "key": {
-                                                  "description": "key is the label key that the selector applies to.",
-                                                  "type": "string"
+                        podAffinity: {
+                          description:
+                            'Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).',
+                          properties: {
+                            preferredDuringSchedulingIgnoredDuringExecution: {
+                              description:
+                                'The scheduler will prefer to schedule pods to nodes that satisfy\nthe affinity expressions specified by this field, but it may choose\na node that violates one or more of the expressions. The node that is\nmost preferred is the one with the greatest sum of weights, i.e.\nfor each node that meets all of the scheduling requirements (resource\nrequest, requiredDuringScheduling affinity expressions, etc.),\ncompute a sum by iterating through the elements of this field and adding\n"weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the\nnode(s) with the highest sum are the most preferred.',
+                              items: {
+                                description:
+                                  'The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)',
+                                properties: {
+                                  podAffinityTerm: {
+                                    description:
+                                      'Required. A pod affinity term, associated with the corresponding weight.',
+                                    properties: {
+                                      labelSelector: {
+                                        description:
+                                          "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
+                                        properties: {
+                                          matchExpressions: {
+                                            description:
+                                              'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                            items: {
+                                              description:
+                                                'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                              properties: {
+                                                key: {
+                                                  description: 'key is the label key that the selector applies to.',
+                                                  type: 'string'
                                                 },
-                                                "operator": {
-                                                  "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                                  "type": "string"
+                                                operator: {
+                                                  description:
+                                                    "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                                  type: 'string'
                                                 },
-                                                "values": {
-                                                  "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                                  "items": {
-                                                    "type": "string"
+                                                values: {
+                                                  description:
+                                                    'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                                  items: {
+                                                    type: 'string'
                                                   },
-                                                  "type": "array",
-                                                  "x-kubernetes-list-type": "atomic"
+                                                  type: 'array',
+                                                  'x-kubernetes-list-type': 'atomic'
                                                 }
                                               },
-                                              "required": [
-                                                "key",
-                                                "operator"
-                                              ],
-                                              "type": "object"
+                                              required: ['key', 'operator'],
+                                              type: 'object'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "matchLabels": {
-                                            "additionalProperties": {
-                                              "type": "string"
+                                          matchLabels: {
+                                            additionalProperties: {
+                                              type: 'string'
                                             },
-                                            "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                            "type": "object"
+                                            description:
+                                              'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                            type: 'object'
                                           }
                                         },
-                                        "type": "object",
-                                        "x-kubernetes-map-type": "atomic"
+                                        type: 'object',
+                                        'x-kubernetes-map-type': 'atomic'
                                       },
-                                      "matchLabelKeys": {
-                                        "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
-                                        "items": {
-                                          "type": "string"
+                                      matchLabelKeys: {
+                                        description:
+                                          "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
+                                        items: {
+                                          type: 'string'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "mismatchLabelKeys": {
-                                        "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
-                                        "items": {
-                                          "type": "string"
+                                      mismatchLabelKeys: {
+                                        description:
+                                          "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
+                                        items: {
+                                          type: 'string'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "namespaceSelector": {
-                                        "description": "A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means \"this pod's namespace\".\nAn empty selector ({}) matches all namespaces.",
-                                        "properties": {
-                                          "matchExpressions": {
-                                            "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                            "items": {
-                                              "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                              "properties": {
-                                                "key": {
-                                                  "description": "key is the label key that the selector applies to.",
-                                                  "type": "string"
+                                      namespaceSelector: {
+                                        description:
+                                          'A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means "this pod\'s namespace".\nAn empty selector ({}) matches all namespaces.',
+                                        properties: {
+                                          matchExpressions: {
+                                            description:
+                                              'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                            items: {
+                                              description:
+                                                'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                              properties: {
+                                                key: {
+                                                  description: 'key is the label key that the selector applies to.',
+                                                  type: 'string'
                                                 },
-                                                "operator": {
-                                                  "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                                  "type": "string"
+                                                operator: {
+                                                  description:
+                                                    "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                                  type: 'string'
                                                 },
-                                                "values": {
-                                                  "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                                  "items": {
-                                                    "type": "string"
+                                                values: {
+                                                  description:
+                                                    'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                                  items: {
+                                                    type: 'string'
                                                   },
-                                                  "type": "array",
-                                                  "x-kubernetes-list-type": "atomic"
+                                                  type: 'array',
+                                                  'x-kubernetes-list-type': 'atomic'
                                                 }
                                               },
-                                              "required": [
-                                                "key",
-                                                "operator"
-                                              ],
-                                              "type": "object"
+                                              required: ['key', 'operator'],
+                                              type: 'object'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "matchLabels": {
-                                            "additionalProperties": {
-                                              "type": "string"
+                                          matchLabels: {
+                                            additionalProperties: {
+                                              type: 'string'
                                             },
-                                            "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                            "type": "object"
+                                            description:
+                                              'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                            type: 'object'
                                           }
                                         },
-                                        "type": "object",
-                                        "x-kubernetes-map-type": "atomic"
+                                        type: 'object',
+                                        'x-kubernetes-map-type': 'atomic'
                                       },
-                                      "namespaces": {
-                                        "description": "namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means \"this pod's namespace\".",
-                                        "items": {
-                                          "type": "string"
+                                      namespaces: {
+                                        description:
+                                          'namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means "this pod\'s namespace".',
+                                        items: {
+                                          type: 'string'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "topologyKey": {
-                                        "description": "This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.",
-                                        "type": "string"
+                                      topologyKey: {
+                                        description:
+                                          'This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.',
+                                        type: 'string'
                                       }
                                     },
-                                    "required": [
-                                      "topologyKey"
-                                    ],
-                                    "type": "object"
+                                    required: ['topologyKey'],
+                                    type: 'object'
                                   },
-                                  "weight": {
-                                    "description": "weight associated with matching the corresponding podAffinityTerm,\nin the range 1-100.",
-                                    "format": "int32",
-                                    "type": "integer"
+                                  weight: {
+                                    description:
+                                      'weight associated with matching the corresponding podAffinityTerm,\nin the range 1-100.',
+                                    format: 'int32',
+                                    type: 'integer'
                                   }
                                 },
-                                "required": [
-                                  "podAffinityTerm",
-                                  "weight"
-                                ],
-                                "type": "object"
+                                required: ['podAffinityTerm', 'weight'],
+                                type: 'object'
                               },
-                              "type": "array",
-                              "x-kubernetes-list-type": "atomic"
+                              type: 'array',
+                              'x-kubernetes-list-type': 'atomic'
                             },
-                            "requiredDuringSchedulingIgnoredDuringExecution": {
-                              "description": "If the affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to a pod label update), the\nsystem may or may not try to eventually evict the pod from its node.\nWhen there are multiple elements, the lists of nodes corresponding to each\npodAffinityTerm are intersected, i.e. all terms must be satisfied.",
-                              "items": {
-                                "description": "Defines a set of pods (namely those matching the labelSelector\nrelative to the given namespace(s)) that this pod should be\nco-located (affinity) or not co-located (anti-affinity) with,\nwhere co-located is defined as running on a node whose value of\nthe label with key <topologyKey> matches that of any node on which\na pod of the set of pods is running",
-                                "properties": {
-                                  "labelSelector": {
-                                    "description": "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
-                                    "properties": {
-                                      "matchExpressions": {
-                                        "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                        "items": {
-                                          "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                          "properties": {
-                                            "key": {
-                                              "description": "key is the label key that the selector applies to.",
-                                              "type": "string"
+                            requiredDuringSchedulingIgnoredDuringExecution: {
+                              description:
+                                'If the affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to a pod label update), the\nsystem may or may not try to eventually evict the pod from its node.\nWhen there are multiple elements, the lists of nodes corresponding to each\npodAffinityTerm are intersected, i.e. all terms must be satisfied.',
+                              items: {
+                                description:
+                                  'Defines a set of pods (namely those matching the labelSelector\nrelative to the given namespace(s)) that this pod should be\nco-located (affinity) or not co-located (anti-affinity) with,\nwhere co-located is defined as running on a node whose value of\nthe label with key <topologyKey> matches that of any node on which\na pod of the set of pods is running',
+                                properties: {
+                                  labelSelector: {
+                                    description:
+                                      "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
+                                    properties: {
+                                      matchExpressions: {
+                                        description:
+                                          'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                        items: {
+                                          description:
+                                            'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                          properties: {
+                                            key: {
+                                              description: 'key is the label key that the selector applies to.',
+                                              type: 'string'
                                             },
-                                            "operator": {
-                                              "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                              "type": "string"
+                                            operator: {
+                                              description:
+                                                "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                              type: 'string'
                                             },
-                                            "values": {
-                                              "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                              "items": {
-                                                "type": "string"
+                                            values: {
+                                              description:
+                                                'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                              items: {
+                                                type: 'string'
                                               },
-                                              "type": "array",
-                                              "x-kubernetes-list-type": "atomic"
+                                              type: 'array',
+                                              'x-kubernetes-list-type': 'atomic'
                                             }
                                           },
-                                          "required": [
-                                            "key",
-                                            "operator"
-                                          ],
-                                          "type": "object"
+                                          required: ['key', 'operator'],
+                                          type: 'object'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "matchLabels": {
-                                        "additionalProperties": {
-                                          "type": "string"
+                                      matchLabels: {
+                                        additionalProperties: {
+                                          type: 'string'
                                         },
-                                        "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                        "type": "object"
+                                        description:
+                                          'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                        type: 'object'
                                       }
                                     },
-                                    "type": "object",
-                                    "x-kubernetes-map-type": "atomic"
+                                    type: 'object',
+                                    'x-kubernetes-map-type': 'atomic'
                                   },
-                                  "matchLabelKeys": {
-                                    "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
-                                    "items": {
-                                      "type": "string"
+                                  matchLabelKeys: {
+                                    description:
+                                      "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
+                                    items: {
+                                      type: 'string'
                                     },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
+                                    type: 'array',
+                                    'x-kubernetes-list-type': 'atomic'
                                   },
-                                  "mismatchLabelKeys": {
-                                    "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
-                                    "items": {
-                                      "type": "string"
+                                  mismatchLabelKeys: {
+                                    description:
+                                      "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
+                                    items: {
+                                      type: 'string'
                                     },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
+                                    type: 'array',
+                                    'x-kubernetes-list-type': 'atomic'
                                   },
-                                  "namespaceSelector": {
-                                    "description": "A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means \"this pod's namespace\".\nAn empty selector ({}) matches all namespaces.",
-                                    "properties": {
-                                      "matchExpressions": {
-                                        "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                        "items": {
-                                          "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                          "properties": {
-                                            "key": {
-                                              "description": "key is the label key that the selector applies to.",
-                                              "type": "string"
+                                  namespaceSelector: {
+                                    description:
+                                      'A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means "this pod\'s namespace".\nAn empty selector ({}) matches all namespaces.',
+                                    properties: {
+                                      matchExpressions: {
+                                        description:
+                                          'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                        items: {
+                                          description:
+                                            'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                          properties: {
+                                            key: {
+                                              description: 'key is the label key that the selector applies to.',
+                                              type: 'string'
                                             },
-                                            "operator": {
-                                              "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                              "type": "string"
+                                            operator: {
+                                              description:
+                                                "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                              type: 'string'
                                             },
-                                            "values": {
-                                              "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                              "items": {
-                                                "type": "string"
+                                            values: {
+                                              description:
+                                                'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                              items: {
+                                                type: 'string'
                                               },
-                                              "type": "array",
-                                              "x-kubernetes-list-type": "atomic"
+                                              type: 'array',
+                                              'x-kubernetes-list-type': 'atomic'
                                             }
                                           },
-                                          "required": [
-                                            "key",
-                                            "operator"
-                                          ],
-                                          "type": "object"
+                                          required: ['key', 'operator'],
+                                          type: 'object'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "matchLabels": {
-                                        "additionalProperties": {
-                                          "type": "string"
+                                      matchLabels: {
+                                        additionalProperties: {
+                                          type: 'string'
                                         },
-                                        "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                        "type": "object"
+                                        description:
+                                          'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                        type: 'object'
                                       }
                                     },
-                                    "type": "object",
-                                    "x-kubernetes-map-type": "atomic"
+                                    type: 'object',
+                                    'x-kubernetes-map-type': 'atomic'
                                   },
-                                  "namespaces": {
-                                    "description": "namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means \"this pod's namespace\".",
-                                    "items": {
-                                      "type": "string"
+                                  namespaces: {
+                                    description:
+                                      'namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means "this pod\'s namespace".',
+                                    items: {
+                                      type: 'string'
                                     },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
+                                    type: 'array',
+                                    'x-kubernetes-list-type': 'atomic'
                                   },
-                                  "topologyKey": {
-                                    "description": "This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.",
-                                    "type": "string"
+                                  topologyKey: {
+                                    description:
+                                      'This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.',
+                                    type: 'string'
                                   }
                                 },
-                                "required": [
-                                  "topologyKey"
-                                ],
-                                "type": "object"
+                                required: ['topologyKey'],
+                                type: 'object'
                               },
-                              "type": "array",
-                              "x-kubernetes-list-type": "atomic"
+                              type: 'array',
+                              'x-kubernetes-list-type': 'atomic'
                             }
                           },
-                          "type": "object"
+                          type: 'object'
                         },
-                        "podAntiAffinity": {
-                          "description": "Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).",
-                          "properties": {
-                            "preferredDuringSchedulingIgnoredDuringExecution": {
-                              "description": "The scheduler will prefer to schedule pods to nodes that satisfy\nthe anti-affinity expressions specified by this field, but it may choose\na node that violates one or more of the expressions. The node that is\nmost preferred is the one with the greatest sum of weights, i.e.\nfor each node that meets all of the scheduling requirements (resource\nrequest, requiredDuringScheduling anti-affinity expressions, etc.),\ncompute a sum by iterating through the elements of this field and subtracting\n\"weight\" from the sum if the node has pods which matches the corresponding podAffinityTerm; the\nnode(s) with the highest sum are the most preferred.",
-                              "items": {
-                                "description": "The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)",
-                                "properties": {
-                                  "podAffinityTerm": {
-                                    "description": "Required. A pod affinity term, associated with the corresponding weight.",
-                                    "properties": {
-                                      "labelSelector": {
-                                        "description": "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
-                                        "properties": {
-                                          "matchExpressions": {
-                                            "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                            "items": {
-                                              "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                              "properties": {
-                                                "key": {
-                                                  "description": "key is the label key that the selector applies to.",
-                                                  "type": "string"
+                        podAntiAffinity: {
+                          description:
+                            'Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).',
+                          properties: {
+                            preferredDuringSchedulingIgnoredDuringExecution: {
+                              description:
+                                'The scheduler will prefer to schedule pods to nodes that satisfy\nthe anti-affinity expressions specified by this field, but it may choose\na node that violates one or more of the expressions. The node that is\nmost preferred is the one with the greatest sum of weights, i.e.\nfor each node that meets all of the scheduling requirements (resource\nrequest, requiredDuringScheduling anti-affinity expressions, etc.),\ncompute a sum by iterating through the elements of this field and subtracting\n"weight" from the sum if the node has pods which matches the corresponding podAffinityTerm; the\nnode(s) with the highest sum are the most preferred.',
+                              items: {
+                                description:
+                                  'The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)',
+                                properties: {
+                                  podAffinityTerm: {
+                                    description:
+                                      'Required. A pod affinity term, associated with the corresponding weight.',
+                                    properties: {
+                                      labelSelector: {
+                                        description:
+                                          "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
+                                        properties: {
+                                          matchExpressions: {
+                                            description:
+                                              'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                            items: {
+                                              description:
+                                                'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                              properties: {
+                                                key: {
+                                                  description: 'key is the label key that the selector applies to.',
+                                                  type: 'string'
                                                 },
-                                                "operator": {
-                                                  "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                                  "type": "string"
+                                                operator: {
+                                                  description:
+                                                    "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                                  type: 'string'
                                                 },
-                                                "values": {
-                                                  "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                                  "items": {
-                                                    "type": "string"
+                                                values: {
+                                                  description:
+                                                    'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                                  items: {
+                                                    type: 'string'
                                                   },
-                                                  "type": "array",
-                                                  "x-kubernetes-list-type": "atomic"
+                                                  type: 'array',
+                                                  'x-kubernetes-list-type': 'atomic'
                                                 }
                                               },
-                                              "required": [
-                                                "key",
-                                                "operator"
-                                              ],
-                                              "type": "object"
+                                              required: ['key', 'operator'],
+                                              type: 'object'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "matchLabels": {
-                                            "additionalProperties": {
-                                              "type": "string"
+                                          matchLabels: {
+                                            additionalProperties: {
+                                              type: 'string'
                                             },
-                                            "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                            "type": "object"
+                                            description:
+                                              'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                            type: 'object'
                                           }
                                         },
-                                        "type": "object",
-                                        "x-kubernetes-map-type": "atomic"
+                                        type: 'object',
+                                        'x-kubernetes-map-type': 'atomic'
                                       },
-                                      "matchLabelKeys": {
-                                        "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
-                                        "items": {
-                                          "type": "string"
+                                      matchLabelKeys: {
+                                        description:
+                                          "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
+                                        items: {
+                                          type: 'string'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "mismatchLabelKeys": {
-                                        "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
-                                        "items": {
-                                          "type": "string"
+                                      mismatchLabelKeys: {
+                                        description:
+                                          "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
+                                        items: {
+                                          type: 'string'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "namespaceSelector": {
-                                        "description": "A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means \"this pod's namespace\".\nAn empty selector ({}) matches all namespaces.",
-                                        "properties": {
-                                          "matchExpressions": {
-                                            "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                            "items": {
-                                              "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                              "properties": {
-                                                "key": {
-                                                  "description": "key is the label key that the selector applies to.",
-                                                  "type": "string"
+                                      namespaceSelector: {
+                                        description:
+                                          'A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means "this pod\'s namespace".\nAn empty selector ({}) matches all namespaces.',
+                                        properties: {
+                                          matchExpressions: {
+                                            description:
+                                              'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                            items: {
+                                              description:
+                                                'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                              properties: {
+                                                key: {
+                                                  description: 'key is the label key that the selector applies to.',
+                                                  type: 'string'
                                                 },
-                                                "operator": {
-                                                  "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                                  "type": "string"
+                                                operator: {
+                                                  description:
+                                                    "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                                  type: 'string'
                                                 },
-                                                "values": {
-                                                  "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                                  "items": {
-                                                    "type": "string"
+                                                values: {
+                                                  description:
+                                                    'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                                  items: {
+                                                    type: 'string'
                                                   },
-                                                  "type": "array",
-                                                  "x-kubernetes-list-type": "atomic"
+                                                  type: 'array',
+                                                  'x-kubernetes-list-type': 'atomic'
                                                 }
                                               },
-                                              "required": [
-                                                "key",
-                                                "operator"
-                                              ],
-                                              "type": "object"
+                                              required: ['key', 'operator'],
+                                              type: 'object'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "matchLabels": {
-                                            "additionalProperties": {
-                                              "type": "string"
+                                          matchLabels: {
+                                            additionalProperties: {
+                                              type: 'string'
                                             },
-                                            "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                            "type": "object"
+                                            description:
+                                              'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                            type: 'object'
                                           }
                                         },
-                                        "type": "object",
-                                        "x-kubernetes-map-type": "atomic"
+                                        type: 'object',
+                                        'x-kubernetes-map-type': 'atomic'
                                       },
-                                      "namespaces": {
-                                        "description": "namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means \"this pod's namespace\".",
-                                        "items": {
-                                          "type": "string"
+                                      namespaces: {
+                                        description:
+                                          'namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means "this pod\'s namespace".',
+                                        items: {
+                                          type: 'string'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "topologyKey": {
-                                        "description": "This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.",
-                                        "type": "string"
+                                      topologyKey: {
+                                        description:
+                                          'This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.',
+                                        type: 'string'
                                       }
                                     },
-                                    "required": [
-                                      "topologyKey"
-                                    ],
-                                    "type": "object"
+                                    required: ['topologyKey'],
+                                    type: 'object'
                                   },
-                                  "weight": {
-                                    "description": "weight associated with matching the corresponding podAffinityTerm,\nin the range 1-100.",
-                                    "format": "int32",
-                                    "type": "integer"
+                                  weight: {
+                                    description:
+                                      'weight associated with matching the corresponding podAffinityTerm,\nin the range 1-100.',
+                                    format: 'int32',
+                                    type: 'integer'
                                   }
                                 },
-                                "required": [
-                                  "podAffinityTerm",
-                                  "weight"
-                                ],
-                                "type": "object"
+                                required: ['podAffinityTerm', 'weight'],
+                                type: 'object'
                               },
-                              "type": "array",
-                              "x-kubernetes-list-type": "atomic"
+                              type: 'array',
+                              'x-kubernetes-list-type': 'atomic'
                             },
-                            "requiredDuringSchedulingIgnoredDuringExecution": {
-                              "description": "If the anti-affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the anti-affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to a pod label update), the\nsystem may or may not try to eventually evict the pod from its node.\nWhen there are multiple elements, the lists of nodes corresponding to each\npodAffinityTerm are intersected, i.e. all terms must be satisfied.",
-                              "items": {
-                                "description": "Defines a set of pods (namely those matching the labelSelector\nrelative to the given namespace(s)) that this pod should be\nco-located (affinity) or not co-located (anti-affinity) with,\nwhere co-located is defined as running on a node whose value of\nthe label with key <topologyKey> matches that of any node on which\na pod of the set of pods is running",
-                                "properties": {
-                                  "labelSelector": {
-                                    "description": "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
-                                    "properties": {
-                                      "matchExpressions": {
-                                        "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                        "items": {
-                                          "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                          "properties": {
-                                            "key": {
-                                              "description": "key is the label key that the selector applies to.",
-                                              "type": "string"
+                            requiredDuringSchedulingIgnoredDuringExecution: {
+                              description:
+                                'If the anti-affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the anti-affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to a pod label update), the\nsystem may or may not try to eventually evict the pod from its node.\nWhen there are multiple elements, the lists of nodes corresponding to each\npodAffinityTerm are intersected, i.e. all terms must be satisfied.',
+                              items: {
+                                description:
+                                  'Defines a set of pods (namely those matching the labelSelector\nrelative to the given namespace(s)) that this pod should be\nco-located (affinity) or not co-located (anti-affinity) with,\nwhere co-located is defined as running on a node whose value of\nthe label with key <topologyKey> matches that of any node on which\na pod of the set of pods is running',
+                                properties: {
+                                  labelSelector: {
+                                    description:
+                                      "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
+                                    properties: {
+                                      matchExpressions: {
+                                        description:
+                                          'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                        items: {
+                                          description:
+                                            'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                          properties: {
+                                            key: {
+                                              description: 'key is the label key that the selector applies to.',
+                                              type: 'string'
                                             },
-                                            "operator": {
-                                              "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                              "type": "string"
+                                            operator: {
+                                              description:
+                                                "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                              type: 'string'
                                             },
-                                            "values": {
-                                              "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                              "items": {
-                                                "type": "string"
+                                            values: {
+                                              description:
+                                                'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                              items: {
+                                                type: 'string'
                                               },
-                                              "type": "array",
-                                              "x-kubernetes-list-type": "atomic"
+                                              type: 'array',
+                                              'x-kubernetes-list-type': 'atomic'
                                             }
                                           },
-                                          "required": [
-                                            "key",
-                                            "operator"
-                                          ],
-                                          "type": "object"
+                                          required: ['key', 'operator'],
+                                          type: 'object'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "matchLabels": {
-                                        "additionalProperties": {
-                                          "type": "string"
+                                      matchLabels: {
+                                        additionalProperties: {
+                                          type: 'string'
                                         },
-                                        "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                        "type": "object"
+                                        description:
+                                          'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                        type: 'object'
                                       }
                                     },
-                                    "type": "object",
-                                    "x-kubernetes-map-type": "atomic"
+                                    type: 'object',
+                                    'x-kubernetes-map-type': 'atomic'
                                   },
-                                  "matchLabelKeys": {
-                                    "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
-                                    "items": {
-                                      "type": "string"
+                                  matchLabelKeys: {
+                                    description:
+                                      "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
+                                    items: {
+                                      type: 'string'
                                     },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
+                                    type: 'array',
+                                    'x-kubernetes-list-type': 'atomic'
                                   },
-                                  "mismatchLabelKeys": {
-                                    "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
-                                    "items": {
-                                      "type": "string"
+                                  mismatchLabelKeys: {
+                                    description:
+                                      "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
+                                    items: {
+                                      type: 'string'
                                     },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
+                                    type: 'array',
+                                    'x-kubernetes-list-type': 'atomic'
                                   },
-                                  "namespaceSelector": {
-                                    "description": "A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means \"this pod's namespace\".\nAn empty selector ({}) matches all namespaces.",
-                                    "properties": {
-                                      "matchExpressions": {
-                                        "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                        "items": {
-                                          "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                          "properties": {
-                                            "key": {
-                                              "description": "key is the label key that the selector applies to.",
-                                              "type": "string"
+                                  namespaceSelector: {
+                                    description:
+                                      'A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means "this pod\'s namespace".\nAn empty selector ({}) matches all namespaces.',
+                                    properties: {
+                                      matchExpressions: {
+                                        description:
+                                          'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                        items: {
+                                          description:
+                                            'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                          properties: {
+                                            key: {
+                                              description: 'key is the label key that the selector applies to.',
+                                              type: 'string'
                                             },
-                                            "operator": {
-                                              "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                              "type": "string"
+                                            operator: {
+                                              description:
+                                                "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                              type: 'string'
                                             },
-                                            "values": {
-                                              "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                              "items": {
-                                                "type": "string"
+                                            values: {
+                                              description:
+                                                'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                              items: {
+                                                type: 'string'
                                               },
-                                              "type": "array",
-                                              "x-kubernetes-list-type": "atomic"
+                                              type: 'array',
+                                              'x-kubernetes-list-type': 'atomic'
                                             }
                                           },
-                                          "required": [
-                                            "key",
-                                            "operator"
-                                          ],
-                                          "type": "object"
+                                          required: ['key', 'operator'],
+                                          type: 'object'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "matchLabels": {
-                                        "additionalProperties": {
-                                          "type": "string"
+                                      matchLabels: {
+                                        additionalProperties: {
+                                          type: 'string'
                                         },
-                                        "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                        "type": "object"
+                                        description:
+                                          'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                        type: 'object'
                                       }
                                     },
-                                    "type": "object",
-                                    "x-kubernetes-map-type": "atomic"
+                                    type: 'object',
+                                    'x-kubernetes-map-type': 'atomic'
                                   },
-                                  "namespaces": {
-                                    "description": "namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means \"this pod's namespace\".",
-                                    "items": {
-                                      "type": "string"
+                                  namespaces: {
+                                    description:
+                                      'namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means "this pod\'s namespace".',
+                                    items: {
+                                      type: 'string'
                                     },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
+                                    type: 'array',
+                                    'x-kubernetes-list-type': 'atomic'
                                   },
-                                  "topologyKey": {
-                                    "description": "This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.",
-                                    "type": "string"
+                                  topologyKey: {
+                                    description:
+                                      'This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.',
+                                    type: 'string'
                                   }
                                 },
-                                "required": [
-                                  "topologyKey"
-                                ],
-                                "type": "object"
+                                required: ['topologyKey'],
+                                type: 'object'
                               },
-                              "type": "array",
-                              "x-kubernetes-list-type": "atomic"
+                              type: 'array',
+                              'x-kubernetes-list-type': 'atomic'
                             }
                           },
-                          "type": "object"
+                          type: 'object'
                         }
                       },
-                      "type": "object"
+                      type: 'object'
                     },
-                    "nodeSelector": {
-                      "additionalProperties": {
-                        "type": "string"
+                    nodeSelector: {
+                      additionalProperties: {
+                        type: 'string'
                       },
-                      "description": "`nodeSelector` allows scheduling of pods only onto nodes that have each of the specified labels.\nFor documentation, refer to https://kubernetes.io/docs/concepts/configuration/assign-pod-node/.",
-                      "type": "object",
-                      "x-kubernetes-map-type": "atomic"
+                      description:
+                        '`nodeSelector` allows scheduling of pods only onto nodes that have each of the specified labels.\nFor documentation, refer to https://kubernetes.io/docs/concepts/configuration/assign-pod-node/.',
+                      type: 'object',
+                      'x-kubernetes-map-type': 'atomic'
                     },
-                    "priorityClassName": {
-                      "description": "If specified, indicates the pod's priority. For documentation, refer to https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#how-to-use-priority-and-preemption.\nIf not specified, default priority is used, or zero if there is no default.",
-                      "type": "string"
+                    priorityClassName: {
+                      description:
+                        "If specified, indicates the pod's priority. For documentation, refer to https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#how-to-use-priority-and-preemption.\nIf not specified, default priority is used, or zero if there is no default.",
+                      type: 'string'
                     },
-                    "tolerations": {
-                      "description": "`tolerations` is a list of tolerations that allow the pod to schedule onto nodes with matching taints.\nFor documentation, refer to https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling.",
-                      "items": {
-                        "description": "The pod this Toleration is attached to tolerates any taint that matches\nthe triple <key,value,effect> using the matching operator <operator>.",
-                        "properties": {
-                          "effect": {
-                            "description": "Effect indicates the taint effect to match. Empty means match all taint effects.\nWhen specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.",
-                            "type": "string"
+                    tolerations: {
+                      description:
+                        '`tolerations` is a list of tolerations that allow the pod to schedule onto nodes with matching taints.\nFor documentation, refer to https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling.',
+                      items: {
+                        description:
+                          'The pod this Toleration is attached to tolerates any taint that matches\nthe triple <key,value,effect> using the matching operator <operator>.',
+                        properties: {
+                          effect: {
+                            description:
+                              'Effect indicates the taint effect to match. Empty means match all taint effects.\nWhen specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.',
+                            type: 'string'
                           },
-                          "key": {
-                            "description": "Key is the taint key that the toleration applies to. Empty means match all taint keys.\nIf the key is empty, operator must be Exists; this combination means to match all values and all keys.",
-                            "type": "string"
+                          key: {
+                            description:
+                              'Key is the taint key that the toleration applies to. Empty means match all taint keys.\nIf the key is empty, operator must be Exists; this combination means to match all values and all keys.',
+                            type: 'string'
                           },
-                          "operator": {
-                            "description": "Operator represents a key's relationship to the value.\nValid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.\nExists is equivalent to wildcard for value, so that a pod can\ntolerate all taints of a particular category.\nLt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).",
-                            "type": "string"
+                          operator: {
+                            description:
+                              "Operator represents a key's relationship to the value.\nValid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.\nExists is equivalent to wildcard for value, so that a pod can\ntolerate all taints of a particular category.\nLt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).",
+                            type: 'string'
                           },
-                          "tolerationSeconds": {
-                            "description": "TolerationSeconds represents the period of time the toleration (which must be\nof effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,\nit is not set, which means tolerate the taint forever (do not evict). Zero and\nnegative values will be treated as 0 (evict immediately) by the system.",
-                            "format": "int64",
-                            "type": "integer"
+                          tolerationSeconds: {
+                            description:
+                              'TolerationSeconds represents the period of time the toleration (which must be\nof effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,\nit is not set, which means tolerate the taint forever (do not evict). Zero and\nnegative values will be treated as 0 (evict immediately) by the system.',
+                            format: 'int64',
+                            type: 'integer'
                           },
-                          "value": {
-                            "description": "Value is the taint value the toleration matches to.\nIf the operator is Exists, the value should be empty, otherwise just a regular string.",
-                            "type": "string"
+                          value: {
+                            description:
+                              'Value is the taint value the toleration matches to.\nIf the operator is Exists, the value should be empty, otherwise just a regular string.',
+                            type: 'string'
                           }
                         },
-                        "type": "object"
+                        type: 'object'
                       },
-                      "type": "array"
+                      type: 'array'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 }
               },
-              "type": "object"
+              type: 'object'
             },
-            "autoscaler": {
-              "description": "`autoscaler` [deprecated (*)] spec of a horizontal pod autoscaler to set up for the plugin Deployment.\nDeprecation notice: managed autoscaler will be removed in a future version. You may configure instead an autoscaler of your choice, and set `spec.consolePlugin.unmanagedReplicas` to `true`.",
-              "properties": {
-                "maxReplicas": {
-                  "default": 3,
-                  "description": "`maxReplicas` is the upper limit for the number of pods that can be set by the autoscaler; cannot be smaller than MinReplicas.",
-                  "format": "int32",
-                  "type": "integer"
+            autoscaler: {
+              description:
+                '`autoscaler` [deprecated (*)] spec of a horizontal pod autoscaler to set up for the plugin Deployment.\nDeprecation notice: managed autoscaler will be removed in a future version. You may configure instead an autoscaler of your choice, and set `spec.consolePlugin.unmanagedReplicas` to `true`.',
+              properties: {
+                maxReplicas: {
+                  default: 3,
+                  description:
+                    '`maxReplicas` is the upper limit for the number of pods that can be set by the autoscaler; cannot be smaller than MinReplicas.',
+                  format: 'int32',
+                  type: 'integer'
                 },
-                "metrics": {
-                  "description": "Metrics used by the pod autoscaler. For documentation, refer to https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/horizontal-pod-autoscaler-v2/",
-                  "items": {
-                    "properties": {
-                      "containerResource": {
-                        "properties": {
-                          "container": {
-                            "type": "string"
+                metrics: {
+                  description:
+                    'Metrics used by the pod autoscaler. For documentation, refer to https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/horizontal-pod-autoscaler-v2/',
+                  items: {
+                    properties: {
+                      containerResource: {
+                        properties: {
+                          container: {
+                            type: 'string'
                           },
-                          "name": {
-                            "type": "string"
+                          name: {
+                            type: 'string'
                           },
-                          "target": {
-                            "properties": {
-                              "averageUtilization": {
-                                "format": "int32",
-                                "type": "integer"
+                          target: {
+                            properties: {
+                              averageUtilization: {
+                                format: 'int32',
+                                type: 'integer'
                               },
-                              "averageValue": {
-                                "anyOf": [
+                              averageValue: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               },
-                              "type": {
-                                "type": "string"
+                              type: {
+                                type: 'string'
                               },
-                              "value": {
-                                "anyOf": [
+                              value: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               }
                             },
-                            "required": [
-                              "type"
-                            ],
-                            "type": "object"
+                            required: ['type'],
+                            type: 'object'
                           }
                         },
-                        "required": [
-                          "container",
-                          "name",
-                          "target"
-                        ],
-                        "type": "object"
+                        required: ['container', 'name', 'target'],
+                        type: 'object'
                       },
-                      "external": {
-                        "properties": {
-                          "metric": {
-                            "properties": {
-                              "name": {
-                                "type": "string"
+                      external: {
+                        properties: {
+                          metric: {
+                            properties: {
+                              name: {
+                                type: 'string'
                               },
-                              "selector": {
-                                "properties": {
-                                  "matchExpressions": {
-                                    "items": {
-                                      "properties": {
-                                        "key": {
-                                          "type": "string"
+                              selector: {
+                                properties: {
+                                  matchExpressions: {
+                                    items: {
+                                      properties: {
+                                        key: {
+                                          type: 'string'
                                         },
-                                        "operator": {
-                                          "type": "string"
+                                        operator: {
+                                          type: 'string'
                                         },
-                                        "values": {
-                                          "items": {
-                                            "type": "string"
+                                        values: {
+                                          items: {
+                                            type: 'string'
                                           },
-                                          "type": "array",
-                                          "x-kubernetes-list-type": "atomic"
+                                          type: 'array',
+                                          'x-kubernetes-list-type': 'atomic'
                                         }
                                       },
-                                      "required": [
-                                        "key",
-                                        "operator"
-                                      ],
-                                      "type": "object"
+                                      required: ['key', 'operator'],
+                                      type: 'object'
                                     },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
+                                    type: 'array',
+                                    'x-kubernetes-list-type': 'atomic'
                                   },
-                                  "matchLabels": {
-                                    "additionalProperties": {
-                                      "type": "string"
+                                  matchLabels: {
+                                    additionalProperties: {
+                                      type: 'string'
                                     },
-                                    "type": "object"
+                                    type: 'object'
                                   }
                                 },
-                                "type": "object",
-                                "x-kubernetes-map-type": "atomic"
+                                type: 'object',
+                                'x-kubernetes-map-type': 'atomic'
                               }
                             },
-                            "required": [
-                              "name"
-                            ],
-                            "type": "object"
+                            required: ['name'],
+                            type: 'object'
                           },
-                          "target": {
-                            "properties": {
-                              "averageUtilization": {
-                                "format": "int32",
-                                "type": "integer"
+                          target: {
+                            properties: {
+                              averageUtilization: {
+                                format: 'int32',
+                                type: 'integer'
                               },
-                              "averageValue": {
-                                "anyOf": [
+                              averageValue: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               },
-                              "type": {
-                                "type": "string"
+                              type: {
+                                type: 'string'
                               },
-                              "value": {
-                                "anyOf": [
+                              value: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               }
                             },
-                            "required": [
-                              "type"
-                            ],
-                            "type": "object"
+                            required: ['type'],
+                            type: 'object'
                           }
                         },
-                        "required": [
-                          "metric",
-                          "target"
-                        ],
-                        "type": "object"
+                        required: ['metric', 'target'],
+                        type: 'object'
                       },
-                      "object": {
-                        "properties": {
-                          "describedObject": {
-                            "properties": {
-                              "apiVersion": {
-                                "type": "string"
+                      object: {
+                        properties: {
+                          describedObject: {
+                            properties: {
+                              apiVersion: {
+                                type: 'string'
                               },
-                              "kind": {
-                                "type": "string"
+                              kind: {
+                                type: 'string'
                               },
-                              "name": {
-                                "type": "string"
+                              name: {
+                                type: 'string'
                               }
                             },
-                            "required": [
-                              "kind",
-                              "name"
-                            ],
-                            "type": "object"
+                            required: ['kind', 'name'],
+                            type: 'object'
                           },
-                          "metric": {
-                            "properties": {
-                              "name": {
-                                "type": "string"
+                          metric: {
+                            properties: {
+                              name: {
+                                type: 'string'
                               },
-                              "selector": {
-                                "properties": {
-                                  "matchExpressions": {
-                                    "items": {
-                                      "properties": {
-                                        "key": {
-                                          "type": "string"
+                              selector: {
+                                properties: {
+                                  matchExpressions: {
+                                    items: {
+                                      properties: {
+                                        key: {
+                                          type: 'string'
                                         },
-                                        "operator": {
-                                          "type": "string"
+                                        operator: {
+                                          type: 'string'
                                         },
-                                        "values": {
-                                          "items": {
-                                            "type": "string"
+                                        values: {
+                                          items: {
+                                            type: 'string'
                                           },
-                                          "type": "array",
-                                          "x-kubernetes-list-type": "atomic"
+                                          type: 'array',
+                                          'x-kubernetes-list-type': 'atomic'
                                         }
                                       },
-                                      "required": [
-                                        "key",
-                                        "operator"
-                                      ],
-                                      "type": "object"
+                                      required: ['key', 'operator'],
+                                      type: 'object'
                                     },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
+                                    type: 'array',
+                                    'x-kubernetes-list-type': 'atomic'
                                   },
-                                  "matchLabels": {
-                                    "additionalProperties": {
-                                      "type": "string"
+                                  matchLabels: {
+                                    additionalProperties: {
+                                      type: 'string'
                                     },
-                                    "type": "object"
+                                    type: 'object'
                                   }
                                 },
-                                "type": "object",
-                                "x-kubernetes-map-type": "atomic"
+                                type: 'object',
+                                'x-kubernetes-map-type': 'atomic'
                               }
                             },
-                            "required": [
-                              "name"
-                            ],
-                            "type": "object"
+                            required: ['name'],
+                            type: 'object'
                           },
-                          "target": {
-                            "properties": {
-                              "averageUtilization": {
-                                "format": "int32",
-                                "type": "integer"
+                          target: {
+                            properties: {
+                              averageUtilization: {
+                                format: 'int32',
+                                type: 'integer'
                               },
-                              "averageValue": {
-                                "anyOf": [
+                              averageValue: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               },
-                              "type": {
-                                "type": "string"
+                              type: {
+                                type: 'string'
                               },
-                              "value": {
-                                "anyOf": [
+                              value: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               }
                             },
-                            "required": [
-                              "type"
-                            ],
-                            "type": "object"
+                            required: ['type'],
+                            type: 'object'
                           }
                         },
-                        "required": [
-                          "describedObject",
-                          "metric",
-                          "target"
-                        ],
-                        "type": "object"
+                        required: ['describedObject', 'metric', 'target'],
+                        type: 'object'
                       },
-                      "pods": {
-                        "properties": {
-                          "metric": {
-                            "properties": {
-                              "name": {
-                                "type": "string"
+                      pods: {
+                        properties: {
+                          metric: {
+                            properties: {
+                              name: {
+                                type: 'string'
                               },
-                              "selector": {
-                                "properties": {
-                                  "matchExpressions": {
-                                    "items": {
-                                      "properties": {
-                                        "key": {
-                                          "type": "string"
+                              selector: {
+                                properties: {
+                                  matchExpressions: {
+                                    items: {
+                                      properties: {
+                                        key: {
+                                          type: 'string'
                                         },
-                                        "operator": {
-                                          "type": "string"
+                                        operator: {
+                                          type: 'string'
                                         },
-                                        "values": {
-                                          "items": {
-                                            "type": "string"
+                                        values: {
+                                          items: {
+                                            type: 'string'
                                           },
-                                          "type": "array",
-                                          "x-kubernetes-list-type": "atomic"
+                                          type: 'array',
+                                          'x-kubernetes-list-type': 'atomic'
                                         }
                                       },
-                                      "required": [
-                                        "key",
-                                        "operator"
-                                      ],
-                                      "type": "object"
+                                      required: ['key', 'operator'],
+                                      type: 'object'
                                     },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
+                                    type: 'array',
+                                    'x-kubernetes-list-type': 'atomic'
                                   },
-                                  "matchLabels": {
-                                    "additionalProperties": {
-                                      "type": "string"
+                                  matchLabels: {
+                                    additionalProperties: {
+                                      type: 'string'
                                     },
-                                    "type": "object"
+                                    type: 'object'
                                   }
                                 },
-                                "type": "object",
-                                "x-kubernetes-map-type": "atomic"
+                                type: 'object',
+                                'x-kubernetes-map-type': 'atomic'
                               }
                             },
-                            "required": [
-                              "name"
-                            ],
-                            "type": "object"
+                            required: ['name'],
+                            type: 'object'
                           },
-                          "target": {
-                            "properties": {
-                              "averageUtilization": {
-                                "format": "int32",
-                                "type": "integer"
+                          target: {
+                            properties: {
+                              averageUtilization: {
+                                format: 'int32',
+                                type: 'integer'
                               },
-                              "averageValue": {
-                                "anyOf": [
+                              averageValue: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               },
-                              "type": {
-                                "type": "string"
+                              type: {
+                                type: 'string'
                               },
-                              "value": {
-                                "anyOf": [
+                              value: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               }
                             },
-                            "required": [
-                              "type"
-                            ],
-                            "type": "object"
+                            required: ['type'],
+                            type: 'object'
                           }
                         },
-                        "required": [
-                          "metric",
-                          "target"
-                        ],
-                        "type": "object"
+                        required: ['metric', 'target'],
+                        type: 'object'
                       },
-                      "resource": {
-                        "properties": {
-                          "name": {
-                            "type": "string"
+                      resource: {
+                        properties: {
+                          name: {
+                            type: 'string'
                           },
-                          "target": {
-                            "properties": {
-                              "averageUtilization": {
-                                "format": "int32",
-                                "type": "integer"
+                          target: {
+                            properties: {
+                              averageUtilization: {
+                                format: 'int32',
+                                type: 'integer'
                               },
-                              "averageValue": {
-                                "anyOf": [
+                              averageValue: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               },
-                              "type": {
-                                "type": "string"
+                              type: {
+                                type: 'string'
                               },
-                              "value": {
-                                "anyOf": [
+                              value: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               }
                             },
-                            "required": [
-                              "type"
-                            ],
-                            "type": "object"
+                            required: ['type'],
+                            type: 'object'
                           }
                         },
-                        "required": [
-                          "name",
-                          "target"
-                        ],
-                        "type": "object"
+                        required: ['name', 'target'],
+                        type: 'object'
                       },
-                      "type": {
-                        "type": "string"
+                      type: {
+                        type: 'string'
                       }
                     },
-                    "required": [
-                      "type"
-                    ],
-                    "type": "object"
+                    required: ['type'],
+                    type: 'object'
                   },
-                  "type": "array"
+                  type: 'array'
                 },
-                "minReplicas": {
-                  "description": "`minReplicas` is the lower limit for the number of replicas to which the autoscaler\ncan scale down. It defaults to 1 pod. minReplicas is allowed to be 0 if the\nalpha feature gate HPAScaleToZero is enabled and at least one Object or External\nmetric is configured. Scaling is active as long as at least one metric value is\navailable.",
-                  "format": "int32",
-                  "type": "integer"
+                minReplicas: {
+                  description:
+                    '`minReplicas` is the lower limit for the number of replicas to which the autoscaler\ncan scale down. It defaults to 1 pod. minReplicas is allowed to be 0 if the\nalpha feature gate HPAScaleToZero is enabled and at least one Object or External\nmetric is configured. Scaling is active as long as at least one metric value is\navailable.',
+                  format: 'int32',
+                  type: 'integer'
                 },
-                "status": {
-                  "default": "Disabled",
-                  "description": "`status` describes the desired status regarding deploying an horizontal pod autoscaler.<br>\n- `Disabled` does not deploy an horizontal pod autoscaler.<br>\n- `Enabled` deploys an horizontal pod autoscaler.<br>",
-                  "enum": [
-                    "Disabled",
-                    "Enabled"
-                  ],
-                  "type": "string"
+                status: {
+                  default: 'Disabled',
+                  description:
+                    '`status` describes the desired status regarding deploying an horizontal pod autoscaler.<br>\n- `Disabled` does not deploy an horizontal pod autoscaler.<br>\n- `Enabled` deploys an horizontal pod autoscaler.<br>',
+                  enum: ['Disabled', 'Enabled'],
+                  type: 'string'
                 }
               },
-              "type": "object"
+              type: 'object'
             },
-            "enable": {
-              "default": true,
-              "description": "Enables the console plugin deployment.",
-              "type": "boolean"
+            enable: {
+              default: true,
+              description: 'Enables the console plugin deployment.',
+              type: 'boolean'
             },
-            "imagePullPolicy": {
-              "default": "IfNotPresent",
-              "description": "`imagePullPolicy` is the Kubernetes pull policy for the image defined above.",
-              "enum": [
-                "IfNotPresent",
-                "Always",
-                "Never"
-              ],
-              "type": "string"
+            imagePullPolicy: {
+              default: 'IfNotPresent',
+              description: '`imagePullPolicy` is the Kubernetes pull policy for the image defined above.',
+              enum: ['IfNotPresent', 'Always', 'Never'],
+              type: 'string'
             },
-            "logLevel": {
-              "default": "info",
-              "description": "`logLevel` for the console plugin backend.",
-              "enum": [
-                "trace",
-                "debug",
-                "info",
-                "warn",
-                "error",
-                "fatal",
-                "panic"
-              ],
-              "type": "string"
+            logLevel: {
+              default: 'info',
+              description: '`logLevel` for the console plugin backend.',
+              enum: ['trace', 'debug', 'info', 'warn', 'error', 'fatal', 'panic'],
+              type: 'string'
             },
-            "portNaming": {
-              "default": {
-                "enable": true
+            portNaming: {
+              default: {
+                enable: true
               },
-              "description": "`portNaming` defines the configuration of the port-to-service name translation.",
-              "properties": {
-                "enable": {
-                  "default": true,
-                  "description": "Enable the console plugin port-to-service name translation",
-                  "type": "boolean"
+              description: '`portNaming` defines the configuration of the port-to-service name translation.',
+              properties: {
+                enable: {
+                  default: true,
+                  description: 'Enable the console plugin port-to-service name translation',
+                  type: 'boolean'
                 },
-                "portNames": {
-                  "additionalProperties": {
-                    "type": "string"
+                portNames: {
+                  additionalProperties: {
+                    type: 'string'
                   },
-                  "description": "`portNames` defines additional port names to use in the console,\nfor example, `portNames: {\"3100\": \"loki\"}`.",
-                  "type": "object"
+                  description:
+                    '`portNames` defines additional port names to use in the console,\nfor example, `portNames: {"3100": "loki"}`.',
+                  type: 'object'
                 }
               },
-              "type": "object"
+              type: 'object'
             },
-            "quickFilters": {
-              "default": [
+            quickFilters: {
+              default: [
                 {
-                  "default": true,
-                  "filter": {
-                    "flow_layer": "\"app\""
+                  default: true,
+                  filter: {
+                    flow_layer: '"app"'
                   },
-                  "name": "Applications"
+                  name: 'Applications'
                 },
                 {
-                  "filter": {
-                    "flow_layer": "\"infra\""
+                  filter: {
+                    flow_layer: '"infra"'
                   },
-                  "name": "Infrastructure"
+                  name: 'Infrastructure'
                 },
                 {
-                  "default": true,
-                  "filter": {
-                    "dst_kind": "\"Pod\"",
-                    "src_kind": "\"Pod\""
+                  default: true,
+                  filter: {
+                    dst_kind: '"Pod"',
+                    src_kind: '"Pod"'
                   },
-                  "name": "Pods network"
+                  name: 'Pods network'
                 },
                 {
-                  "filter": {
-                    "dst_kind": "\"Service\""
+                  filter: {
+                    dst_kind: '"Service"'
                   },
-                  "name": "Services network"
+                  name: 'Services network'
                 },
                 {
-                  "filter": {
-                    "src_subnet_label": "\"\",EXT:"
+                  filter: {
+                    src_subnet_label: '"",EXT:'
                   },
-                  "name": "External ingress"
+                  name: 'External ingress'
                 },
                 {
-                  "filter": {
-                    "dst_subnet_label": "\"\",EXT:"
+                  filter: {
+                    dst_subnet_label: '"",EXT:'
                   },
-                  "name": "External egress"
+                  name: 'External egress'
                 }
               ],
-              "description": "`quickFilters` configures quick filter presets for the Console plugin.\nFilters for external traffic assume the subnet labels are configured to distinguish internal and external traffic (see `spec.processor.subnetLabels`).",
-              "items": {
-                "description": "`QuickFilter` defines preset configuration for Console's quick filters",
-                "properties": {
-                  "default": {
-                    "description": "`default` defines whether this filter should be active by default or not",
-                    "type": "boolean"
+              description:
+                '`quickFilters` configures quick filter presets for the Console plugin.\nFilters for external traffic assume the subnet labels are configured to distinguish internal and external traffic (see `spec.processor.subnetLabels`).',
+              items: {
+                description: "`QuickFilter` defines preset configuration for Console's quick filters",
+                properties: {
+                  default: {
+                    description: '`default` defines whether this filter should be active by default or not',
+                    type: 'boolean'
                   },
-                  "filter": {
-                    "additionalProperties": {
-                      "type": "string"
+                  filter: {
+                    additionalProperties: {
+                      type: 'string'
                     },
-                    "description": "`filter` is a set of keys and values to be set when this filter is selected. Each key can relate to a list of values using a coma-separated string,\nfor example, `filter: {\"src_namespace\": \"namespace1,namespace2\"}`.",
-                    "type": "object"
+                    description:
+                      '`filter` is a set of keys and values to be set when this filter is selected. Each key can relate to a list of values using a coma-separated string,\nfor example, `filter: {"src_namespace": "namespace1,namespace2"}`.',
+                    type: 'object'
                   },
-                  "name": {
-                    "description": "Name of the filter, that is displayed in the Console",
-                    "type": "string"
+                  name: {
+                    description: 'Name of the filter, that is displayed in the Console',
+                    type: 'string'
                   }
                 },
-                "required": [
-                  "filter",
-                  "name"
-                ],
-                "type": "object"
+                required: ['filter', 'name'],
+                type: 'object'
               },
-              "type": "array"
+              type: 'array'
             },
-            "replicas": {
-              "default": 1,
-              "description": "`replicas` defines the number of replicas (pods) to start.",
-              "format": "int32",
-              "minimum": 0,
-              "type": "integer"
+            replicas: {
+              default: 1,
+              description: '`replicas` defines the number of replicas (pods) to start.',
+              format: 'int32',
+              minimum: 0,
+              type: 'integer'
             },
-            "resources": {
-              "default": {
-                "limits": {
-                  "memory": "100Mi"
+            resources: {
+              default: {
+                limits: {
+                  memory: '100Mi'
                 },
-                "requests": {
-                  "cpu": "100m",
-                  "memory": "50Mi"
+                requests: {
+                  cpu: '100m',
+                  memory: '50Mi'
                 }
               },
-              "description": "`resources`, in terms of compute resources, required by this container.\nFor more information, see https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/.",
-              "properties": {
-                "claims": {
-                  "description": "Claims lists the names of resources, defined in spec.resourceClaims,\nthat are used by this container.\n\nThis field depends on the\nDynamicResourceAllocation feature gate.\n\nThis field is immutable. It can only be set for containers.",
-                  "items": {
-                    "description": "ResourceClaim references one entry in PodSpec.ResourceClaims.",
-                    "properties": {
-                      "name": {
-                        "description": "Name must match the name of one entry in pod.spec.resourceClaims of\nthe Pod where this field is used. It makes that resource available\ninside a container.",
-                        "type": "string"
+              description:
+                '`resources`, in terms of compute resources, required by this container.\nFor more information, see https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/.',
+              properties: {
+                claims: {
+                  description:
+                    'Claims lists the names of resources, defined in spec.resourceClaims,\nthat are used by this container.\n\nThis field depends on the\nDynamicResourceAllocation feature gate.\n\nThis field is immutable. It can only be set for containers.',
+                  items: {
+                    description: 'ResourceClaim references one entry in PodSpec.ResourceClaims.',
+                    properties: {
+                      name: {
+                        description:
+                          'Name must match the name of one entry in pod.spec.resourceClaims of\nthe Pod where this field is used. It makes that resource available\ninside a container.',
+                        type: 'string'
                       },
-                      "request": {
-                        "description": "Request is the name chosen for a request in the referenced claim.\nIf empty, everything from the claim is made available, otherwise\nonly the result of this request.",
-                        "type": "string"
+                      request: {
+                        description:
+                          'Request is the name chosen for a request in the referenced claim.\nIf empty, everything from the claim is made available, otherwise\nonly the result of this request.',
+                        type: 'string'
                       }
                     },
-                    "required": [
-                      "name"
-                    ],
-                    "type": "object"
+                    required: ['name'],
+                    type: 'object'
                   },
-                  "type": "array",
-                  "x-kubernetes-list-map-keys": [
-                    "name"
-                  ],
-                  "x-kubernetes-list-type": "map"
+                  type: 'array',
+                  'x-kubernetes-list-map-keys': ['name'],
+                  'x-kubernetes-list-type': 'map'
                 },
-                "limits": {
-                  "additionalProperties": {
-                    "anyOf": [
+                limits: {
+                  additionalProperties: {
+                    anyOf: [
                       {
-                        "type": "integer"
+                        type: 'integer'
                       },
                       {
-                        "type": "string"
+                        type: 'string'
                       }
                     ],
-                    "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                    "x-kubernetes-int-or-string": true
+                    pattern:
+                      '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                    'x-kubernetes-int-or-string': true
                   },
-                  "description": "Limits describes the maximum amount of compute resources allowed.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
-                  "type": "object"
+                  description:
+                    'Limits describes the maximum amount of compute resources allowed.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/',
+                  type: 'object'
                 },
-                "requests": {
-                  "additionalProperties": {
-                    "anyOf": [
+                requests: {
+                  additionalProperties: {
+                    anyOf: [
                       {
-                        "type": "integer"
+                        type: 'integer'
                       },
                       {
-                        "type": "string"
+                        type: 'string'
                       }
                     ],
-                    "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                    "x-kubernetes-int-or-string": true
+                    pattern:
+                      '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                    'x-kubernetes-int-or-string': true
                   },
-                  "description": "Requests describes the minimum amount of compute resources required.\nIf Requests is omitted for a container, it defaults to Limits if that is explicitly specified,\notherwise to an implementation-defined value. Requests cannot exceed Limits.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
-                  "type": "object"
+                  description:
+                    'Requests describes the minimum amount of compute resources required.\nIf Requests is omitted for a container, it defaults to Limits if that is explicitly specified,\notherwise to an implementation-defined value. Requests cannot exceed Limits.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/',
+                  type: 'object'
                 }
               },
-              "type": "object"
+              type: 'object'
             },
-            "standalone": {
-              "description": "Deploy as a standalone console, instead of a plugin of the OpenShift Console.\nThis is not recommended when using with OpenShift, as it doesn't provide an integrated experience.\n[Unsupported (*)].",
-              "type": "boolean"
+            standalone: {
+              description:
+                "Deploy as a standalone console, instead of a plugin of the OpenShift Console.\nThis is not recommended when using with OpenShift, as it doesn't provide an integrated experience.\n[Unsupported (*)].",
+              type: 'boolean'
             },
-            "unmanagedReplicas": {
-              "description": "If `unmanagedReplicas` is `true`, the operator will not reconcile `replicas`. This is useful when using a pod autoscaler.",
-              "type": "boolean"
+            unmanagedReplicas: {
+              description:
+                'If `unmanagedReplicas` is `true`, the operator will not reconcile `replicas`. This is useful when using a pod autoscaler.',
+              type: 'boolean'
             }
           },
-          "type": "object"
+          type: 'object'
         },
-        "deploymentModel": {
-          "default": "Service",
-          "description": "`deploymentModel` defines the desired type of deployment for flow processing. Possible values are:<br>\n- `Service` (default) to make the flow processor listen as a Kubernetes Service, backed by a scalable Deployment.<br>\n- `Kafka` to make flows sent to a Kafka pipeline before consumption by the processor.<br>\n- `Direct` to make the flow processor listen directly from the agents using the host network, backed by a DaemonSet. Only recommended on small clusters, below 15 nodes.<br>\nKafka can provide better scalability, resiliency, and high availability (for more details, see https://www.redhat.com/en/topics/integration/what-is-apache-kafka).<br>\n`Direct` is not recommended on large clusters as it is less memory efficient.",
-          "enum": [
-            "Service",
-            "Direct",
-            "Kafka"
-          ],
-          "type": "string"
+        deploymentModel: {
+          default: 'Service',
+          description:
+            '`deploymentModel` defines the desired type of deployment for flow processing. Possible values are:<br>\n- `Service` (default) to make the flow processor listen as a Kubernetes Service, backed by a scalable Deployment.<br>\n- `Kafka` to make flows sent to a Kafka pipeline before consumption by the processor.<br>\n- `Direct` to make the flow processor listen directly from the agents using the host network, backed by a DaemonSet. Only recommended on small clusters, below 15 nodes.<br>\nKafka can provide better scalability, resiliency, and high availability (for more details, see https://www.redhat.com/en/topics/integration/what-is-apache-kafka).<br>\n`Direct` is not recommended on large clusters as it is less memory efficient.',
+          enum: ['Service', 'Direct', 'Kafka'],
+          type: 'string'
         },
-        "execution": {
-          "description": "`execution` defines configuration related to the execution of the flow collection process.",
-          "properties": {
-            "mode": {
-              "default": "Running",
-              "description": "`mode` is the flow collection process execution desired mode: `Running` or `OnHold`.\nWhen `OnHold`, the operator deletes all managed services and workloads, with the exception\nof the static console plugin, and the operator itself.\nIt allows to use minimal cluster resources without losing configuration.",
-              "enum": [
-                "",
-                "Running",
-                "OnHold"
-              ],
-              "type": "string"
+        execution: {
+          description: '`execution` defines configuration related to the execution of the flow collection process.',
+          properties: {
+            mode: {
+              default: 'Running',
+              description:
+                '`mode` is the flow collection process execution desired mode: `Running` or `OnHold`.\nWhen `OnHold`, the operator deletes all managed services and workloads, with the exception\nof the static console plugin, and the operator itself.\nIt allows to use minimal cluster resources without losing configuration.',
+              enum: ['', 'Running', 'OnHold'],
+              type: 'string'
             }
           },
-          "type": "object"
+          type: 'object'
         },
-        "exporters": {
-          "description": "`exporters` defines additional optional exporters for custom consumption or storage.",
-          "items": {
-            "description": "`FlowCollectorExporter` defines an additional exporter to send enriched flows to.",
-            "properties": {
-              "ipfix": {
-                "description": "IPFIX configuration, such as the IP address and port to send enriched IPFIX flows to.",
-                "properties": {
-                  "enterpriseID": {
-                    "default": 2,
-                    "description": "EnterpriseID, or Private Enterprise Number (PEN). To date, NetObserv does not own an assigned number,\nso it is left open for configuration. The PEN is needed to collect non standard data, such as Kubernetes names,\nRTT, etc.",
-                    "type": "integer"
+        exporters: {
+          description: '`exporters` defines additional optional exporters for custom consumption or storage.',
+          items: {
+            description: '`FlowCollectorExporter` defines an additional exporter to send enriched flows to.',
+            properties: {
+              ipfix: {
+                description: 'IPFIX configuration, such as the IP address and port to send enriched IPFIX flows to.',
+                properties: {
+                  enterpriseID: {
+                    default: 2,
+                    description:
+                      'EnterpriseID, or Private Enterprise Number (PEN). To date, NetObserv does not own an assigned number,\nso it is left open for configuration. The PEN is needed to collect non standard data, such as Kubernetes names,\nRTT, etc.',
+                    type: 'integer'
                   },
-                  "targetHost": {
-                    "default": "",
-                    "description": "Address of the IPFIX external receiver.",
-                    "type": "string"
+                  targetHost: {
+                    default: '',
+                    description: 'Address of the IPFIX external receiver.',
+                    type: 'string'
                   },
-                  "targetPort": {
-                    "default": 4739,
-                    "description": "Port for the IPFIX external receiver.",
-                    "type": "integer"
+                  targetPort: {
+                    default: 4739,
+                    description: 'Port for the IPFIX external receiver.',
+                    type: 'integer'
                   },
-                  "transport": {
-                    "description": "Transport protocol (`TCP` or `UDP`) to be used for the IPFIX connection, defaults to `TCP`.",
-                    "enum": [
-                      "TCP",
-                      "UDP"
-                    ],
-                    "type": "string"
+                  transport: {
+                    description:
+                      'Transport protocol (`TCP` or `UDP`) to be used for the IPFIX connection, defaults to `TCP`.',
+                    enum: ['TCP', 'UDP'],
+                    type: 'string'
                   }
                 },
-                "required": [
-                  "enterpriseID",
-                  "targetHost",
-                  "targetPort"
-                ],
-                "type": "object"
+                required: ['enterpriseID', 'targetHost', 'targetPort'],
+                type: 'object'
               },
-              "kafka": {
-                "description": "Kafka configuration, such as the address and topic, to send enriched flows to.",
-                "properties": {
-                  "address": {
-                    "default": "",
-                    "description": "Address of the Kafka server",
-                    "type": "string"
+              kafka: {
+                description: 'Kafka configuration, such as the address and topic, to send enriched flows to.',
+                properties: {
+                  address: {
+                    default: '',
+                    description: 'Address of the Kafka server',
+                    type: 'string'
                   },
-                  "sasl": {
-                    "description": "SASL authentication configuration. [Unsupported (*)].",
-                    "properties": {
-                      "clientIDReference": {
-                        "description": "Reference to the secret or config map containing the client ID",
-                        "properties": {
-                          "file": {
-                            "description": "File name within the config map or secret.",
-                            "type": "string"
+                  sasl: {
+                    description: 'SASL authentication configuration. [Unsupported (*)].',
+                    properties: {
+                      clientIDReference: {
+                        description: 'Reference to the secret or config map containing the client ID',
+                        properties: {
+                          file: {
+                            description: 'File name within the config map or secret.',
+                            type: 'string'
                           },
-                          "name": {
-                            "description": "Name of the config map or secret containing the file.",
-                            "type": "string"
+                          name: {
+                            description: 'Name of the config map or secret containing the file.',
+                            type: 'string'
                           },
-                          "namespace": {
-                            "default": "",
-                            "description": "Namespace of the config map or secret containing the file. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                            "type": "string"
+                          namespace: {
+                            default: '',
+                            description:
+                              'Namespace of the config map or secret containing the file. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                            type: 'string'
                           },
-                          "type": {
-                            "description": "Type for the file reference: `configmap` or `secret`.",
-                            "enum": [
-                              "configmap",
-                              "secret"
-                            ],
-                            "type": "string"
+                          type: {
+                            description: 'Type for the file reference: `configmap` or `secret`.',
+                            enum: ['configmap', 'secret'],
+                            type: 'string'
                           }
                         },
-                        "type": "object"
+                        type: 'object'
                       },
-                      "clientSecretReference": {
-                        "description": "Reference to the secret or config map containing the client secret",
-                        "properties": {
-                          "file": {
-                            "description": "File name within the config map or secret.",
-                            "type": "string"
+                      clientSecretReference: {
+                        description: 'Reference to the secret or config map containing the client secret',
+                        properties: {
+                          file: {
+                            description: 'File name within the config map or secret.',
+                            type: 'string'
                           },
-                          "name": {
-                            "description": "Name of the config map or secret containing the file.",
-                            "type": "string"
+                          name: {
+                            description: 'Name of the config map or secret containing the file.',
+                            type: 'string'
                           },
-                          "namespace": {
-                            "default": "",
-                            "description": "Namespace of the config map or secret containing the file. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                            "type": "string"
+                          namespace: {
+                            default: '',
+                            description:
+                              'Namespace of the config map or secret containing the file. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                            type: 'string'
                           },
-                          "type": {
-                            "description": "Type for the file reference: `configmap` or `secret`.",
-                            "enum": [
-                              "configmap",
-                              "secret"
-                            ],
-                            "type": "string"
+                          type: {
+                            description: 'Type for the file reference: `configmap` or `secret`.',
+                            enum: ['configmap', 'secret'],
+                            type: 'string'
                           }
                         },
-                        "type": "object"
+                        type: 'object'
                       },
-                      "type": {
-                        "default": "Disabled",
-                        "description": "Type of SASL authentication to use, or `Disabled` if SASL is not used",
-                        "enum": [
-                          "Disabled",
-                          "Plain",
-                          "ScramSHA512"
-                        ],
-                        "type": "string"
+                      type: {
+                        default: 'Disabled',
+                        description: 'Type of SASL authentication to use, or `Disabled` if SASL is not used',
+                        enum: ['Disabled', 'Plain', 'ScramSHA512'],
+                        type: 'string'
                       }
                     },
-                    "type": "object"
+                    type: 'object'
                   },
-                  "tls": {
-                    "description": "TLS and mTLS client configuration. When using TLS, verify that the address matches the Kafka port used for TLS, generally 9093.\nWe recommend the use of mTLS for higher security standards.",
-                    "properties": {
-                      "caCert": {
-                        "description": "`caCert` defines the reference of the certificate for the Certificate Authority.",
-                        "properties": {
-                          "certFile": {
-                            "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                            "type": "string"
+                  tls: {
+                    description:
+                      'TLS and mTLS client configuration. When using TLS, verify that the address matches the Kafka port used for TLS, generally 9093.\nWe recommend the use of mTLS for higher security standards.',
+                    properties: {
+                      caCert: {
+                        description: '`caCert` defines the reference of the certificate for the Certificate Authority.',
+                        properties: {
+                          certFile: {
+                            description:
+                              '`certFile` defines the path to the certificate file name within the config map or secret.',
+                            type: 'string'
                           },
-                          "certKey": {
-                            "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                            "type": "string"
+                          certKey: {
+                            description:
+                              '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                            type: 'string'
                           },
-                          "name": {
-                            "description": "Name of the config map or secret containing certificates.",
-                            "type": "string"
+                          name: {
+                            description: 'Name of the config map or secret containing certificates.',
+                            type: 'string'
                           },
-                          "namespace": {
-                            "default": "",
-                            "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                            "type": "string"
+                          namespace: {
+                            default: '',
+                            description:
+                              'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                            type: 'string'
                           },
-                          "type": {
-                            "description": "Type for the certificate reference: `configmap` or `secret`.",
-                            "enum": [
-                              "configmap",
-                              "secret"
-                            ],
-                            "type": "string"
+                          type: {
+                            description: 'Type for the certificate reference: `configmap` or `secret`.',
+                            enum: ['configmap', 'secret'],
+                            type: 'string'
                           }
                         },
-                        "type": "object"
+                        type: 'object'
                       },
-                      "enable": {
-                        "default": false,
-                        "description": "Enable TLS",
-                        "type": "boolean"
+                      enable: {
+                        default: false,
+                        description: 'Enable TLS',
+                        type: 'boolean'
                       },
-                      "insecureSkipVerify": {
-                        "default": false,
-                        "description": "`insecureSkipVerify` allows skipping client-side verification of the server certificate.\nIf set to `true`, the `caCert` field is ignored.",
-                        "type": "boolean"
+                      insecureSkipVerify: {
+                        default: false,
+                        description:
+                          '`insecureSkipVerify` allows skipping client-side verification of the server certificate.\nIf set to `true`, the `caCert` field is ignored.',
+                        type: 'boolean'
                       },
-                      "userCert": {
-                        "description": "`userCert` defines the user certificate reference and is used for mTLS. When you use one-way TLS, you can ignore this property.",
-                        "properties": {
-                          "certFile": {
-                            "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                            "type": "string"
+                      userCert: {
+                        description:
+                          '`userCert` defines the user certificate reference and is used for mTLS. When you use one-way TLS, you can ignore this property.',
+                        properties: {
+                          certFile: {
+                            description:
+                              '`certFile` defines the path to the certificate file name within the config map or secret.',
+                            type: 'string'
                           },
-                          "certKey": {
-                            "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                            "type": "string"
+                          certKey: {
+                            description:
+                              '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                            type: 'string'
                           },
-                          "name": {
-                            "description": "Name of the config map or secret containing certificates.",
-                            "type": "string"
+                          name: {
+                            description: 'Name of the config map or secret containing certificates.',
+                            type: 'string'
                           },
-                          "namespace": {
-                            "default": "",
-                            "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                            "type": "string"
+                          namespace: {
+                            default: '',
+                            description:
+                              'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                            type: 'string'
                           },
-                          "type": {
-                            "description": "Type for the certificate reference: `configmap` or `secret`.",
-                            "enum": [
-                              "configmap",
-                              "secret"
-                            ],
-                            "type": "string"
+                          type: {
+                            description: 'Type for the certificate reference: `configmap` or `secret`.',
+                            enum: ['configmap', 'secret'],
+                            type: 'string'
                           }
                         },
-                        "type": "object"
+                        type: 'object'
                       }
                     },
-                    "type": "object"
+                    type: 'object'
                   },
-                  "topic": {
-                    "default": "",
-                    "description": "Kafka topic to use. It must exist. NetObserv does not create it.",
-                    "type": "string"
+                  topic: {
+                    default: '',
+                    description: 'Kafka topic to use. It must exist. NetObserv does not create it.',
+                    type: 'string'
                   }
                 },
-                "required": [
-                  "address",
-                  "topic"
-                ],
-                "type": "object"
+                required: ['address', 'topic'],
+                type: 'object'
               },
-              "openTelemetry": {
-                "description": "OpenTelemetry configuration, such as the IP address and port to send enriched logs or metrics to.",
-                "properties": {
-                  "fieldsMapping": {
-                    "description": "Custom fields mapping to an OpenTelemetry conformant format.\nBy default, NetObserv format proposal is used: https://github.com/rhobs/observability-data-model/blob/main/network-observability.md#format-proposal .\nAs there is currently no accepted standard for L3 or L4 enriched network logs, you can freely override it with your own.",
-                    "items": {
-                      "properties": {
-                        "input": {
-                          "type": "string"
+              openTelemetry: {
+                description:
+                  'OpenTelemetry configuration, such as the IP address and port to send enriched logs or metrics to.',
+                properties: {
+                  fieldsMapping: {
+                    description:
+                      'Custom fields mapping to an OpenTelemetry conformant format.\nBy default, NetObserv format proposal is used: https://github.com/rhobs/observability-data-model/blob/main/network-observability.md#format-proposal .\nAs there is currently no accepted standard for L3 or L4 enriched network logs, you can freely override it with your own.',
+                    items: {
+                      properties: {
+                        input: {
+                          type: 'string'
                         },
-                        "multiplier": {
-                          "type": "integer"
+                        multiplier: {
+                          type: 'integer'
                         },
-                        "output": {
-                          "type": "string"
+                        output: {
+                          type: 'string'
                         }
                       },
-                      "type": "object"
+                      type: 'object'
                     },
-                    "type": "array"
+                    type: 'array'
                   },
-                  "headers": {
-                    "additionalProperties": {
-                      "type": "string"
+                  headers: {
+                    additionalProperties: {
+                      type: 'string'
                     },
-                    "description": "Headers to add to messages (optional)",
-                    "type": "object"
+                    description: 'Headers to add to messages (optional)',
+                    type: 'object'
                   },
-                  "logs": {
-                    "description": "OpenTelemetry configuration for logs.",
-                    "properties": {
-                      "enable": {
-                        "default": true,
-                        "description": "Set `enable` to `true` to send logs to an OpenTelemetry receiver.",
-                        "type": "boolean"
+                  logs: {
+                    description: 'OpenTelemetry configuration for logs.',
+                    properties: {
+                      enable: {
+                        default: true,
+                        description: 'Set `enable` to `true` to send logs to an OpenTelemetry receiver.',
+                        type: 'boolean'
                       }
                     },
-                    "type": "object"
+                    type: 'object'
                   },
-                  "metrics": {
-                    "description": "OpenTelemetry configuration for metrics.",
-                    "properties": {
-                      "enable": {
-                        "default": true,
-                        "description": "Set `enable` to `true` to send metrics to an OpenTelemetry receiver.",
-                        "type": "boolean"
+                  metrics: {
+                    description: 'OpenTelemetry configuration for metrics.',
+                    properties: {
+                      enable: {
+                        default: true,
+                        description: 'Set `enable` to `true` to send metrics to an OpenTelemetry receiver.',
+                        type: 'boolean'
                       },
-                      "pushTimeInterval": {
-                        "default": "20s",
-                        "description": "Specify how often metrics are sent to a collector.",
-                        "type": "string"
+                      pushTimeInterval: {
+                        default: '20s',
+                        description: 'Specify how often metrics are sent to a collector.',
+                        type: 'string'
                       }
                     },
-                    "type": "object"
+                    type: 'object'
                   },
-                  "protocol": {
-                    "description": "Protocol of the OpenTelemetry connection. The available options are `http` and `grpc`.",
-                    "enum": [
-                      "http",
-                      "grpc"
-                    ],
-                    "type": "string"
+                  protocol: {
+                    description:
+                      'Protocol of the OpenTelemetry connection. The available options are `http` and `grpc`.',
+                    enum: ['http', 'grpc'],
+                    type: 'string'
                   },
-                  "targetHost": {
-                    "default": "",
-                    "description": "Address of the OpenTelemetry receiver.",
-                    "type": "string"
+                  targetHost: {
+                    default: '',
+                    description: 'Address of the OpenTelemetry receiver.',
+                    type: 'string'
                   },
-                  "targetPort": {
-                    "default": 4317,
-                    "description": "Port for the OpenTelemetry receiver.",
-                    "type": "integer"
+                  targetPort: {
+                    default: 4317,
+                    description: 'Port for the OpenTelemetry receiver.',
+                    type: 'integer'
                   },
-                  "tls": {
-                    "description": "TLS client configuration.",
-                    "properties": {
-                      "caCert": {
-                        "description": "`caCert` defines the reference of the certificate for the Certificate Authority.",
-                        "properties": {
-                          "certFile": {
-                            "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                            "type": "string"
+                  tls: {
+                    description: 'TLS client configuration.',
+                    properties: {
+                      caCert: {
+                        description: '`caCert` defines the reference of the certificate for the Certificate Authority.',
+                        properties: {
+                          certFile: {
+                            description:
+                              '`certFile` defines the path to the certificate file name within the config map or secret.',
+                            type: 'string'
                           },
-                          "certKey": {
-                            "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                            "type": "string"
+                          certKey: {
+                            description:
+                              '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                            type: 'string'
                           },
-                          "name": {
-                            "description": "Name of the config map or secret containing certificates.",
-                            "type": "string"
+                          name: {
+                            description: 'Name of the config map or secret containing certificates.',
+                            type: 'string'
                           },
-                          "namespace": {
-                            "default": "",
-                            "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                            "type": "string"
+                          namespace: {
+                            default: '',
+                            description:
+                              'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                            type: 'string'
                           },
-                          "type": {
-                            "description": "Type for the certificate reference: `configmap` or `secret`.",
-                            "enum": [
-                              "configmap",
-                              "secret"
-                            ],
-                            "type": "string"
+                          type: {
+                            description: 'Type for the certificate reference: `configmap` or `secret`.',
+                            enum: ['configmap', 'secret'],
+                            type: 'string'
                           }
                         },
-                        "type": "object"
+                        type: 'object'
                       },
-                      "enable": {
-                        "default": false,
-                        "description": "Enable TLS",
-                        "type": "boolean"
+                      enable: {
+                        default: false,
+                        description: 'Enable TLS',
+                        type: 'boolean'
                       },
-                      "insecureSkipVerify": {
-                        "default": false,
-                        "description": "`insecureSkipVerify` allows skipping client-side verification of the server certificate.\nIf set to `true`, the `caCert` field is ignored.",
-                        "type": "boolean"
+                      insecureSkipVerify: {
+                        default: false,
+                        description:
+                          '`insecureSkipVerify` allows skipping client-side verification of the server certificate.\nIf set to `true`, the `caCert` field is ignored.',
+                        type: 'boolean'
                       },
-                      "userCert": {
-                        "description": "`userCert` defines the user certificate reference and is used for mTLS. When you use one-way TLS, you can ignore this property.",
-                        "properties": {
-                          "certFile": {
-                            "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                            "type": "string"
+                      userCert: {
+                        description:
+                          '`userCert` defines the user certificate reference and is used for mTLS. When you use one-way TLS, you can ignore this property.',
+                        properties: {
+                          certFile: {
+                            description:
+                              '`certFile` defines the path to the certificate file name within the config map or secret.',
+                            type: 'string'
                           },
-                          "certKey": {
-                            "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                            "type": "string"
+                          certKey: {
+                            description:
+                              '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                            type: 'string'
                           },
-                          "name": {
-                            "description": "Name of the config map or secret containing certificates.",
-                            "type": "string"
+                          name: {
+                            description: 'Name of the config map or secret containing certificates.',
+                            type: 'string'
                           },
-                          "namespace": {
-                            "default": "",
-                            "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                            "type": "string"
+                          namespace: {
+                            default: '',
+                            description:
+                              'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                            type: 'string'
                           },
-                          "type": {
-                            "description": "Type for the certificate reference: `configmap` or `secret`.",
-                            "enum": [
-                              "configmap",
-                              "secret"
-                            ],
-                            "type": "string"
+                          type: {
+                            description: 'Type for the certificate reference: `configmap` or `secret`.',
+                            enum: ['configmap', 'secret'],
+                            type: 'string'
                           }
                         },
-                        "type": "object"
+                        type: 'object'
                       }
                     },
-                    "type": "object"
+                    type: 'object'
                   }
                 },
-                "required": [
-                  "targetHost",
-                  "targetPort"
-                ],
-                "type": "object"
+                required: ['targetHost', 'targetPort'],
+                type: 'object'
               },
-              "type": {
-                "description": "`type` selects the type of exporters. The available options are `Kafka`, `IPFIX`, and `OpenTelemetry`.",
-                "enum": [
-                  "Kafka",
-                  "IPFIX",
-                  "OpenTelemetry"
-                ],
-                "type": "string"
+              type: {
+                description:
+                  '`type` selects the type of exporters. The available options are `Kafka`, `IPFIX`, and `OpenTelemetry`.',
+                enum: ['Kafka', 'IPFIX', 'OpenTelemetry'],
+                type: 'string'
               }
             },
-            "required": [
-              "type"
-            ],
-            "type": "object"
+            required: ['type'],
+            type: 'object'
           },
-          "type": "array"
+          type: 'array'
         },
-        "kafka": {
-          "description": "Kafka configuration, allowing to use Kafka as a broker as part of the flow collection pipeline. Available when the `spec.deploymentModel` is `Kafka`.",
-          "properties": {
-            "address": {
-              "default": "",
-              "description": "Address of the Kafka server",
-              "type": "string"
+        kafka: {
+          description:
+            'Kafka configuration, allowing to use Kafka as a broker as part of the flow collection pipeline. Available when the `spec.deploymentModel` is `Kafka`.',
+          properties: {
+            address: {
+              default: '',
+              description: 'Address of the Kafka server',
+              type: 'string'
             },
-            "sasl": {
-              "description": "SASL authentication configuration. [Unsupported (*)].",
-              "properties": {
-                "clientIDReference": {
-                  "description": "Reference to the secret or config map containing the client ID",
-                  "properties": {
-                    "file": {
-                      "description": "File name within the config map or secret.",
-                      "type": "string"
+            sasl: {
+              description: 'SASL authentication configuration. [Unsupported (*)].',
+              properties: {
+                clientIDReference: {
+                  description: 'Reference to the secret or config map containing the client ID',
+                  properties: {
+                    file: {
+                      description: 'File name within the config map or secret.',
+                      type: 'string'
                     },
-                    "name": {
-                      "description": "Name of the config map or secret containing the file.",
-                      "type": "string"
+                    name: {
+                      description: 'Name of the config map or secret containing the file.',
+                      type: 'string'
                     },
-                    "namespace": {
-                      "default": "",
-                      "description": "Namespace of the config map or secret containing the file. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                      "type": "string"
+                    namespace: {
+                      default: '',
+                      description:
+                        'Namespace of the config map or secret containing the file. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                      type: 'string'
                     },
-                    "type": {
-                      "description": "Type for the file reference: `configmap` or `secret`.",
-                      "enum": [
-                        "configmap",
-                        "secret"
-                      ],
-                      "type": "string"
+                    type: {
+                      description: 'Type for the file reference: `configmap` or `secret`.',
+                      enum: ['configmap', 'secret'],
+                      type: 'string'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 },
-                "clientSecretReference": {
-                  "description": "Reference to the secret or config map containing the client secret",
-                  "properties": {
-                    "file": {
-                      "description": "File name within the config map or secret.",
-                      "type": "string"
+                clientSecretReference: {
+                  description: 'Reference to the secret or config map containing the client secret',
+                  properties: {
+                    file: {
+                      description: 'File name within the config map or secret.',
+                      type: 'string'
                     },
-                    "name": {
-                      "description": "Name of the config map or secret containing the file.",
-                      "type": "string"
+                    name: {
+                      description: 'Name of the config map or secret containing the file.',
+                      type: 'string'
                     },
-                    "namespace": {
-                      "default": "",
-                      "description": "Namespace of the config map or secret containing the file. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                      "type": "string"
+                    namespace: {
+                      default: '',
+                      description:
+                        'Namespace of the config map or secret containing the file. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                      type: 'string'
                     },
-                    "type": {
-                      "description": "Type for the file reference: `configmap` or `secret`.",
-                      "enum": [
-                        "configmap",
-                        "secret"
-                      ],
-                      "type": "string"
+                    type: {
+                      description: 'Type for the file reference: `configmap` or `secret`.',
+                      enum: ['configmap', 'secret'],
+                      type: 'string'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 },
-                "type": {
-                  "default": "Disabled",
-                  "description": "Type of SASL authentication to use, or `Disabled` if SASL is not used",
-                  "enum": [
-                    "Disabled",
-                    "Plain",
-                    "ScramSHA512"
-                  ],
-                  "type": "string"
+                type: {
+                  default: 'Disabled',
+                  description: 'Type of SASL authentication to use, or `Disabled` if SASL is not used',
+                  enum: ['Disabled', 'Plain', 'ScramSHA512'],
+                  type: 'string'
                 }
               },
-              "type": "object"
+              type: 'object'
             },
-            "tls": {
-              "description": "TLS and mTLS client configuration. When using TLS, verify that the address matches the Kafka port used for TLS, generally 9093.\nWe recommend the use of mTLS for higher security standards.",
-              "properties": {
-                "caCert": {
-                  "description": "`caCert` defines the reference of the certificate for the Certificate Authority.",
-                  "properties": {
-                    "certFile": {
-                      "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                      "type": "string"
+            tls: {
+              description:
+                'TLS and mTLS client configuration. When using TLS, verify that the address matches the Kafka port used for TLS, generally 9093.\nWe recommend the use of mTLS for higher security standards.',
+              properties: {
+                caCert: {
+                  description: '`caCert` defines the reference of the certificate for the Certificate Authority.',
+                  properties: {
+                    certFile: {
+                      description:
+                        '`certFile` defines the path to the certificate file name within the config map or secret.',
+                      type: 'string'
                     },
-                    "certKey": {
-                      "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                      "type": "string"
+                    certKey: {
+                      description:
+                        '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                      type: 'string'
                     },
-                    "name": {
-                      "description": "Name of the config map or secret containing certificates.",
-                      "type": "string"
+                    name: {
+                      description: 'Name of the config map or secret containing certificates.',
+                      type: 'string'
                     },
-                    "namespace": {
-                      "default": "",
-                      "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                      "type": "string"
+                    namespace: {
+                      default: '',
+                      description:
+                        'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                      type: 'string'
                     },
-                    "type": {
-                      "description": "Type for the certificate reference: `configmap` or `secret`.",
-                      "enum": [
-                        "configmap",
-                        "secret"
-                      ],
-                      "type": "string"
+                    type: {
+                      description: 'Type for the certificate reference: `configmap` or `secret`.',
+                      enum: ['configmap', 'secret'],
+                      type: 'string'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 },
-                "enable": {
-                  "default": false,
-                  "description": "Enable TLS",
-                  "type": "boolean"
+                enable: {
+                  default: false,
+                  description: 'Enable TLS',
+                  type: 'boolean'
                 },
-                "insecureSkipVerify": {
-                  "default": false,
-                  "description": "`insecureSkipVerify` allows skipping client-side verification of the server certificate.\nIf set to `true`, the `caCert` field is ignored.",
-                  "type": "boolean"
+                insecureSkipVerify: {
+                  default: false,
+                  description:
+                    '`insecureSkipVerify` allows skipping client-side verification of the server certificate.\nIf set to `true`, the `caCert` field is ignored.',
+                  type: 'boolean'
                 },
-                "userCert": {
-                  "description": "`userCert` defines the user certificate reference and is used for mTLS. When you use one-way TLS, you can ignore this property.",
-                  "properties": {
-                    "certFile": {
-                      "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                      "type": "string"
+                userCert: {
+                  description:
+                    '`userCert` defines the user certificate reference and is used for mTLS. When you use one-way TLS, you can ignore this property.',
+                  properties: {
+                    certFile: {
+                      description:
+                        '`certFile` defines the path to the certificate file name within the config map or secret.',
+                      type: 'string'
                     },
-                    "certKey": {
-                      "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                      "type": "string"
+                    certKey: {
+                      description:
+                        '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                      type: 'string'
                     },
-                    "name": {
-                      "description": "Name of the config map or secret containing certificates.",
-                      "type": "string"
+                    name: {
+                      description: 'Name of the config map or secret containing certificates.',
+                      type: 'string'
                     },
-                    "namespace": {
-                      "default": "",
-                      "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                      "type": "string"
+                    namespace: {
+                      default: '',
+                      description:
+                        'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                      type: 'string'
                     },
-                    "type": {
-                      "description": "Type for the certificate reference: `configmap` or `secret`.",
-                      "enum": [
-                        "configmap",
-                        "secret"
-                      ],
-                      "type": "string"
+                    type: {
+                      description: 'Type for the certificate reference: `configmap` or `secret`.',
+                      enum: ['configmap', 'secret'],
+                      type: 'string'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 }
               },
-              "type": "object"
+              type: 'object'
             },
-            "topic": {
-              "default": "",
-              "description": "Kafka topic to use. It must exist. NetObserv does not create it.",
-              "type": "string"
+            topic: {
+              default: '',
+              description: 'Kafka topic to use. It must exist. NetObserv does not create it.',
+              type: 'string'
             }
           },
-          "required": [
-            "address",
-            "topic"
-          ],
-          "type": "object"
+          required: ['address', 'topic'],
+          type: 'object'
         },
-        "loki": {
-          "description": "`loki`, the flow store, client settings.",
-          "properties": {
-            "advanced": {
-              "description": "`advanced` allows setting some aspects of the internal configuration of the Loki clients.\nThis section is aimed mostly for debugging and fine-grained performance optimizations.",
-              "properties": {
-                "excludeLabels": {
-                  "description": "`excludeLabels` is a list of fields to be excluded from the list of Loki labels. [Unsupported (*)].",
-                  "items": {
-                    "type": "string"
+        loki: {
+          description: '`loki`, the flow store, client settings.',
+          properties: {
+            advanced: {
+              description:
+                '`advanced` allows setting some aspects of the internal configuration of the Loki clients.\nThis section is aimed mostly for debugging and fine-grained performance optimizations.',
+              properties: {
+                excludeLabels: {
+                  description:
+                    '`excludeLabels` is a list of fields to be excluded from the list of Loki labels. [Unsupported (*)].',
+                  items: {
+                    type: 'string'
                   },
-                  "type": "array"
+                  type: 'array'
                 },
-                "staticLabels": {
-                  "additionalProperties": {
-                    "type": "string"
+                staticLabels: {
+                  additionalProperties: {
+                    type: 'string'
                   },
-                  "default": {
-                    "app": "netobserv-flowcollector"
+                  default: {
+                    app: 'netobserv-flowcollector'
                   },
-                  "description": "`staticLabels` is a map of common labels to set on each flow in Loki storage.",
-                  "type": "object"
+                  description: '`staticLabels` is a map of common labels to set on each flow in Loki storage.',
+                  type: 'object'
                 },
-                "writeMaxBackoff": {
-                  "default": "5s",
-                  "description": "`writeMaxBackoff` is the maximum backoff time for Loki client connection between retries.",
-                  "type": "string"
+                writeMaxBackoff: {
+                  default: '5s',
+                  description:
+                    '`writeMaxBackoff` is the maximum backoff time for Loki client connection between retries.',
+                  type: 'string'
                 },
-                "writeMaxRetries": {
-                  "default": 2,
-                  "description": "`writeMaxRetries` is the maximum number of retries for Loki client connections.",
-                  "format": "int32",
-                  "minimum": 0,
-                  "type": "integer"
+                writeMaxRetries: {
+                  default: 2,
+                  description: '`writeMaxRetries` is the maximum number of retries for Loki client connections.',
+                  format: 'int32',
+                  minimum: 0,
+                  type: 'integer'
                 },
-                "writeMinBackoff": {
-                  "default": "1s",
-                  "description": "`writeMinBackoff` is the initial backoff time for Loki client connection between retries.",
-                  "type": "string"
+                writeMinBackoff: {
+                  default: '1s',
+                  description:
+                    '`writeMinBackoff` is the initial backoff time for Loki client connection between retries.',
+                  type: 'string'
                 }
               },
-              "type": "object"
+              type: 'object'
             },
-            "enable": {
-              "default": true,
-              "description": "Set `enable` to `true` to store flows in Loki.\nThe Console plugin can use either Loki or Prometheus as a data source for metrics (see also `spec.prometheus.querier`), or both.\nNot all queries are transposable from Loki to Prometheus. Hence, if Loki is disabled, some features of the plugin are disabled as well,\nsuch as getting per-pod information or viewing raw flows.\nIf both Prometheus and Loki are enabled, Prometheus takes precedence and Loki is used as a fallback for queries that Prometheus cannot handle.\nIf they are both disabled, the Console plugin is not deployed.",
-              "type": "boolean"
+            enable: {
+              default: true,
+              description:
+                'Set `enable` to `true` to store flows in Loki.\nThe Console plugin can use either Loki or Prometheus as a data source for metrics (see also `spec.prometheus.querier`), or both.\nNot all queries are transposable from Loki to Prometheus. Hence, if Loki is disabled, some features of the plugin are disabled as well,\nsuch as getting per-pod information or viewing raw flows.\nIf both Prometheus and Loki are enabled, Prometheus takes precedence and Loki is used as a fallback for queries that Prometheus cannot handle.\nIf they are both disabled, the Console plugin is not deployed.',
+              type: 'boolean'
             },
-            "lokiStack": {
-              "description": "Loki configuration for `LokiStack` mode. This is useful for an easy Loki Operator configuration.\nIt is ignored for other modes.",
-              "properties": {
-                "name": {
-                  "default": "loki",
-                  "description": "Name of an existing LokiStack resource to use.",
-                  "type": "string"
+            lokiStack: {
+              description:
+                'Loki configuration for `LokiStack` mode. This is useful for an easy Loki Operator configuration.\nIt is ignored for other modes.',
+              properties: {
+                name: {
+                  default: 'loki',
+                  description: 'Name of an existing LokiStack resource to use.',
+                  type: 'string'
                 },
-                "namespace": {
-                  "description": "Namespace where this `LokiStack` resource is located. If omitted, it is assumed to be the same as `spec.namespace`.",
-                  "type": "string"
+                namespace: {
+                  description:
+                    'Namespace where this `LokiStack` resource is located. If omitted, it is assumed to be the same as `spec.namespace`.',
+                  type: 'string'
                 }
               },
-              "required": [
-                "name"
-              ],
-              "type": "object"
+              required: ['name'],
+              type: 'object'
             },
-            "manual": {
-              "description": "Loki configuration for `Manual` mode. This is the most flexible configuration.\nIt is ignored for other modes.",
-              "properties": {
-                "authToken": {
-                  "default": "Disabled",
-                  "description": "`authToken` describes the way to get a token to authenticate to Loki.<br>\n- `Disabled` does not send any token with the request.<br>\n- `Forward` forwards the user token for authorization.<br>\n- `Host` [deprecated (*)] - uses the local pod service account to authenticate to Loki.<br>\nWhen using the Loki Operator, this must be set to `Forward`.",
-                  "enum": [
-                    "Disabled",
-                    "Host",
-                    "Forward"
-                  ],
-                  "type": "string"
+            manual: {
+              description:
+                'Loki configuration for `Manual` mode. This is the most flexible configuration.\nIt is ignored for other modes.',
+              properties: {
+                authToken: {
+                  default: 'Disabled',
+                  description:
+                    '`authToken` describes the way to get a token to authenticate to Loki.<br>\n- `Disabled` does not send any token with the request.<br>\n- `Forward` forwards the user token for authorization.<br>\n- `Host` [deprecated (*)] - uses the local pod service account to authenticate to Loki.<br>\nWhen using the Loki Operator, this must be set to `Forward`.',
+                  enum: ['Disabled', 'Host', 'Forward'],
+                  type: 'string'
                 },
-                "ingesterUrl": {
-                  "default": "http://loki:3100/",
-                  "description": "`ingesterUrl` is the address of an existing Loki ingester service to push the flows to. When using the Loki Operator,\nset it to the Loki gateway service with the `network` tenant set in path, for example\nhttps://loki-gateway-http.netobserv.svc:8080/api/logs/v1/network.",
-                  "type": "string"
+                ingesterUrl: {
+                  default: 'http://loki:3100/',
+                  description:
+                    '`ingesterUrl` is the address of an existing Loki ingester service to push the flows to. When using the Loki Operator,\nset it to the Loki gateway service with the `network` tenant set in path, for example\nhttps://loki-gateway-http.netobserv.svc:8080/api/logs/v1/network.',
+                  type: 'string'
                 },
-                "querierUrl": {
-                  "default": "http://loki:3100/",
-                  "description": "`querierUrl` specifies the address of the Loki querier service.\nWhen using the Loki Operator, set it to the Loki gateway service with the `network` tenant set in path, for example\nhttps://loki-gateway-http.netobserv.svc:8080/api/logs/v1/network.",
-                  "type": "string"
+                querierUrl: {
+                  default: 'http://loki:3100/',
+                  description:
+                    '`querierUrl` specifies the address of the Loki querier service.\nWhen using the Loki Operator, set it to the Loki gateway service with the `network` tenant set in path, for example\nhttps://loki-gateway-http.netobserv.svc:8080/api/logs/v1/network.',
+                  type: 'string'
                 },
-                "statusTls": {
-                  "description": "TLS client configuration for Loki status URL.",
-                  "properties": {
-                    "caCert": {
-                      "description": "`caCert` defines the reference of the certificate for the Certificate Authority.",
-                      "properties": {
-                        "certFile": {
-                          "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                          "type": "string"
+                statusTls: {
+                  description: 'TLS client configuration for Loki status URL.',
+                  properties: {
+                    caCert: {
+                      description: '`caCert` defines the reference of the certificate for the Certificate Authority.',
+                      properties: {
+                        certFile: {
+                          description:
+                            '`certFile` defines the path to the certificate file name within the config map or secret.',
+                          type: 'string'
                         },
-                        "certKey": {
-                          "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                          "type": "string"
+                        certKey: {
+                          description:
+                            '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                          type: 'string'
                         },
-                        "name": {
-                          "description": "Name of the config map or secret containing certificates.",
-                          "type": "string"
+                        name: {
+                          description: 'Name of the config map or secret containing certificates.',
+                          type: 'string'
                         },
-                        "namespace": {
-                          "default": "",
-                          "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                          "type": "string"
+                        namespace: {
+                          default: '',
+                          description:
+                            'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                          type: 'string'
                         },
-                        "type": {
-                          "description": "Type for the certificate reference: `configmap` or `secret`.",
-                          "enum": [
-                            "configmap",
-                            "secret"
-                          ],
-                          "type": "string"
+                        type: {
+                          description: 'Type for the certificate reference: `configmap` or `secret`.',
+                          enum: ['configmap', 'secret'],
+                          type: 'string'
                         }
                       },
-                      "type": "object"
+                      type: 'object'
                     },
-                    "enable": {
-                      "default": false,
-                      "description": "Enable TLS",
-                      "type": "boolean"
+                    enable: {
+                      default: false,
+                      description: 'Enable TLS',
+                      type: 'boolean'
                     },
-                    "insecureSkipVerify": {
-                      "default": false,
-                      "description": "`insecureSkipVerify` allows skipping client-side verification of the server certificate.\nIf set to `true`, the `caCert` field is ignored.",
-                      "type": "boolean"
+                    insecureSkipVerify: {
+                      default: false,
+                      description:
+                        '`insecureSkipVerify` allows skipping client-side verification of the server certificate.\nIf set to `true`, the `caCert` field is ignored.',
+                      type: 'boolean'
                     },
-                    "userCert": {
-                      "description": "`userCert` defines the user certificate reference and is used for mTLS. When you use one-way TLS, you can ignore this property.",
-                      "properties": {
-                        "certFile": {
-                          "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                          "type": "string"
+                    userCert: {
+                      description:
+                        '`userCert` defines the user certificate reference and is used for mTLS. When you use one-way TLS, you can ignore this property.',
+                      properties: {
+                        certFile: {
+                          description:
+                            '`certFile` defines the path to the certificate file name within the config map or secret.',
+                          type: 'string'
                         },
-                        "certKey": {
-                          "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                          "type": "string"
+                        certKey: {
+                          description:
+                            '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                          type: 'string'
                         },
-                        "name": {
-                          "description": "Name of the config map or secret containing certificates.",
-                          "type": "string"
+                        name: {
+                          description: 'Name of the config map or secret containing certificates.',
+                          type: 'string'
                         },
-                        "namespace": {
-                          "default": "",
-                          "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                          "type": "string"
+                        namespace: {
+                          default: '',
+                          description:
+                            'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                          type: 'string'
                         },
-                        "type": {
-                          "description": "Type for the certificate reference: `configmap` or `secret`.",
-                          "enum": [
-                            "configmap",
-                            "secret"
-                          ],
-                          "type": "string"
+                        type: {
+                          description: 'Type for the certificate reference: `configmap` or `secret`.',
+                          enum: ['configmap', 'secret'],
+                          type: 'string'
                         }
                       },
-                      "type": "object"
+                      type: 'object'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 },
-                "statusUrl": {
-                  "description": "`statusUrl` specifies the address of the Loki `/ready`, `/metrics` and `/config` endpoints, in case it is different from the\nLoki querier URL. If empty, the `querierUrl` value is used.\nThis is useful to show error messages and some context in the frontend.\nWhen using the Loki Operator, set it to the Loki HTTP query frontend service, for example\nhttps://loki-query-frontend-http.netobserv.svc:3100/.\n`statusTLS` configuration is used when `statusUrl` is set.",
-                  "type": "string"
+                statusUrl: {
+                  description:
+                    '`statusUrl` specifies the address of the Loki `/ready`, `/metrics` and `/config` endpoints, in case it is different from the\nLoki querier URL. If empty, the `querierUrl` value is used.\nThis is useful to show error messages and some context in the frontend.\nWhen using the Loki Operator, set it to the Loki HTTP query frontend service, for example\nhttps://loki-query-frontend-http.netobserv.svc:3100/.\n`statusTLS` configuration is used when `statusUrl` is set.',
+                  type: 'string'
                 },
-                "tenantID": {
-                  "default": "netobserv",
-                  "description": "`tenantID` is the Loki `X-Scope-OrgID` that identifies the tenant for each request.\nWhen using the Loki Operator, set it to `network`, which corresponds to a special tenant mode.",
-                  "type": "string"
+                tenantID: {
+                  default: 'netobserv',
+                  description:
+                    '`tenantID` is the Loki `X-Scope-OrgID` that identifies the tenant for each request.\nWhen using the Loki Operator, set it to `network`, which corresponds to a special tenant mode.',
+                  type: 'string'
                 },
-                "tls": {
-                  "description": "TLS client configuration for Loki URL.",
-                  "properties": {
-                    "caCert": {
-                      "description": "`caCert` defines the reference of the certificate for the Certificate Authority.",
-                      "properties": {
-                        "certFile": {
-                          "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                          "type": "string"
+                tls: {
+                  description: 'TLS client configuration for Loki URL.',
+                  properties: {
+                    caCert: {
+                      description: '`caCert` defines the reference of the certificate for the Certificate Authority.',
+                      properties: {
+                        certFile: {
+                          description:
+                            '`certFile` defines the path to the certificate file name within the config map or secret.',
+                          type: 'string'
                         },
-                        "certKey": {
-                          "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                          "type": "string"
+                        certKey: {
+                          description:
+                            '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                          type: 'string'
                         },
-                        "name": {
-                          "description": "Name of the config map or secret containing certificates.",
-                          "type": "string"
+                        name: {
+                          description: 'Name of the config map or secret containing certificates.',
+                          type: 'string'
                         },
-                        "namespace": {
-                          "default": "",
-                          "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                          "type": "string"
+                        namespace: {
+                          default: '',
+                          description:
+                            'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                          type: 'string'
                         },
-                        "type": {
-                          "description": "Type for the certificate reference: `configmap` or `secret`.",
-                          "enum": [
-                            "configmap",
-                            "secret"
-                          ],
-                          "type": "string"
+                        type: {
+                          description: 'Type for the certificate reference: `configmap` or `secret`.',
+                          enum: ['configmap', 'secret'],
+                          type: 'string'
                         }
                       },
-                      "type": "object"
+                      type: 'object'
                     },
-                    "enable": {
-                      "default": false,
-                      "description": "Enable TLS",
-                      "type": "boolean"
+                    enable: {
+                      default: false,
+                      description: 'Enable TLS',
+                      type: 'boolean'
                     },
-                    "insecureSkipVerify": {
-                      "default": false,
-                      "description": "`insecureSkipVerify` allows skipping client-side verification of the server certificate.\nIf set to `true`, the `caCert` field is ignored.",
-                      "type": "boolean"
+                    insecureSkipVerify: {
+                      default: false,
+                      description:
+                        '`insecureSkipVerify` allows skipping client-side verification of the server certificate.\nIf set to `true`, the `caCert` field is ignored.',
+                      type: 'boolean'
                     },
-                    "userCert": {
-                      "description": "`userCert` defines the user certificate reference and is used for mTLS. When you use one-way TLS, you can ignore this property.",
-                      "properties": {
-                        "certFile": {
-                          "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                          "type": "string"
+                    userCert: {
+                      description:
+                        '`userCert` defines the user certificate reference and is used for mTLS. When you use one-way TLS, you can ignore this property.',
+                      properties: {
+                        certFile: {
+                          description:
+                            '`certFile` defines the path to the certificate file name within the config map or secret.',
+                          type: 'string'
                         },
-                        "certKey": {
-                          "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                          "type": "string"
+                        certKey: {
+                          description:
+                            '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                          type: 'string'
                         },
-                        "name": {
-                          "description": "Name of the config map or secret containing certificates.",
-                          "type": "string"
+                        name: {
+                          description: 'Name of the config map or secret containing certificates.',
+                          type: 'string'
                         },
-                        "namespace": {
-                          "default": "",
-                          "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                          "type": "string"
+                        namespace: {
+                          default: '',
+                          description:
+                            'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                          type: 'string'
                         },
-                        "type": {
-                          "description": "Type for the certificate reference: `configmap` or `secret`.",
-                          "enum": [
-                            "configmap",
-                            "secret"
-                          ],
-                          "type": "string"
+                        type: {
+                          description: 'Type for the certificate reference: `configmap` or `secret`.',
+                          enum: ['configmap', 'secret'],
+                          type: 'string'
                         }
                       },
-                      "type": "object"
+                      type: 'object'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 }
               },
-              "type": "object"
+              type: 'object'
             },
-            "microservices": {
-              "description": "Loki configuration for `Microservices` mode.\nUse this option when Loki is installed using the microservices deployment mode (https://grafana.com/docs/loki/latest/fundamentals/architecture/deployment-modes/#microservices-mode).\nIt is ignored for other modes.",
-              "properties": {
-                "ingesterUrl": {
-                  "default": "http://loki-distributor:3100/",
-                  "description": "`ingesterUrl` is the address of an existing Loki ingester service to push the flows to.",
-                  "type": "string"
+            microservices: {
+              description:
+                'Loki configuration for `Microservices` mode.\nUse this option when Loki is installed using the microservices deployment mode (https://grafana.com/docs/loki/latest/fundamentals/architecture/deployment-modes/#microservices-mode).\nIt is ignored for other modes.',
+              properties: {
+                ingesterUrl: {
+                  default: 'http://loki-distributor:3100/',
+                  description:
+                    '`ingesterUrl` is the address of an existing Loki ingester service to push the flows to.',
+                  type: 'string'
                 },
-                "querierUrl": {
-                  "default": "http://loki-query-frontend:3100/",
-                  "description": "`querierURL` specifies the address of the Loki querier service.",
-                  "type": "string"
+                querierUrl: {
+                  default: 'http://loki-query-frontend:3100/',
+                  description: '`querierURL` specifies the address of the Loki querier service.',
+                  type: 'string'
                 },
-                "tenantID": {
-                  "default": "netobserv",
-                  "description": "`tenantID` is the Loki `X-Scope-OrgID` header that identifies the tenant for each request.",
-                  "type": "string"
+                tenantID: {
+                  default: 'netobserv',
+                  description:
+                    '`tenantID` is the Loki `X-Scope-OrgID` header that identifies the tenant for each request.',
+                  type: 'string'
                 },
-                "tls": {
-                  "description": "TLS client configuration for Loki URL.",
-                  "properties": {
-                    "caCert": {
-                      "description": "`caCert` defines the reference of the certificate for the Certificate Authority.",
-                      "properties": {
-                        "certFile": {
-                          "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                          "type": "string"
+                tls: {
+                  description: 'TLS client configuration for Loki URL.',
+                  properties: {
+                    caCert: {
+                      description: '`caCert` defines the reference of the certificate for the Certificate Authority.',
+                      properties: {
+                        certFile: {
+                          description:
+                            '`certFile` defines the path to the certificate file name within the config map or secret.',
+                          type: 'string'
                         },
-                        "certKey": {
-                          "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                          "type": "string"
+                        certKey: {
+                          description:
+                            '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                          type: 'string'
                         },
-                        "name": {
-                          "description": "Name of the config map or secret containing certificates.",
-                          "type": "string"
+                        name: {
+                          description: 'Name of the config map or secret containing certificates.',
+                          type: 'string'
                         },
-                        "namespace": {
-                          "default": "",
-                          "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                          "type": "string"
+                        namespace: {
+                          default: '',
+                          description:
+                            'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                          type: 'string'
                         },
-                        "type": {
-                          "description": "Type for the certificate reference: `configmap` or `secret`.",
-                          "enum": [
-                            "configmap",
-                            "secret"
-                          ],
-                          "type": "string"
+                        type: {
+                          description: 'Type for the certificate reference: `configmap` or `secret`.',
+                          enum: ['configmap', 'secret'],
+                          type: 'string'
                         }
                       },
-                      "type": "object"
+                      type: 'object'
                     },
-                    "enable": {
-                      "default": false,
-                      "description": "Enable TLS",
-                      "type": "boolean"
+                    enable: {
+                      default: false,
+                      description: 'Enable TLS',
+                      type: 'boolean'
                     },
-                    "insecureSkipVerify": {
-                      "default": false,
-                      "description": "`insecureSkipVerify` allows skipping client-side verification of the server certificate.\nIf set to `true`, the `caCert` field is ignored.",
-                      "type": "boolean"
+                    insecureSkipVerify: {
+                      default: false,
+                      description:
+                        '`insecureSkipVerify` allows skipping client-side verification of the server certificate.\nIf set to `true`, the `caCert` field is ignored.',
+                      type: 'boolean'
                     },
-                    "userCert": {
-                      "description": "`userCert` defines the user certificate reference and is used for mTLS. When you use one-way TLS, you can ignore this property.",
-                      "properties": {
-                        "certFile": {
-                          "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                          "type": "string"
+                    userCert: {
+                      description:
+                        '`userCert` defines the user certificate reference and is used for mTLS. When you use one-way TLS, you can ignore this property.',
+                      properties: {
+                        certFile: {
+                          description:
+                            '`certFile` defines the path to the certificate file name within the config map or secret.',
+                          type: 'string'
                         },
-                        "certKey": {
-                          "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                          "type": "string"
+                        certKey: {
+                          description:
+                            '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                          type: 'string'
                         },
-                        "name": {
-                          "description": "Name of the config map or secret containing certificates.",
-                          "type": "string"
+                        name: {
+                          description: 'Name of the config map or secret containing certificates.',
+                          type: 'string'
                         },
-                        "namespace": {
-                          "default": "",
-                          "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                          "type": "string"
+                        namespace: {
+                          default: '',
+                          description:
+                            'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                          type: 'string'
                         },
-                        "type": {
-                          "description": "Type for the certificate reference: `configmap` or `secret`.",
-                          "enum": [
-                            "configmap",
-                            "secret"
-                          ],
-                          "type": "string"
+                        type: {
+                          description: 'Type for the certificate reference: `configmap` or `secret`.',
+                          enum: ['configmap', 'secret'],
+                          type: 'string'
                         }
                       },
-                      "type": "object"
+                      type: 'object'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 }
               },
-              "type": "object"
+              type: 'object'
             },
-            "mode": {
-              "default": "Monolithic",
-              "description": "`mode` must be set according to the installation mode of Loki:<br>\n- Use `LokiStack` when Loki is managed using the Loki Operator<br>\n- Use `Monolithic` when Loki is installed as a monolithic workload<br>\n- Use `Microservices` when Loki is installed as microservices, but without Loki Operator<br>\n- Use `Manual` if none of the options above match your setup<br>",
-              "enum": [
-                "Manual",
-                "LokiStack",
-                "Monolithic",
-                "Microservices"
-              ],
-              "type": "string"
+            mode: {
+              default: 'Monolithic',
+              description:
+                '`mode` must be set according to the installation mode of Loki:<br>\n- Use `LokiStack` when Loki is managed using the Loki Operator<br>\n- Use `Monolithic` when Loki is installed as a monolithic workload<br>\n- Use `Microservices` when Loki is installed as microservices, but without Loki Operator<br>\n- Use `Manual` if none of the options above match your setup<br>',
+              enum: ['Manual', 'LokiStack', 'Monolithic', 'Microservices'],
+              type: 'string'
             },
-            "monolithic": {
-              "description": "Loki configuration for `Monolithic` mode.\nUse this option when Loki is installed using the monolithic deployment mode (https://grafana.com/docs/loki/latest/fundamentals/architecture/deployment-modes/#monolithic-mode).\nIt is ignored for other modes.",
-              "properties": {
-                "installDemoLoki": {
-                  "default": false,
-                  "description": "Set `installDemoLoki` to `true` to automatically create Loki deployment, service and storage.\nThis is useful for development and demo purposes. Do not use it in production.\n[Unsupported (*)].",
-                  "type": "boolean"
+            monolithic: {
+              description:
+                'Loki configuration for `Monolithic` mode.\nUse this option when Loki is installed using the monolithic deployment mode (https://grafana.com/docs/loki/latest/fundamentals/architecture/deployment-modes/#monolithic-mode).\nIt is ignored for other modes.',
+              properties: {
+                installDemoLoki: {
+                  default: false,
+                  description:
+                    'Set `installDemoLoki` to `true` to automatically create Loki deployment, service and storage.\nThis is useful for development and demo purposes. Do not use it in production.\n[Unsupported (*)].',
+                  type: 'boolean'
                 },
-                "tenantID": {
-                  "default": "netobserv",
-                  "description": "`tenantID` is the Loki `X-Scope-OrgID` header that identifies the tenant for each request.",
-                  "type": "string"
+                tenantID: {
+                  default: 'netobserv',
+                  description:
+                    '`tenantID` is the Loki `X-Scope-OrgID` header that identifies the tenant for each request.',
+                  type: 'string'
                 },
-                "tls": {
-                  "description": "TLS client configuration for Loki URL.",
-                  "properties": {
-                    "caCert": {
-                      "description": "`caCert` defines the reference of the certificate for the Certificate Authority.",
-                      "properties": {
-                        "certFile": {
-                          "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                          "type": "string"
+                tls: {
+                  description: 'TLS client configuration for Loki URL.',
+                  properties: {
+                    caCert: {
+                      description: '`caCert` defines the reference of the certificate for the Certificate Authority.',
+                      properties: {
+                        certFile: {
+                          description:
+                            '`certFile` defines the path to the certificate file name within the config map or secret.',
+                          type: 'string'
                         },
-                        "certKey": {
-                          "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                          "type": "string"
+                        certKey: {
+                          description:
+                            '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                          type: 'string'
                         },
-                        "name": {
-                          "description": "Name of the config map or secret containing certificates.",
-                          "type": "string"
+                        name: {
+                          description: 'Name of the config map or secret containing certificates.',
+                          type: 'string'
                         },
-                        "namespace": {
-                          "default": "",
-                          "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                          "type": "string"
+                        namespace: {
+                          default: '',
+                          description:
+                            'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                          type: 'string'
                         },
-                        "type": {
-                          "description": "Type for the certificate reference: `configmap` or `secret`.",
-                          "enum": [
-                            "configmap",
-                            "secret"
-                          ],
-                          "type": "string"
+                        type: {
+                          description: 'Type for the certificate reference: `configmap` or `secret`.',
+                          enum: ['configmap', 'secret'],
+                          type: 'string'
                         }
                       },
-                      "type": "object"
+                      type: 'object'
                     },
-                    "enable": {
-                      "default": false,
-                      "description": "Enable TLS",
-                      "type": "boolean"
+                    enable: {
+                      default: false,
+                      description: 'Enable TLS',
+                      type: 'boolean'
                     },
-                    "insecureSkipVerify": {
-                      "default": false,
-                      "description": "`insecureSkipVerify` allows skipping client-side verification of the server certificate.\nIf set to `true`, the `caCert` field is ignored.",
-                      "type": "boolean"
+                    insecureSkipVerify: {
+                      default: false,
+                      description:
+                        '`insecureSkipVerify` allows skipping client-side verification of the server certificate.\nIf set to `true`, the `caCert` field is ignored.',
+                      type: 'boolean'
                     },
-                    "userCert": {
-                      "description": "`userCert` defines the user certificate reference and is used for mTLS. When you use one-way TLS, you can ignore this property.",
-                      "properties": {
-                        "certFile": {
-                          "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                          "type": "string"
+                    userCert: {
+                      description:
+                        '`userCert` defines the user certificate reference and is used for mTLS. When you use one-way TLS, you can ignore this property.',
+                      properties: {
+                        certFile: {
+                          description:
+                            '`certFile` defines the path to the certificate file name within the config map or secret.',
+                          type: 'string'
                         },
-                        "certKey": {
-                          "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                          "type": "string"
+                        certKey: {
+                          description:
+                            '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                          type: 'string'
                         },
-                        "name": {
-                          "description": "Name of the config map or secret containing certificates.",
-                          "type": "string"
+                        name: {
+                          description: 'Name of the config map or secret containing certificates.',
+                          type: 'string'
                         },
-                        "namespace": {
-                          "default": "",
-                          "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                          "type": "string"
+                        namespace: {
+                          default: '',
+                          description:
+                            'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                          type: 'string'
                         },
-                        "type": {
-                          "description": "Type for the certificate reference: `configmap` or `secret`.",
-                          "enum": [
-                            "configmap",
-                            "secret"
-                          ],
-                          "type": "string"
+                        type: {
+                          description: 'Type for the certificate reference: `configmap` or `secret`.',
+                          enum: ['configmap', 'secret'],
+                          type: 'string'
                         }
                       },
-                      "type": "object"
+                      type: 'object'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 },
-                "url": {
-                  "default": "http://loki:3100/",
-                  "description": "`url` is the unique address of an existing Loki service that points to both the ingester and the querier.",
-                  "type": "string"
+                url: {
+                  default: 'http://loki:3100/',
+                  description:
+                    '`url` is the unique address of an existing Loki service that points to both the ingester and the querier.',
+                  type: 'string'
                 }
               },
-              "type": "object"
+              type: 'object'
             },
-            "readTimeout": {
-              "default": "30s",
-              "description": "`readTimeout` is the maximum console plugin loki query total time limit.\nA timeout of zero means no timeout.",
-              "type": "string"
+            readTimeout: {
+              default: '30s',
+              description:
+                '`readTimeout` is the maximum console plugin loki query total time limit.\nA timeout of zero means no timeout.',
+              type: 'string'
             },
-            "writeBatchSize": {
-              "default": 10485760,
-              "description": "`writeBatchSize` is the maximum batch size (in bytes) of Loki logs to accumulate before sending.",
-              "format": "int64",
-              "minimum": 1,
-              "type": "integer"
+            writeBatchSize: {
+              default: 10485760,
+              description:
+                '`writeBatchSize` is the maximum batch size (in bytes) of Loki logs to accumulate before sending.',
+              format: 'int64',
+              minimum: 1,
+              type: 'integer'
             },
-            "writeBatchWait": {
-              "default": "1s",
-              "description": "`writeBatchWait` is the maximum time to wait before sending a Loki batch.",
-              "type": "string"
+            writeBatchWait: {
+              default: '1s',
+              description: '`writeBatchWait` is the maximum time to wait before sending a Loki batch.',
+              type: 'string'
             },
-            "writeTimeout": {
-              "default": "10s",
-              "description": "`writeTimeout` is the maximum Loki time connection / request limit.\nA timeout of zero means no timeout.",
-              "type": "string"
+            writeTimeout: {
+              default: '10s',
+              description:
+                '`writeTimeout` is the maximum Loki time connection / request limit.\nA timeout of zero means no timeout.',
+              type: 'string'
             }
           },
-          "required": [
-            "mode"
-          ],
-          "type": "object"
+          required: ['mode'],
+          type: 'object'
         },
-        "namespace": {
-          "default": "netobserv",
-          "description": "Namespace where NetObserv pods are deployed.",
-          "type": "string",
-          "x-kubernetes-validations": [
+        namespace: {
+          default: 'netobserv',
+          description: 'Namespace where NetObserv pods are deployed.',
+          type: 'string',
+          'x-kubernetes-validations': [
             {
-              "message": "Namespace is immutable. If you need to change it, delete and recreate the resource.",
-              "rule": "self == oldSelf"
+              message: 'Namespace is immutable. If you need to change it, delete and recreate the resource.',
+              rule: 'self == oldSelf'
             }
           ]
         },
-        "networkPolicy": {
-          "description": "`networkPolicy` defines network policy settings for NetObserv components isolation.",
-          "properties": {
-            "additionalNamespaces": {
-              "description": "`additionalNamespaces` contains additional namespaces allowed to connect to the NetObserv namespace.\nIt provides flexibility in the network policy configuration, but if you need a more specific\nconfiguration, you can disable it and install your own instead.",
-              "items": {
-                "type": "string"
+        networkPolicy: {
+          description: '`networkPolicy` defines network policy settings for NetObserv components isolation.',
+          properties: {
+            additionalNamespaces: {
+              description:
+                '`additionalNamespaces` contains additional namespaces allowed to connect to the NetObserv namespace.\nIt provides flexibility in the network policy configuration, but if you need a more specific\nconfiguration, you can disable it and install your own instead.',
+              items: {
+                type: 'string'
               },
-              "type": "array"
+              type: 'array'
             },
-            "enable": {
-              "description": "Deploys network policies on the namespaces used by NetObserv (main and privileged).\nThese network policies better isolate the NetObserv components to prevent undesired connections from and to them.\nBecause it cannot be tested with all CNIs, this option is only enabled by default when NetObserv runs in a known\nsupported environment, and it is disabled by default otherwise.\nWhen disabled, it is highly recommended to create network policies manually, to prevent undesired accesses.\nMore information: https://github.com/netobserv/netobserv-operator/blob/main/docs/NetworkPolicy.md.",
-              "type": "boolean"
+            enable: {
+              description:
+                'Deploys network policies on the namespaces used by NetObserv (main and privileged).\nThese network policies better isolate the NetObserv components to prevent undesired connections from and to them.\nBecause it cannot be tested with all CNIs, this option is only enabled by default when NetObserv runs in a known\nsupported environment, and it is disabled by default otherwise.\nWhen disabled, it is highly recommended to create network policies manually, to prevent undesired accesses.\nMore information: https://github.com/netobserv/netobserv-operator/blob/main/docs/NetworkPolicy.md.',
+              type: 'boolean'
             }
           },
-          "type": "object"
+          type: 'object'
         },
-        "processor": {
-          "description": "`processor` defines the settings of the component that receives the flows from the agent,\nenriches them, generates metrics, and forwards them to the Loki persistence layer and/or any available exporter.",
-          "properties": {
-            "addZone": {
-              "description": "`addZone` allows availability zone awareness by labeling flows with their source and destination zones.\nThis feature requires the \"topology.kubernetes.io/zone\" label to be set on nodes.",
-              "type": "boolean"
+        processor: {
+          description:
+            '`processor` defines the settings of the component that receives the flows from the agent,\nenriches them, generates metrics, and forwards them to the Loki persistence layer and/or any available exporter.',
+          properties: {
+            addZone: {
+              description:
+                '`addZone` allows availability zone awareness by labeling flows with their source and destination zones.\nThis feature requires the "topology.kubernetes.io/zone" label to be set on nodes.',
+              type: 'boolean'
             },
-            "advanced": {
-              "description": "`advanced` allows setting some aspects of the internal configuration of the flow processor.\nThis section is aimed mostly for debugging and fine-grained performance optimizations,\nsuch as `GOGC` and `GOMAXPROCS` environment variables. Set these values at your own risk.",
-              "properties": {
-                "conversationEndTimeout": {
-                  "default": "10s",
-                  "description": "`conversationEndTimeout` is the time to wait after a network flow is received, to consider the conversation ended.\nThis delay is ignored when a FIN packet is collected for TCP flows (see `conversationTerminatingTimeout` instead).",
-                  "type": "string"
+            advanced: {
+              description:
+                '`advanced` allows setting some aspects of the internal configuration of the flow processor.\nThis section is aimed mostly for debugging and fine-grained performance optimizations,\nsuch as `GOGC` and `GOMAXPROCS` environment variables. Set these values at your own risk.',
+              properties: {
+                conversationEndTimeout: {
+                  default: '10s',
+                  description:
+                    '`conversationEndTimeout` is the time to wait after a network flow is received, to consider the conversation ended.\nThis delay is ignored when a FIN packet is collected for TCP flows (see `conversationTerminatingTimeout` instead).',
+                  type: 'string'
                 },
-                "conversationHeartbeatInterval": {
-                  "default": "30s",
-                  "description": "`conversationHeartbeatInterval` is the time to wait between \"tick\" events of a conversation",
-                  "type": "string"
+                conversationHeartbeatInterval: {
+                  default: '30s',
+                  description:
+                    '`conversationHeartbeatInterval` is the time to wait between "tick" events of a conversation',
+                  type: 'string'
                 },
-                "conversationTerminatingTimeout": {
-                  "default": "5s",
-                  "description": "`conversationTerminatingTimeout` is the time to wait from detected FIN flag to end a conversation. Only relevant for TCP flows.",
-                  "type": "string"
+                conversationTerminatingTimeout: {
+                  default: '5s',
+                  description:
+                    '`conversationTerminatingTimeout` is the time to wait from detected FIN flag to end a conversation. Only relevant for TCP flows.',
+                  type: 'string'
                 },
-                "dropUnusedFields": {
-                  "default": true,
-                  "description": "`dropUnusedFields` [deprecated (*)] this setting is not used anymore.",
-                  "type": "boolean"
+                dropUnusedFields: {
+                  default: true,
+                  description: '`dropUnusedFields` [deprecated (*)] this setting is not used anymore.',
+                  type: 'boolean'
                 },
-                "enableKubeProbes": {
-                  "default": true,
-                  "description": "`enableKubeProbes` is a flag to enable or disable Kubernetes liveness and readiness probes",
-                  "type": "boolean"
+                enableKubeProbes: {
+                  default: true,
+                  description:
+                    '`enableKubeProbes` is a flag to enable or disable Kubernetes liveness and readiness probes',
+                  type: 'boolean'
                 },
-                "env": {
-                  "additionalProperties": {
-                    "type": "string"
+                env: {
+                  additionalProperties: {
+                    type: 'string'
                   },
-                  "description": "`env` allows passing custom environment variables to underlying components. Useful for passing\nsome very concrete performance-tuning options, such as `GOGC` and `GOMAXPROCS`, that should not be\npublicly exposed as part of the FlowCollector descriptor, as they are only useful\nin edge debug or support scenarios.",
-                  "type": "object"
+                  description:
+                    '`env` allows passing custom environment variables to underlying components. Useful for passing\nsome very concrete performance-tuning options, such as `GOGC` and `GOMAXPROCS`, that should not be\npublicly exposed as part of the FlowCollector descriptor, as they are only useful\nin edge debug or support scenarios.',
+                  type: 'object'
                 },
-                "healthPort": {
-                  "default": 8080,
-                  "description": "`healthPort` is a collector HTTP port in the Pod that exposes the health check API",
-                  "format": "int32",
-                  "maximum": 65535,
-                  "minimum": 1,
-                  "type": "integer"
+                healthPort: {
+                  default: 8080,
+                  description: '`healthPort` is a collector HTTP port in the Pod that exposes the health check API',
+                  format: 'int32',
+                  maximum: 65535,
+                  minimum: 1,
+                  type: 'integer'
                 },
-                "port": {
-                  "default": 2055,
-                  "description": "Port of the flow collector (host port).\nBy convention, some values are forbidden. It must be greater than 1024 and different from\n4500, 4789 and 6081.",
-                  "format": "int32",
-                  "maximum": 65535,
-                  "minimum": 1025,
-                  "type": "integer"
+                port: {
+                  default: 2055,
+                  description:
+                    'Port of the flow collector (host port).\nBy convention, some values are forbidden. It must be greater than 1024 and different from\n4500, 4789 and 6081.',
+                  format: 'int32',
+                  maximum: 65535,
+                  minimum: 1025,
+                  type: 'integer'
                 },
-                "profilePort": {
-                  "description": "`profilePort` allows setting up a Go pprof profiler listening to this port",
-                  "format": "int32",
-                  "maximum": 65535,
-                  "minimum": 0,
-                  "type": "integer"
+                profilePort: {
+                  description: '`profilePort` allows setting up a Go pprof profiler listening to this port',
+                  format: 'int32',
+                  maximum: 65535,
+                  minimum: 0,
+                  type: 'integer'
                 },
-                "scheduling": {
-                  "description": "scheduling controls how the pods are scheduled on nodes.",
-                  "properties": {
-                    "affinity": {
-                      "description": "If specified, the pod's scheduling constraints. For documentation, refer to https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling.",
-                      "properties": {
-                        "nodeAffinity": {
-                          "description": "Describes node affinity scheduling rules for the pod.",
-                          "properties": {
-                            "preferredDuringSchedulingIgnoredDuringExecution": {
-                              "description": "The scheduler will prefer to schedule pods to nodes that satisfy\nthe affinity expressions specified by this field, but it may choose\na node that violates one or more of the expressions. The node that is\nmost preferred is the one with the greatest sum of weights, i.e.\nfor each node that meets all of the scheduling requirements (resource\nrequest, requiredDuringScheduling affinity expressions, etc.),\ncompute a sum by iterating through the elements of this field and adding\n\"weight\" to the sum if the node matches the corresponding matchExpressions; the\nnode(s) with the highest sum are the most preferred.",
-                              "items": {
-                                "description": "An empty preferred scheduling term matches all objects with implicit weight 0\n(i.e. it's a no-op). A null preferred scheduling term matches no objects (i.e. is also a no-op).",
-                                "properties": {
-                                  "preference": {
-                                    "description": "A node selector term, associated with the corresponding weight.",
-                                    "properties": {
-                                      "matchExpressions": {
-                                        "description": "A list of node selector requirements by node's labels.",
-                                        "items": {
-                                          "description": "A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.",
-                                          "properties": {
-                                            "key": {
-                                              "description": "The label key that the selector applies to.",
-                                              "type": "string"
+                scheduling: {
+                  description: 'scheduling controls how the pods are scheduled on nodes.',
+                  properties: {
+                    affinity: {
+                      description:
+                        "If specified, the pod's scheduling constraints. For documentation, refer to https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling.",
+                      properties: {
+                        nodeAffinity: {
+                          description: 'Describes node affinity scheduling rules for the pod.',
+                          properties: {
+                            preferredDuringSchedulingIgnoredDuringExecution: {
+                              description:
+                                'The scheduler will prefer to schedule pods to nodes that satisfy\nthe affinity expressions specified by this field, but it may choose\na node that violates one or more of the expressions. The node that is\nmost preferred is the one with the greatest sum of weights, i.e.\nfor each node that meets all of the scheduling requirements (resource\nrequest, requiredDuringScheduling affinity expressions, etc.),\ncompute a sum by iterating through the elements of this field and adding\n"weight" to the sum if the node matches the corresponding matchExpressions; the\nnode(s) with the highest sum are the most preferred.',
+                              items: {
+                                description:
+                                  "An empty preferred scheduling term matches all objects with implicit weight 0\n(i.e. it's a no-op). A null preferred scheduling term matches no objects (i.e. is also a no-op).",
+                                properties: {
+                                  preference: {
+                                    description: 'A node selector term, associated with the corresponding weight.',
+                                    properties: {
+                                      matchExpressions: {
+                                        description: "A list of node selector requirements by node's labels.",
+                                        items: {
+                                          description:
+                                            'A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.',
+                                          properties: {
+                                            key: {
+                                              description: 'The label key that the selector applies to.',
+                                              type: 'string'
                                             },
-                                            "operator": {
-                                              "description": "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
-                                              "type": "string"
+                                            operator: {
+                                              description:
+                                                "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
+                                              type: 'string'
                                             },
-                                            "values": {
-                                              "description": "An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.",
-                                              "items": {
-                                                "type": "string"
+                                            values: {
+                                              description:
+                                                'An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.',
+                                              items: {
+                                                type: 'string'
                                               },
-                                              "type": "array",
-                                              "x-kubernetes-list-type": "atomic"
+                                              type: 'array',
+                                              'x-kubernetes-list-type': 'atomic'
                                             }
                                           },
-                                          "required": [
-                                            "key",
-                                            "operator"
-                                          ],
-                                          "type": "object"
+                                          required: ['key', 'operator'],
+                                          type: 'object'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "matchFields": {
-                                        "description": "A list of node selector requirements by node's fields.",
-                                        "items": {
-                                          "description": "A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.",
-                                          "properties": {
-                                            "key": {
-                                              "description": "The label key that the selector applies to.",
-                                              "type": "string"
+                                      matchFields: {
+                                        description: "A list of node selector requirements by node's fields.",
+                                        items: {
+                                          description:
+                                            'A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.',
+                                          properties: {
+                                            key: {
+                                              description: 'The label key that the selector applies to.',
+                                              type: 'string'
                                             },
-                                            "operator": {
-                                              "description": "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
-                                              "type": "string"
+                                            operator: {
+                                              description:
+                                                "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
+                                              type: 'string'
                                             },
-                                            "values": {
-                                              "description": "An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.",
-                                              "items": {
-                                                "type": "string"
+                                            values: {
+                                              description:
+                                                'An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.',
+                                              items: {
+                                                type: 'string'
                                               },
-                                              "type": "array",
-                                              "x-kubernetes-list-type": "atomic"
+                                              type: 'array',
+                                              'x-kubernetes-list-type': 'atomic'
                                             }
                                           },
-                                          "required": [
-                                            "key",
-                                            "operator"
-                                          ],
-                                          "type": "object"
+                                          required: ['key', 'operator'],
+                                          type: 'object'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       }
                                     },
-                                    "type": "object",
-                                    "x-kubernetes-map-type": "atomic"
+                                    type: 'object',
+                                    'x-kubernetes-map-type': 'atomic'
                                   },
-                                  "weight": {
-                                    "description": "Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.",
-                                    "format": "int32",
-                                    "type": "integer"
+                                  weight: {
+                                    description:
+                                      'Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.',
+                                    format: 'int32',
+                                    type: 'integer'
                                   }
                                 },
-                                "required": [
-                                  "preference",
-                                  "weight"
-                                ],
-                                "type": "object"
+                                required: ['preference', 'weight'],
+                                type: 'object'
                               },
-                              "type": "array",
-                              "x-kubernetes-list-type": "atomic"
+                              type: 'array',
+                              'x-kubernetes-list-type': 'atomic'
                             },
-                            "requiredDuringSchedulingIgnoredDuringExecution": {
-                              "description": "If the affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to an update), the system\nmay or may not try to eventually evict the pod from its node.",
-                              "properties": {
-                                "nodeSelectorTerms": {
-                                  "description": "Required. A list of node selector terms. The terms are ORed.",
-                                  "items": {
-                                    "description": "A null or empty node selector term matches no objects. The requirements of\nthem are ANDed.\nThe TopologySelectorTerm type implements a subset of the NodeSelectorTerm.",
-                                    "properties": {
-                                      "matchExpressions": {
-                                        "description": "A list of node selector requirements by node's labels.",
-                                        "items": {
-                                          "description": "A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.",
-                                          "properties": {
-                                            "key": {
-                                              "description": "The label key that the selector applies to.",
-                                              "type": "string"
+                            requiredDuringSchedulingIgnoredDuringExecution: {
+                              description:
+                                'If the affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to an update), the system\nmay or may not try to eventually evict the pod from its node.',
+                              properties: {
+                                nodeSelectorTerms: {
+                                  description: 'Required. A list of node selector terms. The terms are ORed.',
+                                  items: {
+                                    description:
+                                      'A null or empty node selector term matches no objects. The requirements of\nthem are ANDed.\nThe TopologySelectorTerm type implements a subset of the NodeSelectorTerm.',
+                                    properties: {
+                                      matchExpressions: {
+                                        description: "A list of node selector requirements by node's labels.",
+                                        items: {
+                                          description:
+                                            'A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.',
+                                          properties: {
+                                            key: {
+                                              description: 'The label key that the selector applies to.',
+                                              type: 'string'
                                             },
-                                            "operator": {
-                                              "description": "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
-                                              "type": "string"
+                                            operator: {
+                                              description:
+                                                "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
+                                              type: 'string'
                                             },
-                                            "values": {
-                                              "description": "An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.",
-                                              "items": {
-                                                "type": "string"
+                                            values: {
+                                              description:
+                                                'An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.',
+                                              items: {
+                                                type: 'string'
                                               },
-                                              "type": "array",
-                                              "x-kubernetes-list-type": "atomic"
+                                              type: 'array',
+                                              'x-kubernetes-list-type': 'atomic'
                                             }
                                           },
-                                          "required": [
-                                            "key",
-                                            "operator"
-                                          ],
-                                          "type": "object"
+                                          required: ['key', 'operator'],
+                                          type: 'object'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "matchFields": {
-                                        "description": "A list of node selector requirements by node's fields.",
-                                        "items": {
-                                          "description": "A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.",
-                                          "properties": {
-                                            "key": {
-                                              "description": "The label key that the selector applies to.",
-                                              "type": "string"
+                                      matchFields: {
+                                        description: "A list of node selector requirements by node's fields.",
+                                        items: {
+                                          description:
+                                            'A node selector requirement is a selector that contains values, a key, and an operator\nthat relates the key and values.',
+                                          properties: {
+                                            key: {
+                                              description: 'The label key that the selector applies to.',
+                                              type: 'string'
                                             },
-                                            "operator": {
-                                              "description": "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
-                                              "type": "string"
+                                            operator: {
+                                              description:
+                                                "Represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
+                                              type: 'string'
                                             },
-                                            "values": {
-                                              "description": "An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.",
-                                              "items": {
-                                                "type": "string"
+                                            values: {
+                                              description:
+                                                'An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. If the operator is Gt or Lt, the values\narray must have a single element, which will be interpreted as an integer.\nThis array is replaced during a strategic merge patch.',
+                                              items: {
+                                                type: 'string'
                                               },
-                                              "type": "array",
-                                              "x-kubernetes-list-type": "atomic"
+                                              type: 'array',
+                                              'x-kubernetes-list-type': 'atomic'
                                             }
                                           },
-                                          "required": [
-                                            "key",
-                                            "operator"
-                                          ],
-                                          "type": "object"
+                                          required: ['key', 'operator'],
+                                          type: 'object'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       }
                                     },
-                                    "type": "object",
-                                    "x-kubernetes-map-type": "atomic"
+                                    type: 'object',
+                                    'x-kubernetes-map-type': 'atomic'
                                   },
-                                  "type": "array",
-                                  "x-kubernetes-list-type": "atomic"
+                                  type: 'array',
+                                  'x-kubernetes-list-type': 'atomic'
                                 }
                               },
-                              "required": [
-                                "nodeSelectorTerms"
-                              ],
-                              "type": "object",
-                              "x-kubernetes-map-type": "atomic"
+                              required: ['nodeSelectorTerms'],
+                              type: 'object',
+                              'x-kubernetes-map-type': 'atomic'
                             }
                           },
-                          "type": "object"
+                          type: 'object'
                         },
-                        "podAffinity": {
-                          "description": "Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).",
-                          "properties": {
-                            "preferredDuringSchedulingIgnoredDuringExecution": {
-                              "description": "The scheduler will prefer to schedule pods to nodes that satisfy\nthe affinity expressions specified by this field, but it may choose\na node that violates one or more of the expressions. The node that is\nmost preferred is the one with the greatest sum of weights, i.e.\nfor each node that meets all of the scheduling requirements (resource\nrequest, requiredDuringScheduling affinity expressions, etc.),\ncompute a sum by iterating through the elements of this field and adding\n\"weight\" to the sum if the node has pods which matches the corresponding podAffinityTerm; the\nnode(s) with the highest sum are the most preferred.",
-                              "items": {
-                                "description": "The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)",
-                                "properties": {
-                                  "podAffinityTerm": {
-                                    "description": "Required. A pod affinity term, associated with the corresponding weight.",
-                                    "properties": {
-                                      "labelSelector": {
-                                        "description": "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
-                                        "properties": {
-                                          "matchExpressions": {
-                                            "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                            "items": {
-                                              "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                              "properties": {
-                                                "key": {
-                                                  "description": "key is the label key that the selector applies to.",
-                                                  "type": "string"
+                        podAffinity: {
+                          description:
+                            'Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).',
+                          properties: {
+                            preferredDuringSchedulingIgnoredDuringExecution: {
+                              description:
+                                'The scheduler will prefer to schedule pods to nodes that satisfy\nthe affinity expressions specified by this field, but it may choose\na node that violates one or more of the expressions. The node that is\nmost preferred is the one with the greatest sum of weights, i.e.\nfor each node that meets all of the scheduling requirements (resource\nrequest, requiredDuringScheduling affinity expressions, etc.),\ncompute a sum by iterating through the elements of this field and adding\n"weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the\nnode(s) with the highest sum are the most preferred.',
+                              items: {
+                                description:
+                                  'The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)',
+                                properties: {
+                                  podAffinityTerm: {
+                                    description:
+                                      'Required. A pod affinity term, associated with the corresponding weight.',
+                                    properties: {
+                                      labelSelector: {
+                                        description:
+                                          "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
+                                        properties: {
+                                          matchExpressions: {
+                                            description:
+                                              'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                            items: {
+                                              description:
+                                                'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                              properties: {
+                                                key: {
+                                                  description: 'key is the label key that the selector applies to.',
+                                                  type: 'string'
                                                 },
-                                                "operator": {
-                                                  "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                                  "type": "string"
+                                                operator: {
+                                                  description:
+                                                    "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                                  type: 'string'
                                                 },
-                                                "values": {
-                                                  "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                                  "items": {
-                                                    "type": "string"
+                                                values: {
+                                                  description:
+                                                    'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                                  items: {
+                                                    type: 'string'
                                                   },
-                                                  "type": "array",
-                                                  "x-kubernetes-list-type": "atomic"
+                                                  type: 'array',
+                                                  'x-kubernetes-list-type': 'atomic'
                                                 }
                                               },
-                                              "required": [
-                                                "key",
-                                                "operator"
-                                              ],
-                                              "type": "object"
+                                              required: ['key', 'operator'],
+                                              type: 'object'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "matchLabels": {
-                                            "additionalProperties": {
-                                              "type": "string"
+                                          matchLabels: {
+                                            additionalProperties: {
+                                              type: 'string'
                                             },
-                                            "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                            "type": "object"
+                                            description:
+                                              'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                            type: 'object'
                                           }
                                         },
-                                        "type": "object",
-                                        "x-kubernetes-map-type": "atomic"
+                                        type: 'object',
+                                        'x-kubernetes-map-type': 'atomic'
                                       },
-                                      "matchLabelKeys": {
-                                        "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
-                                        "items": {
-                                          "type": "string"
+                                      matchLabelKeys: {
+                                        description:
+                                          "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
+                                        items: {
+                                          type: 'string'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "mismatchLabelKeys": {
-                                        "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
-                                        "items": {
-                                          "type": "string"
+                                      mismatchLabelKeys: {
+                                        description:
+                                          "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
+                                        items: {
+                                          type: 'string'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "namespaceSelector": {
-                                        "description": "A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means \"this pod's namespace\".\nAn empty selector ({}) matches all namespaces.",
-                                        "properties": {
-                                          "matchExpressions": {
-                                            "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                            "items": {
-                                              "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                              "properties": {
-                                                "key": {
-                                                  "description": "key is the label key that the selector applies to.",
-                                                  "type": "string"
+                                      namespaceSelector: {
+                                        description:
+                                          'A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means "this pod\'s namespace".\nAn empty selector ({}) matches all namespaces.',
+                                        properties: {
+                                          matchExpressions: {
+                                            description:
+                                              'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                            items: {
+                                              description:
+                                                'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                              properties: {
+                                                key: {
+                                                  description: 'key is the label key that the selector applies to.',
+                                                  type: 'string'
                                                 },
-                                                "operator": {
-                                                  "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                                  "type": "string"
+                                                operator: {
+                                                  description:
+                                                    "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                                  type: 'string'
                                                 },
-                                                "values": {
-                                                  "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                                  "items": {
-                                                    "type": "string"
+                                                values: {
+                                                  description:
+                                                    'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                                  items: {
+                                                    type: 'string'
                                                   },
-                                                  "type": "array",
-                                                  "x-kubernetes-list-type": "atomic"
+                                                  type: 'array',
+                                                  'x-kubernetes-list-type': 'atomic'
                                                 }
                                               },
-                                              "required": [
-                                                "key",
-                                                "operator"
-                                              ],
-                                              "type": "object"
+                                              required: ['key', 'operator'],
+                                              type: 'object'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "matchLabels": {
-                                            "additionalProperties": {
-                                              "type": "string"
+                                          matchLabels: {
+                                            additionalProperties: {
+                                              type: 'string'
                                             },
-                                            "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                            "type": "object"
+                                            description:
+                                              'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                            type: 'object'
                                           }
                                         },
-                                        "type": "object",
-                                        "x-kubernetes-map-type": "atomic"
+                                        type: 'object',
+                                        'x-kubernetes-map-type': 'atomic'
                                       },
-                                      "namespaces": {
-                                        "description": "namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means \"this pod's namespace\".",
-                                        "items": {
-                                          "type": "string"
+                                      namespaces: {
+                                        description:
+                                          'namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means "this pod\'s namespace".',
+                                        items: {
+                                          type: 'string'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "topologyKey": {
-                                        "description": "This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.",
-                                        "type": "string"
+                                      topologyKey: {
+                                        description:
+                                          'This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.',
+                                        type: 'string'
                                       }
                                     },
-                                    "required": [
-                                      "topologyKey"
-                                    ],
-                                    "type": "object"
+                                    required: ['topologyKey'],
+                                    type: 'object'
                                   },
-                                  "weight": {
-                                    "description": "weight associated with matching the corresponding podAffinityTerm,\nin the range 1-100.",
-                                    "format": "int32",
-                                    "type": "integer"
+                                  weight: {
+                                    description:
+                                      'weight associated with matching the corresponding podAffinityTerm,\nin the range 1-100.',
+                                    format: 'int32',
+                                    type: 'integer'
                                   }
                                 },
-                                "required": [
-                                  "podAffinityTerm",
-                                  "weight"
-                                ],
-                                "type": "object"
+                                required: ['podAffinityTerm', 'weight'],
+                                type: 'object'
                               },
-                              "type": "array",
-                              "x-kubernetes-list-type": "atomic"
+                              type: 'array',
+                              'x-kubernetes-list-type': 'atomic'
                             },
-                            "requiredDuringSchedulingIgnoredDuringExecution": {
-                              "description": "If the affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to a pod label update), the\nsystem may or may not try to eventually evict the pod from its node.\nWhen there are multiple elements, the lists of nodes corresponding to each\npodAffinityTerm are intersected, i.e. all terms must be satisfied.",
-                              "items": {
-                                "description": "Defines a set of pods (namely those matching the labelSelector\nrelative to the given namespace(s)) that this pod should be\nco-located (affinity) or not co-located (anti-affinity) with,\nwhere co-located is defined as running on a node whose value of\nthe label with key <topologyKey> matches that of any node on which\na pod of the set of pods is running",
-                                "properties": {
-                                  "labelSelector": {
-                                    "description": "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
-                                    "properties": {
-                                      "matchExpressions": {
-                                        "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                        "items": {
-                                          "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                          "properties": {
-                                            "key": {
-                                              "description": "key is the label key that the selector applies to.",
-                                              "type": "string"
+                            requiredDuringSchedulingIgnoredDuringExecution: {
+                              description:
+                                'If the affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to a pod label update), the\nsystem may or may not try to eventually evict the pod from its node.\nWhen there are multiple elements, the lists of nodes corresponding to each\npodAffinityTerm are intersected, i.e. all terms must be satisfied.',
+                              items: {
+                                description:
+                                  'Defines a set of pods (namely those matching the labelSelector\nrelative to the given namespace(s)) that this pod should be\nco-located (affinity) or not co-located (anti-affinity) with,\nwhere co-located is defined as running on a node whose value of\nthe label with key <topologyKey> matches that of any node on which\na pod of the set of pods is running',
+                                properties: {
+                                  labelSelector: {
+                                    description:
+                                      "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
+                                    properties: {
+                                      matchExpressions: {
+                                        description:
+                                          'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                        items: {
+                                          description:
+                                            'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                          properties: {
+                                            key: {
+                                              description: 'key is the label key that the selector applies to.',
+                                              type: 'string'
                                             },
-                                            "operator": {
-                                              "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                              "type": "string"
+                                            operator: {
+                                              description:
+                                                "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                              type: 'string'
                                             },
-                                            "values": {
-                                              "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                              "items": {
-                                                "type": "string"
+                                            values: {
+                                              description:
+                                                'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                              items: {
+                                                type: 'string'
                                               },
-                                              "type": "array",
-                                              "x-kubernetes-list-type": "atomic"
+                                              type: 'array',
+                                              'x-kubernetes-list-type': 'atomic'
                                             }
                                           },
-                                          "required": [
-                                            "key",
-                                            "operator"
-                                          ],
-                                          "type": "object"
+                                          required: ['key', 'operator'],
+                                          type: 'object'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "matchLabels": {
-                                        "additionalProperties": {
-                                          "type": "string"
+                                      matchLabels: {
+                                        additionalProperties: {
+                                          type: 'string'
                                         },
-                                        "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                        "type": "object"
+                                        description:
+                                          'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                        type: 'object'
                                       }
                                     },
-                                    "type": "object",
-                                    "x-kubernetes-map-type": "atomic"
+                                    type: 'object',
+                                    'x-kubernetes-map-type': 'atomic'
                                   },
-                                  "matchLabelKeys": {
-                                    "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
-                                    "items": {
-                                      "type": "string"
+                                  matchLabelKeys: {
+                                    description:
+                                      "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
+                                    items: {
+                                      type: 'string'
                                     },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
+                                    type: 'array',
+                                    'x-kubernetes-list-type': 'atomic'
                                   },
-                                  "mismatchLabelKeys": {
-                                    "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
-                                    "items": {
-                                      "type": "string"
+                                  mismatchLabelKeys: {
+                                    description:
+                                      "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
+                                    items: {
+                                      type: 'string'
                                     },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
+                                    type: 'array',
+                                    'x-kubernetes-list-type': 'atomic'
                                   },
-                                  "namespaceSelector": {
-                                    "description": "A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means \"this pod's namespace\".\nAn empty selector ({}) matches all namespaces.",
-                                    "properties": {
-                                      "matchExpressions": {
-                                        "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                        "items": {
-                                          "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                          "properties": {
-                                            "key": {
-                                              "description": "key is the label key that the selector applies to.",
-                                              "type": "string"
+                                  namespaceSelector: {
+                                    description:
+                                      'A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means "this pod\'s namespace".\nAn empty selector ({}) matches all namespaces.',
+                                    properties: {
+                                      matchExpressions: {
+                                        description:
+                                          'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                        items: {
+                                          description:
+                                            'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                          properties: {
+                                            key: {
+                                              description: 'key is the label key that the selector applies to.',
+                                              type: 'string'
                                             },
-                                            "operator": {
-                                              "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                              "type": "string"
+                                            operator: {
+                                              description:
+                                                "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                              type: 'string'
                                             },
-                                            "values": {
-                                              "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                              "items": {
-                                                "type": "string"
+                                            values: {
+                                              description:
+                                                'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                              items: {
+                                                type: 'string'
                                               },
-                                              "type": "array",
-                                              "x-kubernetes-list-type": "atomic"
+                                              type: 'array',
+                                              'x-kubernetes-list-type': 'atomic'
                                             }
                                           },
-                                          "required": [
-                                            "key",
-                                            "operator"
-                                          ],
-                                          "type": "object"
+                                          required: ['key', 'operator'],
+                                          type: 'object'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "matchLabels": {
-                                        "additionalProperties": {
-                                          "type": "string"
+                                      matchLabels: {
+                                        additionalProperties: {
+                                          type: 'string'
                                         },
-                                        "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                        "type": "object"
+                                        description:
+                                          'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                        type: 'object'
                                       }
                                     },
-                                    "type": "object",
-                                    "x-kubernetes-map-type": "atomic"
+                                    type: 'object',
+                                    'x-kubernetes-map-type': 'atomic'
                                   },
-                                  "namespaces": {
-                                    "description": "namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means \"this pod's namespace\".",
-                                    "items": {
-                                      "type": "string"
+                                  namespaces: {
+                                    description:
+                                      'namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means "this pod\'s namespace".',
+                                    items: {
+                                      type: 'string'
                                     },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
+                                    type: 'array',
+                                    'x-kubernetes-list-type': 'atomic'
                                   },
-                                  "topologyKey": {
-                                    "description": "This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.",
-                                    "type": "string"
+                                  topologyKey: {
+                                    description:
+                                      'This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.',
+                                    type: 'string'
                                   }
                                 },
-                                "required": [
-                                  "topologyKey"
-                                ],
-                                "type": "object"
+                                required: ['topologyKey'],
+                                type: 'object'
                               },
-                              "type": "array",
-                              "x-kubernetes-list-type": "atomic"
+                              type: 'array',
+                              'x-kubernetes-list-type': 'atomic'
                             }
                           },
-                          "type": "object"
+                          type: 'object'
                         },
-                        "podAntiAffinity": {
-                          "description": "Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).",
-                          "properties": {
-                            "preferredDuringSchedulingIgnoredDuringExecution": {
-                              "description": "The scheduler will prefer to schedule pods to nodes that satisfy\nthe anti-affinity expressions specified by this field, but it may choose\na node that violates one or more of the expressions. The node that is\nmost preferred is the one with the greatest sum of weights, i.e.\nfor each node that meets all of the scheduling requirements (resource\nrequest, requiredDuringScheduling anti-affinity expressions, etc.),\ncompute a sum by iterating through the elements of this field and subtracting\n\"weight\" from the sum if the node has pods which matches the corresponding podAffinityTerm; the\nnode(s) with the highest sum are the most preferred.",
-                              "items": {
-                                "description": "The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)",
-                                "properties": {
-                                  "podAffinityTerm": {
-                                    "description": "Required. A pod affinity term, associated with the corresponding weight.",
-                                    "properties": {
-                                      "labelSelector": {
-                                        "description": "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
-                                        "properties": {
-                                          "matchExpressions": {
-                                            "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                            "items": {
-                                              "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                              "properties": {
-                                                "key": {
-                                                  "description": "key is the label key that the selector applies to.",
-                                                  "type": "string"
+                        podAntiAffinity: {
+                          description:
+                            'Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).',
+                          properties: {
+                            preferredDuringSchedulingIgnoredDuringExecution: {
+                              description:
+                                'The scheduler will prefer to schedule pods to nodes that satisfy\nthe anti-affinity expressions specified by this field, but it may choose\na node that violates one or more of the expressions. The node that is\nmost preferred is the one with the greatest sum of weights, i.e.\nfor each node that meets all of the scheduling requirements (resource\nrequest, requiredDuringScheduling anti-affinity expressions, etc.),\ncompute a sum by iterating through the elements of this field and subtracting\n"weight" from the sum if the node has pods which matches the corresponding podAffinityTerm; the\nnode(s) with the highest sum are the most preferred.',
+                              items: {
+                                description:
+                                  'The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)',
+                                properties: {
+                                  podAffinityTerm: {
+                                    description:
+                                      'Required. A pod affinity term, associated with the corresponding weight.',
+                                    properties: {
+                                      labelSelector: {
+                                        description:
+                                          "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
+                                        properties: {
+                                          matchExpressions: {
+                                            description:
+                                              'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                            items: {
+                                              description:
+                                                'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                              properties: {
+                                                key: {
+                                                  description: 'key is the label key that the selector applies to.',
+                                                  type: 'string'
                                                 },
-                                                "operator": {
-                                                  "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                                  "type": "string"
+                                                operator: {
+                                                  description:
+                                                    "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                                  type: 'string'
                                                 },
-                                                "values": {
-                                                  "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                                  "items": {
-                                                    "type": "string"
+                                                values: {
+                                                  description:
+                                                    'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                                  items: {
+                                                    type: 'string'
                                                   },
-                                                  "type": "array",
-                                                  "x-kubernetes-list-type": "atomic"
+                                                  type: 'array',
+                                                  'x-kubernetes-list-type': 'atomic'
                                                 }
                                               },
-                                              "required": [
-                                                "key",
-                                                "operator"
-                                              ],
-                                              "type": "object"
+                                              required: ['key', 'operator'],
+                                              type: 'object'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "matchLabels": {
-                                            "additionalProperties": {
-                                              "type": "string"
+                                          matchLabels: {
+                                            additionalProperties: {
+                                              type: 'string'
                                             },
-                                            "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                            "type": "object"
+                                            description:
+                                              'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                            type: 'object'
                                           }
                                         },
-                                        "type": "object",
-                                        "x-kubernetes-map-type": "atomic"
+                                        type: 'object',
+                                        'x-kubernetes-map-type': 'atomic'
                                       },
-                                      "matchLabelKeys": {
-                                        "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
-                                        "items": {
-                                          "type": "string"
+                                      matchLabelKeys: {
+                                        description:
+                                          "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
+                                        items: {
+                                          type: 'string'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "mismatchLabelKeys": {
-                                        "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
-                                        "items": {
-                                          "type": "string"
+                                      mismatchLabelKeys: {
+                                        description:
+                                          "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
+                                        items: {
+                                          type: 'string'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "namespaceSelector": {
-                                        "description": "A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means \"this pod's namespace\".\nAn empty selector ({}) matches all namespaces.",
-                                        "properties": {
-                                          "matchExpressions": {
-                                            "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                            "items": {
-                                              "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                              "properties": {
-                                                "key": {
-                                                  "description": "key is the label key that the selector applies to.",
-                                                  "type": "string"
+                                      namespaceSelector: {
+                                        description:
+                                          'A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means "this pod\'s namespace".\nAn empty selector ({}) matches all namespaces.',
+                                        properties: {
+                                          matchExpressions: {
+                                            description:
+                                              'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                            items: {
+                                              description:
+                                                'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                              properties: {
+                                                key: {
+                                                  description: 'key is the label key that the selector applies to.',
+                                                  type: 'string'
                                                 },
-                                                "operator": {
-                                                  "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                                  "type": "string"
+                                                operator: {
+                                                  description:
+                                                    "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                                  type: 'string'
                                                 },
-                                                "values": {
-                                                  "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                                  "items": {
-                                                    "type": "string"
+                                                values: {
+                                                  description:
+                                                    'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                                  items: {
+                                                    type: 'string'
                                                   },
-                                                  "type": "array",
-                                                  "x-kubernetes-list-type": "atomic"
+                                                  type: 'array',
+                                                  'x-kubernetes-list-type': 'atomic'
                                                 }
                                               },
-                                              "required": [
-                                                "key",
-                                                "operator"
-                                              ],
-                                              "type": "object"
+                                              required: ['key', 'operator'],
+                                              type: 'object'
                                             },
-                                            "type": "array",
-                                            "x-kubernetes-list-type": "atomic"
+                                            type: 'array',
+                                            'x-kubernetes-list-type': 'atomic'
                                           },
-                                          "matchLabels": {
-                                            "additionalProperties": {
-                                              "type": "string"
+                                          matchLabels: {
+                                            additionalProperties: {
+                                              type: 'string'
                                             },
-                                            "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                            "type": "object"
+                                            description:
+                                              'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                            type: 'object'
                                           }
                                         },
-                                        "type": "object",
-                                        "x-kubernetes-map-type": "atomic"
+                                        type: 'object',
+                                        'x-kubernetes-map-type': 'atomic'
                                       },
-                                      "namespaces": {
-                                        "description": "namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means \"this pod's namespace\".",
-                                        "items": {
-                                          "type": "string"
+                                      namespaces: {
+                                        description:
+                                          'namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means "this pod\'s namespace".',
+                                        items: {
+                                          type: 'string'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "topologyKey": {
-                                        "description": "This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.",
-                                        "type": "string"
+                                      topologyKey: {
+                                        description:
+                                          'This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.',
+                                        type: 'string'
                                       }
                                     },
-                                    "required": [
-                                      "topologyKey"
-                                    ],
-                                    "type": "object"
+                                    required: ['topologyKey'],
+                                    type: 'object'
                                   },
-                                  "weight": {
-                                    "description": "weight associated with matching the corresponding podAffinityTerm,\nin the range 1-100.",
-                                    "format": "int32",
-                                    "type": "integer"
+                                  weight: {
+                                    description:
+                                      'weight associated with matching the corresponding podAffinityTerm,\nin the range 1-100.',
+                                    format: 'int32',
+                                    type: 'integer'
                                   }
                                 },
-                                "required": [
-                                  "podAffinityTerm",
-                                  "weight"
-                                ],
-                                "type": "object"
+                                required: ['podAffinityTerm', 'weight'],
+                                type: 'object'
                               },
-                              "type": "array",
-                              "x-kubernetes-list-type": "atomic"
+                              type: 'array',
+                              'x-kubernetes-list-type': 'atomic'
                             },
-                            "requiredDuringSchedulingIgnoredDuringExecution": {
-                              "description": "If the anti-affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the anti-affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to a pod label update), the\nsystem may or may not try to eventually evict the pod from its node.\nWhen there are multiple elements, the lists of nodes corresponding to each\npodAffinityTerm are intersected, i.e. all terms must be satisfied.",
-                              "items": {
-                                "description": "Defines a set of pods (namely those matching the labelSelector\nrelative to the given namespace(s)) that this pod should be\nco-located (affinity) or not co-located (anti-affinity) with,\nwhere co-located is defined as running on a node whose value of\nthe label with key <topologyKey> matches that of any node on which\na pod of the set of pods is running",
-                                "properties": {
-                                  "labelSelector": {
-                                    "description": "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
-                                    "properties": {
-                                      "matchExpressions": {
-                                        "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                        "items": {
-                                          "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                          "properties": {
-                                            "key": {
-                                              "description": "key is the label key that the selector applies to.",
-                                              "type": "string"
+                            requiredDuringSchedulingIgnoredDuringExecution: {
+                              description:
+                                'If the anti-affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the anti-affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to a pod label update), the\nsystem may or may not try to eventually evict the pod from its node.\nWhen there are multiple elements, the lists of nodes corresponding to each\npodAffinityTerm are intersected, i.e. all terms must be satisfied.',
+                              items: {
+                                description:
+                                  'Defines a set of pods (namely those matching the labelSelector\nrelative to the given namespace(s)) that this pod should be\nco-located (affinity) or not co-located (anti-affinity) with,\nwhere co-located is defined as running on a node whose value of\nthe label with key <topologyKey> matches that of any node on which\na pod of the set of pods is running',
+                                properties: {
+                                  labelSelector: {
+                                    description:
+                                      "A label query over a set of resources, in this case pods.\nIf it's null, this PodAffinityTerm matches with no Pods.",
+                                    properties: {
+                                      matchExpressions: {
+                                        description:
+                                          'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                        items: {
+                                          description:
+                                            'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                          properties: {
+                                            key: {
+                                              description: 'key is the label key that the selector applies to.',
+                                              type: 'string'
                                             },
-                                            "operator": {
-                                              "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                              "type": "string"
+                                            operator: {
+                                              description:
+                                                "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                              type: 'string'
                                             },
-                                            "values": {
-                                              "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                              "items": {
-                                                "type": "string"
+                                            values: {
+                                              description:
+                                                'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                              items: {
+                                                type: 'string'
                                               },
-                                              "type": "array",
-                                              "x-kubernetes-list-type": "atomic"
+                                              type: 'array',
+                                              'x-kubernetes-list-type': 'atomic'
                                             }
                                           },
-                                          "required": [
-                                            "key",
-                                            "operator"
-                                          ],
-                                          "type": "object"
+                                          required: ['key', 'operator'],
+                                          type: 'object'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "matchLabels": {
-                                        "additionalProperties": {
-                                          "type": "string"
+                                      matchLabels: {
+                                        additionalProperties: {
+                                          type: 'string'
                                         },
-                                        "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                        "type": "object"
+                                        description:
+                                          'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                        type: 'object'
                                       }
                                     },
-                                    "type": "object",
-                                    "x-kubernetes-map-type": "atomic"
+                                    type: 'object',
+                                    'x-kubernetes-map-type': 'atomic'
                                   },
-                                  "matchLabelKeys": {
-                                    "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
-                                    "items": {
-                                      "type": "string"
+                                  matchLabelKeys: {
+                                    description:
+                                      "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.",
+                                    items: {
+                                      type: 'string'
                                     },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
+                                    type: 'array',
+                                    'x-kubernetes-list-type': 'atomic'
                                   },
-                                  "mismatchLabelKeys": {
-                                    "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
-                                    "items": {
-                                      "type": "string"
+                                  mismatchLabelKeys: {
+                                    description:
+                                      "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.",
+                                    items: {
+                                      type: 'string'
                                     },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
+                                    type: 'array',
+                                    'x-kubernetes-list-type': 'atomic'
                                   },
-                                  "namespaceSelector": {
-                                    "description": "A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means \"this pod's namespace\".\nAn empty selector ({}) matches all namespaces.",
-                                    "properties": {
-                                      "matchExpressions": {
-                                        "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                        "items": {
-                                          "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                                          "properties": {
-                                            "key": {
-                                              "description": "key is the label key that the selector applies to.",
-                                              "type": "string"
+                                  namespaceSelector: {
+                                    description:
+                                      'A label query over the set of namespaces that the term applies to.\nThe term is applied to the union of the namespaces selected by this field\nand the ones listed in the namespaces field.\nnull selector and null or empty namespaces list means "this pod\'s namespace".\nAn empty selector ({}) matches all namespaces.',
+                                    properties: {
+                                      matchExpressions: {
+                                        description:
+                                          'matchExpressions is a list of label selector requirements. The requirements are ANDed.',
+                                        items: {
+                                          description:
+                                            'A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.',
+                                          properties: {
+                                            key: {
+                                              description: 'key is the label key that the selector applies to.',
+                                              type: 'string'
                                             },
-                                            "operator": {
-                                              "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                                              "type": "string"
+                                            operator: {
+                                              description:
+                                                "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                              type: 'string'
                                             },
-                                            "values": {
-                                              "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                                              "items": {
-                                                "type": "string"
+                                            values: {
+                                              description:
+                                                'values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.',
+                                              items: {
+                                                type: 'string'
                                               },
-                                              "type": "array",
-                                              "x-kubernetes-list-type": "atomic"
+                                              type: 'array',
+                                              'x-kubernetes-list-type': 'atomic'
                                             }
                                           },
-                                          "required": [
-                                            "key",
-                                            "operator"
-                                          ],
-                                          "type": "object"
+                                          required: ['key', 'operator'],
+                                          type: 'object'
                                         },
-                                        "type": "array",
-                                        "x-kubernetes-list-type": "atomic"
+                                        type: 'array',
+                                        'x-kubernetes-list-type': 'atomic'
                                       },
-                                      "matchLabels": {
-                                        "additionalProperties": {
-                                          "type": "string"
+                                      matchLabels: {
+                                        additionalProperties: {
+                                          type: 'string'
                                         },
-                                        "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                        "type": "object"
+                                        description:
+                                          'matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is "key", the\noperator is "In", and the values array contains only "value". The requirements are ANDed.',
+                                        type: 'object'
                                       }
                                     },
-                                    "type": "object",
-                                    "x-kubernetes-map-type": "atomic"
+                                    type: 'object',
+                                    'x-kubernetes-map-type': 'atomic'
                                   },
-                                  "namespaces": {
-                                    "description": "namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means \"this pod's namespace\".",
-                                    "items": {
-                                      "type": "string"
+                                  namespaces: {
+                                    description:
+                                      'namespaces specifies a static list of namespace names that the term applies to.\nThe term is applied to the union of the namespaces listed in this field\nand the ones selected by namespaceSelector.\nnull or empty namespaces list and null namespaceSelector means "this pod\'s namespace".',
+                                    items: {
+                                      type: 'string'
                                     },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
+                                    type: 'array',
+                                    'x-kubernetes-list-type': 'atomic'
                                   },
-                                  "topologyKey": {
-                                    "description": "This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.",
-                                    "type": "string"
+                                  topologyKey: {
+                                    description:
+                                      'This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.',
+                                    type: 'string'
                                   }
                                 },
-                                "required": [
-                                  "topologyKey"
-                                ],
-                                "type": "object"
+                                required: ['topologyKey'],
+                                type: 'object'
                               },
-                              "type": "array",
-                              "x-kubernetes-list-type": "atomic"
+                              type: 'array',
+                              'x-kubernetes-list-type': 'atomic'
                             }
                           },
-                          "type": "object"
+                          type: 'object'
                         }
                       },
-                      "type": "object"
+                      type: 'object'
                     },
-                    "nodeSelector": {
-                      "additionalProperties": {
-                        "type": "string"
+                    nodeSelector: {
+                      additionalProperties: {
+                        type: 'string'
                       },
-                      "description": "`nodeSelector` allows scheduling of pods only onto nodes that have each of the specified labels.\nFor documentation, refer to https://kubernetes.io/docs/concepts/configuration/assign-pod-node/.",
-                      "type": "object",
-                      "x-kubernetes-map-type": "atomic"
+                      description:
+                        '`nodeSelector` allows scheduling of pods only onto nodes that have each of the specified labels.\nFor documentation, refer to https://kubernetes.io/docs/concepts/configuration/assign-pod-node/.',
+                      type: 'object',
+                      'x-kubernetes-map-type': 'atomic'
                     },
-                    "priorityClassName": {
-                      "description": "If specified, indicates the pod's priority. For documentation, refer to https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#how-to-use-priority-and-preemption.\nIf not specified, default priority is used, or zero if there is no default.",
-                      "type": "string"
+                    priorityClassName: {
+                      description:
+                        "If specified, indicates the pod's priority. For documentation, refer to https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#how-to-use-priority-and-preemption.\nIf not specified, default priority is used, or zero if there is no default.",
+                      type: 'string'
                     },
-                    "tolerations": {
-                      "description": "`tolerations` is a list of tolerations that allow the pod to schedule onto nodes with matching taints.\nFor documentation, refer to https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling.",
-                      "items": {
-                        "description": "The pod this Toleration is attached to tolerates any taint that matches\nthe triple <key,value,effect> using the matching operator <operator>.",
-                        "properties": {
-                          "effect": {
-                            "description": "Effect indicates the taint effect to match. Empty means match all taint effects.\nWhen specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.",
-                            "type": "string"
+                    tolerations: {
+                      description:
+                        '`tolerations` is a list of tolerations that allow the pod to schedule onto nodes with matching taints.\nFor documentation, refer to https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling.',
+                      items: {
+                        description:
+                          'The pod this Toleration is attached to tolerates any taint that matches\nthe triple <key,value,effect> using the matching operator <operator>.',
+                        properties: {
+                          effect: {
+                            description:
+                              'Effect indicates the taint effect to match. Empty means match all taint effects.\nWhen specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.',
+                            type: 'string'
                           },
-                          "key": {
-                            "description": "Key is the taint key that the toleration applies to. Empty means match all taint keys.\nIf the key is empty, operator must be Exists; this combination means to match all values and all keys.",
-                            "type": "string"
+                          key: {
+                            description:
+                              'Key is the taint key that the toleration applies to. Empty means match all taint keys.\nIf the key is empty, operator must be Exists; this combination means to match all values and all keys.',
+                            type: 'string'
                           },
-                          "operator": {
-                            "description": "Operator represents a key's relationship to the value.\nValid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.\nExists is equivalent to wildcard for value, so that a pod can\ntolerate all taints of a particular category.\nLt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).",
-                            "type": "string"
+                          operator: {
+                            description:
+                              "Operator represents a key's relationship to the value.\nValid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.\nExists is equivalent to wildcard for value, so that a pod can\ntolerate all taints of a particular category.\nLt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).",
+                            type: 'string'
                           },
-                          "tolerationSeconds": {
-                            "description": "TolerationSeconds represents the period of time the toleration (which must be\nof effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,\nit is not set, which means tolerate the taint forever (do not evict). Zero and\nnegative values will be treated as 0 (evict immediately) by the system.",
-                            "format": "int64",
-                            "type": "integer"
+                          tolerationSeconds: {
+                            description:
+                              'TolerationSeconds represents the period of time the toleration (which must be\nof effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,\nit is not set, which means tolerate the taint forever (do not evict). Zero and\nnegative values will be treated as 0 (evict immediately) by the system.',
+                            format: 'int64',
+                            type: 'integer'
                           },
-                          "value": {
-                            "description": "Value is the taint value the toleration matches to.\nIf the operator is Exists, the value should be empty, otherwise just a regular string.",
-                            "type": "string"
+                          value: {
+                            description:
+                              'Value is the taint value the toleration matches to.\nIf the operator is Exists, the value should be empty, otherwise just a regular string.',
+                            type: 'string'
                           }
                         },
-                        "type": "object"
+                        type: 'object'
                       },
-                      "type": "array"
+                      type: 'array'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 },
-                "secondaryNetworks": {
-                  "description": "Defines secondary networks to be checked for resources identification.\nTo guarantee a correct identification, indexed values must form an unique identifier across the cluster.\nIf the same index is used by several resources, those resources might be incorrectly labeled.\nIf not provided and the agent feature `SecondaryNetworks` is enabled, secondary networks are detected automatically.",
-                  "items": {
-                    "properties": {
-                      "index": {
-                        "description": "`index` is a list of fields to use for indexing the pods. They should form a unique Pod identifier across the cluster.\nCan be any of: `MAC`, `IP`, `Interface`.\nFields absent from the 'k8s.v1.cni.cncf.io/network-status' annotation must not be added to the index.",
-                        "items": {
-                          "description": "Field to index for secondary network pod identification, can be any of: `MAC`, `IP`, `Interface`.",
-                          "enum": [
-                            "MAC",
-                            "IP",
-                            "Interface"
-                          ],
-                          "type": "string"
+                secondaryNetworks: {
+                  description:
+                    'Defines secondary networks to be checked for resources identification.\nTo guarantee a correct identification, indexed values must form an unique identifier across the cluster.\nIf the same index is used by several resources, those resources might be incorrectly labeled.\nIf not provided and the agent feature `SecondaryNetworks` is enabled, secondary networks are detected automatically.',
+                  items: {
+                    properties: {
+                      index: {
+                        description:
+                          "`index` is a list of fields to use for indexing the pods. They should form a unique Pod identifier across the cluster.\nCan be any of: `MAC`, `IP`, `Interface`.\nFields absent from the 'k8s.v1.cni.cncf.io/network-status' annotation must not be added to the index.",
+                        items: {
+                          description:
+                            'Field to index for secondary network pod identification, can be any of: `MAC`, `IP`, `Interface`.',
+                          enum: ['MAC', 'IP', 'Interface'],
+                          type: 'string'
                         },
-                        "type": "array"
+                        type: 'array'
                       },
-                      "name": {
-                        "description": "Deprecated: `name` is unused.",
-                        "type": "string"
+                      name: {
+                        description: 'Deprecated: `name` is unused.',
+                        type: 'string'
                       }
                     },
-                    "required": [
-                      "index"
-                    ],
-                    "type": "object"
+                    required: ['index'],
+                    type: 'object'
                   },
-                  "type": "array"
+                  type: 'array'
                 }
               },
-              "type": "object"
+              type: 'object'
             },
-            "clusterName": {
-              "default": "",
-              "description": "`clusterName` is the name of the cluster to appear in the flows data. This is useful in a multi-cluster context. When using OpenShift, leave empty to make it automatically determined.",
-              "type": "string"
+            clusterName: {
+              default: '',
+              description:
+                '`clusterName` is the name of the cluster to appear in the flows data. This is useful in a multi-cluster context. When using OpenShift, leave empty to make it automatically determined.',
+              type: 'string'
             },
-            "consumerReplicas": {
-              "description": "`consumerReplicas` defines the number of replicas (pods) to start for `flowlogs-pipeline`, default is 3.\nThis setting is ignored when `spec.deploymentModel` is `Direct` or when `spec.processor.unmanagedReplicas` is `true`.",
-              "format": "int32",
-              "minimum": 0,
-              "type": "integer"
+            consumerReplicas: {
+              description:
+                '`consumerReplicas` defines the number of replicas (pods) to start for `flowlogs-pipeline`, default is 3.\nThis setting is ignored when `spec.deploymentModel` is `Direct` or when `spec.processor.unmanagedReplicas` is `true`.',
+              format: 'int32',
+              minimum: 0,
+              type: 'integer'
             },
-            "deduper": {
-              "description": "`deduper` allows you to sample or drop flows identified as duplicates, in order to save on resource usage.",
-              "properties": {
-                "mode": {
-                  "default": "Disabled",
-                  "description": "Set the Processor de-duplication mode. It comes in addition to the Agent-based deduplication, since the Agent cannot de-duplicate same flows reported from different nodes.<br>\n- Use `Drop` to drop every flow considered as duplicates, allowing saving more on resource usage but potentially losing some information such as the network interfaces used from peer, or network events.<br>\n- Use `Sample` to randomly keep only one flow on 50, which is the default, among the ones considered as duplicates. This is a compromise between dropping every duplicate or keeping every duplicate. This sampling action comes in addition to the Agent-based sampling. If both Agent and Processor sampling values are `50`, the combined sampling is 1:2500.<br>\n- Use `Disabled` to turn off Processor-based de-duplication.<br>",
-                  "enum": [
-                    "Disabled",
-                    "Drop",
-                    "Sample"
-                  ],
-                  "type": "string"
+            deduper: {
+              description:
+                '`deduper` allows you to sample or drop flows identified as duplicates, in order to save on resource usage.',
+              properties: {
+                mode: {
+                  default: 'Disabled',
+                  description:
+                    'Set the Processor de-duplication mode. It comes in addition to the Agent-based deduplication, since the Agent cannot de-duplicate same flows reported from different nodes.<br>\n- Use `Drop` to drop every flow considered as duplicates, allowing saving more on resource usage but potentially losing some information such as the network interfaces used from peer, or network events.<br>\n- Use `Sample` to randomly keep only one flow on 50, which is the default, among the ones considered as duplicates. This is a compromise between dropping every duplicate or keeping every duplicate. This sampling action comes in addition to the Agent-based sampling. If both Agent and Processor sampling values are `50`, the combined sampling is 1:2500.<br>\n- Use `Disabled` to turn off Processor-based de-duplication.<br>',
+                  enum: ['Disabled', 'Drop', 'Sample'],
+                  type: 'string'
                 },
-                "sampling": {
-                  "default": 50,
-                  "description": "`sampling` is the sampling interval when deduper `mode` is `Sample`. For example, a value of `50` means that 1 flow in 50 is sampled.",
-                  "format": "int32",
-                  "minimum": 0,
-                  "type": "integer"
+                sampling: {
+                  default: 50,
+                  description:
+                    '`sampling` is the sampling interval when deduper `mode` is `Sample`. For example, a value of `50` means that 1 flow in 50 is sampled.',
+                  format: 'int32',
+                  minimum: 0,
+                  type: 'integer'
                 }
               },
-              "type": "object"
+              type: 'object'
             },
-            "filters": {
-              "description": "`filters` lets you define custom filters to limit the amount of generated flows.\nThese filters provide more flexibility than the eBPF Agent filters (in `spec.agent.ebpf.flowFilter`), such as allowing to filter by Kubernetes namespace,\nbut with a lesser improvement in performance.",
-              "items": {
-                "description": "`FLPFilterSet` defines the desired configuration for FLP-based filtering satisfying all conditions.",
-                "properties": {
-                  "outputTarget": {
-                    "description": "If specified, these filters target a single output: `Loki`, `Metrics` or `Exporters`. By default, all outputs are targeted.",
-                    "enum": [
-                      "",
-                      "Loki",
-                      "Metrics",
-                      "Exporters"
-                    ],
-                    "type": "string"
+            filters: {
+              description:
+                '`filters` lets you define custom filters to limit the amount of generated flows.\nThese filters provide more flexibility than the eBPF Agent filters (in `spec.agent.ebpf.flowFilter`), such as allowing to filter by Kubernetes namespace,\nbut with a lesser improvement in performance.',
+              items: {
+                description:
+                  '`FLPFilterSet` defines the desired configuration for FLP-based filtering satisfying all conditions.',
+                properties: {
+                  outputTarget: {
+                    description:
+                      'If specified, these filters target a single output: `Loki`, `Metrics` or `Exporters`. By default, all outputs are targeted.',
+                    enum: ['', 'Loki', 'Metrics', 'Exporters'],
+                    type: 'string'
                   },
-                  "query": {
-                    "description": "A query that selects the network flows to keep. More information about this query language in https://github.com/netobserv/flowlogs-pipeline/blob/main/docs/filtering.md.",
-                    "type": "string"
+                  query: {
+                    description:
+                      'A query that selects the network flows to keep. More information about this query language in https://github.com/netobserv/flowlogs-pipeline/blob/main/docs/filtering.md.',
+                    type: 'string'
                   },
-                  "sampling": {
-                    "description": "`sampling` is an optional sampling interval to apply to this filter. For example, a value of `50` means that 1 matching flow in 50 is sampled.",
-                    "format": "int32",
-                    "minimum": 0,
-                    "type": "integer"
+                  sampling: {
+                    description:
+                      '`sampling` is an optional sampling interval to apply to this filter. For example, a value of `50` means that 1 matching flow in 50 is sampled.',
+                    format: 'int32',
+                    minimum: 0,
+                    type: 'integer'
                   }
                 },
-                "type": "object"
+                type: 'object'
               },
-              "type": "array"
+              type: 'array'
             },
-            "imagePullPolicy": {
-              "default": "IfNotPresent",
-              "description": "`imagePullPolicy` is the Kubernetes pull policy for the image defined above",
-              "enum": [
-                "IfNotPresent",
-                "Always",
-                "Never"
-              ],
-              "type": "string"
+            imagePullPolicy: {
+              default: 'IfNotPresent',
+              description: '`imagePullPolicy` is the Kubernetes pull policy for the image defined above',
+              enum: ['IfNotPresent', 'Always', 'Never'],
+              type: 'string'
             },
-            "kafkaConsumerAutoscaler": {
-              "description": "`kafkaConsumerAutoscaler` [deprecated (*)] is the spec of a horizontal pod autoscaler to set up for `flowlogs-pipeline-transformer`, which consumes Kafka messages.\nThis setting is ignored when Kafka is disabled.\nDeprecation notice: managed autoscaler will be removed in a future version. You may configure instead an autoscaler of your choice, and set `spec.processor.unmanagedReplicas` to `true`.",
-              "properties": {
-                "maxReplicas": {
-                  "default": 3,
-                  "description": "`maxReplicas` is the upper limit for the number of pods that can be set by the autoscaler; cannot be smaller than MinReplicas.",
-                  "format": "int32",
-                  "type": "integer"
+            kafkaConsumerAutoscaler: {
+              description:
+                '`kafkaConsumerAutoscaler` [deprecated (*)] is the spec of a horizontal pod autoscaler to set up for `flowlogs-pipeline-transformer`, which consumes Kafka messages.\nThis setting is ignored when Kafka is disabled.\nDeprecation notice: managed autoscaler will be removed in a future version. You may configure instead an autoscaler of your choice, and set `spec.processor.unmanagedReplicas` to `true`.',
+              properties: {
+                maxReplicas: {
+                  default: 3,
+                  description:
+                    '`maxReplicas` is the upper limit for the number of pods that can be set by the autoscaler; cannot be smaller than MinReplicas.',
+                  format: 'int32',
+                  type: 'integer'
                 },
-                "metrics": {
-                  "description": "Metrics used by the pod autoscaler. For documentation, refer to https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/horizontal-pod-autoscaler-v2/",
-                  "items": {
-                    "properties": {
-                      "containerResource": {
-                        "properties": {
-                          "container": {
-                            "type": "string"
+                metrics: {
+                  description:
+                    'Metrics used by the pod autoscaler. For documentation, refer to https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/horizontal-pod-autoscaler-v2/',
+                  items: {
+                    properties: {
+                      containerResource: {
+                        properties: {
+                          container: {
+                            type: 'string'
                           },
-                          "name": {
-                            "type": "string"
+                          name: {
+                            type: 'string'
                           },
-                          "target": {
-                            "properties": {
-                              "averageUtilization": {
-                                "format": "int32",
-                                "type": "integer"
+                          target: {
+                            properties: {
+                              averageUtilization: {
+                                format: 'int32',
+                                type: 'integer'
                               },
-                              "averageValue": {
-                                "anyOf": [
+                              averageValue: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               },
-                              "type": {
-                                "type": "string"
+                              type: {
+                                type: 'string'
                               },
-                              "value": {
-                                "anyOf": [
+                              value: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               }
                             },
-                            "required": [
-                              "type"
-                            ],
-                            "type": "object"
+                            required: ['type'],
+                            type: 'object'
                           }
                         },
-                        "required": [
-                          "container",
-                          "name",
-                          "target"
-                        ],
-                        "type": "object"
+                        required: ['container', 'name', 'target'],
+                        type: 'object'
                       },
-                      "external": {
-                        "properties": {
-                          "metric": {
-                            "properties": {
-                              "name": {
-                                "type": "string"
+                      external: {
+                        properties: {
+                          metric: {
+                            properties: {
+                              name: {
+                                type: 'string'
                               },
-                              "selector": {
-                                "properties": {
-                                  "matchExpressions": {
-                                    "items": {
-                                      "properties": {
-                                        "key": {
-                                          "type": "string"
+                              selector: {
+                                properties: {
+                                  matchExpressions: {
+                                    items: {
+                                      properties: {
+                                        key: {
+                                          type: 'string'
                                         },
-                                        "operator": {
-                                          "type": "string"
+                                        operator: {
+                                          type: 'string'
                                         },
-                                        "values": {
-                                          "items": {
-                                            "type": "string"
+                                        values: {
+                                          items: {
+                                            type: 'string'
                                           },
-                                          "type": "array",
-                                          "x-kubernetes-list-type": "atomic"
+                                          type: 'array',
+                                          'x-kubernetes-list-type': 'atomic'
                                         }
                                       },
-                                      "required": [
-                                        "key",
-                                        "operator"
-                                      ],
-                                      "type": "object"
+                                      required: ['key', 'operator'],
+                                      type: 'object'
                                     },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
+                                    type: 'array',
+                                    'x-kubernetes-list-type': 'atomic'
                                   },
-                                  "matchLabels": {
-                                    "additionalProperties": {
-                                      "type": "string"
+                                  matchLabels: {
+                                    additionalProperties: {
+                                      type: 'string'
                                     },
-                                    "type": "object"
+                                    type: 'object'
                                   }
                                 },
-                                "type": "object",
-                                "x-kubernetes-map-type": "atomic"
+                                type: 'object',
+                                'x-kubernetes-map-type': 'atomic'
                               }
                             },
-                            "required": [
-                              "name"
-                            ],
-                            "type": "object"
+                            required: ['name'],
+                            type: 'object'
                           },
-                          "target": {
-                            "properties": {
-                              "averageUtilization": {
-                                "format": "int32",
-                                "type": "integer"
+                          target: {
+                            properties: {
+                              averageUtilization: {
+                                format: 'int32',
+                                type: 'integer'
                               },
-                              "averageValue": {
-                                "anyOf": [
+                              averageValue: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               },
-                              "type": {
-                                "type": "string"
+                              type: {
+                                type: 'string'
                               },
-                              "value": {
-                                "anyOf": [
+                              value: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               }
                             },
-                            "required": [
-                              "type"
-                            ],
-                            "type": "object"
+                            required: ['type'],
+                            type: 'object'
                           }
                         },
-                        "required": [
-                          "metric",
-                          "target"
-                        ],
-                        "type": "object"
+                        required: ['metric', 'target'],
+                        type: 'object'
                       },
-                      "object": {
-                        "properties": {
-                          "describedObject": {
-                            "properties": {
-                              "apiVersion": {
-                                "type": "string"
+                      object: {
+                        properties: {
+                          describedObject: {
+                            properties: {
+                              apiVersion: {
+                                type: 'string'
                               },
-                              "kind": {
-                                "type": "string"
+                              kind: {
+                                type: 'string'
                               },
-                              "name": {
-                                "type": "string"
+                              name: {
+                                type: 'string'
                               }
                             },
-                            "required": [
-                              "kind",
-                              "name"
-                            ],
-                            "type": "object"
+                            required: ['kind', 'name'],
+                            type: 'object'
                           },
-                          "metric": {
-                            "properties": {
-                              "name": {
-                                "type": "string"
+                          metric: {
+                            properties: {
+                              name: {
+                                type: 'string'
                               },
-                              "selector": {
-                                "properties": {
-                                  "matchExpressions": {
-                                    "items": {
-                                      "properties": {
-                                        "key": {
-                                          "type": "string"
+                              selector: {
+                                properties: {
+                                  matchExpressions: {
+                                    items: {
+                                      properties: {
+                                        key: {
+                                          type: 'string'
                                         },
-                                        "operator": {
-                                          "type": "string"
+                                        operator: {
+                                          type: 'string'
                                         },
-                                        "values": {
-                                          "items": {
-                                            "type": "string"
+                                        values: {
+                                          items: {
+                                            type: 'string'
                                           },
-                                          "type": "array",
-                                          "x-kubernetes-list-type": "atomic"
+                                          type: 'array',
+                                          'x-kubernetes-list-type': 'atomic'
                                         }
                                       },
-                                      "required": [
-                                        "key",
-                                        "operator"
-                                      ],
-                                      "type": "object"
+                                      required: ['key', 'operator'],
+                                      type: 'object'
                                     },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
+                                    type: 'array',
+                                    'x-kubernetes-list-type': 'atomic'
                                   },
-                                  "matchLabels": {
-                                    "additionalProperties": {
-                                      "type": "string"
+                                  matchLabels: {
+                                    additionalProperties: {
+                                      type: 'string'
                                     },
-                                    "type": "object"
+                                    type: 'object'
                                   }
                                 },
-                                "type": "object",
-                                "x-kubernetes-map-type": "atomic"
+                                type: 'object',
+                                'x-kubernetes-map-type': 'atomic'
                               }
                             },
-                            "required": [
-                              "name"
-                            ],
-                            "type": "object"
+                            required: ['name'],
+                            type: 'object'
                           },
-                          "target": {
-                            "properties": {
-                              "averageUtilization": {
-                                "format": "int32",
-                                "type": "integer"
+                          target: {
+                            properties: {
+                              averageUtilization: {
+                                format: 'int32',
+                                type: 'integer'
                               },
-                              "averageValue": {
-                                "anyOf": [
+                              averageValue: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               },
-                              "type": {
-                                "type": "string"
+                              type: {
+                                type: 'string'
                               },
-                              "value": {
-                                "anyOf": [
+                              value: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               }
                             },
-                            "required": [
-                              "type"
-                            ],
-                            "type": "object"
+                            required: ['type'],
+                            type: 'object'
                           }
                         },
-                        "required": [
-                          "describedObject",
-                          "metric",
-                          "target"
-                        ],
-                        "type": "object"
+                        required: ['describedObject', 'metric', 'target'],
+                        type: 'object'
                       },
-                      "pods": {
-                        "properties": {
-                          "metric": {
-                            "properties": {
-                              "name": {
-                                "type": "string"
+                      pods: {
+                        properties: {
+                          metric: {
+                            properties: {
+                              name: {
+                                type: 'string'
                               },
-                              "selector": {
-                                "properties": {
-                                  "matchExpressions": {
-                                    "items": {
-                                      "properties": {
-                                        "key": {
-                                          "type": "string"
+                              selector: {
+                                properties: {
+                                  matchExpressions: {
+                                    items: {
+                                      properties: {
+                                        key: {
+                                          type: 'string'
                                         },
-                                        "operator": {
-                                          "type": "string"
+                                        operator: {
+                                          type: 'string'
                                         },
-                                        "values": {
-                                          "items": {
-                                            "type": "string"
+                                        values: {
+                                          items: {
+                                            type: 'string'
                                           },
-                                          "type": "array",
-                                          "x-kubernetes-list-type": "atomic"
+                                          type: 'array',
+                                          'x-kubernetes-list-type': 'atomic'
                                         }
                                       },
-                                      "required": [
-                                        "key",
-                                        "operator"
-                                      ],
-                                      "type": "object"
+                                      required: ['key', 'operator'],
+                                      type: 'object'
                                     },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
+                                    type: 'array',
+                                    'x-kubernetes-list-type': 'atomic'
                                   },
-                                  "matchLabels": {
-                                    "additionalProperties": {
-                                      "type": "string"
+                                  matchLabels: {
+                                    additionalProperties: {
+                                      type: 'string'
                                     },
-                                    "type": "object"
+                                    type: 'object'
                                   }
                                 },
-                                "type": "object",
-                                "x-kubernetes-map-type": "atomic"
+                                type: 'object',
+                                'x-kubernetes-map-type': 'atomic'
                               }
                             },
-                            "required": [
-                              "name"
-                            ],
-                            "type": "object"
+                            required: ['name'],
+                            type: 'object'
                           },
-                          "target": {
-                            "properties": {
-                              "averageUtilization": {
-                                "format": "int32",
-                                "type": "integer"
+                          target: {
+                            properties: {
+                              averageUtilization: {
+                                format: 'int32',
+                                type: 'integer'
                               },
-                              "averageValue": {
-                                "anyOf": [
+                              averageValue: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               },
-                              "type": {
-                                "type": "string"
+                              type: {
+                                type: 'string'
                               },
-                              "value": {
-                                "anyOf": [
+                              value: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               }
                             },
-                            "required": [
-                              "type"
-                            ],
-                            "type": "object"
+                            required: ['type'],
+                            type: 'object'
                           }
                         },
-                        "required": [
-                          "metric",
-                          "target"
-                        ],
-                        "type": "object"
+                        required: ['metric', 'target'],
+                        type: 'object'
                       },
-                      "resource": {
-                        "properties": {
-                          "name": {
-                            "type": "string"
+                      resource: {
+                        properties: {
+                          name: {
+                            type: 'string'
                           },
-                          "target": {
-                            "properties": {
-                              "averageUtilization": {
-                                "format": "int32",
-                                "type": "integer"
+                          target: {
+                            properties: {
+                              averageUtilization: {
+                                format: 'int32',
+                                type: 'integer'
                               },
-                              "averageValue": {
-                                "anyOf": [
+                              averageValue: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               },
-                              "type": {
-                                "type": "string"
+                              type: {
+                                type: 'string'
                               },
-                              "value": {
-                                "anyOf": [
+                              value: {
+                                anyOf: [
                                   {
-                                    "type": "integer"
+                                    type: 'integer'
                                   },
                                   {
-                                    "type": "string"
+                                    type: 'string'
                                   }
                                 ],
-                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                                "x-kubernetes-int-or-string": true
+                                pattern:
+                                  '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                                'x-kubernetes-int-or-string': true
                               }
                             },
-                            "required": [
-                              "type"
-                            ],
-                            "type": "object"
+                            required: ['type'],
+                            type: 'object'
                           }
                         },
-                        "required": [
-                          "name",
-                          "target"
-                        ],
-                        "type": "object"
+                        required: ['name', 'target'],
+                        type: 'object'
                       },
-                      "type": {
-                        "type": "string"
+                      type: {
+                        type: 'string'
                       }
                     },
-                    "required": [
-                      "type"
-                    ],
-                    "type": "object"
+                    required: ['type'],
+                    type: 'object'
                   },
-                  "type": "array"
+                  type: 'array'
                 },
-                "minReplicas": {
-                  "description": "`minReplicas` is the lower limit for the number of replicas to which the autoscaler\ncan scale down. It defaults to 1 pod. minReplicas is allowed to be 0 if the\nalpha feature gate HPAScaleToZero is enabled and at least one Object or External\nmetric is configured. Scaling is active as long as at least one metric value is\navailable.",
-                  "format": "int32",
-                  "type": "integer"
+                minReplicas: {
+                  description:
+                    '`minReplicas` is the lower limit for the number of replicas to which the autoscaler\ncan scale down. It defaults to 1 pod. minReplicas is allowed to be 0 if the\nalpha feature gate HPAScaleToZero is enabled and at least one Object or External\nmetric is configured. Scaling is active as long as at least one metric value is\navailable.',
+                  format: 'int32',
+                  type: 'integer'
                 },
-                "status": {
-                  "default": "Disabled",
-                  "description": "`status` describes the desired status regarding deploying an horizontal pod autoscaler.<br>\n- `Disabled` does not deploy an horizontal pod autoscaler.<br>\n- `Enabled` deploys an horizontal pod autoscaler.<br>",
-                  "enum": [
-                    "Disabled",
-                    "Enabled"
-                  ],
-                  "type": "string"
+                status: {
+                  default: 'Disabled',
+                  description:
+                    '`status` describes the desired status regarding deploying an horizontal pod autoscaler.<br>\n- `Disabled` does not deploy an horizontal pod autoscaler.<br>\n- `Enabled` deploys an horizontal pod autoscaler.<br>',
+                  enum: ['Disabled', 'Enabled'],
+                  type: 'string'
                 }
               },
-              "type": "object"
+              type: 'object'
             },
-            "kafkaConsumerBatchSize": {
-              "default": 10485760,
-              "description": "`kafkaConsumerBatchSize` indicates to the broker the maximum batch size, in bytes, that the consumer accepts. Ignored when not using Kafka. Default: 10MB.",
-              "type": "integer"
+            kafkaConsumerBatchSize: {
+              default: 10485760,
+              description:
+                '`kafkaConsumerBatchSize` indicates to the broker the maximum batch size, in bytes, that the consumer accepts. Ignored when not using Kafka. Default: 10MB.',
+              type: 'integer'
             },
-            "kafkaConsumerQueueCapacity": {
-              "default": 1000,
-              "description": "`kafkaConsumerQueueCapacity` defines the capacity of the internal message queue used in the Kafka consumer client. Ignored when not using Kafka.",
-              "type": "integer"
+            kafkaConsumerQueueCapacity: {
+              default: 1000,
+              description:
+                '`kafkaConsumerQueueCapacity` defines the capacity of the internal message queue used in the Kafka consumer client. Ignored when not using Kafka.',
+              type: 'integer'
             },
-            "kafkaConsumerReplicas": {
-              "default": 3,
-              "description": "`kafkaConsumerReplicas` [deprecated (*)] defines the number of replicas (pods) to start for `flowlogs-pipeline-transformer`, which consumes Kafka messages.\nThis setting is ignored when Kafka is disabled.\nDeprecation notice: use `spec.processor.consumerReplicas` instead.",
-              "format": "int32",
-              "minimum": 0,
-              "type": "integer"
+            kafkaConsumerReplicas: {
+              default: 3,
+              description:
+                '`kafkaConsumerReplicas` [deprecated (*)] defines the number of replicas (pods) to start for `flowlogs-pipeline-transformer`, which consumes Kafka messages.\nThis setting is ignored when Kafka is disabled.\nDeprecation notice: use `spec.processor.consumerReplicas` instead.',
+              format: 'int32',
+              minimum: 0,
+              type: 'integer'
             },
-            "logLevel": {
-              "default": "info",
-              "description": "`logLevel` of the processor runtime",
-              "enum": [
-                "trace",
-                "debug",
-                "info",
-                "warn",
-                "error",
-                "fatal",
-                "panic"
-              ],
-              "type": "string"
+            logLevel: {
+              default: 'info',
+              description: '`logLevel` of the processor runtime',
+              enum: ['trace', 'debug', 'info', 'warn', 'error', 'fatal', 'panic'],
+              type: 'string'
             },
-            "logTypes": {
-              "default": "Flows",
-              "description": "`logTypes` defines the desired record types to generate. Possible values are:<br>\n- `Flows` to export regular network flows. This is the default.<br>\n- `Conversations` to generate events for started conversations, ended conversations as well as periodic \"tick\" updates. Note that in this mode, Prometheus metrics are not accurate on long-standing conversations.<br>\n- `EndedConversations` to generate only ended conversations events. Note that in this mode, Prometheus metrics are not accurate on long-standing conversations.<br>\n- `All` to generate both network flows and all conversations events. It is not recommended due to the impact on resources footprint.<br>",
-              "enum": [
-                "Flows",
-                "Conversations",
-                "EndedConversations",
-                "All"
-              ],
-              "type": "string"
+            logTypes: {
+              default: 'Flows',
+              description:
+                '`logTypes` defines the desired record types to generate. Possible values are:<br>\n- `Flows` to export regular network flows. This is the default.<br>\n- `Conversations` to generate events for started conversations, ended conversations as well as periodic "tick" updates. Note that in this mode, Prometheus metrics are not accurate on long-standing conversations.<br>\n- `EndedConversations` to generate only ended conversations events. Note that in this mode, Prometheus metrics are not accurate on long-standing conversations.<br>\n- `All` to generate both network flows and all conversations events. It is not recommended due to the impact on resources footprint.<br>',
+              enum: ['Flows', 'Conversations', 'EndedConversations', 'All'],
+              type: 'string'
             },
-            "metrics": {
-              "description": "`Metrics` define the processor configuration regarding metrics.\n\nTo add optional metrics while keeping the built-in defaults, use `additionalIncludeList`.\nTo take full control and export only specific metrics, use `includeList` (which replaces the default set; `additionalIncludeList` is then ignored).",
-              "properties": {
-                "disableAlerts": {
-                  "description": "`disableAlerts` is a list of alert groups that should be disabled from the default set of alerts.\nPossible values are: `NetObservNoFlows`, `NetObservLokiError`, `PacketDropsByKernel`, `PacketDropsByDevice`, `IPsecErrors`, `NetpolDenied`,\n`LatencyHighTrend`, `DNSErrors`, `DNSNxDomain`, `ExternalEgressHighTrend`, `ExternalIngressHighTrend`, `Ingress5xxErrors`, `IngressHTTPLatencyTrend`.\nMore information on alerts: https://github.com/netobserv/netobserv-operator/blob/main/docs/HealthRules.md",
-                  "items": {
-                    "type": "string"
+            metrics: {
+              description:
+                '`Metrics` define the processor configuration regarding metrics.\n\nTo add optional metrics while keeping the built-in defaults, use `additionalIncludeList`.\nTo take full control and export only specific metrics, use `includeList` (which replaces the default set; `additionalIncludeList` is then ignored).',
+              properties: {
+                disableAlerts: {
+                  description:
+                    '`disableAlerts` is a list of alert groups that should be disabled from the default set of alerts.\nPossible values are: `NetObservNoFlows`, `NetObservLokiError`, `PacketDropsByKernel`, `PacketDropsByDevice`, `IPsecErrors`, `NetpolDenied`,\n`LatencyHighTrend`, `DNSErrors`, `DNSNxDomain`, `ExternalEgressHighTrend`, `ExternalIngressHighTrend`, `Ingress5xxErrors`, `IngressHTTPLatencyTrend`.\nMore information on alerts: https://github.com/netobserv/netobserv-operator/blob/main/docs/HealthRules.md',
+                  items: {
+                    type: 'string'
                   },
-                  "type": "array"
+                  type: 'array'
                 },
-                "healthRules": {
-                  "description": "`healthRules` is a list of health rules to be created for Prometheus, organized by templates and variants.\nEach health rule can be configured to generate either alerts or recording rules based on the mode field.\nMore information on health rules: https://github.com/netobserv/netobserv-operator/blob/main/docs/HealthRules.md",
-                  "items": {
-                    "properties": {
-                      "mode": {
-                        "default": "Alert",
-                        "description": "Mode defines whether this health rule should be generated as an alert or a recording rule.\nPossible values are: `Alert` (default), `Recording`.\nRecording rules violations are visible in the Network Health dashboard without generating any Prometheus alert.\nThis provides an alternative way of getting Health information for SRE and cluster admins who may find\nmany new alerts burdensome.",
-                        "enum": [
-                          "Alert",
-                          "Recording"
-                        ],
-                        "type": "string"
+                healthRules: {
+                  description:
+                    '`healthRules` is a list of health rules to be created for Prometheus, organized by templates and variants.\nEach health rule can be configured to generate either alerts or recording rules based on the mode field.\nMore information on health rules: https://github.com/netobserv/netobserv-operator/blob/main/docs/HealthRules.md',
+                  items: {
+                    properties: {
+                      mode: {
+                        default: 'Alert',
+                        description:
+                          'Mode defines whether this health rule should be generated as an alert or a recording rule.\nPossible values are: `Alert` (default), `Recording`.\nRecording rules violations are visible in the Network Health dashboard without generating any Prometheus alert.\nThis provides an alternative way of getting Health information for SRE and cluster admins who may find\nmany new alerts burdensome.',
+                        enum: ['Alert', 'Recording'],
+                        type: 'string'
                       },
-                      "template": {
-                        "description": "Health rule template name.\nPossible values are: `PacketDropsByKernel`, `PacketDropsByDevice`, `IPsecErrors`, `NetpolDenied`,\n`LatencyHighTrend`, `DNSErrors`, `DNSNxDomain`, `ExternalEgressHighTrend`, `ExternalIngressHighTrend`, `Ingress5xxErrors`, `IngressHTTPLatencyTrend`.\nNote: `NetObservNoFlows` and `NetObservLokiError` are alert-only and cannot be used as health rules.\nMore information on health rules: https://github.com/netobserv/netobserv-operator/blob/main/docs/HealthRules.md",
-                        "enum": [
-                          "PacketDropsByKernel",
-                          "PacketDropsByDevice",
-                          "IPsecErrors",
-                          "NetpolDenied",
-                          "LatencyHighTrend",
-                          "DNSErrors",
-                          "DNSNxDomain",
-                          "ExternalEgressHighTrend",
-                          "ExternalIngressHighTrend",
-                          "Ingress5xxErrors",
-                          "IngressHTTPLatencyTrend"
+                      template: {
+                        description:
+                          'Health rule template name.\nPossible values are: `PacketDropsByKernel`, `PacketDropsByDevice`, `IPsecErrors`, `NetpolDenied`,\n`LatencyHighTrend`, `DNSErrors`, `DNSNxDomain`, `ExternalEgressHighTrend`, `ExternalIngressHighTrend`, `Ingress5xxErrors`, `IngressHTTPLatencyTrend`.\nNote: `NetObservNoFlows` and `NetObservLokiError` are alert-only and cannot be used as health rules.\nMore information on health rules: https://github.com/netobserv/netobserv-operator/blob/main/docs/HealthRules.md',
+                        enum: [
+                          'PacketDropsByKernel',
+                          'PacketDropsByDevice',
+                          'IPsecErrors',
+                          'NetpolDenied',
+                          'LatencyHighTrend',
+                          'DNSErrors',
+                          'DNSNxDomain',
+                          'ExternalEgressHighTrend',
+                          'ExternalIngressHighTrend',
+                          'Ingress5xxErrors',
+                          'IngressHTTPLatencyTrend'
                         ],
-                        "type": "string"
+                        type: 'string'
                       },
-                      "variants": {
-                        "description": "A list of variants for this template",
-                        "items": {
-                          "properties": {
-                            "groupBy": {
-                              "description": "Optional grouping criteria, possible values are: `Node`, `Namespace`, `Workload`.",
-                              "enum": [
-                                "",
-                                "Node",
-                                "Namespace",
-                                "Workload"
-                              ],
-                              "type": "string"
+                      variants: {
+                        description: 'A list of variants for this template',
+                        items: {
+                          properties: {
+                            groupBy: {
+                              description:
+                                'Optional grouping criteria, possible values are: `Node`, `Namespace`, `Workload`.',
+                              enum: ['', 'Node', 'Namespace', 'Workload'],
+                              type: 'string'
                             },
-                            "lowVolumeThreshold": {
-                              "description": "The low volume threshold allows to ignore metrics with a too low volume of traffic, in order to improve signal-to-noise.\nIt is provided as an absolute rate (bytes per second or packets per second, depending on the context).\nWhen provided, it must be parsable as a float.",
-                              "type": "string"
+                            lowVolumeThreshold: {
+                              description:
+                                'The low volume threshold allows to ignore metrics with a too low volume of traffic, in order to improve signal-to-noise.\nIt is provided as an absolute rate (bytes per second or packets per second, depending on the context).\nWhen provided, it must be parsable as a float.',
+                              type: 'string'
                             },
-                            "mode": {
-                              "description": "Mode overrides the health rule mode for this specific variant.\nIf not specified, inherits from the parent health rule's mode.\nPossible values are: `Alert`, `Recording`.",
-                              "enum": [
-                                "Alert",
-                                "Recording"
-                              ],
-                              "type": "string"
+                            mode: {
+                              description:
+                                "Mode overrides the health rule mode for this specific variant.\nIf not specified, inherits from the parent health rule's mode.\nPossible values are: `Alert`, `Recording`.",
+                              enum: ['Alert', 'Recording'],
+                              type: 'string'
                             },
-                            "thresholds": {
-                              "description": "Thresholds of the health rule per severity.\nThey are expressed as a percentage of errors above which the alert is triggered. They must be parsable as floats.\nRequired for both alert and recording modes",
-                              "properties": {
-                                "critical": {
-                                  "description": "Threshold for severity `critical`. Leave empty to not generate a Critical alert.",
-                                  "type": "string"
+                            thresholds: {
+                              description:
+                                'Thresholds of the health rule per severity.\nThey are expressed as a percentage of errors above which the alert is triggered. They must be parsable as floats.\nRequired for both alert and recording modes',
+                              properties: {
+                                critical: {
+                                  description:
+                                    'Threshold for severity `critical`. Leave empty to not generate a Critical alert.',
+                                  type: 'string'
                                 },
-                                "info": {
-                                  "description": "Threshold for severity `info`. Leave empty to not generate an Info alert.",
-                                  "type": "string"
+                                info: {
+                                  description:
+                                    'Threshold for severity `info`. Leave empty to not generate an Info alert.',
+                                  type: 'string'
                                 },
-                                "warning": {
-                                  "description": "Threshold for severity `warning`. Leave empty to not generate a Warning alert.",
-                                  "type": "string"
+                                warning: {
+                                  description:
+                                    'Threshold for severity `warning`. Leave empty to not generate a Warning alert.',
+                                  type: 'string'
                                 }
                               },
-                              "type": "object"
+                              type: 'object'
                             },
-                            "trendDuration": {
-                              "description": "For trending health rules, the duration interval for baseline comparison. For example, \"2h\" means comparing against a 2-hours average. Defaults to 2h.",
-                              "type": "string"
+                            trendDuration: {
+                              description:
+                                'For trending health rules, the duration interval for baseline comparison. For example, "2h" means comparing against a 2-hours average. Defaults to 2h.',
+                              type: 'string'
                             },
-                            "trendOffset": {
-                              "description": "For trending health rules, the time offset for baseline comparison. For example, \"1d\" means comparing against yesterday. Defaults to 1d.",
-                              "type": "string"
+                            trendOffset: {
+                              description:
+                                'For trending health rules, the time offset for baseline comparison. For example, "1d" means comparing against yesterday. Defaults to 1d.',
+                              type: 'string'
                             }
                           },
-                          "required": [
-                            "thresholds"
-                          ],
-                          "type": "object"
+                          required: ['thresholds'],
+                          type: 'object'
                         },
-                        "type": "array"
+                        type: 'array'
                       }
                     },
-                    "required": [
-                      "template",
-                      "variants"
-                    ],
-                    "type": "object"
+                    required: ['template', 'variants'],
+                    type: 'object'
                   },
-                  "type": "array"
+                  type: 'array'
                 },
-                "includeList": {
-                  "description": "`includeList` replaces the default metric set entirely: only the metrics you list here are generated.\nOmit this field to keep the built-in defaults (they depend on enabled features). To add metrics on top of defaults instead, use `additionalIncludeList`.\n\nIf both are set, `includeList` wins and `additionalIncludeList` is ignored.\n\nNames match Prometheus without the `netobserv_` prefix; for example, `namespace_egress_packets_total` appears as `netobserv_namespace_egress_packets_total`.\nMore metrics increase load on Prometheus.\n\nWhen this field is omitted, defaults include: `namespace_flows_total`, `node_ingress_bytes_total`, `node_egress_bytes_total`, `workload_ingress_bytes_total`,\n`workload_egress_bytes_total`, `namespace_drop_packets_total` (when `PacketDrop` is enabled),\n`namespace_rtt_seconds` (when `FlowRTT` is enabled), `namespace_dns_latency_seconds` (when `DNSTracking` is enabled),\n`namespace_network_policy_events_total` (when `NetworkEvents` is enabled).\nFull list: https://github.com/netobserv/netobserv-operator/blob/main/docs/Metrics.md",
-                  "items": {
-                    "description": "Metric name. More information in https://github.com/netobserv/netobserv-operator/blob/main/docs/Metrics.md.",
-                    "enum": [
-                      "namespace_egress_bytes_total",
-                      "namespace_egress_packets_total",
-                      "namespace_ingress_bytes_total",
-                      "namespace_ingress_packets_total",
-                      "namespace_flows_total",
-                      "node_egress_bytes_total",
-                      "node_egress_packets_total",
-                      "node_ingress_bytes_total",
-                      "node_ingress_packets_total",
-                      "node_flows_total",
-                      "workload_egress_bytes_total",
-                      "workload_egress_packets_total",
-                      "workload_ingress_bytes_total",
-                      "workload_ingress_packets_total",
-                      "workload_flows_total",
-                      "namespace_drop_bytes_total",
-                      "namespace_drop_packets_total",
-                      "node_drop_bytes_total",
-                      "node_drop_packets_total",
-                      "workload_drop_bytes_total",
-                      "workload_drop_packets_total",
-                      "namespace_rtt_seconds",
-                      "node_rtt_seconds",
-                      "workload_rtt_seconds",
-                      "namespace_dns_latency_seconds",
-                      "node_dns_latency_seconds",
-                      "workload_dns_latency_seconds",
-                      "node_network_policy_events_total",
-                      "namespace_network_policy_events_total",
-                      "workload_network_policy_events_total",
-                      "node_ipsec_flows_total",
-                      "namespace_ipsec_flows_total",
-                      "workload_ipsec_flows_total",
-                      "node_to_node_ingress_flows_total"
+                includeList: {
+                  description:
+                    '`includeList` replaces the default metric set entirely: only the metrics you list here are generated.\nOmit this field to keep the built-in defaults (they depend on enabled features). To add metrics on top of defaults instead, use `additionalIncludeList`.\n\nIf both are set, `includeList` wins and `additionalIncludeList` is ignored.\n\nNames match Prometheus without the `netobserv_` prefix; for example, `namespace_egress_packets_total` appears as `netobserv_namespace_egress_packets_total`.\nMore metrics increase load on Prometheus.\n\nWhen this field is omitted, defaults include: `namespace_flows_total`, `node_ingress_bytes_total`, `node_egress_bytes_total`, `workload_ingress_bytes_total`,\n`workload_egress_bytes_total`, `namespace_drop_packets_total` (when `PacketDrop` is enabled),\n`namespace_rtt_seconds` (when `FlowRTT` is enabled), `namespace_dns_latency_seconds` (when `DNSTracking` is enabled),\n`namespace_network_policy_events_total` (when `NetworkEvents` is enabled).\nFull list: https://github.com/netobserv/netobserv-operator/blob/main/docs/Metrics.md',
+                  items: {
+                    description:
+                      'Metric name. More information in https://github.com/netobserv/netobserv-operator/blob/main/docs/Metrics.md.',
+                    enum: [
+                      'namespace_egress_bytes_total',
+                      'namespace_egress_packets_total',
+                      'namespace_ingress_bytes_total',
+                      'namespace_ingress_packets_total',
+                      'namespace_flows_total',
+                      'node_egress_bytes_total',
+                      'node_egress_packets_total',
+                      'node_ingress_bytes_total',
+                      'node_ingress_packets_total',
+                      'node_flows_total',
+                      'workload_egress_bytes_total',
+                      'workload_egress_packets_total',
+                      'workload_ingress_bytes_total',
+                      'workload_ingress_packets_total',
+                      'workload_flows_total',
+                      'namespace_drop_bytes_total',
+                      'namespace_drop_packets_total',
+                      'node_drop_bytes_total',
+                      'node_drop_packets_total',
+                      'workload_drop_bytes_total',
+                      'workload_drop_packets_total',
+                      'namespace_rtt_seconds',
+                      'node_rtt_seconds',
+                      'workload_rtt_seconds',
+                      'namespace_dns_latency_seconds',
+                      'node_dns_latency_seconds',
+                      'workload_dns_latency_seconds',
+                      'node_network_policy_events_total',
+                      'namespace_network_policy_events_total',
+                      'workload_network_policy_events_total',
+                      'node_ipsec_flows_total',
+                      'namespace_ipsec_flows_total',
+                      'workload_ipsec_flows_total',
+                      'node_to_node_ingress_flows_total'
                     ],
-                    "type": "string"
+                    type: 'string'
                   },
-                  "type": "array"
+                  type: 'array'
                 },
-                "additionalIncludeList": {
-                  "description": "`additionalIncludeList` adds extra metrics on top of the default set. It does not remove or replace defaults.\nOmit `includeList` when using this field: if `includeList` is set, it replaces all defaults and `additionalIncludeList` is ignored.\n\nNames match Prometheus without the `netobserv_` prefix; for example, `namespace_egress_packets_total` appears as `netobserv_namespace_egress_packets_total`.\nMore metrics increase load on Prometheus.\nFull list: https://github.com/netobserv/netobserv-operator/blob/main/docs/Metrics.md",
-                  "items": {
-                    "description": "Metric name. More information in https://github.com/netobserv/netobserv-operator/blob/main/docs/Metrics.md.",
-                    "enum": [
-                      "namespace_egress_bytes_total",
-                      "namespace_egress_packets_total",
-                      "namespace_ingress_bytes_total",
-                      "namespace_ingress_packets_total",
-                      "namespace_flows_total",
-                      "node_egress_bytes_total",
-                      "node_egress_packets_total",
-                      "node_ingress_bytes_total",
-                      "node_ingress_packets_total",
-                      "node_flows_total",
-                      "workload_egress_bytes_total",
-                      "workload_egress_packets_total",
-                      "workload_ingress_bytes_total",
-                      "workload_ingress_packets_total",
-                      "workload_flows_total",
-                      "namespace_drop_bytes_total",
-                      "namespace_drop_packets_total",
-                      "node_drop_bytes_total",
-                      "node_drop_packets_total",
-                      "workload_drop_bytes_total",
-                      "workload_drop_packets_total",
-                      "namespace_rtt_seconds",
-                      "node_rtt_seconds",
-                      "workload_rtt_seconds",
-                      "namespace_dns_latency_seconds",
-                      "node_dns_latency_seconds",
-                      "workload_dns_latency_seconds",
-                      "node_network_policy_events_total",
-                      "namespace_network_policy_events_total",
-                      "workload_network_policy_events_total",
-                      "node_ipsec_flows_total",
-                      "namespace_ipsec_flows_total",
-                      "workload_ipsec_flows_total",
-                      "node_to_node_ingress_flows_total"
+                additionalIncludeList: {
+                  description:
+                    '`additionalIncludeList` adds extra metrics on top of the default set. It does not remove or replace defaults.\nOmit `includeList` when using this field: if `includeList` is set, it replaces all defaults and `additionalIncludeList` is ignored.\n\nNames match Prometheus without the `netobserv_` prefix; for example, `namespace_egress_packets_total` appears as `netobserv_namespace_egress_packets_total`.\nMore metrics increase load on Prometheus.\nFull list: https://github.com/netobserv/netobserv-operator/blob/main/docs/Metrics.md',
+                  items: {
+                    description:
+                      'Metric name. More information in https://github.com/netobserv/netobserv-operator/blob/main/docs/Metrics.md.',
+                    enum: [
+                      'namespace_egress_bytes_total',
+                      'namespace_egress_packets_total',
+                      'namespace_ingress_bytes_total',
+                      'namespace_ingress_packets_total',
+                      'namespace_flows_total',
+                      'node_egress_bytes_total',
+                      'node_egress_packets_total',
+                      'node_ingress_bytes_total',
+                      'node_ingress_packets_total',
+                      'node_flows_total',
+                      'workload_egress_bytes_total',
+                      'workload_egress_packets_total',
+                      'workload_ingress_bytes_total',
+                      'workload_ingress_packets_total',
+                      'workload_flows_total',
+                      'namespace_drop_bytes_total',
+                      'namespace_drop_packets_total',
+                      'node_drop_bytes_total',
+                      'node_drop_packets_total',
+                      'workload_drop_bytes_total',
+                      'workload_drop_packets_total',
+                      'namespace_rtt_seconds',
+                      'node_rtt_seconds',
+                      'workload_rtt_seconds',
+                      'namespace_dns_latency_seconds',
+                      'node_dns_latency_seconds',
+                      'workload_dns_latency_seconds',
+                      'node_network_policy_events_total',
+                      'namespace_network_policy_events_total',
+                      'workload_network_policy_events_total',
+                      'node_ipsec_flows_total',
+                      'namespace_ipsec_flows_total',
+                      'workload_ipsec_flows_total',
+                      'node_to_node_ingress_flows_total'
                     ],
-                    "type": "string"
+                    type: 'string'
                   },
-                  "type": "array"
+                  type: 'array'
                 },
-                "server": {
-                  "description": "Metrics server endpoint configuration for Prometheus scraper",
-                  "properties": {
-                    "port": {
-                      "description": "The metrics server HTTP port.",
-                      "format": "int32",
-                      "maximum": 65535,
-                      "minimum": 1,
-                      "type": "integer"
+                server: {
+                  description: 'Metrics server endpoint configuration for Prometheus scraper',
+                  properties: {
+                    port: {
+                      description: 'The metrics server HTTP port.',
+                      format: 'int32',
+                      maximum: 65535,
+                      minimum: 1,
+                      type: 'integer'
                     },
-                    "tls": {
-                      "description": "TLS configuration.",
-                      "properties": {
-                        "insecureSkipVerify": {
-                          "default": false,
-                          "description": "`insecureSkipVerify` allows skipping client-side verification of the provided certificate.\nIf set to `true`, the `providedCaFile` field is ignored.",
-                          "type": "boolean"
+                    tls: {
+                      description: 'TLS configuration.',
+                      properties: {
+                        insecureSkipVerify: {
+                          default: false,
+                          description:
+                            '`insecureSkipVerify` allows skipping client-side verification of the provided certificate.\nIf set to `true`, the `providedCaFile` field is ignored.',
+                          type: 'boolean'
                         },
-                        "provided": {
-                          "description": "TLS configuration when `type` is set to `Provided`.",
-                          "properties": {
-                            "certFile": {
-                              "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                              "type": "string"
+                        provided: {
+                          description: 'TLS configuration when `type` is set to `Provided`.',
+                          properties: {
+                            certFile: {
+                              description:
+                                '`certFile` defines the path to the certificate file name within the config map or secret.',
+                              type: 'string'
                             },
-                            "certKey": {
-                              "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                              "type": "string"
+                            certKey: {
+                              description:
+                                '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                              type: 'string'
                             },
-                            "name": {
-                              "description": "Name of the config map or secret containing certificates.",
-                              "type": "string"
+                            name: {
+                              description: 'Name of the config map or secret containing certificates.',
+                              type: 'string'
                             },
-                            "namespace": {
-                              "default": "",
-                              "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                              "type": "string"
+                            namespace: {
+                              default: '',
+                              description:
+                                'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                              type: 'string'
                             },
-                            "type": {
-                              "description": "Type for the certificate reference: `configmap` or `secret`.",
-                              "enum": [
-                                "configmap",
-                                "secret"
-                              ],
-                              "type": "string"
+                            type: {
+                              description: 'Type for the certificate reference: `configmap` or `secret`.',
+                              enum: ['configmap', 'secret'],
+                              type: 'string'
                             }
                           },
-                          "type": "object"
+                          type: 'object'
                         },
-                        "providedCaFile": {
-                          "description": "Reference to the CA file when `type` is set to `Provided`.",
-                          "properties": {
-                            "file": {
-                              "description": "File name within the config map or secret.",
-                              "type": "string"
+                        providedCaFile: {
+                          description: 'Reference to the CA file when `type` is set to `Provided`.',
+                          properties: {
+                            file: {
+                              description: 'File name within the config map or secret.',
+                              type: 'string'
                             },
-                            "name": {
-                              "description": "Name of the config map or secret containing the file.",
-                              "type": "string"
+                            name: {
+                              description: 'Name of the config map or secret containing the file.',
+                              type: 'string'
                             },
-                            "namespace": {
-                              "default": "",
-                              "description": "Namespace of the config map or secret containing the file. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                              "type": "string"
+                            namespace: {
+                              default: '',
+                              description:
+                                'Namespace of the config map or secret containing the file. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                              type: 'string'
                             },
-                            "type": {
-                              "description": "Type for the file reference: `configmap` or `secret`.",
-                              "enum": [
-                                "configmap",
-                                "secret"
-                              ],
-                              "type": "string"
+                            type: {
+                              description: 'Type for the file reference: `configmap` or `secret`.',
+                              enum: ['configmap', 'secret'],
+                              type: 'string'
                             }
                           },
-                          "type": "object"
+                          type: 'object'
                         },
-                        "type": {
-                          "default": "Disabled",
-                          "description": "Select the type of TLS configuration:<br>\n- `Disabled` (default) to not configure TLS for the endpoint.\n- `Provided` to manually provide cert file and a key file. [Unsupported (*)].\n- `Auto` to use OpenShift auto generated certificate using annotations.",
-                          "enum": [
-                            "Disabled",
-                            "Provided",
-                            "Auto"
-                          ],
-                          "type": "string"
+                        type: {
+                          default: 'Disabled',
+                          description:
+                            'Select the type of TLS configuration:<br>\n- `Disabled` (default) to not configure TLS for the endpoint.\n- `Provided` to manually provide cert file and a key file. [Unsupported (*)].\n- `Auto` to use OpenShift auto generated certificate using annotations.',
+                          enum: ['Disabled', 'Provided', 'Auto'],
+                          type: 'string'
                         }
                       },
-                      "required": [
-                        "type"
-                      ],
-                      "type": "object"
+                      required: ['type'],
+                      type: 'object'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 }
               },
-              "type": "object"
+              type: 'object'
             },
-            "multiClusterDeployment": {
-              "default": false,
-              "description": "Set `multiClusterDeployment` to `true` to enable multi clusters feature. This adds `clusterName` label to flows data",
-              "type": "boolean"
+            multiClusterDeployment: {
+              default: false,
+              description:
+                'Set `multiClusterDeployment` to `true` to enable multi clusters feature. This adds `clusterName` label to flows data',
+              type: 'boolean'
             },
-            "resources": {
-              "default": {
-                "limits": {
-                  "memory": "800Mi"
+            resources: {
+              default: {
+                limits: {
+                  memory: '800Mi'
                 },
-                "requests": {
-                  "cpu": "100m",
-                  "memory": "100Mi"
+                requests: {
+                  cpu: '100m',
+                  memory: '100Mi'
                 }
               },
-              "description": "`resources` are the compute resources required by this container.\nFor more information, see https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
-              "properties": {
-                "claims": {
-                  "description": "Claims lists the names of resources, defined in spec.resourceClaims,\nthat are used by this container.\n\nThis field depends on the\nDynamicResourceAllocation feature gate.\n\nThis field is immutable. It can only be set for containers.",
-                  "items": {
-                    "description": "ResourceClaim references one entry in PodSpec.ResourceClaims.",
-                    "properties": {
-                      "name": {
-                        "description": "Name must match the name of one entry in pod.spec.resourceClaims of\nthe Pod where this field is used. It makes that resource available\ninside a container.",
-                        "type": "string"
+              description:
+                '`resources` are the compute resources required by this container.\nFor more information, see https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/',
+              properties: {
+                claims: {
+                  description:
+                    'Claims lists the names of resources, defined in spec.resourceClaims,\nthat are used by this container.\n\nThis field depends on the\nDynamicResourceAllocation feature gate.\n\nThis field is immutable. It can only be set for containers.',
+                  items: {
+                    description: 'ResourceClaim references one entry in PodSpec.ResourceClaims.',
+                    properties: {
+                      name: {
+                        description:
+                          'Name must match the name of one entry in pod.spec.resourceClaims of\nthe Pod where this field is used. It makes that resource available\ninside a container.',
+                        type: 'string'
                       },
-                      "request": {
-                        "description": "Request is the name chosen for a request in the referenced claim.\nIf empty, everything from the claim is made available, otherwise\nonly the result of this request.",
-                        "type": "string"
+                      request: {
+                        description:
+                          'Request is the name chosen for a request in the referenced claim.\nIf empty, everything from the claim is made available, otherwise\nonly the result of this request.',
+                        type: 'string'
                       }
                     },
-                    "required": [
-                      "name"
-                    ],
-                    "type": "object"
+                    required: ['name'],
+                    type: 'object'
                   },
-                  "type": "array",
-                  "x-kubernetes-list-map-keys": [
-                    "name"
-                  ],
-                  "x-kubernetes-list-type": "map"
+                  type: 'array',
+                  'x-kubernetes-list-map-keys': ['name'],
+                  'x-kubernetes-list-type': 'map'
                 },
-                "limits": {
-                  "additionalProperties": {
-                    "anyOf": [
+                limits: {
+                  additionalProperties: {
+                    anyOf: [
                       {
-                        "type": "integer"
+                        type: 'integer'
                       },
                       {
-                        "type": "string"
+                        type: 'string'
                       }
                     ],
-                    "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                    "x-kubernetes-int-or-string": true
+                    pattern:
+                      '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                    'x-kubernetes-int-or-string': true
                   },
-                  "description": "Limits describes the maximum amount of compute resources allowed.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
-                  "type": "object"
+                  description:
+                    'Limits describes the maximum amount of compute resources allowed.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/',
+                  type: 'object'
                 },
-                "requests": {
-                  "additionalProperties": {
-                    "anyOf": [
+                requests: {
+                  additionalProperties: {
+                    anyOf: [
                       {
-                        "type": "integer"
+                        type: 'integer'
                       },
                       {
-                        "type": "string"
+                        type: 'string'
                       }
                     ],
-                    "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                    "x-kubernetes-int-or-string": true
+                    pattern:
+                      '^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$',
+                    'x-kubernetes-int-or-string': true
                   },
-                  "description": "Requests describes the minimum amount of compute resources required.\nIf Requests is omitted for a container, it defaults to Limits if that is explicitly specified,\notherwise to an implementation-defined value. Requests cannot exceed Limits.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
-                  "type": "object"
+                  description:
+                    'Requests describes the minimum amount of compute resources required.\nIf Requests is omitted for a container, it defaults to Limits if that is explicitly specified,\notherwise to an implementation-defined value. Requests cannot exceed Limits.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/',
+                  type: 'object'
                 }
               },
-              "type": "object"
+              type: 'object'
             },
-            "service": {
-              "description": "Service configuration, only used when `spec.deploymentModel` is `Service`.",
-              "properties": {
-                "providedCertificates": {
-                  "description": "TLS or mTLS configuration when `type` is set to `Provided`.",
-                  "properties": {
-                    "caFile": {
-                      "description": "Reference to the CA file.",
-                      "properties": {
-                        "file": {
-                          "description": "File name within the config map or secret.",
-                          "type": "string"
+            service: {
+              description: 'Service configuration, only used when `spec.deploymentModel` is `Service`.',
+              properties: {
+                providedCertificates: {
+                  description: 'TLS or mTLS configuration when `type` is set to `Provided`.',
+                  properties: {
+                    caFile: {
+                      description: 'Reference to the CA file.',
+                      properties: {
+                        file: {
+                          description: 'File name within the config map or secret.',
+                          type: 'string'
                         },
-                        "name": {
-                          "description": "Name of the config map or secret containing the file.",
-                          "type": "string"
+                        name: {
+                          description: 'Name of the config map or secret containing the file.',
+                          type: 'string'
                         },
-                        "namespace": {
-                          "default": "",
-                          "description": "Namespace of the config map or secret containing the file. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                          "type": "string"
+                        namespace: {
+                          default: '',
+                          description:
+                            'Namespace of the config map or secret containing the file. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                          type: 'string'
                         },
-                        "type": {
-                          "description": "Type for the file reference: `configmap` or `secret`.",
-                          "enum": [
-                            "configmap",
-                            "secret"
-                          ],
-                          "type": "string"
+                        type: {
+                          description: 'Type for the file reference: `configmap` or `secret`.',
+                          enum: ['configmap', 'secret'],
+                          type: 'string'
                         }
                       },
-                      "type": "object"
+                      type: 'object'
                     },
-                    "clientCert": {
-                      "description": "TLS client certificate reference, used for mTLS. Leave unset for simple TLS.",
-                      "properties": {
-                        "certFile": {
-                          "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                          "type": "string"
+                    clientCert: {
+                      description: 'TLS client certificate reference, used for mTLS. Leave unset for simple TLS.',
+                      properties: {
+                        certFile: {
+                          description:
+                            '`certFile` defines the path to the certificate file name within the config map or secret.',
+                          type: 'string'
                         },
-                        "certKey": {
-                          "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                          "type": "string"
+                        certKey: {
+                          description:
+                            '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                          type: 'string'
                         },
-                        "name": {
-                          "description": "Name of the config map or secret containing certificates.",
-                          "type": "string"
+                        name: {
+                          description: 'Name of the config map or secret containing certificates.',
+                          type: 'string'
                         },
-                        "namespace": {
-                          "default": "",
-                          "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                          "type": "string"
+                        namespace: {
+                          default: '',
+                          description:
+                            'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                          type: 'string'
                         },
-                        "type": {
-                          "description": "Type for the certificate reference: `configmap` or `secret`.",
-                          "enum": [
-                            "configmap",
-                            "secret"
-                          ],
-                          "type": "string"
+                        type: {
+                          description: 'Type for the certificate reference: `configmap` or `secret`.',
+                          enum: ['configmap', 'secret'],
+                          type: 'string'
                         }
                       },
-                      "type": "object"
+                      type: 'object'
                     },
-                    "serverCert": {
-                      "description": "TLS server certificate reference.",
-                      "properties": {
-                        "certFile": {
-                          "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                          "type": "string"
+                    serverCert: {
+                      description: 'TLS server certificate reference.',
+                      properties: {
+                        certFile: {
+                          description:
+                            '`certFile` defines the path to the certificate file name within the config map or secret.',
+                          type: 'string'
                         },
-                        "certKey": {
-                          "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                          "type": "string"
+                        certKey: {
+                          description:
+                            '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                          type: 'string'
                         },
-                        "name": {
-                          "description": "Name of the config map or secret containing certificates.",
-                          "type": "string"
+                        name: {
+                          description: 'Name of the config map or secret containing certificates.',
+                          type: 'string'
                         },
-                        "namespace": {
-                          "default": "",
-                          "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                          "type": "string"
+                        namespace: {
+                          default: '',
+                          description:
+                            'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                          type: 'string'
                         },
-                        "type": {
-                          "description": "Type for the certificate reference: `configmap` or `secret`.",
-                          "enum": [
-                            "configmap",
-                            "secret"
-                          ],
-                          "type": "string"
+                        type: {
+                          description: 'Type for the certificate reference: `configmap` or `secret`.',
+                          enum: ['configmap', 'secret'],
+                          type: 'string'
                         }
                       },
-                      "type": "object"
+                      type: 'object'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 },
-                "tlsType": {
-                  "default": "Auto",
-                  "description": "Select the type of TLS configuration:<br>\n- `Disabled` to not configure TLS for the endpoint. Disabling TLS results in a less secure deployment model.<br>\n- `Provided` to manually provide the key and certificate references.<br>\n- `Auto` (default) to enable automatically based on the running environment.<br>\n- `Auto-mTLS` to preconfigure mTLS. [Unsupported (*)].<br>\nSee also: https://github.com/netobserv/netobserv-operator/blob/main/docs/TLS.md.",
-                  "enum": [
-                    "Disabled",
-                    "Provided",
-                    "Auto",
-                    "Auto-mTLS"
-                  ],
-                  "type": "string"
+                tlsType: {
+                  default: 'Auto',
+                  description:
+                    'Select the type of TLS configuration:<br>\n- `Disabled` to not configure TLS for the endpoint. Disabling TLS results in a less secure deployment model.<br>\n- `Provided` to manually provide the key and certificate references.<br>\n- `Auto` (default) to enable automatically based on the running environment.<br>\n- `Auto-mTLS` to preconfigure mTLS. [Unsupported (*)].<br>\nSee also: https://github.com/netobserv/netobserv-operator/blob/main/docs/TLS.md.',
+                  enum: ['Disabled', 'Provided', 'Auto', 'Auto-mTLS'],
+                  type: 'string'
                 }
               },
-              "required": [
-                "tlsType"
-              ],
-              "type": "object"
+              required: ['tlsType'],
+              type: 'object'
             },
-            "slicesConfig": {
-              "description": "Global configuration managing FlowCollectorSlices custom resources.",
-              "properties": {
-                "collectionMode": {
-                  "default": "AlwaysCollect",
-                  "description": "`collectionMode` determines how the FlowCollectorSlice custom resources impacts the flow collection process:<br>\n- When set to `AlwaysCollect`, all flows are collected regardless of the presence of FlowCollectorSlice.<br>\n- When set to `AllowList`, only the flows related to namespaces where a FlowCollectorSlice resource is present, or configured via the global `namespacesAllowList`, are collected.<br>",
-                  "enum": [
-                    "AlwaysCollect",
-                    "AllowList"
-                  ],
-                  "type": "string"
+            slicesConfig: {
+              description: 'Global configuration managing FlowCollectorSlices custom resources.',
+              properties: {
+                collectionMode: {
+                  default: 'AlwaysCollect',
+                  description:
+                    '`collectionMode` determines how the FlowCollectorSlice custom resources impacts the flow collection process:<br>\n- When set to `AlwaysCollect`, all flows are collected regardless of the presence of FlowCollectorSlice.<br>\n- When set to `AllowList`, only the flows related to namespaces where a FlowCollectorSlice resource is present, or configured via the global `namespacesAllowList`, are collected.<br>',
+                  enum: ['AlwaysCollect', 'AllowList'],
+                  type: 'string'
                 },
-                "enable": {
-                  "default": false,
-                  "description": "`enable` determines if the FlowCollectorSlice feature is enabled. If not, all resources of kind FlowCollectorSlice are simply ignored.",
-                  "type": "boolean"
+                enable: {
+                  default: false,
+                  description:
+                    '`enable` determines if the FlowCollectorSlice feature is enabled. If not, all resources of kind FlowCollectorSlice are simply ignored.',
+                  type: 'boolean'
                 },
-                "namespacesAllowList": {
-                  "description": "`namespacesAllowList` is a list of namespaces for which flows are always collected, regardless of the presence of FlowCollectorSlice in those namespaces.\nAn entry enclosed by slashes, such as `/openshift-.*/`, is matched as a regular expression.\nThis setting is ignored if `collectionMode` is different from `AllowList`.",
-                  "items": {
-                    "type": "string"
+                namespacesAllowList: {
+                  description:
+                    '`namespacesAllowList` is a list of namespaces for which flows are always collected, regardless of the presence of FlowCollectorSlice in those namespaces.\nAn entry enclosed by slashes, such as `/openshift-.*/`, is matched as a regular expression.\nThis setting is ignored if `collectionMode` is different from `AllowList`.',
+                  items: {
+                    type: 'string'
                   },
-                  "type": "array"
+                  type: 'array'
                 }
               },
-              "required": [
-                "enable"
-              ],
-              "type": "object"
+              required: ['enable'],
+              type: 'object'
             },
-            "subnetLabels": {
-              "description": "`subnetLabels` allows to define custom labels on subnets and IPs or to enable automatic labeling of recognized subnets in OpenShift, which is used to identify cluster external traffic.\nWhen a subnet matches the source or destination IP of a flow, a corresponding field is added: `SrcSubnetLabel` or `DstSubnetLabel`.",
-              "properties": {
-                "customLabels": {
-                  "description": "`customLabels` allows you to customize subnets and IPs labeling, such as to identify cluster external workloads or web services.\nExternal subnets must be labeled with the prefix `EXT:`, or not labeled at all, in order to work with default quick filters and some metrics examples provided.<br/>\nIf `openShiftAutoDetect` is disabled or you are not using OpenShift, it is recommended to manually configure labels for the cluster subnets, to distinguish internal traffic from external traffic.<br/>\nIf `openShiftAutoDetect` is enabled, `customLabels` overrides the detected subnets when they overlap.<br/>",
-                  "items": {
-                    "description": "SubnetLabel allows to label subnets and IPs, such as to identify cluster-external workloads or web services.",
-                    "properties": {
-                      "cidrs": {
-                        "description": "List of CIDRs, such as `[\"1.2.3.4/32\"]`.",
-                        "items": {
-                          "type": "string"
+            subnetLabels: {
+              description:
+                '`subnetLabels` allows to define custom labels on subnets and IPs or to enable automatic labeling of recognized subnets in OpenShift, which is used to identify cluster external traffic.\nWhen a subnet matches the source or destination IP of a flow, a corresponding field is added: `SrcSubnetLabel` or `DstSubnetLabel`.',
+              properties: {
+                customLabels: {
+                  description:
+                    '`customLabels` allows you to customize subnets and IPs labeling, such as to identify cluster external workloads or web services.\nExternal subnets must be labeled with the prefix `EXT:`, or not labeled at all, in order to work with default quick filters and some metrics examples provided.<br/>\nIf `openShiftAutoDetect` is disabled or you are not using OpenShift, it is recommended to manually configure labels for the cluster subnets, to distinguish internal traffic from external traffic.<br/>\nIf `openShiftAutoDetect` is enabled, `customLabels` overrides the detected subnets when they overlap.<br/>',
+                  items: {
+                    description:
+                      'SubnetLabel allows to label subnets and IPs, such as to identify cluster-external workloads or web services.',
+                    properties: {
+                      cidrs: {
+                        description: 'List of CIDRs, such as `["1.2.3.4/32"]`.',
+                        items: {
+                          type: 'string'
                         },
-                        "type": "array"
+                        type: 'array'
                       },
-                      "name": {
-                        "description": "Label name, used to flag matching flows.\nExternal subnets must be labeled with the prefix `EXT:`, or not labeled at all, in order to work with default quick filters and some metrics examples provided.<br/>",
-                        "pattern": "^[a-zA-Z_:-][a-zA-Z0-9_:-]*$",
-                        "type": "string"
+                      name: {
+                        description:
+                          'Label name, used to flag matching flows.\nExternal subnets must be labeled with the prefix `EXT:`, or not labeled at all, in order to work with default quick filters and some metrics examples provided.<br/>',
+                        pattern: '^[a-zA-Z_:-][a-zA-Z0-9_:-]*$',
+                        type: 'string'
                       }
                     },
-                    "required": [
-                      "cidrs",
-                      "name"
-                    ],
-                    "type": "object"
+                    required: ['cidrs', 'name'],
+                    type: 'object'
                   },
-                  "type": "array"
+                  type: 'array'
                 },
-                "openShiftAutoDetect": {
-                  "description": "`openShiftAutoDetect` allows, when set to `true`, to detect automatically the machines, pods and services subnets based on the\nOpenShift install configuration and the Cluster Network Operator configuration. Indirectly, this is a way to accurately detect\nexternal traffic: flows that are not labeled for those subnets are external to the cluster. Enabled by default on OpenShift.",
-                  "type": "boolean"
+                openShiftAutoDetect: {
+                  description:
+                    '`openShiftAutoDetect` allows, when set to `true`, to detect automatically the machines, pods and services subnets based on the\nOpenShift install configuration and the Cluster Network Operator configuration. Indirectly, this is a way to accurately detect\nexternal traffic: flows that are not labeled for those subnets are external to the cluster. Enabled by default on OpenShift.',
+                  type: 'boolean'
                 }
               },
-              "type": "object"
+              type: 'object'
             },
-            "unmanagedReplicas": {
-              "description": "If `unmanagedReplicas` is `true`, the operator will not reconcile `consumerReplicas`. This is useful when using a pod autoscaler.",
-              "type": "boolean"
+            unmanagedReplicas: {
+              description:
+                'If `unmanagedReplicas` is `true`, the operator will not reconcile `consumerReplicas`. This is useful when using a pod autoscaler.',
+              type: 'boolean'
             }
           },
-          "type": "object"
+          type: 'object'
         },
-        "prometheus": {
-          "description": "`prometheus` defines Prometheus settings, such as querier configuration used to fetch metrics from the Console plugin.",
-          "properties": {
-            "querier": {
-              "description": "Prometheus querying configuration, such as client settings, used in the Console plugin.",
-              "properties": {
-                "enable": {
-                  "default": true,
-                  "description": "When `enable` is `true`, the Console plugin queries flow metrics from Prometheus instead of Loki whenever possible.\nIt is enabled by default: set it to `false` to disable this feature.\nThe Console plugin can use either Loki or Prometheus as a data source for metrics (see also `spec.loki`), or both.\nNot all queries are transposable from Loki to Prometheus. Hence, if Loki is disabled, some features of the plugin are disabled as well,\nsuch as getting per-pod information or viewing raw flows.\nIf both Prometheus and Loki are enabled, Prometheus takes precedence and Loki is used as a fallback for queries that Prometheus cannot handle.\nIf they are both disabled, the Console plugin is not deployed.",
-                  "type": "boolean"
+        prometheus: {
+          description:
+            '`prometheus` defines Prometheus settings, such as querier configuration used to fetch metrics from the Console plugin.',
+          properties: {
+            querier: {
+              description: 'Prometheus querying configuration, such as client settings, used in the Console plugin.',
+              properties: {
+                enable: {
+                  default: true,
+                  description:
+                    'When `enable` is `true`, the Console plugin queries flow metrics from Prometheus instead of Loki whenever possible.\nIt is enabled by default: set it to `false` to disable this feature.\nThe Console plugin can use either Loki or Prometheus as a data source for metrics (see also `spec.loki`), or both.\nNot all queries are transposable from Loki to Prometheus. Hence, if Loki is disabled, some features of the plugin are disabled as well,\nsuch as getting per-pod information or viewing raw flows.\nIf both Prometheus and Loki are enabled, Prometheus takes precedence and Loki is used as a fallback for queries that Prometheus cannot handle.\nIf they are both disabled, the Console plugin is not deployed.',
+                  type: 'boolean'
                 },
-                "manual": {
-                  "description": "Prometheus configuration for `Manual` mode.",
-                  "properties": {
-                    "alertManager": {
-                      "description": "AlertManager configuration. This is used in the console to query silenced alerts, for displaying health information.\nWhen used in OpenShift it can be left empty to use the Console API instead.\n[Unsupported (*)].",
-                      "properties": {
-                        "tls": {
-                          "description": "TLS client configuration for Prometheus AlertManager URL.",
-                          "properties": {
-                            "caCert": {
-                              "description": "`caCert` defines the reference of the certificate for the Certificate Authority.",
-                              "properties": {
-                                "certFile": {
-                                  "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                                  "type": "string"
+                manual: {
+                  description: 'Prometheus configuration for `Manual` mode.',
+                  properties: {
+                    alertManager: {
+                      description:
+                        'AlertManager configuration. This is used in the console to query silenced alerts, for displaying health information.\nWhen used in OpenShift it can be left empty to use the Console API instead.\n[Unsupported (*)].',
+                      properties: {
+                        tls: {
+                          description: 'TLS client configuration for Prometheus AlertManager URL.',
+                          properties: {
+                            caCert: {
+                              description:
+                                '`caCert` defines the reference of the certificate for the Certificate Authority.',
+                              properties: {
+                                certFile: {
+                                  description:
+                                    '`certFile` defines the path to the certificate file name within the config map or secret.',
+                                  type: 'string'
                                 },
-                                "certKey": {
-                                  "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                                  "type": "string"
+                                certKey: {
+                                  description:
+                                    '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                                  type: 'string'
                                 },
-                                "name": {
-                                  "description": "Name of the config map or secret containing certificates.",
-                                  "type": "string"
+                                name: {
+                                  description: 'Name of the config map or secret containing certificates.',
+                                  type: 'string'
                                 },
-                                "namespace": {
-                                  "default": "",
-                                  "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                                  "type": "string"
+                                namespace: {
+                                  default: '',
+                                  description:
+                                    'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                                  type: 'string'
                                 },
-                                "type": {
-                                  "description": "Type for the certificate reference: `configmap` or `secret`.",
-                                  "enum": [
-                                    "configmap",
-                                    "secret"
-                                  ],
-                                  "type": "string"
+                                type: {
+                                  description: 'Type for the certificate reference: `configmap` or `secret`.',
+                                  enum: ['configmap', 'secret'],
+                                  type: 'string'
                                 }
                               },
-                              "type": "object"
+                              type: 'object'
                             },
-                            "enable": {
-                              "default": false,
-                              "description": "Enable TLS",
-                              "type": "boolean"
+                            enable: {
+                              default: false,
+                              description: 'Enable TLS',
+                              type: 'boolean'
                             },
-                            "insecureSkipVerify": {
-                              "default": false,
-                              "description": "`insecureSkipVerify` allows skipping client-side verification of the server certificate.\nIf set to `true`, the `caCert` field is ignored.",
-                              "type": "boolean"
+                            insecureSkipVerify: {
+                              default: false,
+                              description:
+                                '`insecureSkipVerify` allows skipping client-side verification of the server certificate.\nIf set to `true`, the `caCert` field is ignored.',
+                              type: 'boolean'
                             },
-                            "userCert": {
-                              "description": "`userCert` defines the user certificate reference and is used for mTLS. When you use one-way TLS, you can ignore this property.",
-                              "properties": {
-                                "certFile": {
-                                  "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                                  "type": "string"
+                            userCert: {
+                              description:
+                                '`userCert` defines the user certificate reference and is used for mTLS. When you use one-way TLS, you can ignore this property.',
+                              properties: {
+                                certFile: {
+                                  description:
+                                    '`certFile` defines the path to the certificate file name within the config map or secret.',
+                                  type: 'string'
                                 },
-                                "certKey": {
-                                  "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                                  "type": "string"
+                                certKey: {
+                                  description:
+                                    '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                                  type: 'string'
                                 },
-                                "name": {
-                                  "description": "Name of the config map or secret containing certificates.",
-                                  "type": "string"
+                                name: {
+                                  description: 'Name of the config map or secret containing certificates.',
+                                  type: 'string'
                                 },
-                                "namespace": {
-                                  "default": "",
-                                  "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                                  "type": "string"
+                                namespace: {
+                                  default: '',
+                                  description:
+                                    'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                                  type: 'string'
                                 },
-                                "type": {
-                                  "description": "Type for the certificate reference: `configmap` or `secret`.",
-                                  "enum": [
-                                    "configmap",
-                                    "secret"
-                                  ],
-                                  "type": "string"
+                                type: {
+                                  description: 'Type for the certificate reference: `configmap` or `secret`.',
+                                  enum: ['configmap', 'secret'],
+                                  type: 'string'
                                 }
                               },
-                              "type": "object"
+                              type: 'object'
                             }
                           },
-                          "type": "object"
+                          type: 'object'
                         },
-                        "url": {
-                          "description": "`url` is the address of an existing Prometheus AlertManager service to use for querying alerts.",
-                          "type": "string"
+                        url: {
+                          description:
+                            '`url` is the address of an existing Prometheus AlertManager service to use for querying alerts.',
+                          type: 'string'
                         }
                       },
-                      "type": "object"
+                      type: 'object'
                     },
-                    "forwardUserToken": {
-                      "description": "Set `true` to forward logged in user token in queries to Prometheus",
-                      "type": "boolean"
+                    forwardUserToken: {
+                      description: 'Set `true` to forward logged in user token in queries to Prometheus',
+                      type: 'boolean'
                     },
-                    "tls": {
-                      "description": "TLS client configuration for Prometheus URL.",
-                      "properties": {
-                        "caCert": {
-                          "description": "`caCert` defines the reference of the certificate for the Certificate Authority.",
-                          "properties": {
-                            "certFile": {
-                              "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                              "type": "string"
+                    tls: {
+                      description: 'TLS client configuration for Prometheus URL.',
+                      properties: {
+                        caCert: {
+                          description:
+                            '`caCert` defines the reference of the certificate for the Certificate Authority.',
+                          properties: {
+                            certFile: {
+                              description:
+                                '`certFile` defines the path to the certificate file name within the config map or secret.',
+                              type: 'string'
                             },
-                            "certKey": {
-                              "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                              "type": "string"
+                            certKey: {
+                              description:
+                                '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                              type: 'string'
                             },
-                            "name": {
-                              "description": "Name of the config map or secret containing certificates.",
-                              "type": "string"
+                            name: {
+                              description: 'Name of the config map or secret containing certificates.',
+                              type: 'string'
                             },
-                            "namespace": {
-                              "default": "",
-                              "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                              "type": "string"
+                            namespace: {
+                              default: '',
+                              description:
+                                'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                              type: 'string'
                             },
-                            "type": {
-                              "description": "Type for the certificate reference: `configmap` or `secret`.",
-                              "enum": [
-                                "configmap",
-                                "secret"
-                              ],
-                              "type": "string"
+                            type: {
+                              description: 'Type for the certificate reference: `configmap` or `secret`.',
+                              enum: ['configmap', 'secret'],
+                              type: 'string'
                             }
                           },
-                          "type": "object"
+                          type: 'object'
                         },
-                        "enable": {
-                          "default": false,
-                          "description": "Enable TLS",
-                          "type": "boolean"
+                        enable: {
+                          default: false,
+                          description: 'Enable TLS',
+                          type: 'boolean'
                         },
-                        "insecureSkipVerify": {
-                          "default": false,
-                          "description": "`insecureSkipVerify` allows skipping client-side verification of the server certificate.\nIf set to `true`, the `caCert` field is ignored.",
-                          "type": "boolean"
+                        insecureSkipVerify: {
+                          default: false,
+                          description:
+                            '`insecureSkipVerify` allows skipping client-side verification of the server certificate.\nIf set to `true`, the `caCert` field is ignored.',
+                          type: 'boolean'
                         },
-                        "userCert": {
-                          "description": "`userCert` defines the user certificate reference and is used for mTLS. When you use one-way TLS, you can ignore this property.",
-                          "properties": {
-                            "certFile": {
-                              "description": "`certFile` defines the path to the certificate file name within the config map or secret.",
-                              "type": "string"
+                        userCert: {
+                          description:
+                            '`userCert` defines the user certificate reference and is used for mTLS. When you use one-way TLS, you can ignore this property.',
+                          properties: {
+                            certFile: {
+                              description:
+                                '`certFile` defines the path to the certificate file name within the config map or secret.',
+                              type: 'string'
                             },
-                            "certKey": {
-                              "description": "`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.",
-                              "type": "string"
+                            certKey: {
+                              description:
+                                '`certKey` defines the path to the certificate private key file name within the config map or secret. Omit when the key is not necessary.',
+                              type: 'string'
                             },
-                            "name": {
-                              "description": "Name of the config map or secret containing certificates.",
-                              "type": "string"
+                            name: {
+                              description: 'Name of the config map or secret containing certificates.',
+                              type: 'string'
                             },
-                            "namespace": {
-                              "default": "",
-                              "description": "Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.",
-                              "type": "string"
+                            namespace: {
+                              default: '',
+                              description:
+                                'Namespace of the config map or secret containing certificates. If omitted, the default is to use the same namespace as where NetObserv is deployed.\nIf the namespace is different, the config map or the secret is copied so that it can be mounted as required.',
+                              type: 'string'
                             },
-                            "type": {
-                              "description": "Type for the certificate reference: `configmap` or `secret`.",
-                              "enum": [
-                                "configmap",
-                                "secret"
-                              ],
-                              "type": "string"
+                            type: {
+                              description: 'Type for the certificate reference: `configmap` or `secret`.',
+                              enum: ['configmap', 'secret'],
+                              type: 'string'
                             }
                           },
-                          "type": "object"
+                          type: 'object'
                         }
                       },
-                      "type": "object"
+                      type: 'object'
                     },
-                    "url": {
-                      "default": "http://prometheus:9090",
-                      "description": "`url` is the address of an existing Prometheus service to use for querying metrics.",
-                      "type": "string"
+                    url: {
+                      default: 'http://prometheus:9090',
+                      description:
+                        '`url` is the address of an existing Prometheus service to use for querying metrics.',
+                      type: 'string'
                     }
                   },
-                  "type": "object"
+                  type: 'object'
                 },
-                "mode": {
-                  "default": "Auto",
-                  "description": "`mode` must be set according to the type of Prometheus installation that stores NetObserv metrics:<br>\n- Use `Auto` to try configuring automatically. In OpenShift, it uses the Thanos querier from OpenShift Cluster Monitoring.<br>\n- Use `Manual` for a manual setup.<br>",
-                  "enum": [
-                    "Manual",
-                    "Auto"
-                  ],
-                  "type": "string"
+                mode: {
+                  default: 'Auto',
+                  description:
+                    '`mode` must be set according to the type of Prometheus installation that stores NetObserv metrics:<br>\n- Use `Auto` to try configuring automatically. In OpenShift, it uses the Thanos querier from OpenShift Cluster Monitoring.<br>\n- Use `Manual` for a manual setup.<br>',
+                  enum: ['Manual', 'Auto'],
+                  type: 'string'
                 },
-                "timeout": {
-                  "default": "30s",
-                  "description": "`timeout` is the read timeout for console plugin queries to Prometheus.\nA timeout of zero means no timeout.",
-                  "type": "string"
+                timeout: {
+                  default: '30s',
+                  description:
+                    '`timeout` is the read timeout for console plugin queries to Prometheus.\nA timeout of zero means no timeout.',
+                  type: 'string'
                 }
               },
-              "required": [
-                "mode"
-              ],
-              "type": "object"
+              required: ['mode'],
+              type: 'object'
             }
           },
-          "type": "object"
+          type: 'object'
         }
       },
-      "type": "object"
+      type: 'object'
     },
-    "status": {
-      "description": "`FlowCollectorStatus` defines the observed state of FlowCollector",
-      "properties": {
-        "conditions": {
-          "description": "`conditions` represents the latest available observations of an object's state",
-          "items": {
-            "description": "Condition contains details for one aspect of the current state of this API Resource.",
-            "properties": {
-              "lastTransitionTime": {
-                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
-                "format": "date-time",
-                "type": "string"
+    status: {
+      description: '`FlowCollectorStatus` defines the observed state of FlowCollector',
+      properties: {
+        conditions: {
+          description: "`conditions` represents the latest available observations of an object's state",
+          items: {
+            description: 'Condition contains details for one aspect of the current state of this API Resource.',
+            properties: {
+              lastTransitionTime: {
+                description:
+                  'lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.',
+                format: 'date-time',
+                type: 'string'
               },
-              "message": {
-                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
-                "maxLength": 32768,
-                "type": "string"
+              message: {
+                description:
+                  'message is a human readable message indicating details about the transition.\nThis may be an empty string.',
+                maxLength: 32768,
+                type: 'string'
               },
-              "observedGeneration": {
-                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
-                "format": "int64",
-                "minimum": 0,
-                "type": "integer"
+              observedGeneration: {
+                description:
+                  'observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.',
+                format: 'int64',
+                minimum: 0,
+                type: 'integer'
               },
-              "reason": {
-                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
-                "maxLength": 1024,
-                "minLength": 1,
-                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
-                "type": "string"
+              reason: {
+                description:
+                  "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                maxLength: 1024,
+                minLength: 1,
+                pattern: '^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$',
+                type: 'string'
               },
-              "status": {
-                "description": "status of the condition, one of True, False, Unknown.",
-                "enum": [
-                  "True",
-                  "False",
-                  "Unknown"
-                ],
-                "type": "string"
+              status: {
+                description: 'status of the condition, one of True, False, Unknown.',
+                enum: ['True', 'False', 'Unknown'],
+                type: 'string'
               },
-              "type": {
-                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
-                "maxLength": 316,
-                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
-                "type": "string"
+              type: {
+                description: 'type of condition in CamelCase or in foo.example.com/CamelCase.',
+                maxLength: 316,
+                pattern:
+                  '^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$',
+                type: 'string'
               }
             },
-            "required": [
-              "lastTransitionTime",
-              "message",
-              "reason",
-              "status",
-              "type"
-            ],
-            "type": "object"
+            required: ['lastTransitionTime', 'message', 'reason', 'status', 'type'],
+            type: 'object'
           },
-          "type": "array"
+          type: 'array'
         },
-        "namespace": {
-          "description": "Namespace where console plugin and flowlogs-pipeline have been deployed.\n\nDeprecated: annotations are used instead",
-          "type": "string"
+        namespace: {
+          description:
+            'Namespace where console plugin and flowlogs-pipeline have been deployed.\n\nDeprecated: annotations are used instead',
+          type: 'string'
         }
       },
-      "required": [
-        "conditions"
-      ],
-      "type": "object"
+      required: ['conditions'],
+      type: 'object'
     }
   },
-  "type": "object"
+  type: 'object'
 };
 
 // flowCollectorSliceSchema is only used in tests or dev console
 export const flowCollectorSliceSchema: RJSFSchema | any = {
-  "description": "FlowCollectorSlice is the API allowing to decentralize some of the FlowCollector configuration per namespace tenant.",
-  "properties": {
-    "apiVersion": {
-      "description": "APIVersion defines the versioned schema of this representation of an object.\nServers should convert recognized schemas to the latest internal value, and\nmay reject unrecognized values.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-      "type": "string"
+  description:
+    'FlowCollectorSlice is the API allowing to decentralize some of the FlowCollector configuration per namespace tenant.',
+  properties: {
+    apiVersion: {
+      description:
+        'APIVersion defines the versioned schema of this representation of an object.\nServers should convert recognized schemas to the latest internal value, and\nmay reject unrecognized values.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources',
+      type: 'string'
     },
-    "kind": {
-      "description": "Kind is a string value representing the REST resource this object represents.\nServers may infer this from the endpoint the client submits requests to.\nCannot be updated.\nIn CamelCase.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-      "type": "string"
+    kind: {
+      description:
+        'Kind is a string value representing the REST resource this object represents.\nServers may infer this from the endpoint the client submits requests to.\nCannot be updated.\nIn CamelCase.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds',
+      type: 'string'
     },
-    "metadata": {
-      "type": "object"
+    metadata: {
+      type: 'object'
     },
-    "spec": {
-      "description": "FlowCollectorSliceSpec defines the desired state of FlowCollectorSlice",
-      "properties": {
-        "sampling": {
-          "description": "`sampling` is an optional sampling interval to apply to this slice. For example, a value of `50` means that 1 matching flow in 50 is sampled.",
-          "format": "int32",
-          "minimum": 0,
-          "type": "integer"
+    spec: {
+      description: 'FlowCollectorSliceSpec defines the desired state of FlowCollectorSlice',
+      properties: {
+        sampling: {
+          description:
+            '`sampling` is an optional sampling interval to apply to this slice. For example, a value of `50` means that 1 matching flow in 50 is sampled.',
+          format: 'int32',
+          minimum: 0,
+          type: 'integer'
         },
-        "subnetLabels": {
-          "description": "`subnetLabels` allows you to customize subnets and IPs labeling, such as to identify cluster external workloads or web services.\nExternal subnets must be labeled with the prefix `EXT:`, or not labeled at all, in order to work with default quick filters and some metrics examples provided.<br/>\nBeware that the subnet labels configured in FlowCollectorSlice are not limited to the flows of the related namespace: any flow\nin the whole cluster can be labeled using this configuration. However, subnet labels defined in the cluster-scoped FlowCollector take\nprecedence in case of conflicting rules.",
-          "items": {
-            "description": "SubnetLabel allows to label subnets and IPs, such as to identify cluster-external workloads or web services.",
-            "properties": {
-              "cidrs": {
-                "description": "List of CIDRs, such as `[\"1.2.3.4/32\"]`.",
-                "items": {
-                  "type": "string"
+        subnetLabels: {
+          description:
+            '`subnetLabels` allows you to customize subnets and IPs labeling, such as to identify cluster external workloads or web services.\nExternal subnets must be labeled with the prefix `EXT:`, or not labeled at all, in order to work with default quick filters and some metrics examples provided.<br/>\nBeware that the subnet labels configured in FlowCollectorSlice are not limited to the flows of the related namespace: any flow\nin the whole cluster can be labeled using this configuration. However, subnet labels defined in the cluster-scoped FlowCollector take\nprecedence in case of conflicting rules.',
+          items: {
+            description:
+              'SubnetLabel allows to label subnets and IPs, such as to identify cluster-external workloads or web services.',
+            properties: {
+              cidrs: {
+                description: 'List of CIDRs, such as `["1.2.3.4/32"]`.',
+                items: {
+                  type: 'string'
                 },
-                "type": "array"
+                type: 'array'
               },
-              "name": {
-                "description": "Label name, used to flag matching flows.\nExternal subnets must be labeled with the prefix `EXT:`, or not labeled at all, in order to work with default quick filters and some metrics examples provided.<br/>",
-                "type": "string"
+              name: {
+                description:
+                  'Label name, used to flag matching flows.\nExternal subnets must be labeled with the prefix `EXT:`, or not labeled at all, in order to work with default quick filters and some metrics examples provided.<br/>',
+                type: 'string'
               }
             },
-            "required": [
-              "cidrs",
-              "name"
-            ],
-            "type": "object"
+            required: ['cidrs', 'name'],
+            type: 'object'
           },
-          "type": "array"
+          type: 'array'
         }
       },
-      "type": "object"
+      type: 'object'
     },
-    "status": {
-      "description": "FlowCollectorSliceStatus defines the observed state of FlowCollectorSlice",
-      "properties": {
-        "conditions": {
-          "description": "`conditions` represent the latest available observations of an object's state",
-          "items": {
-            "description": "Condition contains details for one aspect of the current state of this API Resource.",
-            "properties": {
-              "lastTransitionTime": {
-                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
-                "format": "date-time",
-                "type": "string"
+    status: {
+      description: 'FlowCollectorSliceStatus defines the observed state of FlowCollectorSlice',
+      properties: {
+        conditions: {
+          description: "`conditions` represent the latest available observations of an object's state",
+          items: {
+            description: 'Condition contains details for one aspect of the current state of this API Resource.',
+            properties: {
+              lastTransitionTime: {
+                description:
+                  'lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.',
+                format: 'date-time',
+                type: 'string'
               },
-              "message": {
-                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
-                "maxLength": 32768,
-                "type": "string"
+              message: {
+                description:
+                  'message is a human readable message indicating details about the transition.\nThis may be an empty string.',
+                maxLength: 32768,
+                type: 'string'
               },
-              "observedGeneration": {
-                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
-                "format": "int64",
-                "minimum": 0,
-                "type": "integer"
+              observedGeneration: {
+                description:
+                  'observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.',
+                format: 'int64',
+                minimum: 0,
+                type: 'integer'
               },
-              "reason": {
-                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
-                "maxLength": 1024,
-                "minLength": 1,
-                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
-                "type": "string"
+              reason: {
+                description:
+                  "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                maxLength: 1024,
+                minLength: 1,
+                pattern: '^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$',
+                type: 'string'
               },
-              "status": {
-                "description": "status of the condition, one of True, False, Unknown.",
-                "enum": [
-                  "True",
-                  "False",
-                  "Unknown"
-                ],
-                "type": "string"
+              status: {
+                description: 'status of the condition, one of True, False, Unknown.',
+                enum: ['True', 'False', 'Unknown'],
+                type: 'string'
               },
-              "type": {
-                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
-                "maxLength": 316,
-                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
-                "type": "string"
+              type: {
+                description: 'type of condition in CamelCase or in foo.example.com/CamelCase.',
+                maxLength: 316,
+                pattern:
+                  '^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$',
+                type: 'string'
               }
             },
-            "required": [
-              "lastTransitionTime",
-              "message",
-              "reason",
-              "status",
-              "type"
-            ],
-            "type": "object"
+            required: ['lastTransitionTime', 'message', 'reason', 'status', 'type'],
+            type: 'object'
           },
-          "type": "array"
+          type: 'array'
         },
-        "filterApplied": {
-          "description": "Filter that is applied for flow collection",
-          "type": "string"
+        filterApplied: {
+          description: 'Filter that is applied for flow collection',
+          type: 'string'
         },
-        "subnetLabelsConfigured": {
-          "description": "Number of subnet labels configured",
-          "type": "integer"
+        subnetLabelsConfigured: {
+          description: 'Number of subnet labels configured',
+          type: 'integer'
         }
       },
-      "required": [
-        "conditions"
-      ],
-      "type": "object"
+      required: ['conditions'],
+      type: 'object'
     }
   },
-  "type": "object"
+  type: 'object'
 };
 
 // flowMetricSchema is only used in tests or dev console
 export const flowMetricSchema: RJSFSchema | any = {
-  "description": "FlowMetric is the API allowing to create custom metrics from the collected flow logs.",
-  "properties": {
-    "apiVersion": {
-      "description": "APIVersion defines the versioned schema of this representation of an object.\nServers should convert recognized schemas to the latest internal value, and\nmay reject unrecognized values.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-      "type": "string"
+  description: 'FlowMetric is the API allowing to create custom metrics from the collected flow logs.',
+  properties: {
+    apiVersion: {
+      description:
+        'APIVersion defines the versioned schema of this representation of an object.\nServers should convert recognized schemas to the latest internal value, and\nmay reject unrecognized values.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources',
+      type: 'string'
     },
-    "kind": {
-      "description": "Kind is a string value representing the REST resource this object represents.\nServers may infer this from the endpoint the client submits requests to.\nCannot be updated.\nIn CamelCase.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-      "type": "string"
+    kind: {
+      description:
+        'Kind is a string value representing the REST resource this object represents.\nServers may infer this from the endpoint the client submits requests to.\nCannot be updated.\nIn CamelCase.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds',
+      type: 'string'
     },
-    "metadata": {
-      "type": "object"
+    metadata: {
+      type: 'object'
     },
-    "spec": {
-      "description": "FlowMetricSpec defines the desired state of FlowMetric\nThe provided API allows you to customize these metrics according to your needs.<br>\nWhen adding new metrics or modifying existing labels, you must carefully monitor the memory\nusage of Prometheus workloads as this could potentially have a high impact. Cf https://rhobs-handbook.netlify.app/products/openshiftmonitoring/telemetry.md/#what-is-the-cardinality-of-a-metric<br>\nTo check the cardinality of all NetObserv metrics, run as `promql`: `count({__name__=~\"netobserv.*\"}) by (__name__)`.",
-      "properties": {
-        "buckets": {
-          "description": "A list of buckets to use when `type` is \"Histogram\". The list must be parsable as floats. When not set, Prometheus default buckets are used.",
-          "items": {
-            "type": "string"
+    spec: {
+      description:
+        'FlowMetricSpec defines the desired state of FlowMetric\nThe provided API allows you to customize these metrics according to your needs.<br>\nWhen adding new metrics or modifying existing labels, you must carefully monitor the memory\nusage of Prometheus workloads as this could potentially have a high impact. Cf https://rhobs-handbook.netlify.app/products/openshiftmonitoring/telemetry.md/#what-is-the-cardinality-of-a-metric<br>\nTo check the cardinality of all NetObserv metrics, run as `promql`: `count({__name__=~"netobserv.*"}) by (__name__)`.',
+      properties: {
+        buckets: {
+          description:
+            'A list of buckets to use when `type` is "Histogram". The list must be parsable as floats. When not set, Prometheus default buckets are used.',
+          items: {
+            type: 'string'
           },
-          "type": "array"
+          type: 'array'
         },
-        "charts": {
-          "description": "Charts configuration, for the OpenShift Console in the administrator view, Dashboards menu.",
-          "items": {
-            "description": "Configures charts / dashboard generation associated to a metric",
-            "properties": {
-              "dashboardName": {
-                "default": "Main",
-                "description": "Name of the containing dashboard. If this name does not refer to an existing dashboard, a new dashboard is created.",
-                "type": "string"
+        charts: {
+          description: 'Charts configuration, for the OpenShift Console in the administrator view, Dashboards menu.',
+          items: {
+            description: 'Configures charts / dashboard generation associated to a metric',
+            properties: {
+              dashboardName: {
+                default: 'Main',
+                description:
+                  'Name of the containing dashboard. If this name does not refer to an existing dashboard, a new dashboard is created.',
+                type: 'string'
               },
-              "queries": {
-                "description": "List of queries to be displayed on this chart. If `type` is `SingleStat` and multiple queries are provided,\nthis chart is automatically expanded in several panels (one per query).",
-                "items": {
-                  "description": "Configures PromQL queries",
-                  "properties": {
-                    "legend": {
-                      "description": "The query legend that applies to each timeseries represented in this chart. When multiple timeseries are displayed, you should set a legend\nthat distinguishes each of them. It can be done with the following format: `{{ Label }}`. For example, if the `promQL` groups timeseries per\nlabel such as: `sum(rate($METRIC[2m])) by (Label1, Label2)`, you may write as the legend: `Label1={{ Label1 }}, Label2={{ Label2 }}`.",
-                      "type": "string"
+              queries: {
+                description:
+                  'List of queries to be displayed on this chart. If `type` is `SingleStat` and multiple queries are provided,\nthis chart is automatically expanded in several panels (one per query).',
+                items: {
+                  description: 'Configures PromQL queries',
+                  properties: {
+                    legend: {
+                      description:
+                        'The query legend that applies to each timeseries represented in this chart. When multiple timeseries are displayed, you should set a legend\nthat distinguishes each of them. It can be done with the following format: `{{ Label }}`. For example, if the `promQL` groups timeseries per\nlabel such as: `sum(rate($METRIC[2m])) by (Label1, Label2)`, you may write as the legend: `Label1={{ Label1 }}, Label2={{ Label2 }}`.',
+                      type: 'string'
                     },
-                    "promQL": {
-                      "description": "The `promQL` query to be run against Prometheus. If the chart `type` is `SingleStat`, this query should only return\na single timeseries. For other types, a top 7 is displayed.\nYou can use `$METRIC` to refer to the metric defined in this resource. For example: `sum(rate($METRIC[2m]))`.\nTo learn more about `promQL`, refer to the Prometheus documentation: https://prometheus.io/docs/prometheus/latest/querying/basics/",
-                      "type": "string"
+                    promQL: {
+                      description:
+                        'The `promQL` query to be run against Prometheus. If the chart `type` is `SingleStat`, this query should only return\na single timeseries. For other types, a top 7 is displayed.\nYou can use `$METRIC` to refer to the metric defined in this resource. For example: `sum(rate($METRIC[2m]))`.\nTo learn more about `promQL`, refer to the Prometheus documentation: https://prometheus.io/docs/prometheus/latest/querying/basics/',
+                      type: 'string'
                     },
-                    "top": {
-                      "default": 7,
-                      "description": "Top N series to display per timestamp. Does not apply to `SingleStat` chart type.",
-                      "minimum": 1,
-                      "type": "integer"
+                    top: {
+                      default: 7,
+                      description: 'Top N series to display per timestamp. Does not apply to `SingleStat` chart type.',
+                      minimum: 1,
+                      type: 'integer'
                     }
                   },
-                  "required": [
-                    "legend",
-                    "promQL",
-                    "top"
-                  ],
-                  "type": "object"
+                  required: ['legend', 'promQL', 'top'],
+                  type: 'object'
                 },
-                "type": "array"
+                type: 'array'
               },
-              "sectionName": {
-                "description": "Name of the containing dashboard section. If this name does not refer to an existing section, a new section is created.\nIf `sectionName` is omitted or empty, the chart is placed in the global top section.",
-                "type": "string"
+              sectionName: {
+                description:
+                  'Name of the containing dashboard section. If this name does not refer to an existing section, a new section is created.\nIf `sectionName` is omitted or empty, the chart is placed in the global top section.',
+                type: 'string'
               },
-              "title": {
-                "description": "Title of the chart.",
-                "type": "string"
+              title: {
+                description: 'Title of the chart.',
+                type: 'string'
               },
-              "type": {
-                "description": "Type of the chart.",
-                "enum": [
-                  "SingleStat",
-                  "Line",
-                  "StackArea"
-                ],
-                "type": "string"
+              type: {
+                description: 'Type of the chart.',
+                enum: ['SingleStat', 'Line', 'StackArea'],
+                type: 'string'
               },
-              "unit": {
-                "description": "Unit of this chart. Only a few units are currently supported. Leave empty to use generic number.",
-                "enum": [
-                  "bytes",
-                  "seconds",
-                  "Bps",
-                  "pps",
-                  "percent",
-                  ""
-                ],
-                "type": "string"
+              unit: {
+                description:
+                  'Unit of this chart. Only a few units are currently supported. Leave empty to use generic number.',
+                enum: ['bytes', 'seconds', 'Bps', 'pps', 'percent', ''],
+                type: 'string'
               }
             },
-            "required": [
-              "dashboardName",
-              "queries",
-              "title",
-              "type"
-            ],
-            "type": "object"
+            required: ['dashboardName', 'queries', 'title', 'type'],
+            type: 'object'
           },
-          "type": "array"
+          type: 'array'
         },
-        "direction": {
-          "default": "Any",
-          "description": "Filter for ingress, egress or any direction flows.\nWhen set to `Ingress`, it is equivalent to adding the regular expression filter on `FlowDirection`: `0|2`.\nWhen set to `Egress`, it is equivalent to adding the regular expression filter on `FlowDirection`: `1|2`.",
-          "enum": [
-            "Any",
-            "Egress",
-            "Ingress"
-          ],
-          "type": "string"
+        direction: {
+          default: 'Any',
+          description:
+            'Filter for ingress, egress or any direction flows.\nWhen set to `Ingress`, it is equivalent to adding the regular expression filter on `FlowDirection`: `0|2`.\nWhen set to `Egress`, it is equivalent to adding the regular expression filter on `FlowDirection`: `1|2`.',
+          enum: ['Any', 'Egress', 'Ingress'],
+          type: 'string'
         },
-        "divider": {
-          "description": "When nonzero, scale factor (divider) of the value. Metric value = Flow value / Divider.",
-          "type": "string"
+        divider: {
+          description: 'When nonzero, scale factor (divider) of the value. Metric value = Flow value / Divider.',
+          type: 'string'
         },
-        "filters": {
-          "description": "`filters` is a list of fields and values used to restrict which flows are taken into account.\nRefer to the documentation for the list of available fields: https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/network_observability/json-flows-format-reference.",
-          "items": {
-            "properties": {
-              "field": {
-                "description": "Name of the field to filter on (for example: `SrcK8S_Namespace`).",
-                "type": "string"
+        filters: {
+          description:
+            '`filters` is a list of fields and values used to restrict which flows are taken into account.\nRefer to the documentation for the list of available fields: https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/network_observability/json-flows-format-reference.',
+          items: {
+            properties: {
+              field: {
+                description: 'Name of the field to filter on (for example: `SrcK8S_Namespace`).',
+                type: 'string'
               },
-              "matchType": {
-                "default": "Equal",
-                "description": "Type of matching to apply",
-                "enum": [
-                  "Equal",
-                  "NotEqual",
-                  "Presence",
-                  "Absence",
-                  "MatchRegex",
-                  "NotMatchRegex"
-                ],
-                "type": "string"
+              matchType: {
+                default: 'Equal',
+                description: 'Type of matching to apply',
+                enum: ['Equal', 'NotEqual', 'Presence', 'Absence', 'MatchRegex', 'NotMatchRegex'],
+                type: 'string'
               },
-              "value": {
-                "description": "Value to filter on. When `matchType` is `Equal` or `NotEqual`, you can use field injection with `$(SomeField)` to refer to any other field of the flow.",
-                "type": "string"
+              value: {
+                description:
+                  'Value to filter on. When `matchType` is `Equal` or `NotEqual`, you can use field injection with `$(SomeField)` to refer to any other field of the flow.',
+                type: 'string'
               }
             },
-            "required": [
-              "field",
-              "matchType"
-            ],
-            "type": "object"
+            required: ['field', 'matchType'],
+            type: 'object'
           },
-          "type": "array"
+          type: 'array'
         },
-        "flatten": {
-          "description": "`flatten` is a list of array-type fields that must be flattened, such as Interfaces or NetworkEvents. Flattened fields generate one metric per item in that field.\nFor instance, when flattening `Interfaces` on a bytes counter, a flow having Interfaces [br-ex, ens5] increases one counter for `br-ex` and another for `ens5`.",
-          "items": {
-            "type": "string"
+        flatten: {
+          description:
+            '`flatten` is a list of array-type fields that must be flattened, such as Interfaces or NetworkEvents. Flattened fields generate one metric per item in that field.\nFor instance, when flattening `Interfaces` on a bytes counter, a flow having Interfaces [br-ex, ens5] increases one counter for `br-ex` and another for `ens5`.',
+          items: {
+            type: 'string'
           },
-          "type": "array"
+          type: 'array'
         },
-        "help": {
-          "description": "Help text of the metric, as it appears in Prometheus.",
-          "type": "string"
+        help: {
+          description: 'Help text of the metric, as it appears in Prometheus.',
+          type: 'string'
         },
-        "labels": {
-          "description": "`labels` is a list of fields that should be used as Prometheus labels, also known as dimensions (for example: `SrcK8S_Namespace`).\nFrom choosing labels results the level of granularity of this metric, and the available aggregations at query time.\nIt must be done carefully as it impacts the metric cardinality (cf https://rhobs-handbook.netlify.app/products/openshiftmonitoring/telemetry.md/#what-is-the-cardinality-of-a-metric).\nIn general, avoid setting very high cardinality labels such as IP or MAC addresses.\n\"SrcK8S_OwnerName\" or \"DstK8S_OwnerName\" should be preferred over \"SrcK8S_Name\" or \"DstK8S_Name\" as much as possible.\nRefer to the documentation for the list of available fields: https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/network_observability/json-flows-format-reference.",
-          "items": {
-            "type": "string"
+        labels: {
+          description:
+            '`labels` is a list of fields that should be used as Prometheus labels, also known as dimensions (for example: `SrcK8S_Namespace`).\nFrom choosing labels results the level of granularity of this metric, and the available aggregations at query time.\nIt must be done carefully as it impacts the metric cardinality (cf https://rhobs-handbook.netlify.app/products/openshiftmonitoring/telemetry.md/#what-is-the-cardinality-of-a-metric).\nIn general, avoid setting very high cardinality labels such as IP or MAC addresses.\n"SrcK8S_OwnerName" or "DstK8S_OwnerName" should be preferred over "SrcK8S_Name" or "DstK8S_Name" as much as possible.\nRefer to the documentation for the list of available fields: https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/network_observability/json-flows-format-reference.',
+          items: {
+            type: 'string'
           },
-          "type": "array"
+          type: 'array'
         },
-        "metricName": {
-          "description": "Name of the metric. In Prometheus, it is automatically prefixed with \"netobserv_\". Leave empty to generate the name based on the `FlowMetric` resource name.",
-          "pattern": "^[a-zA-Z_][a-zA-Z0-9:_]*$|^$",
-          "type": "string"
+        metricName: {
+          description:
+            'Name of the metric. In Prometheus, it is automatically prefixed with "netobserv_". Leave empty to generate the name based on the `FlowMetric` resource name.',
+          pattern: '^[a-zA-Z_][a-zA-Z0-9:_]*$|^$',
+          type: 'string'
         },
-        "remap": {
-          "additionalProperties": {
-            "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$",
-            "type": "string"
+        remap: {
+          additionalProperties: {
+            pattern: '^[a-zA-Z_][a-zA-Z0-9_]*$',
+            type: 'string'
           },
-          "description": "Set the `remap` property to use different names for the generated metric labels than the flow fields. Use the origin flow fields as keys, and the desired label names as values.",
-          "type": "object"
+          description:
+            'Set the `remap` property to use different names for the generated metric labels than the flow fields. Use the origin flow fields as keys, and the desired label names as values.',
+          type: 'object'
         },
-        "type": {
-          "description": "Metric type: \"Counter\", \"Histogram\" or \"Gauge\".\nUse \"Counter\" for any value that increases over time and on which you can compute a rate, such as Bytes or Packets.\nUse \"Histogram\" for any value that must be sampled independently, such as latencies.\nUse \"Gauge\" for other values that don't necessitate accuracy over time (gauges are sampled only every N seconds when Prometheus fetches the metric).",
-          "enum": [
-            "Counter",
-            "Histogram",
-            "Gauge"
-          ],
-          "type": "string"
+        type: {
+          description:
+            'Metric type: "Counter", "Histogram" or "Gauge".\nUse "Counter" for any value that increases over time and on which you can compute a rate, such as Bytes or Packets.\nUse "Histogram" for any value that must be sampled independently, such as latencies.\nUse "Gauge" for other values that don\'t necessitate accuracy over time (gauges are sampled only every N seconds when Prometheus fetches the metric).',
+          enum: ['Counter', 'Histogram', 'Gauge'],
+          type: 'string'
         },
-        "valueField": {
-          "description": "`valueField` is the flow field that must be used as a value for this metric (for example: `Bytes`). This field must hold numeric values.\nLeave empty to count flows rather than a specific value per flow.\nRefer to the documentation for the list of available fields: https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/network_observability/json-flows-format-reference.",
-          "type": "string"
+        valueField: {
+          description:
+            '`valueField` is the flow field that must be used as a value for this metric (for example: `Bytes`). This field must hold numeric values.\nLeave empty to count flows rather than a specific value per flow.\nRefer to the documentation for the list of available fields: https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/network_observability/json-flows-format-reference.',
+          type: 'string'
         }
       },
-      "required": [
-        "type"
-      ],
-      "type": "object"
+      required: ['type'],
+      type: 'object'
     },
-    "status": {
-      "description": "FlowMetricStatus defines the observed state of FlowMetric",
-      "properties": {
-        "conditions": {
-          "description": "`conditions` represent the latest available observations of an object's state",
-          "items": {
-            "description": "Condition contains details for one aspect of the current state of this API Resource.",
-            "properties": {
-              "lastTransitionTime": {
-                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
-                "format": "date-time",
-                "type": "string"
+    status: {
+      description: 'FlowMetricStatus defines the observed state of FlowMetric',
+      properties: {
+        conditions: {
+          description: "`conditions` represent the latest available observations of an object's state",
+          items: {
+            description: 'Condition contains details for one aspect of the current state of this API Resource.',
+            properties: {
+              lastTransitionTime: {
+                description:
+                  'lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.',
+                format: 'date-time',
+                type: 'string'
               },
-              "message": {
-                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
-                "maxLength": 32768,
-                "type": "string"
+              message: {
+                description:
+                  'message is a human readable message indicating details about the transition.\nThis may be an empty string.',
+                maxLength: 32768,
+                type: 'string'
               },
-              "observedGeneration": {
-                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
-                "format": "int64",
-                "minimum": 0,
-                "type": "integer"
+              observedGeneration: {
+                description:
+                  'observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.',
+                format: 'int64',
+                minimum: 0,
+                type: 'integer'
               },
-              "reason": {
-                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
-                "maxLength": 1024,
-                "minLength": 1,
-                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
-                "type": "string"
+              reason: {
+                description:
+                  "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                maxLength: 1024,
+                minLength: 1,
+                pattern: '^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$',
+                type: 'string'
               },
-              "status": {
-                "description": "status of the condition, one of True, False, Unknown.",
-                "enum": [
-                  "True",
-                  "False",
-                  "Unknown"
-                ],
-                "type": "string"
+              status: {
+                description: 'status of the condition, one of True, False, Unknown.',
+                enum: ['True', 'False', 'Unknown'],
+                type: 'string'
               },
-              "type": {
-                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
-                "maxLength": 316,
-                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
-                "type": "string"
+              type: {
+                description: 'type of condition in CamelCase or in foo.example.com/CamelCase.',
+                maxLength: 316,
+                pattern:
+                  '^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$',
+                type: 'string'
               }
             },
-            "required": [
-              "lastTransitionTime",
-              "message",
-              "reason",
-              "status",
-              "type"
-            ],
-            "type": "object"
+            required: ['lastTransitionTime', 'message', 'reason', 'status', 'type'],
+            type: 'object'
           },
-          "type": "array"
+          type: 'array'
         },
-        "prometheusName": {
-          "description": "Metric name, including prefix, as it appears in Prometheus",
-          "type": "string"
+        prometheusName: {
+          description: 'Metric name, including prefix, as it appears in Prometheus',
+          type: 'string'
         }
       },
-      "required": [
-        "conditions"
-      ],
-      "type": "object"
+      required: ['conditions'],
+      type: 'object'
     }
   },
-  "type": "object"
+  type: 'object'
 };

@@ -442,37 +442,39 @@ export const FiltersChips: React.FC<FiltersChipsProps> = ({
             {t('Edit filters')}
           </Button>
         ) : (
-          <LinksOverflow
-            id={'chips-more-options'}
-            items={[
-              {
-                id: 'reset-filters',
-                label: t('Reset defaults'),
-                onClick: () => {
-                  resetFilters();
-                  autoCompleteCache.clear();
+          <>
+            <LinksOverflow
+              id={'chips-more-options'}
+              items={[
+                {
+                  id: 'reset-filters',
+                  label: t('Reset defaults'),
+                  onClick: () => {
+                    resetFilters();
+                    autoCompleteCache.clear();
+                  },
+                  enabled: getDefaultFilters().length > 0 && !isDefaultFilters
                 },
-                enabled: getDefaultFilters().length > 0 && !isDefaultFilters
-              },
-              {
-                id: 'clear-all-filters',
-                label: t('Clear all'),
-                onClick: () => {
-                  clearFilters();
-                  autoCompleteCache.clear();
+                {
+                  id: 'clear-all-filters',
+                  label: t('Clear all'),
+                  onClick: () => {
+                    clearFilters();
+                    autoCompleteCache.clear();
+                  },
+                  enabled: !_.isEmpty(filters.list)
                 },
-                enabled: !_.isEmpty(filters.list)
-              },
-              {
-                id: 'swap-filters',
-                label: t('Swap'),
-                tooltip: t('Swap from and to filters'),
-                onClick: swapAllSrcDst,
-                enabled: hasSrcOrDstFilters(filters.list!) && filters.match !== 'bidirectional'
-              }
-            ]}
-            text={t('More actions')}
-          />
+                {
+                  id: 'swap-filters',
+                  label: t('Swap'),
+                  tooltip: t('Swap from and to filters'),
+                  onClick: swapAllSrcDst,
+                  enabled: hasSrcOrDstFilters(filters.list!) && filters.match !== 'bidirectional'
+                }
+              ]}
+              text={t('More actions')}
+            />
+          </>
         )}
       </ToolbarItem>
     </>

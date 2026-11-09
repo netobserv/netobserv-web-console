@@ -31,11 +31,11 @@ export const useNavigate = () => {
   navigateRef.current = navigate;
 
   // Return a stable callback that uses the ref
-  return useCallback((to: string | number) => {
+  return useCallback((to: string | number, options?: { state?: unknown; replace?: boolean }) => {
     if (typeof to === 'number') {
       navigateRef.current(to);
     } else {
-      navigateRef.current(to);
+      navigateRef.current(to, options);
     }
   }, []); // Empty deps - never changes reference
 };
@@ -110,6 +110,31 @@ export const getFlowCollectorResourceName = (pathname: string = window.location.
   return segment;
 };
 export const flowMetricNewPath = '/k8s/cluster/flows.netobserv.io~v1alpha1~FlowMetric/~new';
+
+export const flowCaptureNewPath = () =>
+  ContextSingleton.isStandalone()
+    ? '/console-flow-capture/~new'
+    : '/k8s/cluster/flows.netobserv.io~v1alpha1~FlowCapture/~new';
+
+export const flowCaptureListPath = (namespace = 'default') =>
+  ContextSingleton.isStandalone()
+    ? '/console-flow-capture'
+    : `/k8s/ns/${encodeURIComponent(namespace)}/flows.netobserv.io~v1alpha1~FlowCapture`;
+
+export const flowCapturePath = (name: string, namespace = 'default') =>
+  ContextSingleton.isStandalone()
+    ? `/console-flow-capture/${encodeURIComponent(name)}`
+    : `/k8s/ns/${encodeURIComponent(namespace)}/flows.netobserv.io~v1alpha1~FlowCapture/${encodeURIComponent(name)}`;
+
+export const flowCaptureEditPath = (name: string, namespace = 'default') =>
+  ContextSingleton.isStandalone()
+    ? `/console-flow-capture/${encodeURIComponent(name)}/edit`
+    : `/k8s/ns/${encodeURIComponent(namespace)}/flows.netobserv.io~v1alpha1~FlowCapture/${encodeURIComponent(name)}/edit`;
+
+export const flowCaptureYamlPath = (name: string, namespace = 'default') =>
+  ContextSingleton.isStandalone()
+    ? `/console-flow-capture/${encodeURIComponent(name)}/yaml`
+    : `/k8s/ns/${encodeURIComponent(namespace)}/flows.netobserv.io~v1alpha1~FlowCapture/${encodeURIComponent(name)}/yaml`;
 
 // React-router query argument (not backend routes)
 export enum URLParam {

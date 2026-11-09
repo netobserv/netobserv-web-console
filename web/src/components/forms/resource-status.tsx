@@ -45,6 +45,7 @@ export type ResourceStatusProps = {
   existing: K8sResourceKind | null;
   selectedTypes: string[];
   setSelectedTypes: (types: string[]) => void;
+  componentLabels?: Record<string, string>;
 };
 
 type LabelColor = 'green' | 'orange' | 'red' | 'blue' | 'grey';
@@ -135,7 +136,15 @@ const ComponentStatusTable: FC<{
                 {c.status.desiredReplicas != null ? `${c.status.readyReplicas ?? 0}/${c.status.desiredReplicas}` : '-'}
               </Td>
               <Td>
-                {c.status.podIssues ? c.status.podIssues : c.status.message ? c.status.message : c.status.reason || '-'}
+                {c.status.podIssues ||
+                  c.status.message ||
+                  c.status.reason ||
+                  (c.status.desiredReplicas != null && c.status.readyReplicas !== c.status.desiredReplicas
+                    ? t('{{ready}} of {{desired}} replicas ready', {
+                        ready: c.status.readyReplicas ?? 0,
+                        desired: c.status.desiredReplicas
+                      })
+                    : '-')}
               </Td>
             </Tr>
           ))}
@@ -237,7 +246,8 @@ export const ResourceStatus: FC<ResourceStatusProps> = ({
   kind,
   existing,
   selectedTypes,
-  setSelectedTypes
+  setSelectedTypes,
+  componentLabels
 }) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
   const navigate = useNavigate();
@@ -261,10 +271,18 @@ export const ResourceStatus: FC<ResourceStatusProps> = ({
 
   const components: ComponentRowData[] = [];
   if (fcStatus?.components?.agent) {
-    components.push({ id: 'agent', name: t('eBPF Agent'), status: fcStatus.components.agent });
+    components.push({
+      id: 'agent',
+      name: componentLabels?.agent || t('eBPF Agent'),
+      status: fcStatus.components.agent
+    });
   }
   if (fcStatus?.components?.processor) {
-    components.push({ id: 'processor', name: t('Flowlogs Pipeline'), status: fcStatus.components.processor });
+    components.push({
+      id: 'processor',
+      name: componentLabels?.processor || t('Flowlogs Pipeline'),
+      status: fcStatus.components.processor
+    });
   }
   if (fcStatus?.components?.plugin) {
     components.push({ id: 'plugin', name: t('Console Plugin'), status: fcStatus.components.plugin });

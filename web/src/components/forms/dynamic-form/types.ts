@@ -1,6 +1,6 @@
 export type DynamicFormFieldDependency = {
   controlFieldPath: string[];
-  controlFieldValue: string;
+  controlFieldValue: string | string[];
   controlFieldName: string;
   /**
    * `equals` (default): show when the value at `controlFieldPath` (under spec) equals `controlFieldValue`.
@@ -10,11 +10,16 @@ export type DynamicFormFieldDependency = {
 };
 
 export type UiSchemaOptionsWithDependency = {
+  flat?: string;
   dependency?: DynamicFormFieldDependency;
   /** When `matchMode: 'controlUnset'` pauses the array, tooltip for the disabled Add action. */
   addDisabledTooltip?: string;
   /** When true, FieldSet accordion starts expanded (root always does). */
   defaultExpanded?: boolean;
+  /** When true, populated array fields start expanded. */
+  expandWhenPopulated?: boolean;
+  /** Groups FlowCapture filtering-related fields into one parent section. */
+  flowCaptureFiltersGroup?: boolean;
 };
 
 export type DynamicFormSchemaError = {

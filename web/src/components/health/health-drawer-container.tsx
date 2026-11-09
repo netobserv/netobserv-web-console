@@ -1,6 +1,7 @@
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Bullseye,
+  Button,
   Content,
   ContentVariants,
   Drawer,
@@ -19,6 +20,8 @@ import { CheckCircleIcon } from '@patternfly/react-icons';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { valueFormat } from '../../utils/format';
+import { flowCaptureNewPath, useNavigate } from '../../utils/url';
+import { captureFromHealthItem } from '../forms/flowCapture/types';
 import { HealthCard } from './health-card';
 import { computeResourceScore, getAllHealthItems, HealthStat, HealthSuperKind } from './health-helper';
 import { RuleDetails } from './rule-details';
@@ -39,6 +42,7 @@ export const HealthDrawerContainer: React.FC<HealthDrawerContainerProps> = ({
   isLoading
 }) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
+  const navigate = useNavigate();
   const [selectedItemName, setSelectedItemName] = React.useState<string | undefined>(undefined);
   const drawerRef = React.useRef<HTMLDivElement>(null);
 
@@ -60,6 +64,23 @@ export const HealthDrawerContainer: React.FC<HealthDrawerContainerProps> = ({
 
   const isExpanded = selectedItem !== undefined;
   const hasAnyViolations = stats.length > 0;
+  const onFlowCapture = React.useCallback(
+    (item: Parameters<typeof captureFromHealthItem>[2]) => {
+      navigate(flowCaptureNewPath(), {
+        state: {
+          capture: captureFromHealthItem(kind, selectedItem!, item),
+          flowCaptureSource: 'health'
+        }
+      });
+    },
+    [kind, navigate, selectedItem]
+  );
+  const onScopeFlowCapture = React.useCallback(() => {
+    if (selectedItem) {
+      const firstItem = getAllHealthItems(selectedItem)[0];
+      if (firstItem) onFlowCapture(firstItem);
+    }
+  }, [onFlowCapture, selectedItem]);
 
   return (
     <>
@@ -73,9 +94,26 @@ export const HealthDrawerContainer: React.FC<HealthDrawerContainerProps> = ({
               minSize="300px"
             >
               <DrawerHead>
-                <span tabIndex={isExpanded ? 0 : -1} ref={drawerRef}>
-                  {selectedItem && <ResourceLink inline={true} kind={selectedItem.k8sKind} name={selectedItem.name} />}
-                </span>
+                <Flex
+                  className="health-drawer-header"
+                  justifyContent={{ default: 'justifyContentSpaceBetween' }}
+                  alignItems={{ default: 'alignItemsCenter' }}
+                  flexWrap={{ default: 'nowrap' }}
+                >
+                  <span className="health-drawer-resource" tabIndex={isExpanded ? 0 : -1} ref={drawerRef}>
+                    {selectedItem && <ResourceLink inline={true} kind={selectedItem.k8sKind} name={selectedItem.name} />}
+                  </span>
+                  {selectedItem && kind !== 'Global' && (
+                    <Button
+                      className="flowcapture-action-button"
+                      variant="primary"
+                      size="sm"
+                      onClick={onScopeFlowCapture}
+                    >
+                      {t('FlowCapture')}
+                    </Button>
+                  )}
+                </Flex>
                 {selectedItem && breakdown && (
                   <Flex
                     direction={{ default: 'column' }}
@@ -129,7 +167,11 @@ export const HealthDrawerContainer: React.FC<HealthDrawerContainerProps> = ({
               </DrawerHead>
               {selectedItem && (
                 <div className="health-gallery-drawer-content" data-test="health-drawer-content">
-                  <RuleDetails kind={kind} resourceHealth={selectedItem} />
+                  <RuleDetails
+                    kind={kind}
+                    resourceHealth={selectedItem}
+                    onFlowCapture={kind === 'Global' ? undefined : onFlowCapture}
+                  />
                 </div>
               )}
             </DrawerPanelContent>

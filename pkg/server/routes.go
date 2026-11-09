@@ -68,6 +68,7 @@ func setupRoutes(ctx context.Context, cfg *config.Config, authChecker auth.Check
 
 		// K8S endpoints
 		api.HandleFunc("/k8s/resources/udnIds", h.GetUDNIdss(ctx))
+		api.HandleFunc("/flowcaptures/{namespace}/{name}/output", h.DownloadFlowCaptureOutput(ctx)).Methods(http.MethodGet)
 
 		// Path prefixed with "console-" are routed via react-router (standalone console)
 		r.PathPrefix("/console-").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

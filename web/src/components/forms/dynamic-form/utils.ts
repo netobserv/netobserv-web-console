@@ -2,7 +2,7 @@
 import { getUiOptions, UiSchema } from '@rjsf/utils';
 import { JSONSchema7 } from 'json-schema';
 import * as _ from 'lodash';
-import { DynamicFormSchemaError } from './types';
+import { DynamicFormSchemaError, UiSchemaOptionsWithDependency } from './types';
 
 const unsupportedSchemaProperties = ['allOf', 'anyOf', 'oneOf'];
 
@@ -55,6 +55,27 @@ export const isDependencyControlUnset = (spec: unknown, path: string[]): boolean
     return true;
   }
   return false;
+};
+
+export const dependencyMatches = (
+  formData: unknown,
+  dependency: UiSchemaOptionsWithDependency['dependency'],
+  fieldId?: string
+): boolean => {
+  if (!dependency) return true;
+  const spec = _.get(formData ?? {}, 'spec', {});
+  if (dependency.matchMode === 'controlUnset') return isDependencyControlUnset(spec, dependency.controlFieldPath);
+  let value: unknown = spec;
+  for (const path of dependency.controlFieldPath) {
+    value = _.get(value, path, '');
+    if (Array.isArray(value)) {
+      const index = Number(fieldId?.replace(/\D/g, ''));
+      value = Number.isInteger(index) && index >= 0 ? value[index] : value;
+    }
+  }
+  return Array.isArray(dependency.controlFieldValue)
+    ? dependency.controlFieldValue.includes(String(value))
+    : dependency.controlFieldValue === String(value);
 };
 
 // Returns true if a value is not nil and is empty
