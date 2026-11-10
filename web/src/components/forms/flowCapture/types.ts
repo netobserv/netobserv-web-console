@@ -119,8 +119,9 @@ export const queryFromFilters = (filters: Filters): string | undefined => {
     : `(${expressions.join(filters.match === 'any' ? ' OR ' : ' AND ')})`;
 };
 
-const uniqueHosts = (hosts: Array<string | undefined>): string[] =>
-  [...new Set(hosts.filter((host): host is string => Boolean(host)))];
+const uniqueHosts = (hosts: Array<string | undefined>): string[] => [
+  ...new Set(hosts.filter((host): host is string => Boolean(host)))
+];
 
 const addNodeSelector = (capture: FlowCaptureResource, hosts: Array<string | undefined>) => {
   const uniqueHostValues = uniqueHosts(hosts);
@@ -161,8 +162,10 @@ const healthScopeQuery = (kind: HealthSuperKind, resourceHealth: HealthStat): st
     const name = queryValue(resourceHealth.name);
     const namespace = queryValue(resourceHealth.namespace);
     const ownerType = queryValue(resourceHealth.k8sKind);
-    return `((SrcK8S_OwnerName=${name} AND SrcK8S_OwnerType=${ownerType} AND SrcK8S_Namespace=${namespace}) OR ` +
-      `(DstK8S_OwnerName=${name} AND DstK8S_OwnerType=${ownerType} AND DstK8S_Namespace=${namespace}))`;
+    return (
+      `((SrcK8S_OwnerName=${name} AND SrcK8S_OwnerType=${ownerType} AND SrcK8S_Namespace=${namespace}) OR ` +
+      `(DstK8S_OwnerName=${name} AND DstK8S_OwnerType=${ownerType} AND DstK8S_Namespace=${namespace}))`
+    );
   }
   return undefined;
 };

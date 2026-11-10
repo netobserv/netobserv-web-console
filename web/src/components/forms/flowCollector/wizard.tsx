@@ -184,7 +184,10 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
                 updatedData.spec = {};
               }
               updatedData.spec.deploymentModel = updatedData.spec.deploymentModel || 'Service';
-              updatedData.spec.agent = { ...(updatedData.spec.agent ?? {}), type: updatedData.spec.agent?.type || 'eBPF' };
+              updatedData.spec.agent = {
+                ...(updatedData.spec.agent ?? {}),
+                type: updatedData.spec.agent?.type || 'eBPF'
+              };
               updatedData.spec.agent.ebpf = { ...(updatedData.spec.agent.ebpf ?? {}) };
               if (updatedData.spec.agent.ebpf.sampling === undefined) {
                 updatedData.spec.agent.ebpf.sampling = 50;

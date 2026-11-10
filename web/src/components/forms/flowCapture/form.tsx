@@ -71,9 +71,9 @@ export const FlowCaptureForm: FC<FlowCaptureFormProps> = ({ name, initialData, s
               ? t('Create FlowCapture from selected flow')
               : flowCaptureSource === 'topology'
                 ? t('Create FlowCapture from topology')
-              : flowCaptureSource === 'health'
-                ? t('Create FlowCapture from Network Health')
-                : undefined
+                : flowCaptureSource === 'health'
+                  ? t('Create FlowCapture from Network Health')
+                  : undefined
         }
         formContext={{ flowCaptureAutofilled: Boolean(flowCaptureSource) }}
         customValidate={flowCaptureCustomValidate}

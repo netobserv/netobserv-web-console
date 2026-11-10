@@ -101,7 +101,9 @@ export const HealthDrawerContainer: React.FC<HealthDrawerContainerProps> = ({
                   flexWrap={{ default: 'nowrap' }}
                 >
                   <span className="health-drawer-resource" tabIndex={isExpanded ? 0 : -1} ref={drawerRef}>
-                    {selectedItem && <ResourceLink inline={true} kind={selectedItem.k8sKind} name={selectedItem.name} />}
+                    {selectedItem && (
+                      <ResourceLink inline={true} kind={selectedItem.k8sKind} name={selectedItem.name} />
+                    )}
                   </span>
                   {selectedItem && kind !== 'Global' && (
                     <Button

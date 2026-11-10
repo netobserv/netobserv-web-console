@@ -20,8 +20,14 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { getFlowCaptureOutputURL } from '../../../api/routes';
 import { useK8sModel } from '../../../utils/k8s-models-hook';
+import {
+  flowCaptureEditPath,
+  flowCaptureListPath,
+  flowCaptureYamlPath,
+  useNavigate,
+  useParams
+} from '../../../utils/url';
 import { useFillViewportBelow } from '../../../utils/use-fill-viewport-below';
-import { flowCaptureEditPath, flowCaptureListPath, flowCaptureYamlPath, useNavigate, useParams } from '../../../utils/url';
 import { ComponentStatus, Pipeline } from '../pipeline';
 import { ResourceDeleteModal } from '../resource-delete-modal';
 import { ResourceStatus } from '../resource-status';
@@ -193,7 +199,8 @@ export const FlowCaptureStatus: React.FC = () => {
           </Title>
           {capture.status?.reason === 'CaptureConflict' && (
             <Alert variant={AlertVariant.warning} isInline title={t('Maximum concurrent captures reached')}>
-              {capture.status.message || t('Another FlowCapture is still active. It must finish before this capture can start.')}
+              {capture.status.message ||
+                t('Another FlowCapture is still active. It must finish before this capture can start.')}
             </Alert>
           )}
           {isPartialOutput && hasDownloadableOutput && (
