@@ -9,13 +9,13 @@ import {
   Flex,
   FlexItem,
   Label,
+  MenuToggle,
+  MenuToggleElement,
+  Modal,
   ModalBody,
   ModalFooter,
   ModalHeader,
-  Modal,
   ModalVariant,
-  MenuToggle,
-  MenuToggleElement,
   PageSection,
   Progress,
   Spinner,
@@ -25,9 +25,9 @@ import { EllipsisVIcon } from '@patternfly/react-icons';
 import { Table, TableVariant, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { flowCaptureEditPath, flowCaptureNewPath, flowCapturePath, useNavigate, useParams } from '../../../utils/url';
 import { ContextSingleton } from '../../../utils/context';
 import { useK8sModel } from '../../../utils/k8s-models-hook';
+import { flowCaptureEditPath, flowCaptureNewPath, flowCapturePath, useNavigate, useParams } from '../../../utils/url';
 import '../forms.css';
 import { FlowCaptureResource } from './types';
 
@@ -272,7 +272,11 @@ export const FlowCaptureList: React.FC = () => {
                   return (
                     <Tr key={key}>
                       <Td>
-                        <Button variant="link" isInline onClick={() => navigate(flowCapturePath(name, captureNamespace))}>
+                        <Button
+                          variant="link"
+                          isInline
+                          onClick={() => navigate(flowCapturePath(name, captureNamespace))}
+                        >
                           {name}
                         </Button>
                       </Td>
@@ -353,7 +357,9 @@ export const FlowCaptureList: React.FC = () => {
         </ModalBody>
         <ModalFooter>
           <Button variant="danger" isLoading={deleting} isDisabled={deleting} onClick={deleteCompleted}>
-            {deleteTarget ? t('Delete FlowCapture') : t('Delete {{count}} captures', { count: completedCaptures.length })}
+            {deleteTarget
+              ? t('Delete FlowCapture')
+              : t('Delete {{count}} captures', { count: completedCaptures.length })}
           </Button>
           <Button variant="link" isDisabled={deleting} onClick={() => setDeleteModalOpen(false)}>
             {t('Cancel')}
