@@ -7,24 +7,24 @@ import { FieldSet } from '../dynamic-form/fields';
 import { FlowCaptureFilter } from './types';
 
 const fields: Array<{ key: keyof FlowCaptureFilter; label: string }> = [
-  { key: 'ip_cidr', label: 'IP CIDR' },
+  { key: 'cidr', label: 'IP CIDR' },
   { key: 'protocol', label: 'Protocol' },
-  { key: 'source_port', label: 'Source port' },
-  { key: 'destination_port', label: 'Destination port' },
+  { key: 'sourcePort', label: 'Source port' },
+  { key: 'destPort', label: 'Destination port' },
   { key: 'port', label: 'Port' },
-  { key: 'peer_ip', label: 'Peer IP' },
-  { key: 'peer_cidr', label: 'Peer CIDR' },
+  { key: 'peerIP', label: 'Peer IP' },
+  { key: 'peerCIDR', label: 'Peer CIDR' },
   { key: 'action', label: 'Action' },
-  { key: 'tcp_flags', label: 'TCP flags' }
+  { key: 'tcpFlags', label: 'TCP flags' }
 ];
 
 const directionalFields = new Set<keyof FlowCaptureFilter>([
-  'ip_cidr',
-  'source_port',
-  'destination_port',
+  'cidr',
+  'sourcePort',
+  'destPort',
   'port',
-  'peer_ip',
-  'peer_cidr'
+  'peerIP',
+  'peerCIDR'
 ]);
 
 type FlowCaptureFiltersProps = Pick<WidgetProps, 'id' | 'value' | 'onChange' | 'disabled' | 'readonly'>;
@@ -115,13 +115,19 @@ const FlowCaptureFiltersEditor: React.FC<FlowCaptureFiltersProps> = ({
                 <FormSelect
                   aria-label={t('Filter direction')}
                   isDisabled={isReadOnly}
-                  value={filter.direction || ''}
+                  value={
+                    filter.direction === 'ingress'
+                      ? 'Ingress'
+                      : filter.direction === 'egress'
+                        ? 'Egress'
+                        : filter.direction || ''
+                  }
                   data-test={`flowcapture-filter-direction-${index}`}
                   onChange={(_event, next) => update(index, { direction: next || undefined })}
                 >
                   <FormSelectOption value="" label={t('Any direction')} />
-                  <FormSelectOption value="ingress" label={t('Ingress')} />
-                  <FormSelectOption value="egress" label={t('Egress')} />
+                  <FormSelectOption value="Ingress" label={t('Ingress')} />
+                  <FormSelectOption value="Egress" label={t('Egress')} />
                 </FormSelect>
               ) : (
                 <span className="flowcapture-filter-direction-placeholder" aria-hidden="true" />

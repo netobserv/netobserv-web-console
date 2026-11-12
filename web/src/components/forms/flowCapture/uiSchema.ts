@@ -25,10 +25,11 @@ const rawFlowCaptureUISchema: UiSchema = {
       'ui:description': 'Select the optional eBPF features to enable for this capture.',
       'ui:dependency': { controlFieldPath: ['outputType'], controlFieldValue: ['flows', 'metrics'] }
     },
-    getSubnets: {
-      'ui:title': 'Get subnets',
+    subnetLabels: {
+      'ui:title': 'Subnet labels',
       'ui:description':
-        'Detect and label machine, pod, and service CIDRs on captured flows. This is currently supported on OpenShift clusters.',
+        'Detect and label machine, pod, and service CIDRs on captured flows.',
+      autoDetect: { 'ui:title': 'Automatically detect subnets' },
       'ui:dependency': { controlFieldPath: ['outputType'], controlFieldValue: ['flows', 'metrics'] }
     },
     tlsPlaintext: {
@@ -77,32 +78,32 @@ const rawFlowCaptureUISchema: UiSchema = {
         'Add agent-side filters to limit which traffic is captured. Multiple filters are combined by the agent.',
       items: {
         direction: { 'ui:title': 'Direction' },
-        ip_cidr: { 'ui:title': 'IP CIDR' },
+        cidr: { 'ui:title': 'IP CIDR' },
         protocol: { 'ui:title': 'Protocol' },
-        source_port: { 'ui:title': 'Source port' },
-        destination_port: { 'ui:title': 'Destination port' },
+        sourcePort: { 'ui:title': 'Source port' },
+        destPort: { 'ui:title': 'Destination port' },
         port: { 'ui:title': 'Port' },
-        source_port_range: { 'ui:title': 'Source port range' },
-        destination_port_range: { 'ui:title': 'Destination port range' },
-        peer_ip: { 'ui:title': 'Peer IP' },
-        peer_cidr: { 'ui:title': 'Peer CIDR' },
+        sourcePortRange: { 'ui:title': 'Source port range' },
+        destPortRange: { 'ui:title': 'Destination port range' },
+        peerIP: { 'ui:title': 'Peer IP' },
+        peerCIDR: { 'ui:title': 'Peer CIDR' },
         action: { 'ui:title': 'Action' },
-        drops: { 'ui:title': 'Dropped packets only' },
-        sample: { 'ui:title': 'Sample' },
+        pktDrops: { 'ui:title': 'Dropped packets only' },
+        sampling: { 'ui:title': 'Sampling' },
         'ui:order': [
           'direction',
-          'ip_cidr',
+          'cidr',
           'protocol',
-          'source_port',
-          'destination_port',
+          'sourcePort',
+          'destPort',
           'port',
-          'source_port_range',
-          'destination_port_range',
-          'peer_ip',
-          'peer_cidr',
+          'sourcePortRange',
+          'destPortRange',
+          'peerIP',
+          'peerCIDR',
           'action',
-          'drops',
-          'sample',
+          'pktDrops',
+          'sampling',
           '*'
         ]
       }
@@ -135,7 +136,7 @@ const rawFlowCaptureUISchema: UiSchema = {
     'ui:order': [
       'outputType',
       'features',
-      'getSubnets',
+      'subnetLabels',
       'tlsPlaintext',
       'maxTime',
       'maxBytes',
