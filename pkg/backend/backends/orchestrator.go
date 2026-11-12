@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"sync/atomic"
+	"sync"
 
 	"github.com/netobserv/network-observability-console-plugin/pkg/backend"
 	"github.com/netobserv/network-observability-console-plugin/pkg/backend/loki"
@@ -55,6 +55,19 @@ func filterBackends[T named](backends []T, ds constants.DataSource) ([]T, error)
 	return nil, apierrors.NewDatasourceDisabledError(fmt.Sprintf("cannot perform query: %s datasource is not configured", ds))
 }
 
+type failure struct {
+	once sync.Once
+	code int
+	err  error
+}
+
+func (f *failure) recordOnce(code int, err error) {
+	f.once.Do(func() {
+		f.code = code
+		f.err = err
+	})
+}
+
 func (o *Orchestrator) Flows(ctx context.Context, bctx *backend.QueryContext, q *FullFlowsParams) (*model.AggregatedQueryResponse, int, error) {
 	backends, err := filterBackends(o.flowsBackends, bctx.DataSource)
 	if err != nil {
@@ -72,7 +85,7 @@ func (o *Orchestrator) Flows(ctx context.Context, bctx *backend.QueryContext, q 
 
 	g, ctx := errgroup.WithContext(ctx)
 	sm := merger.NewStreamMerger(q.Limit)
-	var code atomic.Int32
+	var f failure
 
 	for _, filters := range q.FilterGroups {
 		subQ := q.FlowParams
@@ -81,11 +94,11 @@ func (o *Orchestrator) Flows(ctx context.Context, bctx *backend.QueryContext, q 
 		g.Go(func() error {
 			qr, c, err := back.Flows(ctx, bctx, &subQ)
 			if err != nil {
-				code.CompareAndSwap(0, int32(c))
+				f.recordOnce(c, err)
 				return err
 			}
 			if _, err := sm.Add(qr, back.Name()); err != nil {
-				code.CompareAndSwap(0, int32(http.StatusInternalServerError))
+				f.recordOnce(http.StatusInternalServerError, err)
 				return err
 			}
 			return nil
@@ -93,7 +106,10 @@ func (o *Orchestrator) Flows(ctx context.Context, bctx *backend.QueryContext, q 
 	}
 
 	if err := g.Wait(); err != nil {
-		return nil, int(code.Load()), err
+		if f.err != nil {
+			return nil, f.code, f.err
+		}
+		return nil, http.StatusInternalServerError, err
 	}
 
 	qresp := sm.Get()
@@ -114,7 +130,7 @@ func (o *Orchestrator) Metrics(ctx context.Context, bctx *backend.QueryContext, 
 
 	g, ctx := errgroup.WithContext(ctx)
 	mm := merger.NewMatrixMerger(q.Top)
-	var code atomic.Int32
+	var f failure
 
 	for _, filters := range q.FilterGroups {
 		subQ := q.MetricsParams
@@ -123,11 +139,11 @@ func (o *Orchestrator) Metrics(ctx context.Context, bctx *backend.QueryContext, 
 		g.Go(func() error {
 			qr, c, err := o.singleCallMetrics(ctx, bctx, &subQ, backends)
 			if err != nil {
-				code.CompareAndSwap(0, int32(c))
+				f.recordOnce(c, err)
 				return err
 			}
 			if _, err := mm.Merge(qr); err != nil {
-				code.CompareAndSwap(0, int32(http.StatusInternalServerError))
+				f.recordOnce(http.StatusInternalServerError, err)
 				return err
 			}
 			return nil
@@ -135,7 +151,10 @@ func (o *Orchestrator) Metrics(ctx context.Context, bctx *backend.QueryContext, 
 	}
 
 	if err := g.Wait(); err != nil {
-		return nil, int(code.Load()), err
+		if f.err != nil {
+			return nil, f.code, f.err
+		}
+		return nil, http.StatusInternalServerError, err
 	}
 
 	qresp := mm.Get()
