@@ -1,6 +1,7 @@
 import { UiSchema } from '@rjsf/utils';
+import { TFunction } from 'i18next';
 
-export const flowCaptureUISchema: UiSchema = {
+const rawFlowCaptureUISchema: UiSchema = {
   'ui:title': 'FlowCapture',
   'ui:flat': 'true',
   metadata: {
@@ -149,3 +150,17 @@ export const flowCaptureUISchema: UiSchema = {
   },
   'ui:order': ['metadata', 'spec', '*']
 };
+
+const translatedUISchema = (schema: unknown, t: TFunction, key?: string): unknown => {
+  if (typeof schema === 'string' && ['ui:title', 'ui:description', 'ui:placeholder', 'text'].includes(key || '')) {
+    return t(schema);
+  }
+  if (Array.isArray(schema)) return schema.map(value => translatedUISchema(value, t));
+  if (!schema || typeof schema !== 'object') return schema;
+  return Object.fromEntries(
+    Object.entries(schema).map(([entryKey, value]) => [entryKey, translatedUISchema(value, t, entryKey)])
+  );
+};
+
+export const flowCaptureUISchema = (t: TFunction): UiSchema =>
+  translatedUISchema(rawFlowCaptureUISchema, t) as UiSchema;

@@ -274,7 +274,7 @@ export function mockK8SResource(
           }
           break;
         case 'FlowCapture':
-          setResource({
+          const flowCapture = {
             apiVersion: 'flows.netobserv.io/v1alpha1',
             kind: 'FlowCapture',
             metadata: { name: req.name || 'flowcapture-sample', namespace: req.namespace || 'default' },
@@ -293,7 +293,8 @@ export function mockK8SResource(
                 }
               ]
             }
-          });
+          };
+          setResource(req.isList ? [flowCapture] : flowCapture);
           break;
         case 'PrometheusRule':
           if (req.isList) {

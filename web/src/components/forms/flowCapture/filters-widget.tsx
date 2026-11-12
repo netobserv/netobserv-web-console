@@ -27,12 +27,6 @@ const directionalFields = new Set<keyof FlowCaptureFilter>([
   'peer_cidr'
 ]);
 
-const clearFilterFields = (filter: FlowCaptureFilter): FlowCaptureFilter => {
-  const cleared = { ...filter };
-  fields.forEach(field => delete cleared[field.key]);
-  return cleared;
-};
-
 type FlowCaptureFiltersProps = Pick<WidgetProps, 'id' | 'value' | 'onChange' | 'disabled' | 'readonly'>;
 
 const FlowCaptureFiltersEditor: React.FC<FlowCaptureFiltersProps> = ({
@@ -74,6 +68,7 @@ const FlowCaptureFiltersEditor: React.FC<FlowCaptureFiltersProps> = ({
                 type="button"
                 variant="link"
                 isDisabled={isReadOnly}
+                data-test={`flowcapture-filter-remove-${index}`}
                 onClick={() =>
                   onChange(
                     filters.filter((_, i) => i !== index),
@@ -90,9 +85,14 @@ const FlowCaptureFiltersEditor: React.FC<FlowCaptureFiltersProps> = ({
                 aria-label={t('Filter field')}
                 isDisabled={isReadOnly}
                 value={selected?.key || ''}
+                data-test={`flowcapture-filter-field-${index}`}
                 onChange={(_event, next) => {
-                  const reset = clearFilterFields(filter);
-                  update(index, { ...reset, direction: undefined, ...(next ? { [next]: '' } : {}) });
+                  const replacement = next ? ({ [next]: '' } as FlowCaptureFilter) : {};
+                  onChange(
+                    filters.map((current, i) => (i === index ? replacement : current)),
+                    undefined,
+                    id
+                  );
                 }}
               >
                 <FormSelectOption value="" label={t('Select a field')} />
@@ -104,6 +104,7 @@ const FlowCaptureFiltersEditor: React.FC<FlowCaptureFiltersProps> = ({
                 aria-label={t('Filter value')}
                 isDisabled={isReadOnly}
                 value={String(selectedValue ?? '')}
+                data-test={`flowcapture-filter-value-${index}`}
                 onChange={(_event, next) => {
                   if (selected) {
                     update(index, { [selected.key]: selected.key.includes('port') ? Number(next) : next });
@@ -115,6 +116,7 @@ const FlowCaptureFiltersEditor: React.FC<FlowCaptureFiltersProps> = ({
                   aria-label={t('Filter direction')}
                   isDisabled={isReadOnly}
                   value={filter.direction || ''}
+                  data-test={`flowcapture-filter-direction-${index}`}
                   onChange={(_event, next) => update(index, { direction: next || undefined })}
                 >
                   <FormSelectOption value="" label={t('Any direction')} />
@@ -134,6 +136,7 @@ const FlowCaptureFiltersEditor: React.FC<FlowCaptureFiltersProps> = ({
           type="button"
           variant="link"
           isDisabled={isReadOnly}
+          data-test="flowcapture-filter-add"
           onClick={() => onChange([...filters, {}], undefined, id)}
         >
           {t('Add filter')}

@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 
@@ -105,7 +106,7 @@ func (h *Handlers) DownloadFlowCaptureOutput(_ context.Context) func(w http.Resp
 				Container: container,
 				// A running capture may not have created its output directory yet. In
 				// that case return an empty, valid archive instead of failing the exec.
-				Command: []string{"sh", "-c", fmt.Sprintf("if [ -d %s ]; then exec tar -C %s -cf - .; fi", flowCaptureOutputDirectory, flowCaptureOutputDirectory)},
+				Command: []string{"sh", "-c", fmt.Sprintf("if [ -d %s ]; then exec tar -C %s -cf - .; else exec tar -cf - --files-from /dev/null; fi", flowCaptureOutputDirectory, flowCaptureOutputDirectory)},
 				Stdout:  true,
 				Stderr:  true,
 			}, scheme.ParameterCodec)
@@ -116,16 +117,41 @@ func (h *Handlers) DownloadFlowCaptureOutput(_ context.Context) func(w http.Resp
 		}
 
 		var stderr bytes.Buffer
+		reader, writer := io.Pipe()
+		streamErr := make(chan error, 1)
+		go func() {
+			streamErr <- executor.StreamWithContext(r.Context(), remotecommand.StreamOptions{Stdout: writer, Stderr: &stderr})
+			_ = writer.Close()
+		}()
+
+		firstChunk := make([]byte, 32*1024)
+		firstSize, readErr := reader.Read(firstChunk)
+		if firstSize == 0 && readErr != nil {
+			streamErrValue := <-streamErr
+			if streamErrValue == nil {
+				streamErrValue = readErr
+			}
+			apierrors.Write(w, http.StatusInternalServerError, streamErrValue)
+			return
+		}
+
 		w.Header().Set("Content-Type", "application/gzip")
 		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s-output.tar.gz\"", safeFlowCaptureFilename(name)))
 		w.WriteHeader(http.StatusOK)
 		gzipWriter := gzip.NewWriter(w)
-		err = executor.StreamWithContext(r.Context(), remotecommand.StreamOptions{
-			Stdout: gzipWriter,
-			Stderr: &stderr,
-		})
+		if _, err = gzipWriter.Write(firstChunk[:firstSize]); err != nil {
+			_ = reader.Close()
+			return
+		}
+		if readErr != io.EOF {
+			_, err = io.Copy(gzipWriter, reader)
+		}
+		streamErrValue := <-streamErr
 		closeErr := gzipWriter.Close()
-		if err != nil {
+		if err != nil || streamErrValue != nil {
+			if err == nil {
+				err = streamErrValue
+			}
 			hlog.WithError(err).WithField("flowcapture", namespace+"/"+name).Error("failed to download FlowCapture output")
 			return
 		}

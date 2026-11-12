@@ -208,6 +208,9 @@ export const App: React.FunctionComponent<{ endUser?: boolean }> = ({ endUser })
             return <Route path={`/console-${page.id}`} key={page.id} element={page.content} />;
           })}
           <Route path="/console-flow-capture/~new" element={<FlowCaptureForm />} />
+          <Route path="/console-flow-capture/:namespace/:name/edit" element={<FlowCaptureForm />} />
+          <Route path="/console-flow-capture/:namespace/:name/yaml" element={<FlowCaptureForm />} />
+          <Route path="/console-flow-capture/:namespace/:name" element={<FlowCaptureStatus />} />
           <Route path="/console-flow-capture/:name/edit" element={<FlowCaptureForm />} />
           <Route path="/console-flow-capture/:name/yaml" element={<FlowCaptureForm />} />
           <Route path="/console-flow-capture/:name" element={<FlowCaptureStatus />} />

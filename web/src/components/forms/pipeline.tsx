@@ -268,13 +268,13 @@ export const Pipeline: React.FC<FlowCollectorPipelineProps> = ({
       }
       if (processorStatus) {
         steps.push({
-          id: 'collector',
+          id: 'processor',
           label: replicaLabel(processorStatus, t('Collector')),
           runAfterTasks: steps.length ? ['agent'] : [],
           data: {
             status: stateToRunStatus(processorStatus),
-            selected: selectedTypes.includes('collector'),
-            onSelect: () => setSelectedTypes(['collector'])
+            selected: selectedTypes.includes('processor'),
+            onSelect: () => setSelectedTypes(['processor'])
           }
         });
       }

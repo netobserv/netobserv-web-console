@@ -29,8 +29,20 @@ export const NodeSelectorEditor: React.FC<NodeSelectorEditorProps> = ({
   const [rows, setRows] = React.useState<NodeSelectorRow[]>(() =>
     Object.entries(selector).map(([key, entryValue]) => ({ key, value: entryValue }))
   );
+  const selfCommittedRows = React.useRef<NodeSelectorRow[] | undefined>();
 
   React.useEffect(() => {
+    if (selfCommittedRows.current) {
+      const committed: NodeSelector = {};
+      selfCommittedRows.current.forEach(row => {
+        if (row.key.trim()) committed[row.key.trim()] = row.value;
+      });
+      if (JSON.stringify(committed) === serializedSelector) {
+        selfCommittedRows.current = undefined;
+        return;
+      }
+      selfCommittedRows.current = undefined;
+    }
     setRows(
       Object.entries(JSON.parse(serializedSelector) as NodeSelector).map(([key, entryValue]) => ({
         key,
@@ -44,6 +56,7 @@ export const NodeSelectorEditor: React.FC<NodeSelectorEditorProps> = ({
     nextRows.forEach(row => {
       if (row.key.trim()) next[row.key.trim()] = row.value;
     });
+    selfCommittedRows.current = nextRows;
     onChange(next);
   };
 
@@ -65,6 +78,7 @@ export const NodeSelectorEditor: React.FC<NodeSelectorEditorProps> = ({
               type="button"
               variant="link"
               isDisabled={isReadOnly}
+              data-test={`flowcapture-node-selector-remove-${index}`}
               onClick={() => {
                 const nextRows = rows.filter((_, rowIndex) => rowIndex !== index);
                 setRows(nextRows);
@@ -79,6 +93,7 @@ export const NodeSelectorEditor: React.FC<NodeSelectorEditorProps> = ({
               aria-label={t('Node selector key')}
               placeholder={t('Label key')}
               value={row.key}
+              data-test={`flowcapture-node-selector-key-${index}`}
               isDisabled={isReadOnly}
               onChange={(_event, next) => updateEntry(index, next, row.value)}
             />
@@ -86,6 +101,7 @@ export const NodeSelectorEditor: React.FC<NodeSelectorEditorProps> = ({
               aria-label={t('Node selector value')}
               placeholder={t('Label value')}
               value={row.value}
+              data-test={`flowcapture-node-selector-value-${index}`}
               isDisabled={isReadOnly}
               onChange={(_event, next) => updateEntry(index, row.key, next)}
             />
@@ -98,6 +114,7 @@ export const NodeSelectorEditor: React.FC<NodeSelectorEditorProps> = ({
           type="button"
           variant="link"
           isDisabled={isReadOnly}
+          data-test="flowcapture-node-selector-add"
           onClick={() => setRows(previous => [...previous, { key: '', value: '' }])}
         >
           {t('Add selector')}

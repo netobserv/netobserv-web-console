@@ -58,12 +58,17 @@ export const FlowCaptureForm: FC<FlowCaptureFormProps> = ({ name, initialData, s
       namespace={params.namespace || 'default'}
       initialData={initialWithDefaults}
       onSuccess={created =>
-        navigate(flowCapturePath(created?.metadata?.name || params.name || name || '', params.namespace))
+        navigate(
+          flowCapturePath(
+            created?.metadata?.name || params.name || name || '',
+            created?.metadata?.namespace || params.namespace
+          )
+        )
       }
       defaultFrom="CRD"
     >
       <ResourceForm
-        uiSchema={flowCaptureUISchema}
+        uiSchema={flowCaptureUISchema(t)}
         createTitle={
           flowCaptureSource === 'filters'
             ? t('Create FlowCapture from filters')
