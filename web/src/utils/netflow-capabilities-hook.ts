@@ -271,7 +271,7 @@ export function useConfigCapabilities(params: {
 
   const flowQuery = React.useMemo((): StructuredFlowQuery => {
     const query: StructuredFlowQuery = {
-      namespace: forcedNamespace,
+      tenant: forcedNamespace,
       structuredFilters: getEnabledFilters(forcedFilters || filters),
       limit: limitValues.includes(limit) ? limit : limitValues[0],
       recordType: recordType,
