@@ -27,8 +27,7 @@ const rawFlowCaptureUISchema: UiSchema = {
     },
     subnetLabels: {
       'ui:title': 'Subnet labels',
-      'ui:description':
-        'Detect and label machine, pod, and service CIDRs on captured flows.',
+      'ui:description': 'Detect and label machine, pod, and service CIDRs on captured flows.',
       autoDetect: { 'ui:title': 'Automatically detect subnets' },
       'ui:dependency': { controlFieldPath: ['outputType'], controlFieldValue: ['flows', 'metrics'] }
     },
