@@ -202,7 +202,7 @@ export const FlowCaptureStatus: React.FC = () => {
           <Title headingLevel="h3" size="md">
             {t('Capture progress')} <Badge isRead>{phase}</Badge>
           </Title>
-          {capture.status?.reason === 'CaptureConflict' && (
+          {(capture.status?.reason === 'CaptureConflict' || capture.status?.reason === 'CaptureConcurrencyLimit') && (
             <Alert variant={AlertVariant.warning} isInline title={t('Maximum concurrent captures reached')}>
               {capture.status.message ||
                 t('Another FlowCapture is still active. It must finish before this capture can start.')}

@@ -40,6 +40,9 @@ export const FlowCaptureForm: FC<FlowCaptureFormProps> = ({ name, initialData, s
     if (formData?.spec?.outputType === 'packets' && !formData.spec.filters?.length) {
       errors.spec?.filters?.addError(t('Packet captures require at least one eBPF filter.'));
     }
+    if (formData?.spec?.queries?.some(query => !query.trim())) {
+      errors.spec?.queries?.addError(t('FlowCapture queries cannot be empty.'));
+    }
     return errors;
   };
   const initialWithDefaults: FlowCaptureResource = {

@@ -55,7 +55,8 @@ export const ResourceForm: FC<ResourceFormProps> = ({
               ...transformed,
               spec: {
                 ...(transformed?.spec || {}),
-                filters: transformed?.spec?.filters || []
+                filters: transformed?.spec?.filters || [],
+                queries: transformed?.spec?.queries || []
               }
             };
             const errorHandler = customValidate(transformed, createErrorHandler(validationData));
