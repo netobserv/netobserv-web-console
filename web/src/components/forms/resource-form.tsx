@@ -48,6 +48,27 @@ export const ResourceForm: FC<ResourceFormProps> = ({
   return (
     <Consumer>
       {ctx => {
+        const submit = (candidate: any) => {
+          const transformed = transformData ? transformData(candidate) : candidate;
+          if (customValidate) {
+            const validationErrors = customValidate(transformed, {} as any) as any;
+            const messages: string[] = [];
+            const collectErrors = (schema: any) => {
+              if (Array.isArray(schema?.__errors)) messages.push(...schema.__errors);
+              Object.keys(schema || {})
+                .filter(key => key !== '__errors')
+                .forEach(key => collectErrors(schema[key]));
+            };
+            collectErrors(validationErrors);
+            if (messages.length > 0) {
+              ctx.setErrors(messages);
+              return;
+            }
+          }
+          ctx.setErrors([]);
+          discard.clearDirty();
+          ctx.onSubmit(transformed);
+        };
         // first init data when watch resource query got results
         if (data == null) {
           setData(ctx.data);
@@ -73,10 +94,7 @@ export const ResourceForm: FC<ResourceFormProps> = ({
                 isUpdate={ctx.isUpdate}
                 onReload={() => setData(ctx.data)}
                 onChange={setViewType}
-                onSubmit={() => {
-                  discard.clearDirty();
-                  ctx.onSubmit(transformData ? transformData(data) : data);
-                }}
+                onSubmit={() => submit(data)}
                 onCancel={() => discard.requestClose(() => window.history.back())}
                 onDelete={() => setDeleteModalOpen(true)}
                 customChild={
@@ -109,8 +127,7 @@ export const ResourceForm: FC<ResourceFormProps> = ({
                         const updatedData = safeYAMLToJS(content);
                         const transformedData = transformData ? transformData(updatedData) : updatedData;
                         setData(transformedData);
-                        discard.clearDirty();
-                        ctx.onSubmit(transformedData);
+                        submit(updatedData);
                       }}
                     />
                     <>{ctx.errors.length > 0 && <ErrorTemplate errors={ctx.errors} />}</>

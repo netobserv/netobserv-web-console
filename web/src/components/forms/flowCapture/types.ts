@@ -61,6 +61,32 @@ const cleanFilterValue = (input: string): string => {
   return value.length > 1 && value.startsWith('"') && value.endsWith('"') ? value.slice(1, -1) : value;
 };
 
+const normalizeDirection = (direction?: string): 'Ingress' | 'Egress' | undefined => {
+  switch (String(direction || '').toLowerCase()) {
+    case '0':
+    case 'ingress':
+      return 'Ingress';
+    case '1':
+    case 'egress':
+      return 'Egress';
+    default:
+      return undefined;
+  }
+};
+
+const normalizeProtocol = (protocol: string): string => {
+  const cleaned = cleanFilterValue(protocol);
+  const names: { [key: string]: string } = { '1': 'ICMP', '6': 'TCP', '17': 'UDP', '58': 'ICMPv6' };
+  return names[cleaned] || cleaned;
+};
+
+const normalizeAddress = (address: string): string | undefined => {
+  const cleaned = cleanFilterValue(address);
+  if (!cleaned || cleaned.includes('-')) return undefined;
+  if (cleaned.includes('/')) return cleaned;
+  return `${cleaned}/${cleaned.includes(':') ? 128 : 32}`;
+};
+
 const flowlogsQueryOperators = (expression: string): string => {
   let result = '';
   let quoted = false;
@@ -103,16 +129,52 @@ const agentFilterIds = new Set([
   'dst_port',
   'icmp_type',
   'icmp_code',
-  'tcp_flags',
-  'pkt_drop_state'
+  'tcp_flags'
 ]);
+
+const agentRuleKey = (id: string): string | undefined => {
+  const keys: { [key: string]: string } = {
+    address: 'ip_cidr',
+    src_address: 'ip_cidr',
+    dst_address: 'ip_cidr',
+    protocol: 'protocol',
+    direction: 'direction',
+    port: 'port',
+    src_port: 'source_port',
+    dst_port: 'destination_port',
+    icmp_type: 'icmp_type',
+    icmp_code: 'icmp_code',
+    tcp_flags: 'tcp_flags'
+  };
+  return keys[id];
+};
+
+const hasConflictingAgentRules = (filters: Filters): boolean => {
+  const keys = new Set<string>();
+  return filters.list
+    .filter(filter => filter.compare === FilterCompare.equal && agentFilterIds.has(filter.def.id))
+    .some(filter => {
+      const key = agentRuleKey(filter.def.id);
+      const values = filter.values.filter(value => !value.disabled);
+      if (!key || values.length !== 1 || keys.has(key)) return true;
+      keys.add(key);
+      return false;
+    });
+};
 
 /** Converts active console filters to a Flowlogs-Pipeline keep-entry query. */
 export const queryFromFilters = (filters: Filters): string | undefined => {
-  const expressions = filters.list
+  const allExpressions = filters.list.map(filterQueryExpression).filter((query): query is string => Boolean(query));
+  const agentExpressions = filters.list
     .filter(filter => filter.compare !== FilterCompare.equal || !agentFilterIds.has(filter.def.id))
     .map(filterQueryExpression)
     .filter((query): query is string => Boolean(query));
+  // For match:any, retaining the complete expression is required when an
+  // agent-side clause is mixed with a pipeline-side clause.
+  const expressions =
+    filters.match === 'any' || (filters.match === 'all' && hasConflictingAgentRules(filters))
+      ? allExpressions
+      : agentExpressions;
   if (expressions.length === 0) return undefined;
   return expressions.length === 1
     ? expressions[0]
@@ -135,7 +197,12 @@ const addNodeSelector = (capture: FlowCaptureResource, hosts: Array<string | und
 
 const addTopologyPeer = (filters: FlowCaptureFilter[], peer: NodeData['peer'] | undefined, direction?: string) => {
   if (peer?.addr) {
-    filters.push({ ip_cidr: `${peer.addr}/32`, ...(direction ? { direction } : {}) });
+    const address = normalizeAddress(peer.addr);
+    if (address)
+      filters.push({
+        ip_cidr: address,
+        ...(normalizeDirection(direction) ? { direction: normalizeDirection(direction) } : {})
+      });
   }
 };
 
@@ -270,9 +337,15 @@ export const captureFromRecord = (record: Record): FlowCaptureResource => {
   const src = value(record, 'SrcAddr');
   const dst = value(record, 'DstAddr');
   const proto = value(record, 'Proto');
-  if (src) filters.push({ ip_cidr: `${src}/32`, direction: 'ingress' });
-  if (dst) filters.push({ ip_cidr: `${dst}/32`, direction: 'egress' });
-  if (proto) filters.push({ protocol: proto });
+  if (src) {
+    const address = normalizeAddress(src);
+    if (address) filters.push({ ip_cidr: address, direction: 'Ingress' });
+  }
+  if (dst) {
+    const address = normalizeAddress(dst);
+    if (address) filters.push({ ip_cidr: address, direction: 'Egress' });
+  }
+  if (proto) filters.push({ protocol: normalizeProtocol(proto) });
   if (fields.SrcPort) filters.push({ source_port: fields.SrcPort });
   if (fields.DstPort) filters.push({ destination_port: fields.DstPort });
   const query = queryFromRecord(record);
@@ -302,17 +375,35 @@ export const captureFromFilters = (filters: Filters): FlowCaptureResource => {
     spec: { outputType: 'flows', filters: [], ...(query ? { queries: [query] } : {}) }
   };
   const captureFilters = capture.spec!.filters!;
-  const add = (filter: Filters['list'][number], key: keyof FlowCaptureFilter, direction?: string) => {
+  const add = (
+    filter: Filters['list'][number],
+    key: keyof FlowCaptureFilter,
+    direction?: string,
+    transform: (input: string) => string = cleanFilterValue
+  ) => {
     filter.values
       .filter(value => !value.disabled)
       .forEach(value => {
-        const cleaned = cleanFilterValue(value.v);
+        const cleaned = transform(value.v);
         if (!cleaned) return;
         const numeric = ['port', 'source_port', 'destination_port', 'icmp_type', 'icmp_code', 'sample'].includes(key);
         captureFilters.push({
           [key]: numeric ? Number(cleaned) : cleaned,
-          ...(direction ? { direction } : {})
+          ...(normalizeDirection(direction) ? { direction: normalizeDirection(direction) } : {})
         } as FlowCaptureFilter);
+      });
+  };
+  const addAddress = (filter: Filters['list'][number], direction?: string) => {
+    filter.values
+      .filter(value => !value.disabled)
+      .forEach(value => {
+        const address = normalizeAddress(value.v);
+        if (address) {
+          captureFilters.push({
+            ip_cidr: address,
+            ...(normalizeDirection(direction) ? { direction: normalizeDirection(direction) } : {})
+          });
+        }
       });
   };
 
@@ -321,16 +412,16 @@ export const captureFromFilters = (filters: Filters): FlowCaptureResource => {
     .forEach(filter => {
       switch (filter.def.id) {
         case 'address':
-          add(filter, 'ip_cidr');
+          addAddress(filter);
           break;
         case 'src_address':
-          add(filter, 'ip_cidr', 'ingress');
+          addAddress(filter, 'Ingress');
           break;
         case 'dst_address':
-          add(filter, 'ip_cidr', 'egress');
+          addAddress(filter, 'Egress');
           break;
         case 'protocol':
-          add(filter, 'protocol');
+          add(filter, 'protocol', undefined, normalizeProtocol);
           break;
         case 'direction':
           add(filter, 'direction');
@@ -354,12 +445,21 @@ export const captureFromFilters = (filters: Filters): FlowCaptureResource => {
           add(filter, 'tcp_flags');
           break;
         case 'pkt_drop_state':
-          add(filter, 'action');
           break;
         default:
           break;
       }
     });
+
+  if (filters.match === 'all' && captureFilters.length > 1) {
+    const combined = captureFilters.reduce<FlowCaptureFilter | undefined>((result, rule) => {
+      if (!result) return { ...rule };
+      const conflicts = Object.keys(rule).some(key => result[key as keyof FlowCaptureFilter] !== undefined);
+      return conflicts ? undefined : { ...result, ...rule };
+    }, undefined);
+    captureFilters.splice(0, captureFilters.length);
+    if (combined) captureFilters.push(combined);
+  }
 
   return capture;
 };

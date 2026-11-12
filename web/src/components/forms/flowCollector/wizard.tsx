@@ -169,6 +169,8 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
               const setupData = _.cloneDeep(ctx.data) as any;
               setupData.metadata = { ...(setupData.metadata ?? {}), name: setupData.metadata?.name || 'cluster' };
               setupData.spec = { ...(setupData.spec ?? {}) };
+              setupData.spec.loki = { ...(setupData.spec.loki ?? {}) };
+              setupData.spec.loki.mode = setupData.spec.loki.mode || 'LokiStack';
               setupData.spec.deploymentModel = setupData.spec.deploymentModel || 'Service';
               setupData.spec.agent = { ...(setupData.spec.agent ?? {}), type: setupData.spec.agent?.type || 'eBPF' };
               setupData.spec.agent.ebpf = { ...(setupData.spec.agent.ebpf ?? {}) };

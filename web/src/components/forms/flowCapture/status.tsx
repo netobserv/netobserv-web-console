@@ -182,7 +182,12 @@ export const FlowCaptureStatus: React.FC = () => {
     <PageSection ref={pageFillRef} hasBodyWrapper={false} id="pageSection" className="flowcapture-status-page">
       <div id="pageHeader">
         <div className="flowcapture-detail-breadcrumb">
-          <Button variant="link" isInline onClick={() => navigate(flowCaptureListPath(namespace))}>
+          <Button
+            variant="link"
+            isInline
+            data-test="flowcapture-back-to-list"
+            onClick={() => navigate(flowCaptureListPath(namespace))}
+          >
             {t('FlowCaptures')}
           </Button>
           <span aria-hidden="true"> / </span>
@@ -221,6 +226,7 @@ export const FlowCaptureStatus: React.FC = () => {
                         component="a"
                         size="sm"
                         variant="secondary"
+                        data-test="flowcapture-download-output"
                         href={canDownloadOutput ? getFlowCaptureOutputURL(namespace, name!) : undefined}
                         download={canDownloadOutput ? true : undefined}
                         isDisabled={!canDownloadOutput}
@@ -277,17 +283,25 @@ export const FlowCaptureStatus: React.FC = () => {
         <FlexItem className="flowcapture-detail-actions-container">
           <Flex className="flowcapture-detail-actions" spaceItems={{ default: 'spaceItemsSm' }}>
             <FlexItem>
-              <Button variant="primary" onClick={() => navigate(flowCaptureEditPath(name!, namespace))}>
+              <Button
+                variant="primary"
+                data-test="flowcapture-edit"
+                onClick={() => navigate(flowCaptureEditPath(name!, namespace))}
+              >
                 {t('Edit FlowCapture')}
               </Button>
             </FlexItem>
             <FlexItem>
-              <Button variant="secondary" onClick={() => navigate(flowCaptureYamlPath(name!, namespace))}>
+              <Button
+                variant="secondary"
+                data-test="flowcapture-yaml"
+                onClick={() => navigate(flowCaptureYamlPath(name!, namespace))}
+              >
                 {t('YAML view')}
               </Button>
             </FlexItem>
             <FlexItem>
-              <Button variant="danger" onClick={() => setDeleteModalOpen(true)}>
+              <Button variant="danger" data-test="flowcapture-delete" onClick={() => setDeleteModalOpen(true)}>
                 {t('Delete FlowCapture')}
               </Button>
             </FlexItem>

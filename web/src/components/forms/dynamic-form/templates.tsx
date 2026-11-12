@@ -99,7 +99,7 @@ export const ObjectFieldTemplate: React.FC<ObjectFieldTemplateProps> = props => 
               idSchema={idSchema}
               required={false}
               schema={schema}
-              uiSchema={uiSchema}
+              uiSchema={{ ...uiSchema, 'ui:title': t('Filters') }}
             >
               {autofilled && (
                 <Alert

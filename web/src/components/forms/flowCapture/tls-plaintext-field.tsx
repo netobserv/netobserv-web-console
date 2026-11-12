@@ -56,6 +56,7 @@ export const TLSPlaintextField: React.FC<FieldProps> = props => {
       >
         <Switch
           id={`${props.idSchema.$id}-enabled`}
+          data-test={`${props.idSchema.$id}-switch`}
           isChecked={enabled}
           isDisabled={props.disabled || props.readonly}
           label={t('True')}

@@ -186,6 +186,7 @@ export const FlowCaptureList: React.FC = () => {
               <Button
                 variant="danger"
                 isDisabled={!completedCaptures.length || deleting}
+                data-test="flowcapture-delete-completed"
                 onClick={() => {
                   setDeleteTarget(undefined);
                   setDeleteModalOpen(true);
@@ -193,7 +194,7 @@ export const FlowCaptureList: React.FC = () => {
               >
                 {t('Delete completed captures')}
               </Button>
-              <Button variant="primary" onClick={() => navigate(flowCaptureNewPath())}>
+              <Button variant="primary" data-test="flowcapture-create" onClick={() => navigate(flowCaptureNewPath())}>
                 {t('Create FlowCapture')}
               </Button>
             </Flex>
@@ -217,6 +218,7 @@ export const FlowCaptureList: React.FC = () => {
                 key={phase}
                 variant={phaseFilter === phase ? 'primary' : 'secondary'}
                 size="sm"
+                data-test={`flowcapture-phase-filter-${phase.toLowerCase()}`}
                 onClick={() => setPhaseFilter(phase)}
               >
                 {phase === 'All' ? t('All') : t(phase)}
@@ -230,6 +232,7 @@ export const FlowCaptureList: React.FC = () => {
                 key={output}
                 variant={outputFilter === output ? 'primary' : 'secondary'}
                 size="sm"
+                data-test={`flowcapture-output-filter-${output.toLowerCase()}`}
                 onClick={() => setOutputFilter(output)}
               >
                 {output === 'All' ? t('All') : output}
@@ -270,11 +273,12 @@ export const FlowCaptureList: React.FC = () => {
                   const collector = collectorByCapture.get(key);
                   const details = String(capture.status?.message || capture.status?.reason || '-');
                   return (
-                    <Tr key={key}>
+                    <Tr key={key} data-test={`flowcapture-row-${name}`}>
                       <Td>
                         <Button
                           variant="link"
                           isInline
+                          data-test={`flowcapture-view-${name}`}
                           onClick={() => navigate(flowCapturePath(name, captureNamespace))}
                         >
                           {name}
@@ -308,20 +312,28 @@ export const FlowCaptureList: React.FC = () => {
                               ref={toggleRef}
                               variant="plain"
                               aria-label={t('Actions')}
+                              data-test={`flowcapture-actions-${name}`}
                               icon={<EllipsisVIcon />}
                               isExpanded={openActionMenu === key}
                               onClick={() => setOpenActionMenu(openActionMenu === key ? undefined : key)}
                             />
                           )}
                         >
-                          <DropdownItem onClick={() => navigate(flowCapturePath(name, captureNamespace))}>
+                          <DropdownItem
+                            data-test={`flowcapture-action-view-${name}`}
+                            onClick={() => navigate(flowCapturePath(name, captureNamespace))}
+                          >
                             {t('View')}
                           </DropdownItem>
-                          <DropdownItem onClick={() => navigate(flowCaptureEditPath(name, captureNamespace))}>
+                          <DropdownItem
+                            data-test={`flowcapture-action-edit-${name}`}
+                            onClick={() => navigate(flowCaptureEditPath(name, captureNamespace))}
+                          >
                             {t('Edit')}
                           </DropdownItem>
                           <DropdownItem
                             isDanger
+                            data-test={`flowcapture-action-delete-${name}`}
                             onClick={() => {
                               setDeleteTarget(capture);
                               setDeleteModalOpen(true);
