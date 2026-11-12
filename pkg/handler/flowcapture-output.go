@@ -131,9 +131,11 @@ func (h *Handlers) DownloadFlowCaptureOutput(_ context.Context) func(w http.Resp
 func streamFlowCaptureOutput(w http.ResponseWriter, r *http.Request, executor remotecommand.Executor, name, namespace string) (bool, error) {
 	var stderr bytes.Buffer
 	reader, writer := io.Pipe()
+	streamContext, cancel := context.WithCancel(r.Context())
+	defer cancel()
 	streamErr := make(chan error, 1)
 	go func() {
-		streamErr <- executor.StreamWithContext(r.Context(), remotecommand.StreamOptions{Stdout: writer, Stderr: &stderr})
+		streamErr <- executor.StreamWithContext(streamContext, remotecommand.StreamOptions{Stdout: writer, Stderr: &stderr})
 		_ = writer.Close()
 	}()
 
@@ -153,17 +155,23 @@ func streamFlowCaptureOutput(w http.ResponseWriter, r *http.Request, executor re
 	gzipWriter := gzip.NewWriter(w)
 	if _, err := gzipWriter.Write(firstChunk[:firstSize]); err != nil {
 		_ = reader.Close()
+		cancel()
+		<-streamErr
 		return true, err
 	}
 	var copyErr error
 	if !errors.Is(readErr, io.EOF) {
 		_, copyErr = io.Copy(gzipWriter, reader)
 	}
-	streamErrValue := <-streamErr
-	closeErr := gzipWriter.Close()
 	if copyErr != nil {
+		_ = reader.CloseWithError(copyErr)
+		cancel()
+		<-streamErr
+		_ = gzipWriter.Close()
 		return true, copyErr
 	}
+	streamErrValue := <-streamErr
+	closeErr := gzipWriter.Close()
 	if streamErrValue != nil {
 		return true, streamErrValue
 	}

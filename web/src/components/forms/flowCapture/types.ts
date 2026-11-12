@@ -2,6 +2,7 @@ import { K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
 import { Record } from '../../../api/ipfix';
 import { Filter, FilterCompare, Filters } from '../../../model/filters';
 import { NodeData } from '../../../model/topology';
+import { getPort } from '../../../utils/port';
 import { HealthItem, HealthStat, HealthSuperKind } from '../../health/health-helper';
 
 export type FlowCaptureOutput = 'flows' | 'packets' | 'metrics';
@@ -111,11 +112,33 @@ const flowlogsPipelineExpression = (expression: string): string => {
   return normalized.replace(
     /([A-Za-z_][A-Za-z0-9_]*)(!~|!=|>=|=|~)(\"[^\"]*\"|[^()\s]+)/g,
     (_match, field: string, operator: string, rawValue: string) => {
-      const flpOperator = operator === '~' ? '=~' : operator === '!~' ? '!=~' : operator;
-      const value = rawValue.startsWith('"') ? rawValue : JSON.stringify(rawValue);
+      const flpOperator = operator === '~' ? '=~' : operator;
+      const value = /^-?(?:\d+(?:\.\d*)?|\.\d+)$/.test(rawValue)
+        ? rawValue
+        : rawValue.startsWith('"')
+          ? rawValue
+          : JSON.stringify(rawValue);
       return `${field}${flpOperator}${value}`;
     }
   );
+};
+
+const addressQueryFields: { [key: string]: string[] } = {
+  address: ['SrcAddr', 'DstAddr'],
+  src_address: ['SrcAddr'],
+  dst_address: ['DstAddr']
+};
+
+const addressRegex = (value: string): string | undefined => {
+  const address = normalizeAddress(value);
+  if (!address) return undefined;
+  const [ip, prefix] = address.split('/');
+  const prefixLength = Number(prefix);
+  if (ip.includes(':') || prefixLength === 32) return `^${ip.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`;
+  const octets = ip.split('.');
+  const fixedOctets = Math.floor(prefixLength / 8);
+  if (prefixLength % 8 !== 0 || fixedOctets === 0) return undefined;
+  return `^${octets.slice(0, fixedOctets).join('\\.')}(?:\\.[0-9]{1,3}){${4 - fixedOctets}}$`;
 };
 
 const filterQueryExpression = (filter: Filter): string | undefined => {
@@ -123,6 +146,15 @@ const filterQueryExpression = (filter: Filter): string | undefined => {
   if (values.length === 0) return undefined;
 
   const expressions = values.map(value => {
+    const fields = addressQueryFields[filter.def.id];
+    const regex = fields && addressRegex(value.v);
+    if (regex) {
+      const operator =
+        filter.compare === FilterCompare.notEqual || filter.compare === FilterCompare.notMatch ? '!~' : '=~';
+      return fields
+        .map(field => `${field}${operator}${JSON.stringify(regex)}`)
+        .join(operator === '!~' ? ' AND ' : ' OR ');
+    }
     const expression = flowlogsPipelineExpression(filter.def.encoder([value], filter.compare, false));
     return expression.includes(' OR ') || expression.includes(' AND ') ? `(${expression})` : expression;
   });
@@ -406,6 +438,7 @@ export const captureFromFilters = (filters: Filters): FlowCaptureResource => {
         const cleaned = transform(value.v);
         if (!cleaned) return;
         const numeric = ['port', 'sourcePort', 'destPort', 'icmpType', 'icmpCode', 'sampling'].includes(key);
+        if (numeric && Number.isNaN(Number(cleaned))) return;
         captureFilters.push({
           [key]: numeric ? Number(cleaned) : cleaned,
           ...(normalizeDirection(direction) ? { direction: normalizeDirection(direction) } : {})
@@ -449,10 +482,10 @@ export const captureFromFilters = (filters: Filters): FlowCaptureResource => {
           add(filter, 'port');
           break;
         case 'src_port':
-          add(filter, 'sourcePort');
+          add(filter, 'sourcePort', undefined, value => getPort(cleanFilterValue(value)) || cleanFilterValue(value));
           break;
         case 'dst_port':
-          add(filter, 'destPort');
+          add(filter, 'destPort', undefined, value => getPort(cleanFilterValue(value)) || cleanFilterValue(value));
           break;
         case 'icmp_type':
           add(filter, 'icmpType');
@@ -472,13 +505,16 @@ export const captureFromFilters = (filters: Filters): FlowCaptureResource => {
 
   let forcePipelineQuery = false;
   if (filters.match === 'all' && captureFilters.length > 1) {
+    let hasConflict = false;
     const combined = captureFilters.reduce<FlowCaptureFilter | undefined>((result, rule) => {
+      if (hasConflict) return undefined;
       if (!result) return { ...rule };
       const conflicts = Object.keys(rule).some(key => result[key as keyof FlowCaptureFilter] !== undefined);
+      if (conflicts) hasConflict = true;
       return conflicts ? undefined : { ...result, ...rule };
     }, undefined);
     captureFilters.splice(0, captureFilters.length);
-    if (combined) captureFilters.push(combined);
+    if (combined && !hasConflict) captureFilters.push(combined);
     else forcePipelineQuery = true;
   }
 

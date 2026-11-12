@@ -123,17 +123,17 @@ export const flowCaptureListPath = (namespace = 'default') =>
 
 export const flowCapturePath = (name: string, namespace = 'default') =>
   ContextSingleton.isStandalone()
-    ? `/console-flow-capture/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}`
+    ? `/console-flow-capture/namespace/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}`
     : `/k8s/ns/${encodeURIComponent(namespace)}/flows.netobserv.io~v1alpha1~FlowCapture/${encodeURIComponent(name)}`;
 
 export const flowCaptureEditPath = (name: string, namespace = 'default') =>
   ContextSingleton.isStandalone()
-    ? `/console-flow-capture/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}/edit`
+    ? `/console-flow-capture/namespace/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}/edit`
     : `/k8s/ns/${encodeURIComponent(namespace)}/flows.netobserv.io~v1alpha1~FlowCapture/${encodeURIComponent(name)}/edit`;
 
 export const flowCaptureYamlPath = (name: string, namespace = 'default') =>
   ContextSingleton.isStandalone()
-    ? `/console-flow-capture/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}/yaml`
+    ? `/console-flow-capture/namespace/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}/yaml`
     : `/k8s/ns/${encodeURIComponent(namespace)}/flows.netobserv.io~v1alpha1~FlowCapture/${encodeURIComponent(name)}/yaml`;
 
 // React-router query argument (not backend routes)
