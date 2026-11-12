@@ -107,7 +107,15 @@ const FlowCaptureFiltersEditor: React.FC<FlowCaptureFiltersProps> = ({
                 data-test={`flowcapture-filter-value-${index}`}
                 onChange={(_event, next) => {
                   if (selected) {
-                    update(index, { [selected.key]: selected.key.includes('port') ? Number(next) : next });
+                    const numericField = new Set<keyof FlowCaptureFilter>([
+                      'sourcePort',
+                      'destPort',
+                      'port',
+                      'icmpType',
+                      'icmpCode',
+                      'sampling'
+                    ]);
+                    update(index, { [selected.key]: numericField.has(selected.key) ? Number(next) : next });
                   }
                 }}
               />
