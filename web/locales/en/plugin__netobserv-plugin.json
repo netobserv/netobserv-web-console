@@ -225,6 +225,7 @@
   "Any direction": "Any direction",
   "Add filter": "Add filter",
   "Packet captures require at least one eBPF filter.": "Packet captures require at least one eBPF filter.",
+  "FlowCapture queries cannot be empty.": "FlowCapture queries cannot be empty.",
   "Create FlowCapture from filters": "Create FlowCapture from filters",
   "Create FlowCapture from selected flow": "Create FlowCapture from selected flow",
   "Create FlowCapture from topology": "Create FlowCapture from topology",
