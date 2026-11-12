@@ -49,16 +49,16 @@ export const flowCaptureSchema: RJSFSchema | any = {
           items: {
             type: 'object',
             properties: {
-              direction: { type: 'string', enum: ['ingress', 'egress'] },
-              ip_cidr: { type: 'string' },
+              direction: { type: 'string', enum: ['Ingress', 'Egress'] },
+              cidr: { type: 'string' },
               protocol: { type: 'string' },
-              source_port: { type: 'integer' },
-              destination_port: { type: 'integer' },
+              sourcePort: { type: 'integer' },
+              destPort: { type: 'integer' },
               port: { type: 'integer' },
-              peer_ip: { type: 'string' },
-              peer_cidr: { type: 'string' },
+              peerIP: { type: 'string' },
+              peerCIDR: { type: 'string' },
               action: { type: 'string' },
-              tcp_flags: { type: 'string' }
+              tcpFlags: { type: 'string' }
             }
           }
         },
@@ -66,7 +66,10 @@ export const flowCaptureSchema: RJSFSchema | any = {
           type: 'array',
           items: { type: 'string' }
         },
-        getSubnets: { type: 'boolean' },
+        subnetLabels: {
+          type: 'object',
+          properties: { autoDetect: { type: 'boolean' } }
+        },
         tlsPlaintext: {
           type: 'object',
           properties: {

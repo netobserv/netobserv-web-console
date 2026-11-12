@@ -18,25 +18,25 @@ export type FlowCaptureFeature =
 
 export type FlowCaptureFilter = {
   direction?: string;
-  ip_cidr?: string;
+  cidr?: string;
   protocol?: string;
-  source_port?: number;
-  destination_port?: number;
+  sourcePort?: number;
+  destPort?: number;
   port?: number;
-  source_port_range?: string;
-  source_ports?: string;
-  destination_port_range?: string;
-  destination_ports?: string;
-  port_range?: string;
+  sourcePortRange?: string;
+  sourcePorts?: string;
+  destPortRange?: string;
+  destPorts?: string;
+  portRange?: string;
   ports?: string;
-  icmp_type?: number;
-  icmp_code?: number;
-  peer_ip?: string;
-  peer_cidr?: string;
+  icmpType?: number;
+  icmpCode?: number;
+  peerIP?: string;
+  peerCIDR?: string;
   action?: string;
-  tcp_flags?: string;
-  drops?: boolean;
-  sample?: number;
+  tcpFlags?: string;
+  pktDrops?: boolean;
+  sampling?: number;
 };
 
 export type FlowCaptureResource = K8sResourceKind & {
@@ -45,7 +45,7 @@ export type FlowCaptureResource = K8sResourceKind & {
     features?: FlowCaptureFeature[];
     filters?: FlowCaptureFilter[];
     queries?: string[];
-    getSubnets?: boolean;
+    subnetLabels?: { autoDetect?: boolean };
     interfaces?: string[];
     [key: string]: unknown;
   };
@@ -106,12 +106,24 @@ const flowlogsQueryOperators = (expression: string): string => {
   return result;
 };
 
+const flowlogsPipelineExpression = (expression: string): string => {
+  const normalized = flowlogsQueryOperators(expression);
+  return normalized.replace(
+    /([A-Za-z_][A-Za-z0-9_]*)(!~|!=|>=|=|~)(\"[^\"]*\"|[^()\s]+)/g,
+    (_match, field: string, operator: string, rawValue: string) => {
+      const flpOperator = operator === '~' ? '=~' : operator === '!~' ? '!=~' : operator;
+      const value = rawValue.startsWith('"') ? rawValue : JSON.stringify(rawValue);
+      return `${field}${flpOperator}${value}`;
+    }
+  );
+};
+
 const filterQueryExpression = (filter: Filter): string | undefined => {
   const values = filter.values.filter(value => !value.disabled);
   if (values.length === 0) return undefined;
 
   const expressions = values.map(value => {
-    const expression = flowlogsQueryOperators(filter.def.encoder([value], filter.compare, false));
+    const expression = flowlogsPipelineExpression(filter.def.encoder([value], filter.compare, false));
     return expression.includes(' OR ') || expression.includes(' AND ') ? `(${expression})` : expression;
   });
   const joiner = [FilterCompare.notEqual, FilterCompare.notMatch].includes(filter.compare) ? ' AND ' : ' OR ';
@@ -134,17 +146,17 @@ const agentFilterIds = new Set([
 
 const agentRuleKey = (id: string): string | undefined => {
   const keys: { [key: string]: string } = {
-    address: 'ip_cidr',
-    src_address: 'ip_cidr',
-    dst_address: 'ip_cidr',
+    address: 'cidr',
+    src_address: 'cidr',
+    dst_address: 'cidr',
     protocol: 'protocol',
     direction: 'direction',
     port: 'port',
-    src_port: 'source_port',
-    dst_port: 'destination_port',
-    icmp_type: 'icmp_type',
-    icmp_code: 'icmp_code',
-    tcp_flags: 'tcp_flags'
+    src_port: 'sourcePort',
+    dst_port: 'destPort',
+    icmp_type: 'icmpType',
+    icmp_code: 'icmpCode',
+    tcp_flags: 'tcpFlags'
   };
   return keys[id];
 };
@@ -162,8 +174,16 @@ const hasConflictingAgentRules = (filters: Filters): boolean => {
     });
 };
 
+const hasMixedAgentAndPipelineFilters = (filters: Filters): boolean => {
+  const enabled = filters.list.filter(filter => filter.values.some(value => !value.disabled));
+  return (
+    enabled.some(filter => filter.compare === FilterCompare.equal && agentFilterIds.has(filter.def.id)) &&
+    enabled.some(filter => filter.compare !== FilterCompare.equal || !agentFilterIds.has(filter.def.id))
+  );
+};
+
 /** Converts active console filters to a Flowlogs-Pipeline keep-entry query. */
-export const queryFromFilters = (filters: Filters): string | undefined => {
+export const queryFromFilters = (filters: Filters, includeAgentFilters = false): string | undefined => {
   const allExpressions = filters.list.map(filterQueryExpression).filter((query): query is string => Boolean(query));
   const agentExpressions = filters.list
     .filter(filter => filter.compare !== FilterCompare.equal || !agentFilterIds.has(filter.def.id))
@@ -172,7 +192,7 @@ export const queryFromFilters = (filters: Filters): string | undefined => {
   // For match:any, retaining the complete expression is required when an
   // agent-side clause is mixed with a pipeline-side clause.
   const expressions =
-    filters.match === 'any' || (filters.match === 'all' && hasConflictingAgentRules(filters))
+    includeAgentFilters || filters.match === 'any' || (filters.match === 'all' && hasConflictingAgentRules(filters))
       ? allExpressions
       : agentExpressions;
   if (expressions.length === 0) return undefined;
@@ -200,7 +220,7 @@ const addTopologyPeer = (filters: FlowCaptureFilter[], peer: NodeData['peer'] | 
     const address = normalizeAddress(peer.addr);
     if (address)
       filters.push({
-        ip_cidr: address,
+        cidr: address,
         ...(normalizeDirection(direction) ? { direction: normalizeDirection(direction) } : {})
       });
   }
@@ -337,17 +357,16 @@ export const captureFromRecord = (record: Record): FlowCaptureResource => {
   const src = value(record, 'SrcAddr');
   const dst = value(record, 'DstAddr');
   const proto = value(record, 'Proto');
-  if (src) {
-    const address = normalizeAddress(src);
-    if (address) filters.push({ ip_cidr: address, direction: 'Ingress' });
-  }
-  if (dst) {
-    const address = normalizeAddress(dst);
-    if (address) filters.push({ ip_cidr: address, direction: 'Egress' });
-  }
-  if (proto) filters.push({ protocol: normalizeProtocol(proto) });
-  if (fields.SrcPort) filters.push({ source_port: fields.SrcPort });
-  if (fields.DstPort) filters.push({ destination_port: fields.DstPort });
+  const flowRule: FlowCaptureFilter = {
+    ...(proto ? { protocol: normalizeProtocol(proto) } : {}),
+    ...(fields.SrcPort ? { sourcePort: fields.SrcPort } : {}),
+    ...(fields.DstPort ? { destPort: fields.DstPort } : {})
+  };
+  const srcAddress = src && normalizeAddress(src);
+  const dstAddress = dst && normalizeAddress(dst);
+  if (srcAddress) filters.push({ ...flowRule, cidr: srcAddress, direction: 'Ingress' });
+  if (dstAddress) filters.push({ ...flowRule, cidr: dstAddress, direction: 'Egress' });
+  if (!srcAddress && !dstAddress && Object.keys(flowRule).length > 0) filters.push(flowRule);
   const query = queryFromRecord(record);
   const interfaces = fields.Interfaces ?? record.labels.Interfaces;
   const capture: FlowCaptureResource = {
@@ -367,14 +386,14 @@ export const captureFromRecord = (record: Record): FlowCaptureResource => {
 
 /** Converts the active console filters into the FlowCapture agent vocabulary. */
 export const captureFromFilters = (filters: Filters): FlowCaptureResource => {
-  const query = queryFromFilters(filters);
   const capture: FlowCaptureResource = {
     apiVersion: 'flows.netobserv.io/v1alpha1',
     kind: 'FlowCapture',
     metadata: { name: `flowcapture-${Date.now()}` },
-    spec: { outputType: 'flows', filters: [], ...(query ? { queries: [query] } : {}) }
+    spec: { outputType: 'flows', filters: [] }
   };
   const captureFilters = capture.spec!.filters!;
+  const skipAgentFilters = filters.match === 'any' && hasMixedAgentAndPipelineFilters(filters);
   const add = (
     filter: Filters['list'][number],
     key: keyof FlowCaptureFilter,
@@ -386,7 +405,7 @@ export const captureFromFilters = (filters: Filters): FlowCaptureResource => {
       .forEach(value => {
         const cleaned = transform(value.v);
         if (!cleaned) return;
-        const numeric = ['port', 'source_port', 'destination_port', 'icmp_type', 'icmp_code', 'sample'].includes(key);
+        const numeric = ['port', 'sourcePort', 'destPort', 'icmpType', 'icmpCode', 'sampling'].includes(key);
         captureFilters.push({
           [key]: numeric ? Number(cleaned) : cleaned,
           ...(normalizeDirection(direction) ? { direction: normalizeDirection(direction) } : {})
@@ -400,7 +419,7 @@ export const captureFromFilters = (filters: Filters): FlowCaptureResource => {
         const address = normalizeAddress(value.v);
         if (address) {
           captureFilters.push({
-            ip_cidr: address,
+            cidr: address,
             ...(normalizeDirection(direction) ? { direction: normalizeDirection(direction) } : {})
           });
         }
@@ -408,7 +427,7 @@ export const captureFromFilters = (filters: Filters): FlowCaptureResource => {
   };
 
   filters.list
-    .filter(filter => filter.compare === FilterCompare.equal)
+    .filter(filter => !skipAgentFilters && filter.compare === FilterCompare.equal)
     .forEach(filter => {
       switch (filter.def.id) {
         case 'address':
@@ -430,19 +449,19 @@ export const captureFromFilters = (filters: Filters): FlowCaptureResource => {
           add(filter, 'port');
           break;
         case 'src_port':
-          add(filter, 'source_port');
+          add(filter, 'sourcePort');
           break;
         case 'dst_port':
-          add(filter, 'destination_port');
+          add(filter, 'destPort');
           break;
         case 'icmp_type':
-          add(filter, 'icmp_type');
+          add(filter, 'icmpType');
           break;
         case 'icmp_code':
-          add(filter, 'icmp_code');
+          add(filter, 'icmpCode');
           break;
         case 'tcp_flags':
-          add(filter, 'tcp_flags');
+          add(filter, 'tcpFlags');
           break;
         case 'pkt_drop_state':
           break;
@@ -451,6 +470,7 @@ export const captureFromFilters = (filters: Filters): FlowCaptureResource => {
       }
     });
 
+  let forcePipelineQuery = false;
   if (filters.match === 'all' && captureFilters.length > 1) {
     const combined = captureFilters.reduce<FlowCaptureFilter | undefined>((result, rule) => {
       if (!result) return { ...rule };
@@ -459,7 +479,12 @@ export const captureFromFilters = (filters: Filters): FlowCaptureResource => {
     }, undefined);
     captureFilters.splice(0, captureFilters.length);
     if (combined) captureFilters.push(combined);
+    else forcePipelineQuery = true;
   }
+
+  const query = queryFromFilters(filters);
+  const completeQuery = forcePipelineQuery ? queryFromFilters(filters, true) : query;
+  if (completeQuery) capture.spec = { ...capture.spec, queries: [completeQuery] };
 
   return capture;
 };

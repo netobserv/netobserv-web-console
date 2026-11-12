@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import { FormHelperText, PageSection, Title } from '@patternfly/react-core';
-import { CustomValidator, UiSchema } from '@rjsf/utils';
+import { createErrorHandler, CustomValidator, toErrorList, UiSchema, unwrapErrorHandler } from '@rjsf/utils';
 import _ from 'lodash';
 import React, { FC, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -51,15 +51,15 @@ export const ResourceForm: FC<ResourceFormProps> = ({
         const submit = (candidate: any) => {
           const transformed = transformData ? transformData(candidate) : candidate;
           if (customValidate) {
-            const validationErrors = customValidate(transformed, {} as any) as any;
-            const messages: string[] = [];
-            const collectErrors = (schema: any) => {
-              if (Array.isArray(schema?.__errors)) messages.push(...schema.__errors);
-              Object.keys(schema || {})
-                .filter(key => key !== '__errors')
-                .forEach(key => collectErrors(schema[key]));
+            const validationData = {
+              ...transformed,
+              spec: {
+                ...(transformed?.spec || {}),
+                filters: transformed?.spec?.filters || []
+              }
             };
-            collectErrors(validationErrors);
+            const errorHandler = customValidate(transformed, createErrorHandler(validationData));
+            const messages = toErrorList(unwrapErrorHandler(errorHandler)).map(error => error.stack);
             if (messages.length > 0) {
               ctx.setErrors(messages);
               return;
