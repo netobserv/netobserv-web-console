@@ -10,19 +10,35 @@ const fields: Array<{ key: keyof FlowCaptureFilter; label: string }> = [
   { key: 'cidr', label: 'IP CIDR' },
   { key: 'protocol', label: 'Protocol' },
   { key: 'sourcePort', label: 'Source port' },
+  { key: 'sourcePortRange', label: 'Source port range' },
+  { key: 'sourcePorts', label: 'Source ports' },
   { key: 'destPort', label: 'Destination port' },
+  { key: 'destPortRange', label: 'Destination port range' },
+  { key: 'destPorts', label: 'Destination ports' },
   { key: 'port', label: 'Port' },
+  { key: 'portRange', label: 'Port range' },
+  { key: 'ports', label: 'Ports' },
+  { key: 'icmpType', label: 'ICMP type' },
+  { key: 'icmpCode', label: 'ICMP code' },
   { key: 'peerIP', label: 'Peer IP' },
   { key: 'peerCIDR', label: 'Peer CIDR' },
   { key: 'action', label: 'Action' },
-  { key: 'tcpFlags', label: 'TCP flags' }
+  { key: 'tcpFlags', label: 'TCP flags' },
+  { key: 'pktDrops', label: 'Packet drops only' },
+  { key: 'sampling', label: 'Sampling' }
 ];
 
 const directionalFields = new Set<keyof FlowCaptureFilter>([
   'cidr',
   'sourcePort',
+  'sourcePortRange',
+  'sourcePorts',
   'destPort',
+  'destPortRange',
+  'destPorts',
   'port',
+  'portRange',
+  'ports',
   'peerIP',
   'peerCIDR'
 ]);
@@ -115,7 +131,12 @@ const FlowCaptureFiltersEditor: React.FC<FlowCaptureFiltersProps> = ({
                       'icmpCode',
                       'sampling'
                     ]);
-                    update(index, { [selected.key]: numericField.has(selected.key) ? Number(next) : next });
+                    const value = numericField.has(selected.key)
+                      ? Number(next)
+                      : selected.key === 'pktDrops'
+                        ? next.toLowerCase() === 'true'
+                        : next;
+                    update(index, { [selected.key]: value });
                   }
                 }}
               />

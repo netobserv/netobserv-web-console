@@ -43,11 +43,21 @@ export type FlowCaptureFilter = {
 export type FlowCaptureResource = K8sResourceKind & {
   spec?: {
     outputType?: FlowCaptureOutput;
+    maxTime?: string;
+    maxBytes?: number;
+    sampling?: number;
     features?: FlowCaptureFeature[];
     filters?: FlowCaptureFilter[];
     queries?: string[];
     subnetLabels?: { autoDetect?: boolean };
+    tlsPlaintext?: {
+      minBytes?: number;
+      previewBytes?: number;
+      processAllowlist?: string[];
+    };
     interfaces?: string[];
+    excludeInterfaces?: string[];
+    nodeSelector?: { [key: string]: string };
     [key: string]: unknown;
   };
 };
