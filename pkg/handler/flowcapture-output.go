@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -116,53 +117,63 @@ func (h *Handlers) DownloadFlowCaptureOutput(_ context.Context) func(w http.Resp
 			return
 		}
 
-		var stderr bytes.Buffer
-		reader, writer := io.Pipe()
-		streamErr := make(chan error, 1)
-		go func() {
-			streamErr <- executor.StreamWithContext(r.Context(), remotecommand.StreamOptions{Stdout: writer, Stderr: &stderr})
-			_ = writer.Close()
-		}()
-
-		firstChunk := make([]byte, 32*1024)
-		firstSize, readErr := reader.Read(firstChunk)
-		if firstSize == 0 && readErr != nil {
-			streamErrValue := <-streamErr
-			if streamErrValue == nil {
-				streamErrValue = readErr
+		committed, streamErr := streamFlowCaptureOutput(w, r, executor, name, namespace)
+		if streamErr != nil {
+			if !committed {
+				apierrors.Write(w, http.StatusInternalServerError, streamErr)
+				return
 			}
-			apierrors.Write(w, http.StatusInternalServerError, streamErrValue)
-			return
-		}
-
-		w.Header().Set("Content-Type", "application/gzip")
-		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s-output.tar.gz\"", safeFlowCaptureFilename(name)))
-		w.WriteHeader(http.StatusOK)
-		gzipWriter := gzip.NewWriter(w)
-		if _, err = gzipWriter.Write(firstChunk[:firstSize]); err != nil {
-			_ = reader.Close()
-			return
-		}
-		if readErr != io.EOF {
-			_, err = io.Copy(gzipWriter, reader)
-		}
-		streamErrValue := <-streamErr
-		closeErr := gzipWriter.Close()
-		if err != nil || streamErrValue != nil {
-			if err == nil {
-				err = streamErrValue
-			}
-			hlog.WithError(err).WithField("flowcapture", namespace+"/"+name).Error("failed to download FlowCapture output")
-			return
-		}
-		if closeErr != nil {
-			hlog.WithError(closeErr).WithField("flowcapture", namespace+"/"+name).Error("failed to finalize FlowCapture output download")
-			return
-		}
-		if stderr.Len() > 0 {
-			hlog.WithField("flowcapture", namespace+"/"+name).Warnf("collector output download reported: %s", strings.TrimSpace(stderr.String()))
+			hlog.WithError(streamErr).WithField("flowcapture", namespace+"/"+name).Error("failed to download FlowCapture output")
 		}
 	}
+}
+
+func streamFlowCaptureOutput(w http.ResponseWriter, r *http.Request, executor remotecommand.Executor, name, namespace string) (bool, error) {
+	var stderr bytes.Buffer
+	reader, writer := io.Pipe()
+	streamErr := make(chan error, 1)
+	go func() {
+		streamErr <- executor.StreamWithContext(r.Context(), remotecommand.StreamOptions{Stdout: writer, Stderr: &stderr})
+		_ = writer.Close()
+	}()
+
+	firstChunk := make([]byte, 32*1024)
+	firstSize, readErr := reader.Read(firstChunk)
+	if firstSize == 0 && readErr != nil {
+		streamErrValue := <-streamErr
+		if streamErrValue == nil {
+			streamErrValue = readErr
+		}
+		return false, streamErrValue
+	}
+
+	w.Header().Set("Content-Type", "application/gzip")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s-output.tar.gz\"", safeFlowCaptureFilename(name)))
+	w.WriteHeader(http.StatusOK)
+	gzipWriter := gzip.NewWriter(w)
+	if _, err := gzipWriter.Write(firstChunk[:firstSize]); err != nil {
+		_ = reader.Close()
+		return true, err
+	}
+	var copyErr error
+	if !errors.Is(readErr, io.EOF) {
+		_, copyErr = io.Copy(gzipWriter, reader)
+	}
+	streamErrValue := <-streamErr
+	closeErr := gzipWriter.Close()
+	if copyErr != nil {
+		return true, copyErr
+	}
+	if streamErrValue != nil {
+		return true, streamErrValue
+	}
+	if closeErr != nil {
+		return true, closeErr
+	}
+	if stderr.Len() > 0 {
+		hlog.WithField("flowcapture", namespace+"/"+name).Warnf("collector output download reported: %s", strings.TrimSpace(stderr.String()))
+	}
+	return true, nil
 }
 
 func selectFlowCaptureCollector(pods []corev1.Pod) *corev1.Pod {
