@@ -53,12 +53,22 @@ export const flowCaptureSchema: RJSFSchema | any = {
               cidr: { type: 'string' },
               protocol: { type: 'string' },
               sourcePort: { type: 'integer' },
+              sourcePortRange: { type: 'string' },
+              sourcePorts: { type: 'string' },
               destPort: { type: 'integer' },
+              destPortRange: { type: 'string' },
+              destPorts: { type: 'string' },
               port: { type: 'integer' },
+              portRange: { type: 'string' },
+              ports: { type: 'string' },
+              icmpType: { type: 'integer' },
+              icmpCode: { type: 'integer' },
               peerIP: { type: 'string' },
               peerCIDR: { type: 'string' },
               action: { type: 'string' },
-              tcpFlags: { type: 'string' }
+              tcpFlags: { type: 'string' },
+              pktDrops: { type: 'boolean' },
+              sampling: { type: 'integer' }
             }
           }
         },
