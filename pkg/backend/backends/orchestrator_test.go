@@ -136,12 +136,23 @@ func TestGetMetrics(t *testing.T) {
 		metricsBackends    []backend.MetricsBackend
 		bctx               backend.QueryContext
 		params             FullMetricsParams
+		useMocks           bool
 		expectedDatasource []constants.DataSource
 		expectedNumQueries int
 		expectedMetrics    []string
 		expectedError      string
 		expectedCode       int
 	}{
+		{
+			// The frontend keys off "mock" to clamp chart ranges to the (outdated) mock timestamps.
+			// Without it, it normalizes datapoints from the mock dates up to "now" and freezes.
+			name:               "Mock console mode flags the response as mocked",
+			metricsBackends:    []backend.MetricsBackend{&fakeMetricBackend{name: "fmb1"}},
+			params:             FullMetricsParams{FilterGroups: filters.MultiQueries{nil}},
+			useMocks:           true,
+			expectedDatasource: []constants.DataSource{"fmb1", constants.DataSourceMock},
+			expectedNumQueries: 1,
+		},
 		{
 			name:               "Valid backends, empty filter, empty context",
 			flowsBackends:      []backend.FlowsBackend{&fakeLogBackend{name: "flb1"}},
@@ -250,7 +261,7 @@ func TestGetMetrics(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			o := Orchestrator{flowsBackends: tc.flowsBackends, metricsBackends: tc.metricsBackends}
+			o := Orchestrator{flowsBackends: tc.flowsBackends, metricsBackends: tc.metricsBackends, useMocks: tc.useMocks}
 			metrics, code, err := o.Metrics(context.Background(), &tc.bctx, &tc.params)
 			if tc.expectedError != "" {
 				assert.ErrorContains(t, err, tc.expectedError)
