@@ -73,6 +73,12 @@ button.borderless-accordion {
   overflow-y: auto !important;
 }
 
+#pf-tab-section-proxy-drawer-tabs {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
 h4.record-field-title,
 button.record-field-title-popover-button {
   color: inherit !important;
