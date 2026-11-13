@@ -451,19 +451,141 @@ const getEdgeStyle = (count: number) => {
   return count ? EdgeStyle.dashed : EdgeStyle.dotted;
 };
 
+const getEdgeMetricFunction = (options: TopologyOptions): MetricFunction => {
+  if (
+    options.metricFunction !== 'sum' &&
+    ['Bytes', 'Packets', 'PktDropBytes', 'PktDropPackets'].includes(options.metricType)
+  ) {
+    return 'rate';
+  }
+  return options.metricFunction as MetricFunction;
+};
+
 const getEdgeTag = (value: number, options: TopologyOptions, t: TFunction) => {
   if (options.edgeTags && value) {
-    let metricFunction = options.metricFunction as MetricFunction;
-    if (
-      options.metricFunction !== 'sum' &&
-      ['Bytes', 'Packets', 'PktDropBytes', 'PktDropPackets'].includes(options.metricType)
-    ) {
-      metricFunction = 'rate';
-    }
-    return getFormattedValue(value, options.metricType, metricFunction, t);
+    return getFormattedValue(value, options.metricType, getEdgeMetricFunction(options), t);
   }
   return undefined;
 };
+
+const compactEdgeTagValue = (value: string) => value.replace(/^(-?[\d.,]+)\s+(\S.*)$/, '$1$2');
+
+const getDirectionalEdgeTags = (
+  forwardValue: number | undefined,
+  reverseValue: number | undefined,
+  totalValue: number,
+  options: TopologyOptions,
+  t: TFunction
+): { tag?: string; tagParts?: { value: string; className?: string; dx?: number }[] } => {
+  if (!options.edgeTags || !totalValue) {
+    return {};
+  }
+  const metricFunction = getEdgeMetricFunction(options);
+  const forwardLabel = forwardValue
+    ? compactEdgeTagValue(getFormattedValue(forwardValue, options.metricType, metricFunction, t))
+    : undefined;
+  const reverseLabel = reverseValue
+    ? compactEdgeTagValue(getFormattedValue(reverseValue, options.metricType, metricFunction, t))
+    : undefined;
+  if (forwardLabel && reverseLabel) {
+    return {
+      tag: `${forwardLabel} ${reverseLabel}`,
+      tagParts: [
+        { value: forwardLabel, className: 'netobserv-topology-edge-tag__value--forward' },
+        { value: reverseLabel, className: 'netobserv-topology-edge-tag__value--reverse', dx: 8 }
+      ]
+    };
+  }
+  if (forwardLabel) {
+    return {
+      tag: forwardLabel,
+      tagParts: [{ value: forwardLabel, className: 'netobserv-topology-edge-tag__value--forward' }]
+    };
+  }
+  if (reverseLabel) {
+    return {
+      tag: reverseLabel,
+      tagParts: [{ value: reverseLabel, className: 'netobserv-topology-edge-tag__value--reverse' }]
+    };
+  }
+  return { tag: getEdgeTag(totalValue, options, t) };
+};
+
+const getParentByNodeId = (nodes: NodeModel[] | undefined): Map<string, string> => {
+  const parentByNodeId = new Map<string, string>();
+  nodes?.forEach(node => {
+    node.children?.forEach(child => parentByNodeId.set(child, node.id));
+  });
+  return parentByNodeId;
+};
+
+const isSelfOrDescendantOf = (
+  nodeId: string | undefined,
+  ancestorId: string | undefined,
+  parentByNodeId: Map<string, string>
+) => {
+  let current = nodeId;
+  while (current) {
+    if (current === ancestorId) {
+      return true;
+    }
+    current = parentByNodeId.get(current);
+  }
+  return false;
+};
+
+const getLeafEndpointForAggregate = (
+  endpointId: string | undefined,
+  aggregateSource: string | undefined,
+  aggregateTarget: string | undefined,
+  parentByNodeId: Map<string, string>
+) => {
+  if (isSelfOrDescendantOf(endpointId, aggregateSource, parentByNodeId)) {
+    return aggregateSource;
+  }
+  if (isSelfOrDescendantOf(endpointId, aggregateTarget, parentByNodeId)) {
+    return aggregateTarget;
+  }
+  return endpointId;
+};
+
+const getAggregateDirectionalBps = (
+  aggregate: EdgeModel,
+  leaves: EdgeModel[],
+  parentByNodeId: Map<string, string>
+): { forwardBps: number; reverseBps: number } =>
+  leaves.reduce(
+    (totals, leaf) => {
+      const leafSource = leaf.data?.sourceId || leaf.source;
+      const leafTarget = leaf.data?.targetId || leaf.target;
+      const remappedSource = getLeafEndpointForAggregate(
+        leafSource,
+        aggregate.source,
+        aggregate.target,
+        parentByNodeId
+      );
+      const remappedTarget = getLeafEndpointForAggregate(
+        leafTarget,
+        aggregate.source,
+        aggregate.target,
+        parentByNodeId
+      );
+      const leafForwardBps = leaf.data?.forwardBps ?? leaf.data?.bps ?? 0;
+      const leafReverseBps = leaf.data?.reverseBps ?? 0;
+
+      if (remappedSource === aggregate.target && remappedTarget === aggregate.source) {
+        return {
+          forwardBps: totals.forwardBps + leafReverseBps,
+          reverseBps: totals.reverseBps + leafForwardBps
+        };
+      }
+      return {
+        forwardBps: totals.forwardBps + leafForwardBps,
+        reverseBps: totals.reverseBps + leafReverseBps
+      };
+    },
+    { forwardBps: 0, reverseBps: 0 }
+  );
 
 /**
  * After structural aggregation, copy/sum leaf NetObserv metrics onto aggregate segments.
@@ -473,8 +595,10 @@ export const applyAggregateEdgeData = (
   edges: EdgeModel[],
   options: TopologyOptions,
   highlightedId: string,
-  t: TFunction
+  t: TFunction,
+  nodes?: NodeModel[]
 ): EdgeModel[] => {
+  const parentByNodeId = getParentByNodeId(nodes);
   const byId = new Map(edges.map(e => [e.id, e]));
 
   edges.forEach(edge => {
@@ -517,6 +641,8 @@ export const applyAggregateEdgeData = (
         highlighted,
         isDark,
         tag: undefined,
+        forwardTag: undefined,
+        reverseTag: undefined,
         tagStatus: NodeStatus.default,
         tagTlsSecure: undefined,
         tagTlsLockSeverity: undefined,
@@ -531,6 +657,7 @@ export const applyAggregateEdgeData = (
 
     // Bridge (or collapse-only aggregate): sum metrics and TLS from leaves.
     const bps = leaves.reduce((sum, l) => sum + (l.data?.bps || 0), 0);
+    const { forwardBps, reverseBps } = getAggregateDirectionalBps(edge, leaves, parentByNodeId);
     const drops = leaves.reduce((sum, l) => sum + (l.data?.drops || 0), 0);
     const tls = tlsPanelFromLabelArrays(
       leaves.flatMap(l => l.data?.tlsVersionLabels || []),
@@ -543,7 +670,8 @@ export const applyAggregateEdgeData = (
       !tls?.tagTlsSecure &&
       bps > 0 &&
       leaves.some(l => l.data?.tagTlsCleartext);
-    const bidirectional = Boolean(edge.data?.bidirectional);
+    const bidirectional = reverseBps > 0;
+    const tags = getDirectionalEdgeTags(forwardBps, reverseBps, bps, options, t);
 
     edge.edgeStyle = getEdgeStyle(bps);
     edge.animationSpeed = getAnimationSpeed(bps, options.maxEdgeStat);
@@ -554,8 +682,13 @@ export const applyAggregateEdgeData = (
       highlighted,
       isDark,
       bps,
+      forwardBps,
+      reverseBps,
       drops,
-      tag: getEdgeTag(bps, options, t),
+      tag: tags.tag,
+      tagParts: tags.tagParts,
+      forwardTag: undefined,
+      reverseTag: undefined,
       tagStatus: getTagStatus(bps, options.maxEdgeStat),
       startTerminalType: bidirectional ? EdgeTerminalType.directional : EdgeTerminalType.none,
       startTerminalStatus: NodeStatus.default,
@@ -591,7 +724,7 @@ export const maybeAggregateEdges = (
     groupEdges: true,
     collapsedGroups: true
   });
-  const withData = applyAggregateEdgeData(aggregated, options, highlightedId, t);
+  const withData = applyAggregateEdgeData(aggregated, options, highlightedId, t, nodes);
   // Drop hidden leaf edges after metrics are copied onto aggregates. Leaving them in the
   // model forces Cola layout to simulate every invisible link and inflates element count.
   return withData.filter(e => e.visible !== false);
@@ -614,6 +747,7 @@ const generateEdge = (
   const id = `${sourceId}.${targetId}`;
 
   const highlighted = !shadowed && !_.isEmpty(highlightedId) && id.includes(highlightedId);
+  const tags = getDirectionalEdgeTags(stat, 0, stat, options, t);
   return {
     id: getTopologyEdgeId(sourceId, targetId),
     type: 'edge',
@@ -633,9 +767,14 @@ const generateEdge = (
       startTerminalStatus: NodeStatus.default,
       endTerminalType: stat > 0 ? EdgeTerminalType.directional : EdgeTerminalType.none,
       endTerminalStatus: NodeStatus.default,
-      tag: getEdgeTag(stat, options, t),
+      tag: tags.tag,
+      tagParts: tags.tagParts,
+      forwardTag: undefined,
+      reverseTag: undefined,
       tagStatus: getTagStatus(stat, options.maxEdgeStat),
       bps: stat,
+      forwardBps: stat,
+      reverseBps: 0,
       drops: droppedStat,
       ...(tls
         ? {
@@ -803,7 +942,10 @@ export const generateDataModel = (
     );
     const tls = mergedTlsPanelForEdge(edge?.data, rowTls);
     if (edge) {
-      const mergedStat = edge.data.bps + stat;
+      const sameDirection = edge.data.sourceId === sourceId;
+      const forwardBps = (edge.data.forwardBps ?? edge.data.bps ?? 0) + (sameDirection ? stat : 0);
+      const reverseBps = (edge.data.reverseBps ?? 0) + (sameDirection ? 0 : stat);
+      const mergedStat = forwardBps + reverseBps;
       const mergedDrops = edge.data.drops + droppedStat;
       const mergedSecure = Boolean(tls?.tagTlsSecure);
       const mergedCleartext =
@@ -813,6 +955,7 @@ export const generateDataModel = (
         !mergedSecure &&
         mergedStat > 0 &&
         (Boolean(edge.data.tagTlsCleartext) || cleartextHint);
+      const tags = getDirectionalEdgeTags(forwardBps, reverseBps, mergedStat, options, t);
       edge.edgeStyle = getEdgeStyle(mergedStat);
       edge.animationSpeed = getAnimationSpeed(mergedStat, options.maxEdgeStat);
       edge.data = {
@@ -822,9 +965,14 @@ export const generateDataModel = (
         isDark,
         //edges are directed from src to dst. It will become bidirectional if inverted pair is found
         startTerminalType: edge.data.sourceId !== sourceId ? EdgeTerminalType.directional : edge.data.startTerminalType,
-        tag: getEdgeTag(mergedStat, options, t),
+        tag: tags.tag,
+        tagParts: tags.tagParts,
+        forwardTag: undefined,
+        reverseTag: undefined,
         tagStatus: getTagStatus(mergedStat, options.maxEdgeStat),
         bps: mergedStat,
+        forwardBps,
+        reverseBps,
         drops: mergedDrops,
         ...(tls || { tagTlsSecure: false, tagTlsLockSeverity: undefined }),
         tagTlsCleartext: mergedCleartext ? true : undefined

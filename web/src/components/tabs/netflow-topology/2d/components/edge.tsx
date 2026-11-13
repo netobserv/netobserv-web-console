@@ -58,6 +58,8 @@ interface DefaultEdgeProps {
   endTerminalSize?: number;
   /** Tag to show for the terminal */
   tag?: string;
+  /** Optional colored chunks for a single edge tag. */
+  tagParts?: { value: string; className?: string; dx?: number }[];
   /** Additional classes added to the tag */
   tagClass?: string;
   /** The status to indicate on the tag */
@@ -90,6 +92,8 @@ interface DefaultEdgeProps {
   shadowed?: boolean;
   filtered?: boolean;
   drops?: number;
+  forwardBps?: number;
+  reverseBps?: number;
   highlighted?: boolean;
   isDark?: boolean;
 }
@@ -118,6 +122,7 @@ const DefaultEdgeInner: React.FunctionComponent<DefaultEdgeInnerProps> = observe
     endTerminalStatus,
     endTerminalSize = 14,
     tag,
+    tagParts,
     tagClass,
     tagStatus,
     tagTlsSecure,
@@ -131,6 +136,8 @@ const DefaultEdgeInner: React.FunctionComponent<DefaultEdgeInnerProps> = observe
     shadowed,
     filtered,
     drops,
+    forwardBps,
+    reverseBps,
     highlighted,
     isDark,
     'data-test': dataTest
@@ -201,6 +208,31 @@ const DefaultEdgeInner: React.FunctionComponent<DefaultEdgeInnerProps> = observe
     const scale = element.getGraph().getScale();
     const tagScale = hover && !(detailsLevel === ScaleDetailsLevel.high) ? Math.max(1, 1 / scale) : 1;
     const tagPositionScale = hover && !(detailsLevel === ScaleDetailsLevel.high) ? Math.min(1, scale) : 1;
+    const tagStartPoint = element.getStartPoint().scale(tagPositionScale);
+    const tagEndPoint = element.getEndPoint().scale(tagPositionScale);
+    const showTlsLock = (showLock: boolean) => ({
+      showLeadingLock: showLock ? tagTlsSecure : undefined,
+      showCleartextLock: showLock ? tagTlsCleartext : undefined,
+      lockSeverity: showLock ? tagTlsLockSeverity : undefined
+    });
+    const renderTag = (value: string, className = tagClass, offset = 0, alignWithEdge = false, showLock = true) => (
+      <TopologyConnectorTag
+        className={className}
+        startPoint={tagStartPoint}
+        endPoint={tagEndPoint}
+        tag={value}
+        tagParts={tagParts}
+        status={tagStatus}
+        offset={offset}
+        alignWithEdge={alignWithEdge}
+        {...showTlsLock(showLock)}
+      />
+    );
+    const startTerminalClasses = css(
+      startTerminalClass,
+      reverseBps ? 'netobserv-topology-edge-arrow--reverse' : undefined
+    );
+    const endTerminalClasses = css(endTerminalClass, forwardBps ? 'netobserv-topology-edge-arrow--forward' : undefined);
 
     return (
       <Layer id={dragging || hover ? topLayer : undefined}>
@@ -221,20 +253,19 @@ const DefaultEdgeInner: React.FunctionComponent<DefaultEdgeInnerProps> = observe
           <path className={linkClassName} d={d} style={{ animationDuration: `${edgeAnimationDuration}s` }} />
           {showTag && (
             <g transform={`scale(${hover ? tagScale : 1})`}>
-              <TopologyConnectorTag
-                className={tagClass}
-                startPoint={element.getStartPoint().scale(tagPositionScale)}
-                endPoint={element.getEndPoint().scale(tagPositionScale)}
-                tag={tag || ''}
-                status={tagStatus}
-                showLeadingLock={tagTlsSecure}
-                showCleartextLock={tagTlsCleartext}
-                lockSeverity={tagTlsLockSeverity}
-              />
+              {tag
+                ? renderTag(
+                    tag,
+                    css(tagClass, tagParts?.length && 'netobserv-topology-edge-tag--directional'),
+                    0,
+                    Boolean(tagParts?.length)
+                  )
+                : null}
+              {!tag && (tagTlsSecure || tagTlsCleartext) && renderTag('')}
             </g>
           )}
           <DefaultConnectorTerminal
-            className={startTerminalClass}
+            className={startTerminalClasses}
             isTarget={false}
             edge={element}
             size={startTerminalSize}
@@ -244,7 +275,7 @@ const DefaultEdgeInner: React.FunctionComponent<DefaultEdgeInnerProps> = observe
             highlight={dragging || hover}
           />
           <DefaultConnectorTerminal
-            className={endTerminalClass}
+            className={endTerminalClasses}
             isTarget
             dragRef={targetDragRef}
             edge={element}

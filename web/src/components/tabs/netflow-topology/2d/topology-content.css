@@ -25,12 +25,39 @@ g.netobserv.topology.shadowed {
   opacity: 0.5;
 }
 
+g.netobserv.topology.pf-topology__edge {
+  --netobserv-topology-edge-forward-color: var(--pf-v6-chart-theme--multi-color-unordered--ColorScale--200, #dca614);
+  --netobserv-topology-edge-reverse-color: var(--pf-v6-chart-theme--multi-color-unordered--ColorScale--300, #63993d);
+}
+
 g.netobserv.topology.pf-topology__edge>.pf-topology__edge__background {
   stroke-width: 6px;
 }
 
 g.netobserv.topology.pf-topology__edge.dark>.pf-topology__edge__tag>.pf-topology__edge__tag__background{
   fill: #E0E0E0;
+}
+
+g.netobserv.topology.pf-topology__edge .netobserv-topology-edge-tag--directional>.pf-topology__edge__tag__background {
+  fill: var(--pf-t--global--background--color--floating--default, #ffffff);
+}
+
+g.netobserv.topology.pf-topology__edge.dark .netobserv-topology-edge-tag--directional>.pf-topology__edge__tag__background {
+  fill: #E0E0E0;
+}
+
+g.netobserv.topology.pf-topology__edge .netobserv-topology-edge-tag--directional>text {
+  fill: var(--pf-t--global--text--color--regular, #151515);
+  font-weight: 600;
+  stroke: transparent;
+}
+
+g.netobserv.topology.pf-topology__edge .netobserv-topology-edge-tag__value--forward {
+  fill: var(--netobserv-topology-edge-forward-color);
+}
+
+g.netobserv.topology.pf-topology__edge .netobserv-topology-edge-tag__value--reverse {
+  fill: var(--netobserv-topology-edge-reverse-color);
 }
 
 /* TLS lock on edge tag: default / unknown */
@@ -115,6 +142,18 @@ g.netobserv.topology.pf-topology__edge.edge-highlighted.dark>.pf-topology__edge_
 g.netobserv.topology.pf-topology__edge.edge-highlighted.dark>.pf-topology-connector-arrow {
   stroke: var(--pf-t--global--color--brand--default);
   fill: var(--pf-t--global--color--brand--clicked);
+}
+
+g.netobserv.topology.pf-topology__edge>.pf-topology-connector-arrow.netobserv-topology-edge-arrow--forward,
+g.netobserv.topology.pf-topology__edge.dark>.pf-topology-connector-arrow.netobserv-topology-edge-arrow--forward {
+  stroke: var(--netobserv-topology-edge-forward-color);
+  fill: var(--netobserv-topology-edge-forward-color);
+}
+
+g.netobserv.topology.pf-topology__edge>.pf-topology-connector-arrow.netobserv-topology-edge-arrow--reverse,
+g.netobserv.topology.pf-topology__edge.dark>.pf-topology-connector-arrow.netobserv-topology-edge-arrow--reverse {
+  stroke: var(--netobserv-topology-edge-reverse-color);
+  fill: var(--netobserv-topology-edge-reverse-color);
 }
 
 g.netobserv.pf-topology__group>.pf-topology__group__background {

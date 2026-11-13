@@ -1,9 +1,12 @@
 import { EdgeModel, NodeModel, NodeShape } from '@patternfly/react-topology';
 import { TFunction } from 'i18next';
+import { MetricStats, TopologyMetrics } from '../../api/query-response';
 import { ScopeDefSample } from '../../components/__tests-data__/scopes';
+import { buildStats } from '../../components/health/health-helper';
 import { ContextSingleton } from '../../utils/context';
+import { createPeer } from '../../utils/metrics';
 import { getGroupName, getGroupsForScope, getStepInto, resolveGroupTypes } from '../scope';
-import { AGGREGATE_EDGE_TYPE, DefaultOptions, maybeAggregateEdges } from '../topology';
+import { AGGREGATE_EDGE_TYPE, DefaultOptions, generateDataModel, maybeAggregateEdges } from '../topology';
 
 const t = ((s: string) => s) as TFunction;
 
@@ -222,5 +225,117 @@ describe('maybeAggregateEdges', () => {
     const result = maybeAggregateEdges(baseNodes(), input, { ...DefaultOptions, groupTypes: 'none' }, '', t);
     expect(result).toBe(input);
     expect(result).toEqual(expected);
+  });
+
+  it('carries bidirectional leaf values onto aggregate bridge tags', () => {
+    const input = [edge('a1', 'b1', 15)];
+    input[0].data.forwardBps = 10;
+    input[0].data.reverseBps = 5;
+
+    const result = maybeAggregateEdges(
+      baseNodes(),
+      input,
+      { ...DefaultOptions, groupTypes: 'namespaces', metricFunction: 'sum', metricType: 'Bytes' },
+      '',
+      t
+    );
+
+    const bridge = result.find(e => e.type === AGGREGATE_EDGE_TYPE && e.data?.role === 'bridge');
+    expect(bridge?.data.bps).toBe(15);
+    expect(bridge?.data.forwardBps).toBe(10);
+    expect(bridge?.data.reverseBps).toBe(5);
+    expect(bridge?.data.tag).toBe('10B 5B');
+    expect(bridge?.data.forwardTag).toBeUndefined();
+    expect(bridge?.data.reverseTag).toBeUndefined();
+  });
+
+  it('swaps directional leaf values when aggregating opposite bridge orientation', () => {
+    const input = [edge('a1', 'b1', 15), edge('b1', 'a2', 10)];
+    input[0].data.forwardBps = 10;
+    input[0].data.reverseBps = 5;
+    input[1].data.forwardBps = 7;
+    input[1].data.reverseBps = 3;
+
+    const result = maybeAggregateEdges(
+      baseNodes(),
+      input,
+      { ...DefaultOptions, groupTypes: 'namespaces', metricFunction: 'sum', metricType: 'Bytes' },
+      '',
+      t
+    );
+
+    const bridge = result.find(e => e.type === AGGREGATE_EDGE_TYPE && e.data?.role === 'bridge');
+    expect(bridge?.data.bps).toBe(25);
+    expect(bridge?.data.forwardBps).toBe(13);
+    expect(bridge?.data.reverseBps).toBe(12);
+    expect(bridge?.data.tag).toBe('13B 12B');
+    expect(bridge?.data.forwardTag).toBeUndefined();
+    expect(bridge?.data.reverseTag).toBeUndefined();
+  });
+});
+
+describe('generateDataModel edge tags', () => {
+  const stats = (value: number): MetricStats => ({
+    sum: value,
+    latest: value,
+    avg: value,
+    min: value,
+    max: value,
+    percentiles: [value, value],
+    total: value
+  });
+
+  const metric = (source: string, destination: string, value: number): TopologyMetrics => ({
+    source: createPeer({ host: source }),
+    destination: createPeer({ host: destination }),
+    values: [],
+    stats: stats(value),
+    scope: 'host'
+  });
+
+  const generate = (metrics: TopologyMetrics[]) =>
+    generateDataModel(
+      metrics,
+      [],
+      { ...DefaultOptions, groupTypes: 'none', metricFunction: 'sum', metricType: 'Bytes' },
+      'host',
+      ScopeDefSample,
+      '',
+      '',
+      { match: 'all', list: [] },
+      t,
+      [],
+      {},
+      [],
+      false,
+      buildStats([])
+    );
+
+  beforeEach(() => {
+    ContextSingleton.setScopes(ScopeDefSample);
+  });
+
+  it('shows direction for one-way edge tags', () => {
+    const model = generate([metric('node-a', 'node-b', 10)]);
+    const edges = model.edges || [];
+    expect(edges).toHaveLength(1);
+    expect(edges[0].data.bps).toBe(10);
+    expect(edges[0].data.forwardBps).toBe(10);
+    expect(edges[0].data.reverseBps).toBe(0);
+    expect(edges[0].data.tag).toBe('10B');
+    expect(edges[0].data.forwardTag).toBeUndefined();
+    expect(edges[0].data.reverseTag).toBeUndefined();
+  });
+
+  it('shows directional tags for bidirectional edges', () => {
+    const model = generate([metric('node-a', 'node-b', 13600), metric('node-b', 'node-a', 5300)]);
+    const edges = model.edges || [];
+    expect(edges).toHaveLength(1);
+    expect(edges[0].data.bps).toBe(18900);
+    expect(edges[0].data.forwardBps).toBe(13600);
+    expect(edges[0].data.reverseBps).toBe(5300);
+    expect(edges[0].data.tag).toBe('13.6kB 5.3kB');
+    expect(edges[0].data.forwardTag).toBeUndefined();
+    expect(edges[0].data.reverseTag).toBeUndefined();
   });
 });
