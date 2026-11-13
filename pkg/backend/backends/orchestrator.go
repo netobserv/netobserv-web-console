@@ -21,10 +21,11 @@ import (
 type Orchestrator struct {
 	flowsBackends   []backend.FlowsBackend
 	metricsBackends []backend.MetricsBackend
+	useMocks        bool
 }
 
 func NewOrchestrator(cfg *config.Config) *Orchestrator {
-	o := Orchestrator{}
+	o := Orchestrator{useMocks: cfg.Frontend.ConsoleMode == config.Mock}
 	if cfg.IsPromEnabled() {
 		b := prometheus.NewBackend(cfg)
 		o.metricsBackends = append(o.metricsBackends, b)
@@ -158,6 +159,10 @@ func (o *Orchestrator) Metrics(ctx context.Context, bctx *backend.QueryContext, 
 	}
 
 	qresp := mm.Get()
+	if o.useMocks {
+		// The frontend needs to know it's mocked data, to clamp chart ranges to the (outdated) mock timestamps
+		qresp.Stats.DataSources = append(qresp.Stats.DataSources, constants.DataSourceMock)
+	}
 	return qresp, http.StatusOK, nil
 }
 
