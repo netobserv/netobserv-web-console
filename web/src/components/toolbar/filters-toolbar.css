@@ -91,6 +91,27 @@ div#filter-toolbar-search-filters .overflow-button {
   vertical-align: middle;
 }
 
+.flowcapture-action-button {
+  align-items: center;
+  display: inline-flex;
+  height: 33px !important;
+  justify-content: center;
+  line-height: 1;
+  min-height: 33px !important;
+  padding-block: 0 !important;
+  color: var(--pf-t--global--text--color--on-brand--default, #fff) !important;
+  vertical-align: middle;
+}
+
+.flowcapture-action-button > .pf-v6-c-button__text {
+  align-items: center;
+  align-self: center !important;
+  display: inline-flex;
+  justify-content: center;
+  line-height: 1;
+  text-align: center;
+}
+
 div#filter-toolbar-search-filters #query-options-dropdown-container .pf-v6-c-button,
 div#filter-toolbar-search-filters #show-filters-button,
 div#filter-toolbar-search-filters #fullscreen-button,
@@ -108,7 +129,9 @@ div#filter-toolbar-search-filters .overflow-button {
 .custom-chip-group,
 .custom-chip {
   border-radius: 3px;
-  box-shadow: 0 0.0625rem 0.125rem 0 rgb(3 3 3 / 12%), 0 0 0.125rem 0 rgb(3 3 3 / 6%);
+  box-shadow:
+    0 0.0625rem 0.125rem 0 rgb(3 3 3 / 12%),
+    0 0 0.125rem 0 rgb(3 3 3 / 6%);
   display: inline-flex;
   align-items: center;
 }
@@ -135,7 +158,7 @@ div#filter-toolbar-search-filters .overflow-button {
   text-align: center;
 }
 
-.custom-chip-group>.filtervalues {
+.custom-chip-group > .filtervalues {
   display: flex;
   flex-wrap: wrap;
   align-content: center;
@@ -146,7 +169,7 @@ div#filter-toolbar-search-filters .overflow-button {
   justify-self: center;
 }
 
-.custom-chip-group>p {
+.custom-chip-group > p {
   font-size: 0.85rem;
 }
 
@@ -175,17 +198,17 @@ div#filter-toolbar-search-filters .overflow-button {
 }
 
 .custom-chip-group.disabled-group,
-.custom-chip-group.disabled-group>button,
-.custom-chip-group.disabled-group>* {
+.custom-chip-group.disabled-group > button,
+.custom-chip-group.disabled-group > * {
   color: #000;
-  background-color: #D2D2D2;
+  background-color: #d2d2d2;
 }
 
 .custom-chip.disabled-value,
-.custom-chip.disabled-value>button,
-.custom-chip.disabled-value>* {
+.custom-chip.disabled-value > button,
+.custom-chip.disabled-value > * {
   color: #fff;
-  background-color: #6A6E73;
+  background-color: #6a6e73;
 }
 
 .pf-v6-theme-dark .custom-chip-peer {
@@ -194,57 +217,57 @@ div#filter-toolbar-search-filters .overflow-button {
 }
 
 .pf-v6-theme-dark .custom-chip-group,
-.pf-v6-theme-dark .custom-chip-group>button,
-.pf-v6-theme-dark .custom-chip-group>* {
+.pf-v6-theme-dark .custom-chip-group > button,
+.pf-v6-theme-dark .custom-chip-group > * {
   color: #fff;
   background-color: #004080;
 }
 
 .pf-v6-theme-dark .custom-chip,
-.pf-v6-theme-dark .custom-chip>button,
-.pf-v6-theme-dark .custom-chip>* {
+.pf-v6-theme-dark .custom-chip > button,
+.pf-v6-theme-dark .custom-chip > * {
   color: #fff;
   background-color: #06c;
 }
 
 .pf-v6-theme-dark .custom-chip-group.disabled-group,
-.pf-v6-theme-dark .custom-chip-group.disabled-group>button,
-.pf-v6-theme-dark .custom-chip-group.disabled-group>* {
+.pf-v6-theme-dark .custom-chip-group.disabled-group > button,
+.pf-v6-theme-dark .custom-chip-group.disabled-group > * {
   color: #fff;
-  background-color: #6A6E73;
+  background-color: #6a6e73;
 }
 
 .pf-v6-theme-dark .custom-chip.disabled-value,
-.pf-v6-theme-dark .custom-chip.disabled-value>button,
-.pf-v6-theme-dark .custom-chip.disabled-value>* {
+.pf-v6-theme-dark .custom-chip.disabled-value > button,
+.pf-v6-theme-dark .custom-chip.disabled-value > * {
   color: #000;
-  background-color: #D2D2D2;
+  background-color: #d2d2d2;
 }
 
-.custom-chip>p {
+.custom-chip > p {
   font-size: 0.75rem;
 }
 
-.custom-chip-group>*:hover {
+.custom-chip-group > *:hover {
   color: #06c;
 }
 
-.custom-chip>*:hover {
+.custom-chip > *:hover {
   color: #004080;
 }
 
-.custom-chip-group.disabled-group>*:hover,
-.custom-chip.disabled-value>*:hover {
-  color: #4F5255
+.custom-chip-group.disabled-group > *:hover,
+.custom-chip.disabled-value > *:hover {
+  color: #4f5255;
 }
 
-.custom-chip-group>button,
-.custom-chip>button {
+.custom-chip-group > button,
+.custom-chip > button {
   padding: 0 0 0 1em;
 }
 
-.custom-chip-group>p,
-.custom-chip>p {
+.custom-chip-group > p,
+.custom-chip > p {
   cursor: pointer;
   user-select: none;
   max-width: 18ch;
@@ -262,30 +285,30 @@ div#filter-toolbar-search-filters .overflow-button {
   padding: 0;
 }
 
-.custom-chip.buttonless>p {
+.custom-chip.buttonless > p {
   margin-right: 1rem;
 }
 
 .custom-chip.selected,
-.custom-chip.selected>button,
-.custom-chip.selected>*,
+.custom-chip.selected > button,
+.custom-chip.selected > *,
 .pf-v6-theme-dark .custom-chip.selected,
-.pf-v6-theme-dark .custom-chip.selected>button,
-.pf-v6-theme-dark .custom-chip.selected>* {
+.pf-v6-theme-dark .custom-chip.selected > button,
+.pf-v6-theme-dark .custom-chip.selected > * {
   color: var(--pf-t--global--text--color--on-brand--default, #fff);
   background-color: var(--pf-t--global--color--brand--default, #06c);
 }
 
 .custom-chip.unselected,
-.custom-chip.unselected>button,
-.custom-chip.unselected>* {
+.custom-chip.unselected > button,
+.custom-chip.unselected > * {
   color: var(--pf-t--global--text--color--regular, #000);
   background-color: var(--pf-t--global--background--color--primary--default, #fff);
 }
 
 .pf-v6-theme-dark .custom-chip.unselected,
-.pf-v6-theme-dark .custom-chip.unselected>button,
-.pf-v6-theme-dark .custom-chip.unselected>* {
+.pf-v6-theme-dark .custom-chip.unselected > button,
+.pf-v6-theme-dark .custom-chip.unselected > * {
   color: var(--pf-t--global--text--color--regular, #000);
-  background-color: var(--pf-t--global--background--color--secondary--default, #D2D2D2);
+  background-color: var(--pf-t--global--background--color--secondary--default, #d2d2d2);
 }

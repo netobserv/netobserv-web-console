@@ -1,112 +1,131 @@
 .netobserv-overlay-container {
-    position: absolute;
-    width: 100%;
-    height: 100%;
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
 .netobserv-overlay {
-    position: absolute;
-    z-index: 999;
-    background: rgba(3, 3, 3, 0.62);
+  position: absolute;
+  z-index: 999;
+  background: rgba(3, 3, 3, 0.62);
 }
 
 .netobserv-overlay.dark {
-    background: rgba(200, 200, 200, 0.33);
+  background: rgba(200, 200, 200, 0.33);
 }
 
 .netobserv-align-start {
-    text-align: start;
+  text-align: start;
 }
 
 /*hack to keep refresh button size while loading*/
 
 .co-action-refresh-button {
-    width: 45px !important;
-    height: 33px !important;
+  width: 45px !important;
+  height: 33px !important;
+}
+
+.flowcapture-action-button {
+  align-items: center;
+  display: inline-flex;
+  height: 33px !important;
+  justify-content: center;
+  min-height: 33px !important;
+  padding-block: 0 !important;
+  color: var(--pf-t--global--text--color--on-brand--default, #fff) !important;
+}
+
+.flowcapture-action-button > .pf-v6-c-button__text {
+  align-items: center;
+  align-self: center !important;
+  display: inline-flex;
+  justify-content: center;
+  line-height: 1;
+  text-align: center;
 }
 
 .netobserv-refresh-container {
-    align-self: end;
-    padding-left: 1em;
+  align-self: end;
+  padding-left: 1em;
 }
 
 span.pf-v6-c-button__icon.pf-m-start {
-    width: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /*rotate animation for loading icon*/
 
 @keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
+  from {
+    transform: rotate(0deg);
+  }
 
-    to {
-        transform: rotate(360deg);
-    }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /*allow new lines for error text*/
 
 .pf-v6-c-empty-state__body {
-    white-space: pre-line;
+  white-space: pre-line;
 }
 
 #pageSection {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    flex: 1;
-    padding: 0;
-    gap: 0;
-    background: var(--pf-t--global--background--color--primary--default);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
+  padding: 0;
+  gap: 0;
+  background: var(--pf-t--global--background--color--primary--default);
 }
 
 #filter-toolbar {
-    padding: 0 1.5rem 0 1.5rem;
+  padding: 0 1.5rem 0 1.5rem;
 }
 
 #drawer {
-    z-index: 1;
+  z-index: 1;
 }
 
 #drawerContent {
-    overflow: hidden;
+  overflow: hidden;
 }
 
 .pf-v6-c-drawer__panel.pf-m-resizable {
-    overflow: hidden;
+  overflow: hidden;
 }
 
 /* flex page header */
 #pageHeader {
-    padding: 1.5rem 1.5rem 0 1.5rem;
+  padding: 1.5rem 1.5rem 0 1.5rem;
 }
 
-#pageHeader>div {
-    align-items: start;
+#pageHeader > div {
+  align-items: start;
 }
 
 .netobserv-action-title {
-    height: 2em;
-    padding: 0 !important;
-    margin: 0 !important;
+  height: 2em;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 #page-content-flex {
-    height: 100%;
+  height: 100%;
 }
 
-#page-content-flex>div {
-    margin: 0;
-    overflow-y: auto;
+#page-content-flex > div {
+  margin: 0;
+  overflow-y: auto;
 }
 
 .flex {
-    flex: 1;
+  flex: 1;
 }
 
 /*force buttons to have the exact same display since they are different components*/
@@ -117,184 +136,184 @@ span.pf-v6-c-button__icon.pf-m-start {
 #view-options-button,
 #more-options-button,
 .pf-v6-c-overflow-menu .overflow-button {
-    display: flex;
-    align-items: center;
-    margin-left: 0;
-    margin-right: 5px;
-    padding-left: 0;
-    padding-right: 0;
+  display: flex;
+  align-items: center;
+  margin-left: 0;
+  margin-right: 5px;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 /* histogram is maximum 2x standard toolbar height */
 #histogram-toolbar {
-    max-height: 150px;
+  max-height: 150px;
 }
 
 #histogram-toolbar,
 #view-options-toolbar {
-    padding-top: 1em;
-    z-index: 5;
-    box-shadow: 0 0.125rem 0.1rem -0.0625rem rgba(3, 3, 3, 0.16);
+  padding-top: 1em;
+  z-index: 5;
+  box-shadow: 0 0.125rem 0.1rem -0.0625rem rgba(3, 3, 3, 0.16);
 }
 
 #histogram-toolbar.dark,
 #view-options-toolbar.dark {
-    box-shadow: 0 0.125rem 0.1rem -0.0625rem rgba(255, 255, 255, 0.16);
+  box-shadow: 0 0.125rem 0.1rem -0.0625rem rgba(255, 255, 255, 0.16);
 }
 
 .histogram {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /*hide some content for fullscreen mode*/
 .hidden {
-    display: none !important;
+  display: none !important;
 }
 
 /*remove bullets from dropdown*/
-.pf-v6-c-dropdown__group>ul {
-    list-style: none;
-    padding-left: 10px;
+.pf-v6-c-dropdown__group > ul {
+  list-style: none;
+  padding-left: 10px;
 }
 
 #netflow-warning {
-    position: absolute;
-    right: 2em;
-    bottom: 3em;
-    z-index: 999;
+  position: absolute;
+  right: 2em;
+  bottom: 3em;
+  z-index: 999;
 }
 
 /*fix tabs styling*/
 .netflow-traffic-tabs-container {
-    margin: 1rem 0 0 0;
-    padding: 0;
+  margin: 1rem 0 0 0;
+  padding: 0;
 }
 
-.netflow-traffic-tabs-container>div:last-child {
-    margin-right: 1rem;
+.netflow-traffic-tabs-container > div:last-child {
+  margin-right: 1rem;
 }
 
 #histogram-toolbar,
 #view-options-toolbar {
-    display: flex;
+  display: flex;
 }
 
-#histogram-toolbar>.histogram,
-#view-options-toolbar>.view-options-first {
-    margin-left: 1.5rem;
+#histogram-toolbar > .histogram,
+#view-options-toolbar > .view-options-first {
+  margin-left: 1.5rem;
 }
 
-#histogram-toolbar>.histogram,
-#view-options-toolbar>.view-options-last {
-    margin-right: 1.5rem;
+#histogram-toolbar > .histogram,
+#view-options-toolbar > .view-options-last {
+  margin-right: 1.5rem;
 }
 
 #search-container {
-    max-width: 430px;
+  max-width: 430px;
 }
 
 #tabs-container {
-    margin: 0;
+  margin: 0;
 }
 
 /* outside bottom border */
 .bottom-border {
-    margin: 0 !important;
-    align-self: flex-end;
-    border-bottom: 1px var(--pf-t--global--border--color--default) solid;
+  margin: 0 !important;
+  align-self: flex-end;
+  border-bottom: 1px var(--pf-t--global--border--color--default) solid;
 }
 
 /* inside bottom border */
 .bottom-shadow {
-    box-shadow: inset 0 -1px 0 0 var(--pf-t--global--border--color--default);
+  box-shadow: inset 0 -1px 0 0 var(--pf-t--global--border--color--default);
 }
 
 .query-option-tooltip-text {
-    color: var(--pf-t--global--text--color--inverse) !important;
+  color: var(--pf-t--global--text--color--inverse) !important;
 }
 
 .netobserv-tooltip-text {
-    color: var(--pf-t--global--text--color--inverse) !important;
+  color: var(--pf-t--global--text--color--inverse) !important;
 }
 
-.netobserv-no-child-margin>* {
-    margin: 0 !important;
+.netobserv-no-child-margin > * {
+  margin: 0 !important;
 }
 
 .netobserv-tab-container {
-    margin-top: 0;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    /* Enable container queries for nested NetObserv layouts in narrow resource tabs */
-    container-type: inline-size;
-    container-name: netobserv-tab;
+  margin-top: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* Enable container queries for nested NetObserv layouts in narrow resource tabs */
+  container-type: inline-size;
+  container-name: netobserv-tab;
 }
 
-.netobserv-tab-container>section#pageSection {
-    flex: 1 1 auto;
-    min-height: 0;
+.netobserv-tab-container > section#pageSection {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 #pageSection.tab {
-    container-type: inline-size;
-    container-name: netobserv-page;
+  container-type: inline-size;
+  container-name: netobserv-page;
 }
 
 .netobserv-filters-toolbar-item {
-    min-width: 0;
-    padding-right: 1.5rem;
+  min-width: 0;
+  padding-right: 1.5rem;
 }
 
 #pageSection.tab #filter-toolbar-search-filters {
-    padding-top: var(--pf-t--global--spacer--md, 1rem);
+  padding-top: var(--pf-t--global--spacer--md, 1rem);
 }
 
 @container netobserv-tab (max-width: 56rem) {
-    #filter-toolbar {
-        padding-left: var(--pf-t--global--spacer--md, 1rem);
-        padding-right: var(--pf-t--global--spacer--md, 1rem);
-    }
+  #filter-toolbar {
+    padding-left: var(--pf-t--global--spacer--md, 1rem);
+    padding-right: var(--pf-t--global--spacer--md, 1rem);
+  }
 
-    .filter-search-toolbar-item {
-        flex: 1 1 100%;
-    }
+  .filter-search-toolbar-item {
+    flex: 1 1 100%;
+  }
 }
 
 @container netobserv-page (max-width: 56rem) {
-    .filter-search-toolbar-item {
-        flex: 1 1 100%;
-    }
+  .filter-search-toolbar-item {
+    flex: 1 1 100%;
+  }
 
-    /* Narrow pane: Time range / Refresh stay on the first row, controls below */
-    div#filter-toolbar-search-filters.netobserv-controls-with-trailing > .pf-v6-c-toolbar__content-section {
-        grid-template-columns: 1fr;
-    }
+  /* Narrow pane: Time range / Refresh stay on the first row, controls below */
+  div#filter-toolbar-search-filters.netobserv-controls-with-trailing > .pf-v6-c-toolbar__content-section {
+    grid-template-columns: 1fr;
+  }
 
-    div#filter-toolbar-search-filters .netobserv-toolbar-trailing {
-        grid-column: 1;
-        grid-row: 1;
-        justify-self: end;
-    }
+  div#filter-toolbar-search-filters .netobserv-toolbar-trailing {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: end;
+  }
 
-    div#filter-toolbar-search-filters .netobserv-toolbar-leading {
-        grid-column: 1;
-        grid-row: 2;
-    }
+  div#filter-toolbar-search-filters .netobserv-toolbar-leading {
+    grid-column: 1;
+    grid-row: 2;
+  }
 }
 
 .chips-popover-close-button {
-    padding: 0 !important;
+  padding: 0 !important;
 }
 
 .centered-list button,
 .centered-list .center {
-    align-self: center;
+  align-self: center;
 }
 
 div#table-display-popper {
-    padding: 1em 2em 2em 0;
+  padding: 1em 2em 2em 0;
 }

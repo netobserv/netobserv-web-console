@@ -15,6 +15,8 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../utils/theme-hook';
+import FlowCaptureFiltersWidget from '../flowCapture/filters-widget';
+import NodeSelectorWidget from '../flowCapture/node-selector-widget';
 import { jsonSchemaNumberTypes } from './const';
 import { DescriptionField } from './fields';
 import { PromQLEditor } from './promql-editor';
@@ -163,6 +165,9 @@ export const JSONWidget: React.FC<WidgetProps> = props => {
   const isDarkTheme = useTheme();
 
   const { disabled = false, id, onBlur, onChange, onFocus, readonly = false, value = '{}' } = props;
+  const serialized = typeof value === 'string' ? value : JSON.stringify(value ?? {}, null, 2);
+  const [code, setCode] = React.useState(serialized);
+  React.useEffect(() => setCode(serialized), [serialized]);
   return (
     <span
       data-test={id}
@@ -178,10 +183,17 @@ export const JSONWidget: React.FC<WidgetProps> = props => {
         isLineNumbersVisible={false}
         isLanguageLabelVisible={true}
         isReadOnly={readonly || disabled}
-        code={value}
-        onBlur={onBlur && (() => onBlur(id, value))}
-        onChange={v => onChange(v, undefined, id)}
-        onFocus={onFocus && (() => onFocus(id, value))}
+        code={code}
+        onBlur={onBlur && (() => onBlur(id, code))}
+        onChange={v => {
+          setCode(v);
+          try {
+            onChange(JSON.parse(v), undefined, id);
+          } catch {
+            // Keep the editor usable while the user is typing incomplete JSON.
+          }
+        }}
+        onFocus={onFocus && (() => onFocus(id, code))}
         language={Language.json}
         height="75px"
       />
@@ -239,7 +251,9 @@ export const ArrayCheckboxesWidget: React.FC<WidgetProps> = props => {
               isChecked={_.isNil(value) ? false : value.includes(option)}
               onClick={() =>
                 onChange(
-                  value.includes(option) ? value.filter((v: string) => v !== option) : [...value, option],
+                  (value || []).includes(option)
+                    ? (value || []).filter((v: string) => v !== option)
+                    : [...(value || []), option],
                   undefined,
                   id
                 )
@@ -264,5 +278,7 @@ export default {
   int64: NumberWidget,
   map: JSONWidget,
   arrayCheckboxes: ArrayCheckboxesWidget,
+  flowCaptureFilters: FlowCaptureFiltersWidget,
+  nodeSelector: NodeSelectorWidget,
   promql: PromQLWidget
 };

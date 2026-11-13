@@ -1,4 +1,5 @@
 import {
+  Button,
   Content,
   ContentVariants,
   Divider,
@@ -22,7 +23,9 @@ import { MetricType } from '../../../model/flow-query';
 import { useNetflowContext } from '../../../model/netflow-context';
 import { GraphElementPeer, NodeData } from '../../../model/topology';
 import { defaultSize, maxSize, minSize } from '../../../utils/panel';
+import { flowCaptureNewPath, useNavigate } from '../../../utils/url';
 import { TruncateLength } from '../../dropdowns/truncate-dropdown';
+import { captureFromTopologyElement } from '../../forms/flowCapture/types';
 import { HealthCard } from '../../health/health-card';
 import { HealthSuperKind } from '../../health/health-helper';
 import { PeerResourceLink } from '../../tabs/netflow-topology/peer-resource-link';
@@ -59,6 +62,7 @@ export const ElementPanel: React.FC<ElementPanelProps> = ({
 }) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
   const { caps } = useNetflowContext();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = React.useState<string>('details');
 
   const data = element.getData();
@@ -131,6 +135,21 @@ export const ElementPanel: React.FC<ElementPanelProps> = ({
       <DrawerHead id={`${id}-drawer-head`} data-test-id="drawer-head" className="drawer-head">
         {titleContent()}
         <DrawerActions>
+          <Button
+            className="flowcapture-action-button"
+            variant="primary"
+            size="sm"
+            onClick={() =>
+              navigate(flowCaptureNewPath(), {
+                state: {
+                  capture: captureFromTopologyElement(filters, aData, bData),
+                  flowCaptureSource: 'topology'
+                }
+              })
+            }
+          >
+            {t('FlowCapture')}
+          </Button>
           <DrawerCloseButton data-test-id="drawer-close-button" className="drawer-close-button" onClick={onClose} />
         </DrawerActions>
       </DrawerHead>

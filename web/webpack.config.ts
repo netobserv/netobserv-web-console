@@ -510,7 +510,7 @@ if (process.env.FLAVOR === 'static') {
         name: "netobserv-plugin-static",
         version: "0.1.0",
         displayName: "NetObserv Static Plugin for the OpenShift Console",
-        description: "This plugin adds custom forms and wizards for FlowCollector, FlowCollectorSlice, FlowMetric and Health Rules APIs",
+        description: "This plugin adds custom forms and wizards for FlowCollector, FlowCollectorSlice, FlowMetric, FlowCapture and Health Rules APIs",
         exposedModules: {
           "flowCollectorWizard": "./components/forms/flowCollector/wizard.tsx",
           "flowCollectorForm": "./components/forms/flowCollector/form.tsx",
@@ -518,6 +518,9 @@ if (process.env.FLAVOR === 'static') {
           "flowCollectorSliceForm": "./components/forms/flowCollectorSlice/form.tsx",
           "flowMetricWizard": "./components/forms/flowMetric/wizard.tsx",
           "flowMetricForm": "./components/forms/flowMetric/form.tsx",
+          "flowCaptureForm": "./components/forms/flowCapture/form.tsx",
+          "flowCaptureList": "./components/forms/flowCapture/list.tsx",
+          "flowCaptureStatus": "./components/forms/flowCapture/status.tsx",
           "healthRuleWizard": "./components/forms/healthRule/wizard.tsx",
         },
       },
@@ -533,6 +536,39 @@ if (process.env.FLAVOR === 'static') {
             component: {
               "$codeRef": "flowCollectorWizard.default"
             }
+          }
+        },
+        {
+          type: "console.page/route",
+          properties: {
+            path: [
+              "/k8s/all-namespaces/flows.netobserv.io~v1alpha1~FlowCapture",
+              "/k8s/ns/:namespace/flows.netobserv.io~v1alpha1~FlowCapture",
+              "/k8s/ns/:namespace/clusterserviceversions/:operator/flows.netobserv.io~v1alpha1~FlowCapture"
+            ],
+            component: { "$codeRef": "flowCaptureList.default" }
+          }
+        },
+        {
+          type: "console.page/route",
+          properties: {
+            path: [
+              "/k8s/cluster/flows.netobserv.io~v1alpha1~FlowCapture/~new",
+              "/k8s/ns/:namespace/flows.netobserv.io~v1alpha1~FlowCapture/~new",
+              "/k8s/ns/:namespace/flows.netobserv.io~v1alpha1~FlowCapture/:name/edit",
+              "/k8s/ns/:namespace/flows.netobserv.io~v1alpha1~FlowCapture/:name/yaml"
+            ],
+            component: { "$codeRef": "flowCaptureForm.default" }
+          }
+        },
+        {
+          type: "console.page/route",
+          properties: {
+            path: [
+              "/k8s/ns/:namespace/flows.netobserv.io~v1alpha1~FlowCapture/:name",
+              "/k8s/ns/:namespace/clusterserviceversions/:operator/flows.netobserv.io~v1alpha1~FlowCapture/:name"
+            ],
+            component: { "$codeRef": "flowCaptureStatus.default" }
           }
         },
         {

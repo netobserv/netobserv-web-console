@@ -18,7 +18,7 @@ import './forms.css';
 import { ClusterServiceVersionKind, CustomResourceDefinitionKind } from './types';
 import { exampleForModel, isK8sNotFoundError, k8sErrorMessage } from './utils';
 
-export type SupportedKind = 'FlowCollector' | 'FlowCollectorSlice' | 'FlowMetric';
+export type SupportedKind = 'FlowCollector' | 'FlowCollectorSlice' | 'FlowMetric' | 'FlowCapture';
 type DefaultFrom = 'CSVExample' | 'CRD' | 'None';
 const MISSING_RESOURCE_WATCH_CONFIRMATION_DELAY_MS = 1000;
 /** Poll interval after delete: Console watch cache can miss DELETED and stay stale until remount. */
@@ -39,6 +39,8 @@ export type ResourceWatcherProps = {
   /** Render children without waiting for the CR watch to finish (e.g. missing resource). */
   skipCRLoading?: boolean;
   defaultFrom: DefaultFrom;
+  /** Values to merge into the CRD defaults when creating a resource. */
+  initialData?: K8sResourceKind;
 };
 
 export type ResourceWatcherContext = {
@@ -90,7 +92,8 @@ export const ResourceWatcher: FC<ResourceWatcherProps> = ({
   skipErrors,
   skipCRError,
   skipCRLoading,
-  defaultFrom
+  defaultFrom,
+  initialData
 }) => {
   if (!group || !version || !kind) {
     throw new Error('ResourceForm error: apiVersion and kind must be provided');
@@ -119,7 +122,9 @@ export const ResourceWatcher: FC<ResourceWatcherProps> = ({
         ? 'flowcollectors.flows.netobserv.io'
         : kind === 'FlowCollectorSlice'
           ? 'flowcollectorslices.flows.netobserv.io'
-          : 'flowmetrics.flows.netobserv.io',
+          : kind === 'FlowMetric'
+            ? 'flowmetrics.flows.netobserv.io'
+            : 'flowcaptures.flows.netobserv.io',
     isList: false
   });
   const [cr, crLoaded, crLoadError] = useK8sWatchResource<K8sResourceKind>(
@@ -286,6 +291,14 @@ export const ResourceWatcher: FC<ResourceWatcherProps> = ({
     }
   } else if (defaultFrom === 'CRD') {
     useCRDDefaults = true;
+  }
+  if (!isCRPresent && initialData) {
+    data = {
+      ...data,
+      ...initialData,
+      metadata: { ...data.metadata, ...initialData.metadata },
+      spec: { ...(data as any).spec, ...(initialData as any).spec }
+    };
   }
   const schema = crd?.spec?.versions?.find(v => v.name === version)?.schema?.openAPIV3Schema || null;
   // force namespace to be present in the form when namespaced

@@ -165,6 +165,9 @@ export const FormField: React.FC<FormFieldProps> = ({ children, id, defaultLabel
 export type FieldSetProps = Pick<FieldProps, 'idSchema' | 'required' | 'schema' | 'uiSchema'> & {
   children?: React.ReactNode;
   defaultLabel?: string;
+  formData?: unknown;
+  /** Overrides the UI schema expansion state for this field. */
+  defaultExpanded?: boolean;
   /** Takes priority over schema/uiSchema title (e.g. array items with data-derived names). */
   labelOverride?: string;
   /** When true, the schema description block under the accordion title is omitted (e.g. full text only in a tooltip). */
@@ -175,6 +178,8 @@ export const FieldSet: React.FC<FieldSetProps> = props => {
   const {
     children,
     defaultLabel,
+    defaultExpanded,
+    formData,
     labelOverride,
     idSchema,
     required = false,
@@ -182,8 +187,17 @@ export const FieldSet: React.FC<FieldSetProps> = props => {
     suppressDescription,
     uiSchema
   } = props;
-  const { defaultExpanded } = getUiOptions(uiSchema ?? {}) as UiSchemaOptionsWithDependency;
-  const [expanded, setExpanded] = React.useState(idSchema['$id'] === 'root' || Boolean(defaultExpanded));
+  const uiOptions = getUiOptions(uiSchema ?? {}) as UiSchemaOptionsWithDependency;
+  const isPopulated = Array.isArray(formData)
+    ? formData.length > 0
+    : Boolean(formData && typeof formData === 'object' && Object.keys(formData).length > 0);
+  const expandWhenPopulated = Boolean(uiOptions.expandWhenPopulated && isPopulated);
+  const [expanded, setExpanded] = React.useState(
+    idSchema['$id'] === 'root' || Boolean((defaultExpanded ?? uiOptions.defaultExpanded) || expandWhenPopulated)
+  );
+  React.useEffect(() => {
+    if (defaultExpanded || expandWhenPopulated) setExpanded(true);
+  }, [defaultExpanded, expandWhenPopulated]);
   const [showLabel, schemaLabel] = useSchemaLabel(schema, uiSchema || {}, defaultLabel);
   const label = labelOverride || schemaLabel;
   const schemaDescription = useSchemaDescription(schema, uiSchema || {});

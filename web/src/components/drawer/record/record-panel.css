@@ -6,19 +6,19 @@
   padding-left: 2em;
 }
 
-.borderless-accordion>.pf-v6-c-accordion__expandable-content.pf-m-expanded::after,
+.borderless-accordion > .pf-v6-c-accordion__expandable-content.pf-m-expanded::after,
 .borderless-accordion::after {
   display: none;
 }
 
-.borderless-accordion>.pf-v6-c-accordion__toggle-text {
+.borderless-accordion > .pf-v6-c-accordion__toggle-text {
   padding-left: 0.8em;
   font-size: 14px;
   font-weight: 400 !important;
   line-height: 1.5;
 }
 
-.borderless-accordion>.pf-v6-c-accordion__toggle-icon {
+.borderless-accordion > .pf-v6-c-accordion__toggle-icon {
   position: absolute;
   left: 0;
 }
@@ -28,8 +28,8 @@ button.borderless-accordion {
   padding-bottom: 1em;
 }
 
-.borderless-accordion>.pf-v6-c-accordion__expandable-content.pf-m-expanded,
-.drawer-panel-content>.pf-v6-c-drawer__panel-main>.pf-v6-c-drawer__body {
+.borderless-accordion > .pf-v6-c-accordion__expandable-content.pf-m-expanded,
+.drawer-panel-content > .pf-v6-c-drawer__panel-main > .pf-v6-c-drawer__body {
   padding: 0 !important;
 }
 
@@ -37,11 +37,11 @@ button.borderless-accordion {
   padding-left: 0;
 }
 
-.drawer-tab>button {
+.drawer-tab > button {
   font-size: 15px;
 }
 
-.drawer-panel-content>.pf-v6-c-drawer__panel-main {
+.drawer-panel-content > .pf-v6-c-drawer__panel-main {
   overflow: hidden;
 }
 
@@ -49,7 +49,27 @@ button.borderless-accordion {
   font-size: 1.25rem !important;
   margin: 0 !important;
   padding: 1em !important;
-  align-items: baseline;
+  align-items: center;
+}
+
+.flowcapture-action-button {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  height: 33px !important;
+  min-height: 33px !important;
+  line-height: 1;
+  padding-block: 0 !important;
+  color: var(--pf-t--global--text--color--on-brand--default, #fff) !important;
+}
+
+.flowcapture-action-button > .pf-v6-c-button__text {
+  align-items: center;
+  align-self: center !important;
+  display: inline-flex;
+  justify-content: center;
+  line-height: 1;
+  text-align: center;
 }
 
 .pf-v6-c-drawer__body.drawer-body {
