@@ -157,13 +157,9 @@ const filterQueryExpression = (filter: Filter): string | undefined => {
 
   const expressions = values.map(value => {
     const fields = addressQueryFields[filter.def.id];
-    const regex = fields && addressRegex(value.v);
+    const regex = fields && filter.compare === FilterCompare.equal && addressRegex(value.v);
     if (regex) {
-      const operator =
-        filter.compare === FilterCompare.notEqual || filter.compare === FilterCompare.notMatch ? '!~' : '=~';
-      return fields
-        .map(field => `${field}${operator}${JSON.stringify(regex)}`)
-        .join(operator === '!~' ? ' AND ' : ' OR ');
+      return `(${fields.map(field => `${field}=~${JSON.stringify(regex)}`).join(' OR ')})`;
     }
     const expression = flowlogsPipelineExpression(filter.def.encoder([value], filter.compare, false));
     return expression.includes(' OR ') || expression.includes(' AND ') ? `(${expression})` : expression;

@@ -1,4 +1,4 @@
-import { Button, Divider, FormSelect, FormSelectOption, TextInput } from '@patternfly/react-core';
+import { Button, Checkbox, Divider, FormSelect, FormSelectOption, TextInput } from '@patternfly/react-core';
 import { MinusCircleIcon, PlusCircleIcon } from '@patternfly/react-icons';
 import { FieldProps, WidgetProps } from '@rjsf/utils';
 import React from 'react';
@@ -116,30 +116,36 @@ const FlowCaptureFiltersEditor: React.FC<FlowCaptureFiltersProps> = ({
                   <FormSelectOption key={field.key} value={field.key} label={t(field.label)} />
                 ))}
               </FormSelect>
-              <TextInput
-                aria-label={t('Filter value')}
-                isDisabled={isReadOnly}
-                value={String(selectedValue ?? '')}
-                data-test={`flowcapture-filter-value-${index}`}
-                onChange={(_event, next) => {
-                  if (selected) {
-                    const numericField = new Set<keyof FlowCaptureFilter>([
-                      'sourcePort',
-                      'destPort',
-                      'port',
-                      'icmpType',
-                      'icmpCode',
-                      'sampling'
-                    ]);
-                    const value = numericField.has(selected.key)
-                      ? Number(next)
-                      : selected.key === 'pktDrops'
-                        ? next.toLowerCase() === 'true'
-                        : next;
-                    update(index, { [selected.key]: value });
-                  }
-                }}
-              />
+              {selected?.key === 'pktDrops' ? (
+                <Checkbox
+                  aria-label={t('Filter value')}
+                  isDisabled={isReadOnly}
+                  isChecked={selectedValue === true}
+                  data-test={`flowcapture-filter-value-${index}`}
+                  onChange={(_event, checked) => update(index, { pktDrops: checked })}
+                />
+              ) : (
+                <TextInput
+                  aria-label={t('Filter value')}
+                  isDisabled={isReadOnly}
+                  value={String(selectedValue ?? '')}
+                  data-test={`flowcapture-filter-value-${index}`}
+                  onChange={(_event, next) => {
+                    if (selected) {
+                      const numericField = new Set<keyof FlowCaptureFilter>([
+                        'sourcePort',
+                        'destPort',
+                        'port',
+                        'icmpType',
+                        'icmpCode',
+                        'sampling'
+                      ]);
+                      const value = numericField.has(selected.key) ? Number(next) : next;
+                      update(index, { [selected.key]: value });
+                    }
+                  }}
+                />
+              )}
               {selected && directionalFields.has(selected.key) ? (
                 <FormSelect
                   aria-label={t('Filter direction')}
