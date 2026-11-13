@@ -1,4 +1,4 @@
-import { FlowMetricsResult, RawTopologyMetrics } from '../../api/query-response';
+import { FlowMetricsResult, TopologyMetrics } from '../../api/query-response';
 import { getFlowMetrics, getFlowRecords } from '../../api/routes';
 import { FilterDefinitionSample } from '../../components/__tests-data__/filters';
 import { ScopeDefSample } from '../../components/__tests-data__/scopes';
@@ -6,7 +6,7 @@ import { Filter, FilterCompare, FilterId, Filters, FilterValue } from '../../mod
 import { getFetchFunctions, mergeMetricsBNF } from '../back-and-forth';
 import { ContextSingleton } from '../context';
 import { findFilter } from '../filter-definitions';
-import { parseTopologyMetrics } from '../metrics';
+import { computeStats, createPeer } from '../metrics';
 
 jest.mock('../../api/routes', () => ({
   getFlowRecords: jest.fn(() => Promise.resolve({ records: [] })),
@@ -227,54 +227,39 @@ describe('Match all, topology', () => {
 
 describe('Merge topology BNF', () => {
   const range = { from: 0, to: 300 };
-  const genNsMetric = (
+  const genNsTopology = (
     srcns: string | undefined,
     dstns: string | undefined,
     value1stHalf: number | undefined,
     value2ndHalf: number | undefined
-  ): RawTopologyMetrics => {
-    const m: RawTopologyMetrics = {
-      metric: { SrcK8S_Namespace: srcns, DstK8S_Namespace: dstns },
-      values: []
+  ): TopologyMetrics => {
+    const values: [number, number][] = [];
+    for (let i = 0; i < 20; i++) {
+      const value = i < 10 ? value1stHalf : value2ndHalf;
+      values.push([i * 15, value ?? 0]);
+    }
+    return {
+      source: createPeer({ namespace: srcns }),
+      destination: createPeer({ namespace: dstns }),
+      values,
+      stats: computeStats(values),
+      scope: 'namespace'
     };
-    if (value1stHalf !== undefined) {
-      for (let i = 0; i < 10; i++) {
-        m.values.push([i * 15, value1stHalf]);
-      }
-    }
-    if (value2ndHalf !== undefined) {
-      for (let i = 10; i < 20; i++) {
-        m.values.push([i * 15, value2ndHalf]);
-      }
-    }
-    return m;
   };
 
   it('should merge without overlap', () => {
     ContextSingleton.setScopes(ScopeDefSample);
 
     const rsOrig: FlowMetricsResult = {
-      metrics: parseTopologyMetrics(
-        [
-          genNsMetric('foo', 'bar', 10, 20),
-          genNsMetric('foo', 'foo', 10, 5),
-          genNsMetric('foo', undefined, 5, undefined)
-        ],
-        range,
-        'namespace',
-        0,
-        true
-      ),
+      metrics: [
+        genNsTopology('foo', 'bar', 10, 20),
+        genNsTopology('foo', 'foo', 10, 5),
+        genNsTopology('foo', undefined, 5, undefined)
+      ],
       stats: { limitReached: true, numQueries: 2, dataSources: ['loki'] }
     };
     const rsSwap: FlowMetricsResult = {
-      metrics: parseTopologyMetrics(
-        [genNsMetric('bar', 'foo', 1, 1), genNsMetric('foo', 'foo', 5, 5)],
-        range,
-        'namespace',
-        0,
-        true
-      ),
+      metrics: [genNsTopology('bar', 'foo', 1, 1), genNsTopology('foo', 'foo', 5, 5)],
       stats: { limitReached: false, numQueries: 1, dataSources: ['loki'] }
     };
 
@@ -329,31 +314,19 @@ describe('Merge topology BNF', () => {
 
   it('should merge with overlap', () => {
     const rsOrig: FlowMetricsResult = {
-      metrics: parseTopologyMetrics(
-        [
-          genNsMetric('foo', 'bar', 10, 20),
-          genNsMetric('foo', 'foo', 10, 5),
-          genNsMetric('foo', undefined, 5, undefined)
-        ],
-        range,
-        'namespace',
-        0,
-        true
-      ),
+      metrics: [
+        genNsTopology('foo', 'bar', 10, 20),
+        genNsTopology('foo', 'foo', 10, 5),
+        genNsTopology('foo', undefined, 5, undefined)
+      ],
       stats: { limitReached: true, numQueries: 2, dataSources: ['loki'] }
     };
     const rsSwap: FlowMetricsResult = {
-      metrics: parseTopologyMetrics(
-        [genNsMetric('bar', 'foo', 1, 1), genNsMetric('foo', 'foo', 5, 5)],
-        range,
-        'namespace',
-        0,
-        true
-      ),
+      metrics: [genNsTopology('bar', 'foo', 1, 1), genNsTopology('foo', 'foo', 5, 5)],
       stats: { limitReached: false, numQueries: 1, dataSources: ['loki'] }
     };
     const rsOverlap: FlowMetricsResult = {
-      metrics: parseTopologyMetrics([genNsMetric('foo', 'foo', 3, 3)], range, 'namespace', 0, true),
+      metrics: [genNsTopology('foo', 'foo', 3, 3)],
       stats: { limitReached: false, numQueries: 1, dataSources: ['loki'] }
     };
 
