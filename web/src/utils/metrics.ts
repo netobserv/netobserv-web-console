@@ -427,8 +427,11 @@ export const normalizeMetrics = (
       return [dp[0], val];
     });
 
-    // Normalize by filling missing datapoints with zeros
-    for (let current = start; current < end; current += step) {
+    // Normalize by filling missing datapoints with zeros.
+    // The iteration count is capped: a bogus [start,end] range (e.g. stale data vs. "now") would
+    // otherwise fill millions of points and freeze the browser.
+    const maxPoints = 10000;
+    for (let current = start, i = 0; current < end && i < maxPoints; current += step, i++) {
       if (!getValueCloseTo(normalized, current, step)) {
         normalized.push([current, 0]);
       }

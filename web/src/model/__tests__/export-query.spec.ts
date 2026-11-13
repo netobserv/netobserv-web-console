@@ -5,7 +5,7 @@ describe('buildExportQuery', () => {
     const query = buildExportQuery({
       filters: 'SrcK8S_Name%3Dtest1%2Ctest2',
       recordType: 'flowLog',
-      namespace: undefined,
+      tenant: undefined,
       dataSource: 'auto',
       packetLoss: 'all',
       limit: 500,

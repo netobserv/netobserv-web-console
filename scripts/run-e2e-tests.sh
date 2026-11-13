@@ -268,14 +268,21 @@ CYPRESS_ARGS=(
     --reporter-options configFile=reporter-config.json
 )
 
-# Run tests and capture exit code (tee so SIGTRAP/early crashes leave a trace)
+# Run tests and capture exit code (tee so SIGTRAP/early crashes leave a trace).
+# Hard wall-clock cap: if the browser wedges (e.g. app stuck in a render/compute loop), Cypress'
+# own timeouts never fire, and the CI pod would otherwise run until the prow job timeout, which
+# kills the pod and loses all logs/artifacts. Exiting on our own terms keeps them.
 set +e
-npx cypress run "${CYPRESS_ARGS[@]}" 2>&1 | tee "${RESULTS_DIR}/cypress-console.log"
+timeout -k 30s "${TEST_TIMEOUT:-3h}" npx cypress run "${CYPRESS_ARGS[@]}" 2>&1 | tee "${RESULTS_DIR}/cypress-console.log"
 CYPRESS_EXIT_CODE=${PIPESTATUS[0]}
 set -e
 
 if [ "${CYPRESS_EXIT_CODE}" -ne 0 ]; then
     echo "====> Cypress failed with exit ${CYPRESS_EXIT_CODE}"
+    # 124: killed by timeout's SIGTERM. 137: outlived it and needed the -k SIGKILL.
+    if [ "${CYPRESS_EXIT_CODE}" -eq 124 ] || [ "${CYPRESS_EXIT_CODE}" -eq 137 ]; then
+        echo "====> Cypress run exceeded ${TEST_TIMEOUT:-3h} and was killed"
+    fi
     if [ "${CYPRESS_EXIT_CODE}" -eq 133 ] || [ "${CYPRESS_EXIT_CODE}" -eq 139 ] || [ "${CYPRESS_EXIT_CODE}" -eq 134 ]; then
         echo "====> Signal-style exit (128+n). Dumping environment diagnostics:"
         echo "uid=$(id -u) gid=$(id -g) HOME=${HOME:-} XDG_CACHE_HOME=${XDG_CACHE_HOME:-}"

@@ -36,7 +36,7 @@ export interface FlowQuery {
   timeRange?: number;
   startTime?: string;
   endTime?: string;
-  namespace?: string;
+  tenant?: string;
   filters: string;
   recordType: RecordType;
   dataSource: DataSource;

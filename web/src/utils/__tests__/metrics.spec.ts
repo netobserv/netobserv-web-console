@@ -625,3 +625,14 @@ describe('getFormattedValue', () => {
     expect(getFormattedValue(2500, 'TimeFlowRttNs', 'max', t as TFunction)).toBe('2.5s');
   });
 });
+
+describe('normalizeMetrics bounds', () => {
+  it('should not fill an unbounded number of datapoints when the range is absurd', () => {
+    // Regression: stale data (e.g. mocks) not flagged as such gave start=2024 / end=now,
+    // which filled millions of zeros and froze the browser.
+    const start = 1708009560;
+    const end = Math.floor(Date.now() / 1000);
+    const norm = normalizeMetrics([[start, '5']], start, end, 15, true);
+    expect(norm.length).toBeLessThanOrEqual(10000);
+  });
+});
