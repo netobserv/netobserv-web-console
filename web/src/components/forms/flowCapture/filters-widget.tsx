@@ -118,6 +118,7 @@ const FlowCaptureFiltersEditor: React.FC<FlowCaptureFiltersProps> = ({
               </FormSelect>
               {selected?.key === 'pktDrops' ? (
                 <Checkbox
+                  id={`${id}-filter-value-${index}`}
                   aria-label={t('Filter value')}
                   isDisabled={isReadOnly}
                   isChecked={selectedValue === true}
