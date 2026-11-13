@@ -108,7 +108,7 @@
     "@patternfly/react-drag-drop": "^6.4.0",
     "@patternfly/react-icons": "^6.4.0",
     "@patternfly/react-styles": "^6.4.0",
-    "@patternfly/react-table": "^6.4.2",
+    "@patternfly/react-table": "^6.7.0",
     "@patternfly/react-tokens": "^6.4.0",
     "@patternfly/react-topology": "^6.4.0",
     "@rjsf/core": "^5.24.12",
