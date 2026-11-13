@@ -1,6 +1,7 @@
 import {
   aggregateByWithTlsVersion,
   isTimeMetric,
+  isVolumeMetric,
   showTLSHints,
   topologyTlsVersionAggregateSuffix
 } from '../flow-query';
@@ -28,17 +29,24 @@ describe('aggregateByWithTlsVersion', () => {
   });
 });
 
-describe('isTopologyTlsMetric', () => {
+describe('isVolumeMetric', () => {
   it('should be true for volume metrics', () => {
-    expect(showTLSHints('Bytes')).toBe(true);
-    expect(showTLSHints('Packets')).toBe(true);
-    expect(showTLSHints('PktDropBytes')).toBe(true);
-    expect(showTLSHints('PktDropPackets')).toBe(true);
+    expect(isVolumeMetric('Bytes')).toBe(true);
+    expect(isVolumeMetric('Packets')).toBe(true);
+    expect(isVolumeMetric('PktDropBytes')).toBe(true);
+    expect(isVolumeMetric('PktDropPackets')).toBe(true);
   });
 
   it('should be false for DNS, RTT, and undefined', () => {
+    expect(isVolumeMetric('DnsLatencyMs')).toBe(false);
+    expect(isVolumeMetric('TimeFlowRttNs')).toBe(false);
+    expect(isVolumeMetric(undefined)).toBe(false);
+  });
+});
+
+describe('showTLSHints', () => {
+  it('should match volume metrics', () => {
+    expect(showTLSHints('Bytes')).toBe(true);
     expect(showTLSHints('DnsLatencyMs')).toBe(false);
-    expect(showTLSHints('TimeFlowRttNs')).toBe(false);
-    expect(showTLSHints(undefined)).toBe(false);
   });
 });

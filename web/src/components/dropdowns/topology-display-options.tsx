@@ -180,6 +180,18 @@ export const TopologyDisplayOptions: React.FC<TopologyDisplayOptionsProps> = ({
               })
             }
           />
+          <Checkbox
+            id="edge-tag-display-switch"
+            label={t('Combined edge values')}
+            isDisabled={!topologyOptions.edges || !topologyOptions.edgeTags}
+            isChecked={topologyOptions.edgeTagDisplay !== 'directional'}
+            onChange={() =>
+              setTopologyOptions({
+                ...topologyOptions,
+                edgeTagDisplay: topologyOptions.edgeTagDisplay === 'directional' ? 'combined' : 'directional'
+              })
+            }
+          />
           <Tooltip
             content={t(
               'Merge parallel connections between groups into shared bridges with exit and entry stubs. Reduces edge clutter when nodes are grouped.'
