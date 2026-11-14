@@ -21,6 +21,7 @@ export type TopologyConnectorTagProps = {
   startPoint: Point;
   endPoint: Point;
   tag: string;
+  tagParts?: { value: string; className?: string; dx?: number }[];
   status?: NodeStatus;
   paddingX?: number;
   paddingY?: number;
@@ -30,6 +31,10 @@ export type TopologyConnectorTagProps = {
   showCleartextLock?: boolean;
   /** TLS protocol class for closed-lock color (deprecated / legacy / modern / unknown). */
   lockSeverity?: TlsLockSeverity;
+  /** Perpendicular offset from the edge midpoint. Negative is above the source-to-target line. */
+  offset?: number;
+  /** Rotate the tag to follow the edge angle. */
+  alignWithEdge?: boolean;
 };
 
 const TopologyConnectorTag: React.FunctionComponent<TopologyConnectorTagProps> = ({
@@ -37,16 +42,19 @@ const TopologyConnectorTag: React.FunctionComponent<TopologyConnectorTagProps> =
   startPoint,
   endPoint,
   tag,
+  tagParts,
   status,
   paddingX = 4,
   paddingY = 2,
   showLeadingLock,
   showCleartextLock,
-  lockSeverity
+  lockSeverity,
+  offset = 0,
+  alignWithEdge = false
 }) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
 
-  const [textSize, textRef] = useSize([tag, className]);
+  const [textSize, textRef] = useSize([tag, tagParts, className]);
 
   const showClosedLock = Boolean(showLeadingLock);
   const showOpenLock = Boolean(showCleartextLock) && !showClosedLock;
@@ -122,8 +130,14 @@ const TopologyConnectorTag: React.FunctionComponent<TopologyConnectorTagProps> =
     return null;
   }
 
-  const midX = startPoint.x + (endPoint.x - startPoint.x) * 0.5;
-  const midY = startPoint.y + (endPoint.y - startPoint.y) * 0.5;
+  const dx = endPoint.x - startPoint.x;
+  const dy = endPoint.y - startPoint.y;
+  const length = Math.sqrt(dx * dx + dy * dy) || 1;
+  const midX = startPoint.x + dx * 0.5 + (-dy / length) * offset;
+  const midY = startPoint.y + dy * 0.5 + (dx / length) * offset;
+  const rawAngle = (Math.atan2(dy, dx) * 180) / Math.PI;
+  const angle = rawAngle > 90 ? rawAngle - 180 : rawAngle < -90 ? rawAngle + 180 : rawAngle;
+  const transform = alignWithEdge ? `translate(${midX}, ${midY}) rotate(${angle})` : `translate(${midX}, ${midY})`;
 
   const tagClassName = css(
     styles.topologyEdgeTag,
@@ -134,13 +148,20 @@ const TopologyConnectorTag: React.FunctionComponent<TopologyConnectorTagProps> =
   const lockModifierClass = showOpenLock
     ? 'netobserv-topology-edge-lock--cleartext'
     : `netobserv-topology-edge-lock--${lockSeverity ?? 'unknown'}`;
+  const tagContent = tagParts?.length
+    ? tagParts.map((part, index) => (
+        <tspan key={`${part.value}-${index}`} className={part.className} dx={part.dx}>
+          {part.value}
+        </tspan>
+      ))
+    : tag;
 
   if (!layout) {
     return (
-      <g className={tagClassName} transform={`translate(${midX}, ${midY})`} opacity={0} pointerEvents="none">
+      <g className={tagClassName} transform={transform} opacity={0} pointerEvents="none">
         {tag ? (
           <text ref={textRef as React.LegacyRef<SVGTextElement>} dy="0.35em" x={0} y={0}>
-            {tag}
+            {tagContent}
           </text>
         ) : null}
       </g>
@@ -148,7 +169,7 @@ const TopologyConnectorTag: React.FunctionComponent<TopologyConnectorTagProps> =
   }
 
   return (
-    <g className={tagClassName} transform={`translate(${midX}, ${midY})`}>
+    <g className={tagClassName} transform={transform}>
       <rect
         className={css(styles.topologyEdgeTagBackground)}
         x={layout.startX}
@@ -169,7 +190,7 @@ const TopologyConnectorTag: React.FunctionComponent<TopologyConnectorTagProps> =
       ) : null}
       {tag ? (
         <text ref={textRef as React.LegacyRef<SVGTextElement>} dy="0.35em" x={layout.textOffsetX} y={0}>
-          {tag}
+          {tagContent}
         </text>
       ) : null}
     </g>
