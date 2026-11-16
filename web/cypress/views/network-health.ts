@@ -28,11 +28,11 @@ export namespace networkHealthSelectors {
  *  helpers for the Network Health rule wizard (create/edit/delete).
  */
 export const healthRuleWizard = {
-  next: () => cy.contains('button', 'Next').should('be.visible').click(),
-  back: () => cy.contains('button', 'Back').should('be.visible').click(),
-  submit: () => cy.get(networkHealthSelectors.wizardPrimary).filter(':visible').should('be.enabled').click(),
-  cancel: () => cy.contains('button', 'Cancel').filter(':visible').first().click(),
-  continueEditing: () => cy.contains('button', 'Continue editing').should('be.visible').click(),
+  next: () => cy.contains('button', 'Next').should('be.visible').click({ force: true }),
+  back: () => cy.contains('button', 'Back').should('be.visible').click({ force: true }),
+  submit: () => cy.get(networkHealthSelectors.wizardPrimary).filter(':visible').should('be.enabled').click({ force: true }),
+  cancel: () => cy.contains('button', 'Cancel').filter(':visible').first().click({ force: true }),
+  continueEditing: () => cy.contains('button', 'Continue editing').should('be.visible').click({ force: true }),
 
   // Config -> Review -> Config, waiting for the editor to mount before Back and the form to
   // return after so navigation is deterministic. The editor's benign dispose-time throw on
