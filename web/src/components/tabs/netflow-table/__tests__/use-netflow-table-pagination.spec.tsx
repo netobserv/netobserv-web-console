@@ -18,7 +18,7 @@ const makeWrapper = (
 ): React.FC<React.PropsWithChildren> => {
   const context = {
     caps: {
-      flowQuery: {},
+      flowQuery: { limit: 1 },
       fetchFunctions: { getRecords, getMetrics: jest.fn() }
     } as unknown as ConfigCapabilities,
     config: defaultConfig,
@@ -39,6 +39,79 @@ const makeWrapper = (
 };
 
 describe('useNetflowTablePagination', () => {
+  it('uses the relative time range and keeps its initial lower bound for paging', async () => {
+    const initialNow = 1_700_000_000_000;
+    const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(initialNow);
+    const initialFlow: Record = {
+      ...FlowsSample[0],
+      fields: { ...FlowsSample[0].fields, TimeFlowEndMs: initialNow - 30_000 }
+    };
+    let resolveInitial: ((value: { records: Record[]; stats: Stats }) => void) | undefined;
+    const initialResponse = new Promise<{ records: Record[]; stats: Stats }>(resolve => {
+      resolveInitial = resolve;
+    });
+    const getRecords = jest.fn().mockReturnValueOnce(initialResponse).mockResolvedValueOnce({ records: [], stats });
+    const wrapper = makeWrapper(getRecords, jest.fn());
+    const { result } = renderHook(() => useNetflowTablePagination([]), { wrapper });
+
+    let fetchPromise: Promise<Stats[]> | undefined;
+    act(() => {
+      fetchPromise = result.current.fetch(60, undefined, false, false);
+    });
+    expect(getRecords).toHaveBeenCalledWith(
+      expect.objectContaining({ timeRange: 60, startTime: undefined, endTime: undefined })
+    );
+    nowSpy.mockReturnValue(initialNow + 60_000);
+    await act(async () => {
+      resolveInitial?.({ records: [initialFlow], stats: { ...stats, limitReached: true } });
+      await fetchPromise;
+    });
+    await act(async () => {
+      await result.current.fetchOlder();
+    });
+
+    expect(getRecords.mock.calls[1][0]).toEqual(expect.objectContaining({ startTime: String(initialNow / 1000 - 60) }));
+    nowSpy.mockRestore();
+  });
+
+  it('fetches the remainder of a partially returned Loki timestamp second before paging older', async () => {
+    const timestamp = Math.floor(Date.now() / 1000) - 30;
+    const firstBoundaryFlow: Record = {
+      ...FlowsSample[0],
+      key: FlowsSample[0].key + 200,
+      lokiTimestampNs: String(timestamp * 1_000_000_000),
+      fields: { ...FlowsSample[0].fields, SrcAddr: '10.0.0.200', TimeFlowEndMs: timestamp * 1000 }
+    };
+    const remainingBoundaryFlow: Record = {
+      ...firstBoundaryFlow,
+      key: firstBoundaryFlow.key + 1,
+      fields: { ...firstBoundaryFlow.fields, SrcAddr: '10.0.0.201' }
+    };
+    const getRecords = jest
+      .fn()
+      .mockResolvedValueOnce({ records: [firstBoundaryFlow], stats: { ...stats, limitReached: true } })
+      .mockResolvedValueOnce({ records: [firstBoundaryFlow], stats: { ...stats, limitReached: true } })
+      .mockResolvedValueOnce({ records: [firstBoundaryFlow, remainingBoundaryFlow], stats });
+    const setFlows = jest.fn();
+    const wrapper = makeWrapper(getRecords, setFlows);
+    const { result } = renderHook(() => useNetflowTablePagination([]), { wrapper });
+
+    await act(async () => {
+      await result.current.fetch(60, undefined, false, true);
+    });
+    await act(async () => {
+      await result.current.fetchOlder();
+    });
+
+    expect(getRecords.mock.calls[1][0]).toEqual(
+      expect.objectContaining({ startTime: String(timestamp), endTime: String(timestamp), limit: 1 })
+    );
+    expect(getRecords.mock.calls[2][0]).toEqual(
+      expect.objectContaining({ startTime: String(timestamp), endTime: String(timestamp), limit: 2 })
+    );
+    expect(setFlows).toHaveBeenLastCalledWith(expect.arrayContaining([firstBoundaryFlow, remainingBoundaryFlow]));
+  });
+
   it('adds newer flows while keeping the loaded flows', async () => {
     const initialFlow = FlowsSample[0];
     const newerFlow: Record = {

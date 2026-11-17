@@ -241,7 +241,7 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [fetchOlder, props.flows.length]);
+  }, [fetchOlder, loadingOlder, props.flows.length]);
 
   const fetchNewerOnPull = React.useCallback(
     (deltaY: number, target: EventTarget | null) => {

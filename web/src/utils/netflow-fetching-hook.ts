@@ -312,6 +312,7 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
         return;
       }
 
+      const hadPreviousError = Boolean(errorRef.current);
       setLoading(true);
       setError(undefined);
       errorRef.current = undefined;
@@ -349,8 +350,8 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
               setLastDuration(endDate.getTime() - startDate.getTime());
             })
         );
-      } else if (errorRef.current) {
-        setTimeout(tick);
+      } else if (hadPreviousError && selectedViewId === 'table' && caps.allowLoki) {
+        setTimeout(() => tick(resetTablePagination));
       }
     },
     [

@@ -26,20 +26,33 @@ export interface HistogramToolbarProps {
 
 export const getZoomedTimeRange = (range: TimeRange, zoomIn: boolean, now: number): TimeRange | undefined => {
   const duration = range.to - range.from;
-  const step = Math.floor(duration / (zoomIn ? 4 : 2));
-  if (step <= 0) {
-    return undefined;
+  if (zoomIn) {
+    const step = Math.floor(duration / 4);
+    if (step <= 0) {
+      return undefined;
+    }
+    const updatedRange = { from: range.from + step, to: range.to - step };
+    return updatedRange.to - updatedRange.from >= defaultTimeRange ? updatedRange : undefined;
   }
 
-  const updatedRange = zoomIn
-    ? { from: range.from + step, to: range.to - step }
-    : {
-        from: range.from - step,
-        // Zooming out keeps the complete displayed interval, even if its end
-        // is later than the most recent refresh time.
-        to: Math.min(range.to + step, Math.max(getDateMsInSeconds(now), range.to))
-      };
-  return updatedRange.to - updatedRange.from >= defaultTimeRange ? updatedRange : undefined;
+  const step = Math.floor(duration / 2);
+  if (duration >= defaultTimeRange) {
+    return {
+      from: range.from - step,
+      // Zooming out keeps the complete displayed interval, even if its end
+      // is later than the most recent refresh time.
+      to: Math.min(range.to + step, Math.max(getDateMsInSeconds(now), range.to))
+    };
+  }
+
+  const targetDuration = defaultTimeRange;
+  // Keep the displayed interval intact, even when its end is later than the
+  // most recent refresh time. Clamp short intervals to the default duration.
+  const to = Math.min(
+    range.to + Math.ceil((targetDuration - duration) / 2),
+    Math.max(getDateMsInSeconds(now), range.to)
+  );
+  return { from: to - targetDuration, to };
 };
 
 export const HistogramToolbar: React.FC<HistogramToolbarProps> = props => {

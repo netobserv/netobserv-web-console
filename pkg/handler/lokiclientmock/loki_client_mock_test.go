@@ -23,23 +23,67 @@ func TestGetMockFlowTargetTime(t *testing.T) {
 		t.Fatalf("expected target time near now, got %d", targetTime)
 	}
 
+	response := model.QueryResponse{
+		Status: "success",
+		Data: model.QueryResponseData{
+			ResultType: model.ResultTypeStream,
+			Result: model.Streams{{
+				Labels: map[string]string{"app": "test"},
+				Entries: []model.Entry{{
+					Timestamp: time.Unix(now-120, 0),
+					Line:      fmt.Sprintf(`{"TimeReceived":%d}`, now-120),
+				}},
+			}},
+		},
+	}
+	data, err := json.Marshal(response)
+	if err != nil {
+		t.Fatalf("failed to marshal mock Loki response: %v", err)
+	}
+	countEntries := func(t *testing.T, result []byte) []model.Entry {
+		t.Helper()
+		var parsed model.QueryResponse
+		if err := json.Unmarshal(result, &parsed); err != nil {
+			t.Fatalf("failed to decode mock Loki response: %v", err)
+		}
+		streams, ok := parsed.Data.Result.(model.Streams)
+		if !ok {
+			t.Fatalf("expected streams response, got %T", parsed.Data.Result)
+		}
+		var entries []model.Entry
+		for _, stream := range streams {
+			entries = append(entries, stream.Entries...)
+		}
+		return entries
+	}
+
 	end := now - int64((mockOlderFlowPages+2)*mockOlderFlowPageDuration/time.Second)
 	url := fmt.Sprintf("http://localhost/loki/api/v1/query_range?start=%d&end=%d", end-60, end)
-	firstPage, err := pageFlowRecordsAt([]byte(`{"status":"success","data":{"resultType":"streams","result":[]}}`), url, referenceTime)
+	firstPage, err := pageFlowRecordsAt(data, url, referenceTime)
 	if err != nil {
 		t.Fatalf("pageFlowRecords returned an error: %v", err)
 	}
-	if string(firstPage) != `{"status":"success","data":{"resultType":"streams","result":[]}}` {
-		t.Fatalf("expected the first out-of-history page to be empty, got %s", firstPage)
+	if entries := countEntries(t, firstPage); len(entries) != 0 {
+		t.Fatalf("expected the first out-of-history page to be empty, got %d entries", len(entries))
 	}
 
 	widenedURL := fmt.Sprintf("http://localhost/loki/api/v1/query_range?start=%d&end=%d", end-3600, end)
-	widenedPage, err := pageFlowRecordsAt([]byte(`{"status":"success","data":{"resultType":"streams","result":[]}}`), widenedURL, referenceTime)
+	widenedPage, err := pageFlowRecordsAt(data, widenedURL, referenceTime)
 	if err != nil {
 		t.Fatalf("pageFlowRecords returned an error for a widened window: %v", err)
 	}
-	if string(widenedPage) != string(firstPage) {
-		t.Fatalf("expected widening an empty page to keep it empty, got %s", widenedPage)
+	if entries := countEntries(t, widenedPage); len(entries) != 0 {
+		t.Fatalf("expected the widened out-of-history page to remain empty, got %d entries", len(entries))
+	}
+
+	availableEnd := now - 60
+	availableURL := fmt.Sprintf("http://localhost/loki/api/v1/query_range?start=%d&end=%d", availableEnd-60, availableEnd)
+	availablePage, err := pageFlowRecordsAt(data, availableURL, referenceTime)
+	if err != nil {
+		t.Fatalf("pageFlowRecords returned an error for an available window: %v", err)
+	}
+	if entries := countEntries(t, availablePage); len(entries) != 1 {
+		t.Fatalf("expected the available window to return its entry, got %d entries", len(entries))
 	}
 }
 
