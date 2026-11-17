@@ -1,5 +1,5 @@
 import { Bullseye, Spinner } from '@patternfly/react-core';
-import { SortByDirection, Table, Tbody } from '@patternfly/react-table';
+import { SortByDirection, Table, Tbody, Td, Tr } from '@patternfly/react-table';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,9 +19,42 @@ import { usePrevious } from '../../../utils/previous-hook';
 import { Size } from '../../dropdowns/table-display-dropdown';
 import { Empty } from '../../messages/empty';
 import { NetflowTableHeader } from './netflow-table-header';
+import { NetflowTableNavigation } from './netflow-table-navigation';
 import NetflowTableRow from './netflow-table-row';
 import './netflow-table.css';
 import { useNetflowTablePagination } from './use-netflow-table-pagination';
+
+const VIRTUAL_ROWS_OVERSCAN = 10;
+
+type ScrollRoot = HTMLElement | Window;
+
+const getScrollRoot = (element: HTMLElement): ScrollRoot => {
+  let ancestor: HTMLElement | null = element;
+  while (ancestor && ancestor !== document.body) {
+    const overflowY = window.getComputedStyle(ancestor).overflowY;
+    if (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay') {
+      return ancestor;
+    }
+    ancestor = ancestor.parentElement;
+  }
+  return window;
+};
+
+const getViewportMetrics = (container: HTMLElement): { position: number; height: number } | undefined => {
+  const table = container.querySelector('table');
+  const header = table?.querySelector('thead');
+  if (!table || !header) {
+    return undefined;
+  }
+
+  const scrollRoot = getScrollRoot(container);
+  const viewportTop = scrollRoot instanceof Window ? 0 : scrollRoot.getBoundingClientRect().top;
+  const height = scrollRoot instanceof Window ? window.innerHeight : scrollRoot.clientHeight;
+  return {
+    position: Math.max(0, viewportTop - table.getBoundingClientRect().top - header.getBoundingClientRect().height),
+    height: height || 300
+  };
+};
 
 const getDistanceToTableTop = (table: HTMLElement, target: EventTarget | null): number | undefined => {
   let element = target instanceof HTMLElement ? target : null;
@@ -150,43 +183,30 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
       default:
         return convertRemToPixels(containsDoubleLine ? 4 : 2.5);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.columns, props.size]);
 
-  //update table container height on window resize
-  const handleResize = React.useCallback(() => {
+  // Keep mounted rows aligned with the actual scroll viewport. The table can
+  // scroll inside a page section in both Console and standalone mode.
+  const updateViewport = React.useCallback(() => {
     const container = document.getElementById('table-container');
-    if (container) {
-      setContainerHeight(container.clientHeight);
+    const metrics = container && getViewportMetrics(container);
+    if (metrics) {
+      setContainerHeight(previous => (previous === metrics.height ? previous : metrics.height));
+      setScrollPosition(previous =>
+        Math.abs(previous - metrics.position) > getRowHeight() ? metrics.position : previous
+      );
     }
-  }, []);
-
-  const handleScroll = React.useCallback(() => {
-    const rowHeight = getRowHeight();
-    const container = document.getElementById('table-container');
-    const header = container?.children[0]?.children[0]?.children[0];
-    if (container && header) {
-      const position = container.scrollTop - header.clientHeight;
-      //updates only when position moved more than one row height
-      if (scrollPosition < position - rowHeight || scrollPosition > position + rowHeight) {
-        setScrollPosition(position);
-      }
-    }
-  }, [getRowHeight, scrollPosition]);
+  }, [getRowHeight]);
 
   React.useEffect(() => {
-    handleScroll();
-    handleResize();
-    const container = document.getElementById('table-container');
-    if (container && container.getAttribute('listener') !== 'true') {
-      container.addEventListener('scroll', handleScroll);
-    }
-
-    window.addEventListener('resize', handleResize);
+    updateViewport();
+    document.addEventListener('scroll', updateViewport, true);
+    window.addEventListener('resize', updateViewport);
     return () => {
-      window.removeEventListener('resize', handleResize);
+      document.removeEventListener('scroll', updateViewport, true);
+      window.removeEventListener('resize', updateViewport);
     };
-  }, [handleResize, handleScroll, props.loading]);
+  }, [props.flows.length, props.loading, loadingNewer, upToDate, updateViewport]);
 
   React.useEffect(() => {
     document.addEventListener('scroll', fetchOlderIfVisible, true);
@@ -234,6 +254,57 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
     },
     [activeSortDirection, activeSortId, fetchNewer]
   );
+
+  const canFetchNewerInCurrentSort =
+    activeSortId === ColumnsId.endtime && activeSortDirection === SortByDirection.asc;
+
+  const handleStart = React.useCallback(() => {
+    const container = document.getElementById('table-container');
+    const metrics = container && getViewportMetrics(container);
+    if (!container || !metrics) {
+      return;
+    }
+
+    getScrollRoot(container).scrollBy({ top: -metrics.position, behavior: 'auto' });
+    if (canFetchNewerInCurrentSort) {
+      void fetchNewer(true);
+    }
+  }, [canFetchNewerInCurrentSort, fetchNewer]);
+
+  const handlePageUp = React.useCallback(() => {
+    const container = document.getElementById('table-container');
+    const metrics = container && getViewportMetrics(container);
+    if (!container || !metrics) {
+      return;
+    }
+
+    const targetPosition = Math.max(0, metrics.position - metrics.height);
+    getScrollRoot(container).scrollBy({ top: targetPosition - metrics.position, behavior: 'smooth' });
+    if (targetPosition <= 200 && canFetchNewerInCurrentSort) {
+      void fetchNewer(targetPosition <= 1);
+    }
+  }, [canFetchNewerInCurrentSort, fetchNewer]);
+
+  const handlePageDown = React.useCallback(() => {
+    const container = document.getElementById('table-container');
+    const metrics = container && getViewportMetrics(container);
+    if (!container || !metrics) {
+      return;
+    }
+
+    const maxPosition = Math.max(0, props.flows.length * getRowHeight() - metrics.height);
+    const currentPosition = Math.min(metrics.position, maxPosition);
+    const targetPosition = Math.min(maxPosition, currentPosition + metrics.height);
+    getScrollRoot(container).scrollBy({ top: targetPosition - metrics.position, behavior: 'smooth' });
+    if (maxPosition - targetPosition <= 200) {
+      void fetchOlder();
+    }
+  }, [fetchOlder, getRowHeight, props.flows.length]);
+
+  const handleEnd = React.useCallback(() => {
+    paginationSentinelRef.current?.scrollIntoView?.({ behavior: 'auto', block: 'end' });
+    void fetchOlder();
+  }, [fetchOlder]);
 
   React.useEffect(() => {
     const handleWheel = (event: WheelEvent) => fetchNewerOnPull(event.deltaY, event.target);
@@ -286,10 +357,20 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
 
   const getBody = React.useCallback(() => {
     const rowHeight = getRowHeight();
-
-    return getSortedFlows().map((f, i) => (
+    const flows = getSortedFlows();
+    const visibleRowCount = Math.ceil(containerHeight / rowHeight) + VIRTUAL_ROWS_OVERSCAN * 2;
+    const maxStartIndex = Math.max(0, flows.length - visibleRowCount);
+    const startIndex = Math.min(
+      maxStartIndex,
+      Math.max(0, Math.floor(scrollPosition / rowHeight) - VIRTUAL_ROWS_OVERSCAN)
+    );
+    const endIndex = Math.min(
+      flows.length,
+      Math.max(startIndex, Math.ceil((scrollPosition + containerHeight) / rowHeight) + VIRTUAL_ROWS_OVERSCAN)
+    );
+    const rows = flows.slice(startIndex, endIndex).map((f, index) => (
       <NetflowTableRow
-        rowNumber={i}
+        rowNumber={startIndex + index}
         key={f.key}
         allowPktDrops={props.allowPktDrops}
         flow={f}
@@ -306,11 +387,33 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
           !firstRender.current
         }
         height={rowHeight}
-        showContent={scrollPosition <= i * rowHeight && scrollPosition + containerHeight > i * rowHeight}
         tableWidth={width}
         isDark={props.isDark}
       />
     ));
+    const spacerProps = {
+      'aria-hidden': true,
+      'data-last-render': lastRender,
+      className: 'netflow-table-virtual-spacer'
+    };
+    const topSpacerHeight = startIndex * rowHeight;
+    const bottomSpacerHeight = Math.max(0, (flows.length - endIndex) * rowHeight);
+
+    return (
+      <>
+        {topSpacerHeight > 0 && (
+          <Tr {...spacerProps} data-test="table-top-spacer" style={{ height: topSpacerHeight }}>
+            <Td colSpan={props.columns.length} style={{ height: topSpacerHeight, padding: 0, border: 0 }} />
+          </Tr>
+        )}
+        {rows}
+        {bottomSpacerHeight > 0 && (
+          <Tr {...spacerProps} data-test="table-bottom-spacer" style={{ height: bottomSpacerHeight }}>
+            <Td colSpan={props.columns.length} style={{ height: bottomSpacerHeight, padding: 0, border: 0 }} />
+          </Tr>
+        )}
+      </>
+    );
   }, [
     props.allowPktDrops,
     lastRender,
@@ -368,6 +471,12 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
           )}
         </div>
       )}
+      <NetflowTableNavigation
+        onStart={handleStart}
+        onPageUp={handlePageUp}
+        onPageDown={handlePageDown}
+        onEnd={handleEnd}
+      />
       <Table
         data-test="table-composable"
         data-test-cols-count={props.columns.length}

@@ -18,7 +18,6 @@ export interface NetflowTableRowProps {
   onSelect: (record?: Record) => void;
   highlight: boolean;
   height?: number;
-  showContent?: boolean;
   tableWidth: number;
   isDark?: boolean;
 }
@@ -34,7 +33,6 @@ export const NetflowTableRow: React.FC<NetflowTableRowProps> = ({
   onSelect,
   highlight,
   height,
-  showContent,
   tableWidth,
   isDark
 }) => {
@@ -55,27 +53,24 @@ export const NetflowTableRow: React.FC<NetflowTableRowProps> = ({
         className="stripped"
         style={{ height }}
       >
-        {showContent &&
-          columns.map(c => (
-            <Td
-              data-test={`td-${flow.key}`}
-              data-test-td-column-id={c.id}
-              data-test-td-value={c.value && c.value(flow)}
-              key={c.id}
-              style={{ height: '100%', width: `${Math.floor((100 * c.width) / tableWidth)}%` }}
-            >
-              {
-                <RecordField
-                  allowPktDrops={allowPktDrops}
-                  flow={flow}
-                  column={c}
-                  size={size}
-                  useLinks={false}
-                  isDark={isDark}
-                />
-              }
-            </Td>
-          ))}
+        {columns.map(c => (
+          <Td
+            data-test={`td-${flow.key}`}
+            data-test-td-column-id={c.id}
+            data-test-td-value={c.value && c.value(flow)}
+            key={c.id}
+            style={{ height: '100%', width: `${Math.floor((100 * c.width) / tableWidth)}%` }}
+          >
+            <RecordField
+              allowPktDrops={allowPktDrops}
+              flow={flow}
+              column={c}
+              size={size}
+              useLinks={false}
+              isDark={isDark}
+            />
+          </Td>
+        ))}
       </Tr>
     </CSSTransition>
   );
