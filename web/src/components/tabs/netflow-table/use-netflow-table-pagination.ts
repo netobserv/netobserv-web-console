@@ -11,14 +11,14 @@ import {
   getTimeRangeDuration,
   TimeRange
 } from '../../../utils/datetime';
-import { getStructuredHTTPError } from '../../../utils/errors';
+import { getStructuredHTTPError, StructuredError } from '../../../utils/errors';
 import { mergeFlowReporters } from '../../../utils/flows';
 import { Result } from '../../../utils/result';
 
 interface FlowPagingState {
   signature: string;
   query: StructuredFlowQuery;
-  olderFlows: Record[];
+  sessionFlows: Record[];
   currentStart: number;
   nextEnd: number;
   newerUntil: number;
@@ -111,6 +111,7 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
   const isFetchingPageRef = React.useRef(false);
   const metricsRequestIdRef = React.useRef(0);
   const [loadingOlder, setLoadingOlder] = React.useState(false);
+  const [olderError, setOlderError] = React.useState<StructuredError | string>();
   const [loadingNewer, setLoadingNewer] = React.useState(false);
   const [upToDate, setUpToDate] = React.useState(false);
   const upToDateTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -124,6 +125,8 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
       if (upToDateTimeoutRef.current !== undefined) {
         clearTimeout(upToDateTimeoutRef.current);
       }
+      pagingRef.current = undefined;
+      metricsRequestIdRef.current++;
     },
     []
   );
@@ -159,6 +162,7 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
     }
 
     isFetchingPageRef.current = true;
+    setOlderError(undefined);
     setLoadingOlder(true);
     try {
       const requestStart = paging.currentStart;
@@ -170,9 +174,9 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
       };
       const res = await caps.fetchFunctions.getRecords(query);
       const older = paging.showDuplicates ? res.records : mergeFlowReporters(res.records);
-      const existingKeys = new Set(paging.olderFlows.map(flow => flow.key));
+      const existingKeys = new Set(paging.sessionFlows.map(flow => flow.key));
       const newFlows = older.filter(flow => !existingKeys.has(flow.key));
-      paging.olderFlows = paging.olderFlows.concat(newFlows);
+      paging.sessionFlows = paging.sessionFlows.concat(newFlows);
       if (newFlows.length > 0) {
         paging.loadedStart = Math.min(paging.loadedStart ?? requestStart, requestStart);
       }
@@ -210,12 +214,7 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
         if (!paging.hasMore) {
           setHasMoreOlder(false);
         }
-        const allKeys = new Set<number>();
-        const combinedFlows = [...flowsRef.current, ...newFlows].filter(flow => {
-          if (allKeys.has(flow.key)) return false;
-          allKeys.add(flow.key);
-          return true;
-        });
+        const combinedFlows = paging.sessionFlows;
         flowsRef.current = combinedFlows;
         fetchCallbacks.setFlows(combinedFlows);
         onLoadedRangeChange?.(getLoadedFlowsRange(combinedFlows));
@@ -237,7 +236,7 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
         // A failed query doesn't prove that Loki has no older flows. Pause
         // automatic retries and let the next user scroll retry the request.
         paging.blockedByError = true;
-        fetchCallbacks.setError(getStructuredHTTPError(err));
+        setOlderError(getStructuredHTTPError(err));
       }
     } finally {
       isFetchingPageRef.current = false;
@@ -312,7 +311,7 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
 
         if (pagingRef.current === paging) {
           const newer = paging.showDuplicates ? receivedRecords : mergeFlowReporters(receivedRecords);
-          const existingKeys = new Set(flowsRef.current.map(flow => flow.key));
+          const existingKeys = new Set(paging.sessionFlows.map(flow => flow.key));
           const newFlows = newer.filter(flow => {
             if (existingKeys.has(flow.key)) {
               return false;
@@ -322,7 +321,8 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
           });
           if (newFlows.length > 0) {
             upToDateUntilRef.current = 0;
-            const combinedFlows = [...newFlows, ...flowsRef.current];
+            const combinedFlows = [...newFlows, ...paging.sessionFlows];
+            paging.sessionFlows = combinedFlows;
             flowsRef.current = combinedFlows;
             fetchCallbacks.setFlows(combinedFlows);
             onLoadedRangeChange?.(getLoadedFlowsRange(combinedFlows));
@@ -429,7 +429,7 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
         paging = {
           signature,
           query: tableQuery,
-          olderFlows: [],
+          sessionFlows: [],
           currentStart: tableRange.from - pageDuration,
           nextEnd: getExclusiveEndTime(tableRange.from),
           newerUntil: tableRange.to,
@@ -474,12 +474,12 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
             paging.initializedFromResult = true;
           }
           if (pagingRef.current === paging) {
-            const allKeys = new Set<number>();
-            const combinedFlows = [...currentFlows, ...paging.olderFlows].filter(flow => {
-              if (allKeys.has(flow.key)) return false;
-              allKeys.add(flow.key);
-              return true;
-            });
+            const currentFlowsByKey = new Map(currentFlows.map(flow => [flow.key, flow]));
+            const sessionKeys = new Set(paging.sessionFlows.map(flow => flow.key));
+            const refreshedSessionFlows = paging.sessionFlows.map(flow => currentFlowsByKey.get(flow.key) ?? flow);
+            const newCurrentFlows = currentFlows.filter(flow => !sessionKeys.has(flow.key));
+            const combinedFlows = [...newCurrentFlows, ...refreshedSessionFlows];
+            paging.sessionFlows = combinedFlows;
             flowsRef.current = combinedFlows;
             setFlows(combinedFlows);
             onLoadedRangeChange?.(getLoadedFlowsRange(combinedFlows));
@@ -495,5 +495,15 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
     [caps.flowQuery, caps.fetchFunctions, fetchCallbacks, fetchTotalFlowCount, onLoadedRangeChange]
   );
 
-  return { fetch, fetchOlder, fetchNewer, fetchOlderIfVisible, hasMoreOlder, loadingOlder, loadingNewer, upToDate };
+  return {
+    fetch,
+    fetchOlder,
+    fetchNewer,
+    fetchOlderIfVisible,
+    hasMoreOlder,
+    loadingOlder,
+    loadingNewer,
+    olderError,
+    upToDate
+  };
 };

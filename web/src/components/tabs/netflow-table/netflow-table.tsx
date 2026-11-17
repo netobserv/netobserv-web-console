@@ -126,8 +126,17 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
   const firstRender = React.useRef(true);
   const paginationSentinelRef = React.useRef<HTMLDivElement>(null);
   const touchStartYRef = React.useRef<number | undefined>(undefined);
-  const { fetch, fetchOlder, fetchNewer, fetchOlderIfVisible, hasMoreOlder, loadingOlder, loadingNewer, upToDate } =
-    useNetflowTablePagination(props.flows, props.onLoadedRangeChange);
+  const {
+    fetch,
+    fetchOlder,
+    fetchNewer,
+    fetchOlderIfVisible,
+    hasMoreOlder,
+    loadingOlder,
+    loadingNewer,
+    olderError,
+    upToDate
+  } = useNetflowTablePagination(props.flows, props.onLoadedRangeChange);
   const width = props.columns.reduce((prev, cur) => prev + cur.width, 0);
 
   React.useImperativeHandle(ref, () => ({
@@ -501,12 +510,16 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
           {getBody()}
         </Tbody>
       </Table>
-      {(loadingOlder || !hasMoreOlder) && (
+      {(loadingOlder || olderError || !hasMoreOlder) && (
         <div
           className={`netflow-table-pagination-status ${
-            loadingOlder ? 'netflow-table-pagination-status--loading' : 'netflow-table-pagination-status--end'
+            loadingOlder
+              ? 'netflow-table-pagination-status--loading'
+              : olderError
+                ? 'netflow-table-pagination-status--error'
+                : 'netflow-table-pagination-status--end'
           }`}
-          role="status"
+          role={olderError && !loadingOlder ? 'alert' : 'status'}
           aria-live="polite"
         >
           {loadingOlder ? (
@@ -514,6 +527,10 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
               <Spinner size="sm" aria-label={t('Loading older flows')} />
               <span data-test="loading-older-flows">{t('Loading older flows')}</span>
             </>
+          ) : olderError ? (
+            <span data-test="older-flows-error">
+              {t('Unable to load older flows')}: {typeof olderError === 'string' ? olderError : olderError.toString()}
+            </span>
           ) : (
             <span data-test="no-older-flows">{t('End of available flows')}</span>
           )}

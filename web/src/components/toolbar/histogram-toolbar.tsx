@@ -24,6 +24,24 @@ export interface HistogramToolbarProps {
   tick: () => void;
 }
 
+export const getZoomedTimeRange = (range: TimeRange, zoomIn: boolean, now: number): TimeRange | undefined => {
+  const duration = range.to - range.from;
+  const step = Math.floor(duration / (zoomIn ? 4 : 2));
+  if (step <= 0) {
+    return undefined;
+  }
+
+  const updatedRange = zoomIn
+    ? { from: range.from + step, to: range.to - step }
+    : {
+        from: range.from - step,
+        // Zooming out keeps the complete displayed interval, even if its end
+        // is later than the most recent refresh time.
+        to: Math.min(range.to + step, Math.max(getDateMsInSeconds(now), range.to))
+      };
+  return updatedRange.to - updatedRange.from >= defaultTimeRange ? updatedRange : undefined;
+};
+
 export const HistogramToolbar: React.FC<HistogramToolbarProps> = props => {
   const { t } = useTranslation('plugin__netobserv-plugin');
   const isDarkTheme = useTheme();
@@ -68,9 +86,10 @@ export const HistogramToolbar: React.FC<HistogramToolbarProps> = props => {
     (zoomIn: boolean) => {
       const timeRangeOptions = getTimeRangeOptions(t, false);
       const keys = Object.keys(timeRangeOptions);
+      const displayedRange = props.loadedRange ?? props.range;
 
-      if (typeof props.range === 'number') {
-        const selectedKey = formatDuration(getDateSInMiliseconds(props.range as number));
+      if (typeof displayedRange === 'number') {
+        const selectedKey = formatDuration(getDateSInMiliseconds(displayedRange));
         let index = keys.indexOf(selectedKey);
         if (zoomIn && index > 0) {
           index--;
@@ -80,24 +99,15 @@ export const HistogramToolbar: React.FC<HistogramToolbarProps> = props => {
 
         props.setRange(getDateMsInSeconds(parseDuration(keys[index])));
       } else {
-        const updatedRange = { ...props.range };
-        const factor = Math.floor(((zoomIn ? -1 : 1) * (props.range.to - props.range.from)) / (zoomIn ? 4 : 2));
-
-        updatedRange.from -= factor;
-        updatedRange.to += factor;
-
-        if (updatedRange.to - updatedRange.from >= getDateMsInSeconds(parseDuration(keys[0]))) {
-          const now = props.lastRefresh ? props.lastRefresh.getTime() : new Date().getTime();
-          if (getDateSInMiliseconds(updatedRange.to) > now) {
-            updatedRange.to = getDateMsInSeconds(now);
-          }
-
+        const now = props.lastRefresh ? props.lastRefresh.getTime() : new Date().getTime();
+        const updatedRange = getZoomedTimeRange(displayedRange, zoomIn, now);
+        if (updatedRange) {
           props.setRange(updatedRange);
         }
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [props.lastRefresh, props.range]
+    [props.lastRefresh, props.loadedRange, props.range]
   );
 
   return (

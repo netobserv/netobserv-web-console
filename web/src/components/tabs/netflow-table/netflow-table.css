@@ -50,6 +50,10 @@
   font-size: var(--pf-t--global--font--size--sm);
 }
 
+.netflow-table-pagination-status--error {
+  color: var(--pf-t--global--color--status--danger--default);
+}
+
 .netflow-table-pagination-status--end::before,
 .netflow-table-pagination-status--end::after {
   content: '';

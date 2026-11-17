@@ -19,11 +19,12 @@ type LokiClientMock struct {
 }
 
 const (
-	mockOlderFlowPages = 8
-	mockOlderFlowDelay = 300 * time.Millisecond
+	mockOlderFlowPages        = 8
+	mockOlderFlowPageDuration = 5 * time.Minute
+	mockOlderFlowDelay        = 300 * time.Millisecond
 )
 
-func getMockFlowTargetTime(requestURL string) (int64, bool, error) {
+func getMockFlowTargetTimeAt(requestURL string, referenceTime time.Time) (int64, bool, error) {
 	parsedURL, err := neturl.Parse(requestURL)
 	if err != nil {
 		return 0, false, err
@@ -31,12 +32,12 @@ func getMockFlowTargetTime(requestURL string) (int64, bool, error) {
 	params := parsedURL.Query()
 	start, startErr := strconv.ParseInt(params.Get("start"), 10, 64)
 	end, endErr := strconv.ParseInt(params.Get("end"), 10, 64)
-	now := time.Now().Unix()
+	now := referenceTime.Unix()
 	targetTime := now - 1
 	if startErr == nil && endErr == nil {
-		duration := end - start
-		if duration > 0 {
-			page := int((now - end + duration/2) / duration)
+		if end > start {
+			pageDuration := int64(mockOlderFlowPageDuration / time.Second)
+			page := int((now - end) / pageDuration)
 			if page > mockOlderFlowPages {
 				if page == mockOlderFlowPages+1 {
 					time.Sleep(mockOlderFlowDelay)
@@ -86,7 +87,11 @@ func shiftMockFlowEntry(entry *model.Entry, shiftSeconds int64) {
 }
 
 func pageFlowRecords(data []byte, requestURL string) ([]byte, error) {
-	targetTime, beyondAvailablePages, err := getMockFlowTargetTime(requestURL)
+	return pageFlowRecordsAt(data, requestURL, time.Now())
+}
+
+func pageFlowRecordsAt(data []byte, requestURL string, referenceTime time.Time) ([]byte, error) {
+	targetTime, beyondAvailablePages, err := getMockFlowTargetTimeAt(requestURL, referenceTime)
 	if err != nil {
 		return nil, err
 	}

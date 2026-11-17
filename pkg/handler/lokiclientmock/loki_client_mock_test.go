@@ -10,8 +10,9 @@ import (
 )
 
 func TestGetMockFlowTargetTime(t *testing.T) {
-	now := time.Now().Unix()
-	targetTime, beyondAvailablePages, err := getMockFlowTargetTime("http://localhost/loki/api/v1/query_range")
+	referenceTime := time.Unix(1_700_000_000, 0)
+	now := referenceTime.Unix()
+	targetTime, beyondAvailablePages, err := getMockFlowTargetTimeAt("http://localhost/loki/api/v1/query_range", referenceTime)
 	if err != nil {
 		t.Fatalf("getMockFlowTargetTime returned an error: %v", err)
 	}
@@ -22,14 +23,23 @@ func TestGetMockFlowTargetTime(t *testing.T) {
 		t.Fatalf("expected target time near now, got %d", targetTime)
 	}
 
-	end := now - 20
-	url := fmt.Sprintf("http://localhost/loki/api/v1/query_range?start=%d&end=%d", end-1, end)
-	_, beyondAvailablePages, err = getMockFlowTargetTime(url)
+	end := now - int64((mockOlderFlowPages+2)*mockOlderFlowPageDuration/time.Second)
+	url := fmt.Sprintf("http://localhost/loki/api/v1/query_range?start=%d&end=%d", end-60, end)
+	firstPage, err := pageFlowRecordsAt([]byte(`{"status":"success","data":{"resultType":"streams","result":[]}}`), url, referenceTime)
 	if err != nil {
-		t.Fatalf("getMockFlowTargetTime returned an error: %v", err)
+		t.Fatalf("pageFlowRecords returned an error: %v", err)
 	}
-	if !beyondAvailablePages {
-		t.Fatal("expected mock pages beyond the configured history to be empty")
+	if string(firstPage) != `{"status":"success","data":{"resultType":"streams","result":[]}}` {
+		t.Fatalf("expected the first out-of-history page to be empty, got %s", firstPage)
+	}
+
+	widenedURL := fmt.Sprintf("http://localhost/loki/api/v1/query_range?start=%d&end=%d", end-3600, end)
+	widenedPage, err := pageFlowRecordsAt([]byte(`{"status":"success","data":{"resultType":"streams","result":[]}}`), widenedURL, referenceTime)
+	if err != nil {
+		t.Fatalf("pageFlowRecords returned an error for a widened window: %v", err)
+	}
+	if string(widenedPage) != string(firstPage) {
+		t.Fatalf("expected widening an empty page to keep it empty, got %s", widenedPage)
 	}
 }
 

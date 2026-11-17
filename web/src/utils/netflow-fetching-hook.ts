@@ -247,6 +247,10 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
   // Data-fetching state
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | StructuredError | undefined>();
+  const errorRef = React.useRef(error);
+  React.useEffect(() => {
+    errorRef.current = error;
+  }, [error]);
   const [flows, setFlows] = React.useState<Record[]>([]);
   const [stats, setStats] = React.useState<Stats | undefined>(undefined);
   const [metrics, setMetrics] = React.useState<NetflowMetrics>(defaultNetflowMetrics);
@@ -310,6 +314,7 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
 
       setLoading(true);
       setError(undefined);
+      errorRef.current = undefined;
 
       const promises = dispatchFetch({
         selectedViewId,
@@ -344,7 +349,7 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
               setLastDuration(endDate.getTime() - startDate.getTime());
             })
         );
-      } else if (error) {
+      } else if (errorRef.current) {
         setTimeout(tick);
       }
     },
@@ -368,7 +373,6 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
       chipsPopoverMessage,
       config.columns,
       drawerRef,
-      error,
       filters,
       initState
     ]
