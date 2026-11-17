@@ -263,8 +263,7 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
     [activeSortDirection, activeSortId, fetchNewer]
   );
 
-  const canFetchNewerInCurrentSort =
-    activeSortId === ColumnsId.endtime && activeSortDirection === SortByDirection.asc;
+  const canFetchNewerInCurrentSort = activeSortId === ColumnsId.endtime && activeSortDirection === SortByDirection.asc;
 
   const handleStart = React.useCallback(() => {
     const container = document.getElementById('table-container');
@@ -414,29 +413,31 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
       flows.length,
       Math.max(startIndex, Math.ceil((scrollPosition + containerHeight) / rowHeight) + VIRTUAL_ROWS_OVERSCAN)
     );
-    const rows = flows.slice(startIndex, endIndex).map((f, index) => (
-      <NetflowTableRow
-        rowNumber={startIndex + index}
-        key={f.key}
-        allowPktDrops={props.allowPktDrops}
-        flow={f}
-        lastRender={lastRender}
-        columns={props.columns}
-        size={props.size}
-        selectedRecord={props.selectedRecord}
-        onSelect={props.onSelect}
-        highlight={
-          previousContainerHeight === containerHeight &&
-          previousScrollPosition === scrollPosition &&
-          previousActiveSortDirection === activeSortDirection &&
-          previousActiveSortIndex === activeSortId &&
-          !firstRender.current
-        }
-        height={rowHeight}
-        tableWidth={width}
-        isDark={props.isDark}
-      />
-    ));
+    const rows = flows
+      .slice(startIndex, endIndex)
+      .map((f, index) => (
+        <NetflowTableRow
+          rowNumber={startIndex + index}
+          key={f.key}
+          allowPktDrops={props.allowPktDrops}
+          flow={f}
+          lastRender={lastRender}
+          columns={props.columns}
+          size={props.size}
+          selectedRecord={props.selectedRecord}
+          onSelect={props.onSelect}
+          highlight={
+            previousContainerHeight === containerHeight &&
+            previousScrollPosition === scrollPosition &&
+            previousActiveSortDirection === activeSortDirection &&
+            previousActiveSortIndex === activeSortId &&
+            !firstRender.current
+          }
+          height={rowHeight}
+          tableWidth={width}
+          isDark={props.isDark}
+        />
+      ));
     const spacerProps = {
       'aria-hidden': true,
       'data-last-render': lastRender,
