@@ -5,241 +5,177 @@
     "result": [
       {
         "metric": {
-          "DstK8S_Zone": "us-east-1a",
-          "SrcK8S_Zone": "us-east-1a"
+          "DstK8S_Zone": "us-east-1d",
+          "SrcK8S_Zone": "us-east-1d"
         },
         "values": [
           [
-            1708009560,
-            "185.5"
+            1786459590,
+            "360666.75333333336"
           ],
           [
-            1708009920,
-            "225.8"
+            1786459620,
+            "816084.8866666667"
           ],
           [
-            1708010280,
-            "245.3"
+            1786459650,
+            "1219662.0333333334"
           ],
           [
-            1708010640,
-            "258.7"
+            1786459680,
+            "1612191.2466666666"
           ],
           [
-            1708011000,
-            "252.1"
+            1786459710,
+            "1983246.1333333333"
           ],
           [
-            1708011360,
-            "265.4"
+            1786459740,
+            "2360109.76"
           ],
           [
-            1708011720,
-            "270.2"
+            1786459770,
+            "2730184.3733333335"
+          ],
+          [
+            1786459800,
+            "3109724.48"
+          ],
+          [
+            1786459830,
+            "3478775.67"
+          ],
+          [
+            1786459860,
+            "3857560.6466666665"
+          ],
+          [
+            1786459890,
+            "3865410.316666667"
+          ],
+          [
+            1786459920,
+            "3786513.46"
+          ],
+          [
+            1786459950,
+            "3748721.4066666667"
+          ],
+          [
+            1786459980,
+            "3730795.6933333334"
+          ],
+          [
+            1786460010,
+            "3725192.243333333"
+          ],
+          [
+            1786460040,
+            "3724431.85"
+          ],
+          [
+            1786460070,
+            "3722276.256666667"
           ]
         ]
       },
       {
         "metric": {
-          "DstK8S_Zone": "us-east-1b",
-          "SrcK8S_Zone": "us-east-1a"
+          "SrcK8S_Zone": "us-east-1d"
         },
         "values": [
           [
-            1708009560,
-            "120.3"
+            1786459590,
+            "33857.88"
           ],
           [
-            1708009920,
-            "145.8"
+            1786459620,
+            "150302.45666666667"
           ],
           [
-            1708010280,
-            "165.2"
+            1786459650,
+            "171014.06666666668"
           ],
           [
-            1708010640,
-            "175.5"
+            1786459680,
+            "193468.88333333333"
           ],
           [
-            1708011000,
-            "172.1"
+            1786459710,
+            "205075.30333333334"
           ],
           [
-            1708011360,
-            "182.8"
+            1786459740,
+            "214906.78333333333"
           ],
           [
-            1708011720,
-            "188.5"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstK8S_Zone": "us-east-1b",
-          "SrcK8S_Zone": "us-east-1b"
-        },
-        "values": [
-          [
-            1708009560,
-            "150.2"
+            1786459770,
+            "228104.31"
           ],
           [
-            1708009920,
-            "180.5"
+            1786459800,
+            "238520.40333333332"
           ],
           [
-            1708010280,
-            "195.8"
+            1786459830,
+            "248459.20666666667"
           ],
           [
-            1708010640,
-            "205.3"
+            1786459860,
+            "258305.73333333334"
           ],
           [
-            1708011000,
-            "198.7"
+            1786459890,
+            "233570.53"
           ],
           [
-            1708011360,
-            "212.5"
+            1786459920,
+            "127436.82"
           ],
           [
-            1708011720,
-            "218.9"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstK8S_Zone": "us-east-1c",
-          "SrcK8S_Zone": "us-east-1a"
-        },
-        "values": [
-          [
-            1708009560,
-            "95.8"
+            1786459950,
+            "115407.10333333333"
           ],
           [
-            1708009920,
-            "115.2"
+            1786459980,
+            "101880.7"
           ],
           [
-            1708010280,
-            "128.5"
+            1786460010,
+            "101235.90666666666"
           ],
           [
-            1708010640,
-            "135.7"
+            1786460040,
+            "101990.39666666667"
           ],
           [
-            1708011000,
-            "132.3"
-          ],
-          [
-            1708011360,
-            "142.1"
-          ],
-          [
-            1708011720,
-            "148.8"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstK8S_Zone": "us-east-1c",
-          "SrcK8S_Zone": "us-east-1c"
-        },
-        "values": [
-          [
-            1708009560,
-            "88.5"
-          ],
-          [
-            1708009920,
-            "105.8"
-          ],
-          [
-            1708010280,
-            "118.2"
-          ],
-          [
-            1708010640,
-            "125.3"
-          ],
-          [
-            1708011000,
-            "122.7"
-          ],
-          [
-            1708011360,
-            "132.5"
-          ],
-          [
-            1708011720,
-            "138.1"
-          ]
-        ]
-      },
-      {
-        "metric": {
-          "DstK8S_Zone": "us-west-2a",
-          "SrcK8S_Zone": "us-east-1a"
-        },
-        "values": [
-          [
-            1708009560,
-            "45.2"
-          ],
-          [
-            1708009920,
-            "52.8"
-          ],
-          [
-            1708010280,
-            "58.5"
-          ],
-          [
-            1708010640,
-            "62.3"
-          ],
-          [
-            1708011000,
-            "60.1"
-          ],
-          [
-            1708011360,
-            "65.7"
-          ],
-          [
-            1708011720,
-            "68.9"
+            1786460070,
+            "100611.00333333333"
           ]
         ]
       }
     ],
     "stats": {
       "summary": {
-        "bytesProcessedPerSecond": 367070937,
-        "linesProcessedPerSecond": 558627,
-        "totalBytesProcessed": 211370848,
-        "totalLinesProcessed": 321675,
-        "execTime": 0.575831062,
-        "queueTime": 7.719558994,
+        "bytesProcessedPerSecond": 175139040,
+        "linesProcessedPerSecond": 185229,
+        "totalBytesProcessed": 58469421,
+        "totalLinesProcessed": 61838,
+        "execTime": 0.333845731,
+        "queueTime": 0.156897882,
         "subqueries": 0,
-        "totalEntriesReturned": 6,
-        "splits": 6,
-        "shards": 48,
-        "totalPostFilterLines": 199944,
-        "totalStructuredMetadataBytesProcessed": 0
+        "totalEntriesReturned": 2,
+        "splits": 13,
+        "shards": 13,
+        "totalPostFilterLines": 61698,
+        "totalStructuredMetadataBytesProcessed": 1509916
       },
       "querier": {
         "store": {
           "totalChunksRef": 0,
           "totalChunksDownloaded": 0,
           "chunksDownloadTime": 0,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
             "headChunkBytes": 0,
             "headChunkLines": 0,
@@ -250,29 +186,36 @@
             "postFilterLines": 0,
             "headChunkStructuredMetadataBytes": 0,
             "decompressedStructuredMetadataBytes": 0
-          }
+          },
+          "chunkRefsFetchTime": 0,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "ingester": {
-        "totalReached": 48,
-        "totalChunksMatched": 375,
-        "totalBatches": 394,
-        "totalLinesSent": 168379,
+        "totalReached": 13,
+        "totalChunksMatched": 331,
+        "totalBatches": 119,
+        "totalLinesSent": 53599,
         "store": {
-          "totalChunksRef": 16,
-          "totalChunksDownloaded": 16,
-          "chunksDownloadTime": 7650111,
+          "totalChunksRef": 4,
+          "totalChunksDownloaded": 4,
+          "chunksDownloadTime": 763974,
+          "queryReferencedStructuredMetadata": false,
           "chunk": {
-            "headChunkBytes": 18864260,
-            "headChunkLines": 28785,
-            "decompressedBytes": 192506588,
-            "decompressedLines": 292890,
-            "compressedBytes": 43190086,
-            "totalDuplicates": 0,
-            "postFilterLines": 199944,
-            "headChunkStructuredMetadataBytes": 0,
-            "decompressedStructuredMetadataBytes": 0
-          }
+            "headChunkBytes": 15349694,
+            "headChunkLines": 15692,
+            "decompressedBytes": 43119727,
+            "decompressedLines": 46146,
+            "compressedBytes": 9038744,
+            "totalDuplicates": 8050,
+            "postFilterLines": 61698,
+            "headChunkStructuredMetadataBytes": 125536,
+            "decompressedStructuredMetadataBytes": 1384380
+          },
+          "chunkRefsFetchTime": 2693183,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0
         }
       },
       "cache": {
@@ -283,7 +226,8 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "index": {
           "entriesFound": 0,
@@ -292,26 +236,75 @@
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
         },
         "result": {
-          "entriesFound": 4,
-          "entriesRequested": 6,
-          "entriesStored": 3,
-          "bytesReceived": 1391,
+          "entriesFound": 0,
+          "entriesRequested": 12,
+          "entriesStored": 12,
+          "bytesReceived": 0,
           "bytesSent": 0,
-          "requests": 9,
-          "downloadTime": 91551
+          "requests": 24,
+          "downloadTime": 254375,
+          "queryLengthServed": 0
         },
         "statsResult": {
+          "entriesFound": 11,
+          "entriesRequested": 11,
+          "entriesStored": 8,
+          "bytesReceived": 2893,
+          "bytesSent": 0,
+          "requests": 19,
+          "downloadTime": 71983,
+          "queryLengthServed": 2250000000000
+        },
+        "volumeResult": {
           "entriesFound": 0,
           "entriesRequested": 0,
           "entriesStored": 0,
           "bytesReceived": 0,
           "bytesSent": 0,
           "requests": 0,
-          "downloadTime": 0
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "seriesResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "labelResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "instantMetricResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
         }
+      },
+      "index": {
+        "totalChunks": 0,
+        "postFilterChunks": 0,
+        "shardsDuration": 0,
+        "usedBloomFilters": false
       }
     }
   }
