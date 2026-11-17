@@ -21,9 +21,12 @@ export type FlowCollectorFormProps = {
 export const FlowCollectorForm: FC<FlowCollectorFormProps> = props => {
   const params = useParams<{ name?: string }>();
   const navigate = useNavigate();
+  const isSetupRoute = window.location.pathname.startsWith(flowCollectorPath('setup')!);
 
   let name: string | undefined;
-  if (isFlowCollectorCreatePath()) {
+  if (isSetupRoute) {
+    name = 'cluster';
+  } else if (isFlowCollectorCreatePath()) {
     // Create route: do not watch an existing resource (wizard bypass lands here).
     name = undefined;
   } else {

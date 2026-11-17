@@ -31,6 +31,7 @@ export const FlowMetricWizard: FC<FlowMetricWizardProps> = props => {
   const navigate = useNavigate();
   const [discard, discardModal] = useDiscardGuard();
   const editor = useResourceEditor();
+  const discardGuard = editor?.discard ?? discard;
   const watcherContext = useResourceWatcher();
   const [schema, setSchema] = React.useState<RJSFSchema | null>(null);
 
@@ -52,14 +53,14 @@ export const FlowMetricWizard: FC<FlowMetricWizardProps> = props => {
           onChange={event => {
             setData(event.formData);
             editor?.setData(event.formData);
-            discard.markDirty();
+            discardGuard.markDirty();
           }}
           errors={errors}
           skipDefaults
         />
       );
     },
-    [data, discard, editor, paths, schema]
+    [data, discardGuard, editor, paths, schema]
   );
 
   const onStepChange = React.useCallback((_event: React.MouseEvent<HTMLButtonElement>, step: WizardStepType) => {
@@ -102,10 +103,10 @@ export const FlowMetricWizard: FC<FlowMetricWizardProps> = props => {
                 id="flowMetricWizard"
                 onStepChange={onStepChange}
                 onSave={() => {
-                  discard.clearDirty();
+                  discardGuard.clearDirty();
                   ctx.onSubmit(editor?.data ?? data);
                 }}
-                onClose={() => discard.requestClose(() => navigateTo('/'))}
+                onClose={() => discardGuard.requestClose(() => navigateTo('/'))}
               >
                 <WizardStep name={t('Overview')} id="overview">
                   <span className="co-pre-line">
@@ -152,7 +153,7 @@ export const FlowMetricWizard: FC<FlowMetricWizardProps> = props => {
                       const updatedData = safeYAMLToJS(content);
                       setData(updatedData);
                       editor?.setData(updatedData);
-                      discard.clearDirty();
+                      discardGuard.clearDirty();
                       ctx.onSubmit(updatedData);
                     }}
                   />
@@ -160,7 +161,7 @@ export const FlowMetricWizard: FC<FlowMetricWizardProps> = props => {
                 </WizardStep>
               </Wizard>
             </div>
-            {discardModal}
+            {!editor && discardModal}
           </PageSection>
         );
       }}

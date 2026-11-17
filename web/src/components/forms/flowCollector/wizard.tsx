@@ -60,6 +60,7 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [discard, discardModal] = useDiscardGuard();
   const editor = useResourceEditor();
+  const discardGuard = editor?.discard ?? discard;
   const watcherContext = useResourceWatcher();
   const isSetupRoute =
     ContextSingleton.isStandalone() ||
@@ -80,10 +81,10 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
   const submitFlowCollector = React.useCallback(
     (ctx: { onSubmit: (d: any) => void }, formData: any) => {
       blockAutoRedirectToEditRef.current = true;
-      discard.clearDirty();
+      discardGuard.clearDirty();
       ctx.onSubmit(formData);
     },
-    [discard]
+    [discardGuard]
   );
 
   const form = React.useCallback(
@@ -101,14 +102,14 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
           onChange={event => {
             setData(event.formData);
             editor?.setData(event.formData);
-            discard.markDirty();
+            discardGuard.markDirty();
           }}
           errors={errors}
           skipDefaults
         />
       );
     },
-    [data, discard, editor, paths, schema]
+    [data, discardGuard, editor, paths, schema]
   );
 
   const onStepChange = React.useCallback(
@@ -183,7 +184,7 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
                 startIndex={startIndex}
                 onStepChange={onStepChange}
                 onSave={() => submitFlowCollector(ctx, editor?.data ?? data)}
-                onClose={() => discard.requestClose(() => navigateTo('/'))}
+                onClose={() => discardGuard.requestClose(() => navigateTo('/'))}
               >
                 <WizardStep name={t('Overview')} id="overview">
                   <span className="co-pre-line">
@@ -235,7 +236,7 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
                       <Button
                         variant="link"
                         data-test-id="flowcollector-wizard-consumption-cancel"
-                        onClick={() => discard.requestClose(() => navigateTo('/'))}
+                        onClick={() => discardGuard.requestClose(() => navigateTo('/'))}
                       >
                         {t('Cancel')}
                       </Button>
@@ -247,7 +248,7 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
                 </WizardStep>
               </Wizard>
             </div>
-            {discardModal}
+            {!editor && discardModal}
           </PageSection>
         );
       }}

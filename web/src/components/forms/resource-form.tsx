@@ -5,7 +5,9 @@ import { UiSchema } from '@rjsf/utils';
 import _ from 'lodash';
 import React, { FC, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { DiscardGuard } from '../../utils/discard-guard-hook';
 import { useDiscardGuard } from '../../utils/discard-guard-hook';
+import { useSearchParams } from '../../utils/url';
 import { safeYAMLToJS } from '../../utils/yaml';
 import { DynamicForm } from './dynamic-form/dynamic-form';
 import { ErrorTemplate } from './dynamic-form/templates';
@@ -25,6 +27,7 @@ export type ResourceEditorContextValue = {
   data: any;
   setData: React.Dispatch<React.SetStateAction<any>>;
   setView: (view: EditorType) => void;
+  discard: DiscardGuard;
 };
 
 export const ResourceEditorContext = React.createContext<ResourceEditorContextValue | null>(null);
@@ -33,8 +36,12 @@ export const useResourceEditor = () => React.useContext(ResourceEditorContext);
 
 export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema, wizardChild, initialViewType = EditorType.FORM }) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
+  const [, setSearchParams] = useSearchParams();
   const [viewType, setViewType] = React.useState(() => {
     const requestedView = new URLSearchParams(window.location.search).get('view');
+    if (requestedView === EditorType.FORM) {
+      return EditorType.FORM;
+    }
     if (requestedView === EditorType.WIZARD && wizardChild) {
       return EditorType.WIZARD;
     }
@@ -50,16 +57,22 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema, wizardChild, ini
   const [isDeleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [discard, discardModal] = useDiscardGuard();
 
-  const changeView = React.useCallback((next: EditorType) => {
-    setViewType(next);
-    const url = new URL(window.location.href);
-    if (next === EditorType.FORM) {
-      url.searchParams.delete('view');
-    } else {
-      url.searchParams.set('view', next);
-    }
-    window.history.replaceState(window.history.state, '', url.toString());
-  }, []);
+  const changeView = React.useCallback(
+    (next: EditorType) => {
+      setViewType(next);
+      setSearchParams(previous => {
+        const nextParams = new URLSearchParams(previous);
+        const routeDefaultsToForm = initialViewType === EditorType.FORM && !window.location.pathname.endsWith('/yaml');
+        if (next === EditorType.FORM && routeDefaultsToForm) {
+          nextParams.delete('view');
+        } else {
+          nextParams.set('view', next);
+        }
+        return nextParams;
+      });
+    },
+    [initialViewType, setSearchParams]
+  );
 
   const hasChanged = React.useCallback(
     (existing: any) => {
@@ -88,7 +101,7 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema, wizardChild, ini
               </FormHelperText>
             </div>
             <Suspense fallback={<></>}>
-              <ResourceEditorContext.Provider value={{ data, setData, setView: changeView }}>
+              <ResourceEditorContext.Provider value={{ data, setData, setView: changeView, discard }}>
                 <EditorToggle
                   type={viewType}
                   updated={hasChanged(ctx.data)}
