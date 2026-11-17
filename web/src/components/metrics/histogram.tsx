@@ -32,7 +32,7 @@ import {
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { NamedMetric, TopologyMetrics } from '../../api/query-response';
-import { TimeRange } from '../../utils/datetime';
+import { shiftTimeRange, TimeRange } from '../../utils/datetime';
 import { getDateMsInSeconds } from '../../utils/duration';
 import { localStorageHistogramGuidedTourDoneKey, useLocalStorage } from '../../utils/local-storage-hook';
 import { getFormattedValue } from '../../utils/metrics';
@@ -61,6 +61,7 @@ export interface HistogramProps {
   limit: number;
   isDark: boolean;
   range?: TimeRange;
+  loadedRange?: TimeRange;
   guidedTourHandle: GuidedTourHandle | null;
   setRange: (tr: TimeRange) => void;
   moveRange: (next: boolean) => void;
@@ -74,6 +75,7 @@ export const Histogram: React.FC<HistogramProps> = ({
   limit,
   isDark,
   range,
+  loadedRange,
   guidedTourHandle,
   setRange,
   moveRange,
@@ -86,10 +88,13 @@ export const Histogram: React.FC<HistogramProps> = ({
   const [displayedRange, setDisplayedRange] = React.useState<TimeRange>();
 
   React.useEffect(() => {
-    if (range) {
-      setDisplayedRange(range);
+    const selectedRange = loadedRange || range;
+    if (selectedRange) {
+      setDisplayedRange(selectedRange);
+    } else {
+      setDisplayedRange(undefined);
     }
-  }, [range]);
+  }, [loadedRange, range]);
 
   const [tooltipsTrigger, setTooltipsTrigger] = React.useState<'manual' | 'mouseenter'>('mouseenter');
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -112,14 +117,10 @@ export const Histogram: React.FC<HistogramProps> = ({
     (next: boolean) => {
       containerRef.current?.focus();
 
-      const r = range ? range : defaultRange;
-      const rSize = r.to - r.from;
-
-      let start = r.from - rSize;
-      if (next) {
-        start = r.to;
-      }
-      const end = start + rSize;
+      const r = loadedRange || range || defaultRange;
+      const shiftedRange = shiftTimeRange(r, next ? 1 : -1);
+      const start = shiftedRange.from;
+      const end = shiftedRange.to;
 
       //try to get new range using limit
       let updatedRange = getHistogramRangeFromLimit(totalMetric, limit, start);
@@ -141,7 +142,7 @@ export const Histogram: React.FC<HistogramProps> = ({
         setRange(defaultRange);
       }
     },
-    [containerRef, datapoints, defaultRange, limit, range, setRange, totalMetric]
+    [containerRef, datapoints, defaultRange, limit, loadedRange, range, setRange, totalMetric]
   );
 
   const onKeyDown = React.useCallback(
@@ -407,7 +408,7 @@ export const Histogram: React.FC<HistogramProps> = ({
             handleWidth={1}
             brushStyle={{ stroke: 'transparent', fill: 'black', fillOpacity: 0.1 }}
             brushDomain={{
-              x: getDomainFromRange(range ? range : defaultRange)
+              x: getDomainFromRange(loadedRange || range || defaultRange)
             }}
           />
         }
@@ -453,6 +454,7 @@ export const HistogramContainer: React.FC<{
   limit: number;
   isDark: boolean;
   range?: TimeRange;
+  loadedRange?: TimeRange;
   guidedTourHandle: GuidedTourHandle | null;
   setRange: (tr: TimeRange) => void;
   moveRange: (next: boolean) => void;
@@ -465,6 +467,7 @@ export const HistogramContainer: React.FC<{
   limit,
   isDark,
   range,
+  loadedRange,
   guidedTourHandle,
   setRange,
   moveRange,
@@ -481,6 +484,7 @@ export const HistogramContainer: React.FC<{
       limit={limit}
       isDark={isDark}
       range={range}
+      loadedRange={loadedRange}
       guidedTourHandle={guidedTourHandle}
       setRange={setRange}
       moveRange={moveRange}

@@ -18,6 +18,7 @@ export interface HistogramToolbarProps {
   guidedTourHandle: GuidedTourHandle | null;
   setRange: (tr: TimeRange | number) => void;
   histogramRange?: TimeRange;
+  loadedRange?: TimeRange;
   setHistogramRange: (tr: TimeRange) => void;
   resetRange: () => void;
   tick: () => void;
@@ -109,6 +110,7 @@ export const HistogramToolbar: React.FC<HistogramToolbarProps> = props => {
           limit={props.limit}
           isDark={isDarkTheme}
           range={props.histogramRange}
+          loadedRange={props.loadedRange}
           guidedTourHandle={props.guidedTourHandle}
           setRange={props.setHistogramRange}
           moveRange={moveRange}

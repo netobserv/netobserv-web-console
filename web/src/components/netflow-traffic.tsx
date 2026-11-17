@@ -202,6 +202,11 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
   );
   const [range, setRange] = React.useState<number | TimeRange>(getRangeFromURL());
   const [histogramRange, setHistogramRange] = React.useState<TimeRange>();
+  const [loadedHistogramRange, setLoadedHistogramRange] = React.useState<TimeRange>();
+  const updateHistogramRange = React.useCallback((nextRange?: TimeRange) => {
+    setHistogramRange(nextRange);
+    setLoadedHistogramRange(undefined);
+  }, []);
   const [_selectedRecord, setSelectedRecord] = React.useState<Record | undefined>(undefined);
   const [_selectedElement, setSelectedElement] = React.useState<GraphElementPeer | undefined>(undefined);
   const [_searchEvent, setSearchEvent] = React.useState<SearchEvent | undefined>(undefined);
@@ -634,7 +639,7 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
             id="refresh-button"
             className="co-action-refresh-button"
             variant="primary"
-            onClick={() => tick()}
+            onClick={() => tick(true)}
             icon={<SyncAltIcon style={{ animation: `spin ${loading ? 1 : 0}s linear infinite` }} />}
           />
         </FlexItem>
@@ -719,7 +724,7 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
             showHistogram={showHistogram}
             setShowViewOptions={setShowViewOptions}
             setShowHistogram={setShowHistogram}
-            setHistogramRange={setHistogramRange}
+            setHistogramRange={updateHistogramRange}
             selectView={selectView}
             isShowViewOptions={isShowViewOptions}
             style={{ paddingRight: hideTitle ? '1.5rem' : undefined }}
@@ -733,7 +738,8 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
             range={range}
             setRange={setRange}
             histogramRange={histogramRange}
-            setHistogramRange={setHistogramRange}
+            loadedRange={loadedHistogramRange}
+            setHistogramRange={updateHistogramRange}
             totalMetric={metrics.totalFlowCount?.result}
             guidedTourHandle={guidedTourRef.current}
             resetRange={() => setRange(defaultTimeRange)}
@@ -805,6 +811,7 @@ export const NetflowTraffic: React.FC<NetflowTrafficProps> = ({
             lastRefresh={lastRefresh}
             range={range}
             setRange={setRange}
+            onLoadedRangeChange={setLoadedHistogramRange}
             setRecordType={setRecordType}
             stats={stats}
             lastDuration={lastDuration}

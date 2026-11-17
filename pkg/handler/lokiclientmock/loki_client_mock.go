@@ -2,8 +2,11 @@ package lokiclientmock
 
 import (
 	"encoding/json"
+	neturl "net/url"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/netobserv/network-observability-console-plugin/pkg/decoders"
 	"github.com/netobserv/network-observability-console-plugin/pkg/model"
@@ -13,6 +16,106 @@ import (
 var mlog = logrus.WithField("module", "lokiclientmock")
 
 type LokiClientMock struct {
+}
+
+const (
+	mockOlderFlowPages = 8
+	mockOlderFlowDelay = 300 * time.Millisecond
+)
+
+func getMockFlowTargetTime(requestURL string) (int64, bool, error) {
+	parsedURL, err := neturl.Parse(requestURL)
+	if err != nil {
+		return 0, false, err
+	}
+	params := parsedURL.Query()
+	start, startErr := strconv.ParseInt(params.Get("start"), 10, 64)
+	end, endErr := strconv.ParseInt(params.Get("end"), 10, 64)
+	now := time.Now().Unix()
+	targetTime := now - 1
+	if startErr == nil && endErr == nil {
+		duration := end - start
+		if duration > 0 {
+			page := int((now - end + duration/2) / duration)
+			if page > mockOlderFlowPages {
+				if page == mockOlderFlowPages+1 {
+					time.Sleep(mockOlderFlowDelay)
+				}
+				return 0, true, nil
+			}
+			if page > 0 {
+				time.Sleep(mockOlderFlowDelay)
+			}
+			targetTime = end - 1
+		}
+	}
+	return targetTime, false, nil
+}
+
+func getLatestMockFlowTime(streams model.Streams) int64 {
+	var latestTime int64
+	for _, stream := range streams {
+		for _, entry := range stream.Entries {
+			if entry.Timestamp.Unix() > latestTime {
+				latestTime = entry.Timestamp.Unix()
+			}
+		}
+	}
+	return latestTime
+}
+
+func shiftMockFlowEntry(entry *model.Entry, shiftSeconds int64) {
+	entry.Timestamp = entry.Timestamp.Add(time.Duration(shiftSeconds) * time.Second)
+
+	var fields map[string]interface{}
+	if err := json.Unmarshal([]byte(entry.Line), &fields); err != nil || fields == nil {
+		return
+	}
+	if received, ok := fields["TimeReceived"].(float64); ok {
+		fields["TimeReceived"] = received + float64(shiftSeconds)
+	}
+	for _, field := range []string{"TimeFlowStartMs", "TimeFlowEndMs"} {
+		if timestamp, ok := fields[field].(float64); ok {
+			fields[field] = timestamp + float64(shiftSeconds*1000)
+		}
+	}
+	line, err := json.Marshal(fields)
+	if err == nil {
+		entry.Line = string(line)
+	}
+}
+
+func pageFlowRecords(data []byte, requestURL string) ([]byte, error) {
+	targetTime, beyondAvailablePages, err := getMockFlowTargetTime(requestURL)
+	if err != nil {
+		return nil, err
+	}
+	if beyondAvailablePages {
+		return []byte(`{"status":"success","data":{"resultType":"streams","result":[]}}`), nil
+	}
+
+	var response model.QueryResponse
+	if err := json.Unmarshal(data, &response); err != nil {
+		return nil, err
+	}
+	streams, ok := response.Data.Result.(model.Streams)
+	if !ok {
+		return data, nil
+	}
+
+	latestTime := getLatestMockFlowTime(streams)
+	if latestTime == 0 {
+		return data, nil
+	}
+
+	shiftSeconds := targetTime - latestTime
+	for streamIndex := range streams {
+		for entryIndex := range streams[streamIndex].Entries {
+			shiftMockFlowEntry(&streams[streamIndex].Entries[entryIndex], shiftSeconds)
+		}
+	}
+
+	return json.Marshal(response)
 }
 
 //nolint:cyclop
@@ -152,6 +255,13 @@ func (o *LokiClientMock) Get(url string) ([]byte, int, error) {
 			}
 		}
 		file, err = json.Marshal(qr)
+		if err != nil {
+			return nil, 500, err
+		}
+	}
+
+	if strings.HasPrefix(path, "mocks/loki/flow_records") {
+		file, err = pageFlowRecords(file, url)
 		if err != nil {
 			return nil, 500, err
 		}

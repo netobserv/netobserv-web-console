@@ -56,6 +56,7 @@ export interface DispatchFetchParams {
   setTopologyUDNIds: (ids: string[]) => void;
   setLoading: (v: boolean) => void;
   t: (key: string) => string;
+  resetTablePagination?: boolean;
 }
 
 export function dispatchFetch(params: DispatchFetchParams): Promise<Stats[]> | undefined {
@@ -74,14 +75,17 @@ export function dispatchFetch(params: DispatchFetchParams): Promise<Stats[]> | u
     setError,
     setTopologyUDNIds,
     setLoading,
-    t
+    t,
+    resetTablePagination
   } = params;
 
   let promises: Promise<Stats[]> | undefined = undefined;
   switch (selectedViewId) {
     case 'table':
       if (allowLoki) {
-        promises = drawerRef.current?.getTableHandle()?.fetch(range, histogramRange, showHistogram, showDuplicates);
+        promises = drawerRef.current
+          ?.getTableHandle()
+          ?.fetch(range, histogramRange, showHistogram, showDuplicates, resetTablePagination);
       } else {
         setError(t('Only available when Loki is enabled in the FlowCollector'));
       }
@@ -204,7 +208,7 @@ export interface UseDataFetchingResult {
   chipsPopoverMessage: string | undefined;
   setChipsPopoverMessage: (m: string | undefined) => void;
   topologyUDNIds: string[];
-  tick: () => void;
+  tick: (resetTablePagination?: boolean) => void;
   updateTableFilters: (f: Filters) => void;
   setFlows: React.Dispatch<React.SetStateAction<Record[]>>;
   setMetrics: React.Dispatch<React.SetStateAction<NetflowMetrics>>;
@@ -293,73 +297,82 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
     [updateTableFilters]
   );
 
-  const tick = React.useCallback(() => {
-    const modals = { isTRModalOpen, isOverviewModalOpen, isColModalOpen, isExportModalOpen };
-    if (!canTick(initState, modals)) return;
+  const tick = React.useCallback(
+    (resetTablePagination = false) => {
+      const modals = { isTRModalOpen, isOverviewModalOpen, isColModalOpen, isExportModalOpen };
+      if (!canTick(initState, modals)) return;
 
-    if (drawerRef.current == null) {
-      console.debug('tick called before drawer rendering. Retrying after render');
-      setTimeout(tick);
-      return;
-    }
+      if (drawerRef.current == null) {
+        console.debug('tick called before drawer rendering. Retrying after render');
+        setTimeout(() => tick(resetTablePagination));
+        return;
+      }
 
-    setLoading(true);
-    setError(undefined);
+      setLoading(true);
+      setError(undefined);
 
-    const promises = dispatchFetch({
-      selectedViewId,
-      drawerRef,
+      const promises = dispatchFetch({
+        selectedViewId,
+        drawerRef,
+        range,
+        histogramRange,
+        showHistogram,
+        showDuplicates,
+        metricScope,
+        topologyMetricType,
+        topologyMetricFunction,
+        topologyOptions,
+        allowLoki: caps.allowLoki,
+        setError,
+        setTopologyUDNIds,
+        setLoading,
+        t: (key: string) => key,
+        resetTablePagination
+      });
+
+      if (promises) {
+        const startDate = new Date();
+        setStats(undefined);
+        manageWarnings(
+          promises
+            .then(allStats => handleQueryResult(allStats, setStats))
+            .catch(err => handleQueryError(err, filters, config.columns, chipsPopoverMessage, errorHandlers))
+            .finally(() => {
+              const endDate = new Date();
+              setLoading(false);
+              setLastRefresh(endDate);
+              setLastDuration(endDate.getTime() - startDate.getTime());
+            })
+        );
+      } else if (error) {
+        setTimeout(tick);
+      }
+    },
+    [
+      isTRModalOpen,
+      isOverviewModalOpen,
+      isColModalOpen,
+      isExportModalOpen,
+      showHistogram,
       range,
       histogramRange,
-      showHistogram,
       showDuplicates,
       metricScope,
       topologyMetricType,
       topologyMetricFunction,
       topologyOptions,
-      allowLoki: caps.allowLoki,
-      setError,
-      setTopologyUDNIds,
-      setLoading,
-      t: (key: string) => key
-    });
-
-    if (promises) {
-      const startDate = new Date();
-      setStats(undefined);
-      manageWarnings(
-        promises
-          .then(allStats => handleQueryResult(allStats, setStats))
-          .catch(err => handleQueryError(err, filters, config.columns, chipsPopoverMessage, errorHandlers))
-          .finally(() => {
-            const endDate = new Date();
-            setLoading(false);
-            setLastRefresh(endDate);
-            setLastDuration(endDate.getTime() - startDate.getTime());
-          })
-      );
-    } else if (error) {
-      setTimeout(tick);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    isTRModalOpen,
-    isOverviewModalOpen,
-    isColModalOpen,
-    isExportModalOpen,
-    showHistogram,
-    range,
-    histogramRange,
-    showDuplicates,
-    metricScope,
-    topologyMetricType,
-    topologyMetricFunction,
-    topologyOptions,
-    selectedViewId,
-    caps.allowLoki,
-    manageWarnings,
-    errorHandlers
-  ]);
+      selectedViewId,
+      caps.allowLoki,
+      manageWarnings,
+      errorHandlers,
+      chipsPopoverMessage,
+      config.columns,
+      drawerRef,
+      error,
+      filters,
+      initState
+    ]
+  );
 
   usePoll(tick, interval);
 

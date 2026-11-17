@@ -2,6 +2,37 @@
   vertical-align: top;
 }
 
+.netflow-table-pagination-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--pf-t--global--background--color--primary--default);
+  color: var(--pf-t--global--text--color--subtle);
+}
+
+.netflow-table-pagination-status--loading {
+  border-top: 1px solid var(--pf-t--global--border--color--default);
+}
+
+.netflow-table-pagination-status--top-loading {
+  border-bottom: 1px solid var(--pf-t--global--border--color--default);
+}
+
+.netflow-table-pagination-status--end {
+  gap: 0.75rem;
+  font-size: var(--pf-t--global--font--size--sm);
+}
+
+.netflow-table-pagination-status--end::before,
+.netflow-table-pagination-status--end::after {
+  content: '';
+  flex: 0 1 4rem;
+  border-top: 1px solid var(--pf-t--global--border--color--default);
+}
+
 .pf-v6-theme-dark #table-container {
   --pf-t--global--background--color--primary--default: #292929;
   --pf-t--global--background--color--secondary--default: #151515;

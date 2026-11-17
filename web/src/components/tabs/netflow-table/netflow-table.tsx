@@ -2,15 +2,13 @@ import { Bullseye, Spinner } from '@patternfly/react-core';
 import { SortByDirection, Table, Tbody } from '@patternfly/react-table';
 import * as _ from 'lodash';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Record } from '../../../api/ipfix';
-import { defaultNetflowMetrics, Stats } from '../../../api/query-response';
+import { Stats } from '../../../api/query-response';
 import { Config } from '../../../model/config';
-import { useNetflowContext } from '../../../model/netflow-context';
 import { Column, ColumnsId, ColumnSizeMap } from '../../../utils/columns';
 import { TimeRange } from '../../../utils/datetime';
-import { getStructuredHTTPError } from '../../../utils/errors';
-import { mergeFlowReporters } from '../../../utils/flows';
 import {
   localStorageSortDirectionKey,
   localStorageSortIdKey,
@@ -18,19 +16,41 @@ import {
 } from '../../../utils/local-storage-hook';
 import { convertRemToPixels } from '../../../utils/panel';
 import { usePrevious } from '../../../utils/previous-hook';
-import { Result } from '../../../utils/result';
 import { Size } from '../../dropdowns/table-display-dropdown';
 import { Empty } from '../../messages/empty';
 import { NetflowTableHeader } from './netflow-table-header';
 import NetflowTableRow from './netflow-table-row';
 import './netflow-table.css';
+import { useNetflowTablePagination } from './use-netflow-table-pagination';
+
+const getDistanceToTableTop = (table: HTMLElement, target: EventTarget | null): number | undefined => {
+  let element = target instanceof HTMLElement ? target : null;
+  while (element && element !== document.body) {
+    const overflowY = window.getComputedStyle(element).overflowY;
+    const isScrollable = overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay';
+    if (isScrollable && element.scrollHeight > element.clientHeight) {
+      if (element === document.documentElement || element === document.scrollingElement) {
+        return Math.max(0, -table.getBoundingClientRect().top);
+      }
+      if (element === table) {
+        return Math.max(0, element.scrollTop);
+      }
+      return Math.max(0, element.getBoundingClientRect().top - table.getBoundingClientRect().top);
+    }
+    element = element.parentElement;
+  }
+
+  const scrollElement = document.scrollingElement;
+  return scrollElement ? Math.max(0, -table.getBoundingClientRect().top) : undefined;
+};
 
 export type NetflowTableHandle = {
   fetch: (
     range: number | TimeRange,
     histogramRange: TimeRange | undefined,
     showHistogram: boolean,
-    showDuplicates: boolean
+    showDuplicates: boolean,
+    resetPagination?: boolean
   ) => Promise<Stats[]> | undefined;
 };
 
@@ -45,6 +65,7 @@ export interface NetflowTableProps {
   size: Size;
   onSelect: (record?: Record) => void;
   loading?: boolean;
+  onLoadedRangeChange?: (range?: TimeRange) => void;
   resetDefaultFilters?: (c?: Config) => void;
   clearFilters?: () => void;
   isDark?: boolean;
@@ -52,7 +73,7 @@ export interface NetflowTableProps {
 
 // eslint-disable-next-line react/display-name
 export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTableProps>((props, ref) => {
-  const { caps, fetchCallbacks } = useNetflowContext();
+  const { t } = useTranslation('plugin__netobserv-plugin');
 
   //default to 300 to allow content to be rendered in tests
   const [containerHeight, setContainerHeight] = React.useState(300);
@@ -70,57 +91,11 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
   );
   const previousActiveSortDirection = usePrevious(activeSortDirection);
   const firstRender = React.useRef(true);
+  const paginationSentinelRef = React.useRef<HTMLDivElement>(null);
+  const touchStartYRef = React.useRef<number | undefined>(undefined);
+  const { fetch, fetchOlder, fetchNewer, fetchOlderIfVisible, hasMoreOlder, loadingOlder, loadingNewer, upToDate } =
+    useNetflowTablePagination(props.flows, props.onLoadedRangeChange);
   const width = props.columns.reduce((prev, cur) => prev + cur.width, 0);
-
-  const fetch = React.useCallback(
-    (
-      range: number | TimeRange,
-      histogramRange: TimeRange | undefined,
-      showHistogram: boolean,
-      showDuplicates: boolean
-    ) => {
-      const fq = caps.flowQuery;
-      const { getRecords, getMetrics } = caps.fetchFunctions;
-      const { metricsRef, setFlows, setMetrics } = fetchCallbacks;
-
-      if (!showHistogram) {
-        setMetrics(defaultNetflowMetrics);
-      }
-
-      let currentMetrics = metricsRef.current;
-
-      // table query is based on histogram range if available
-      const tableQuery = { ...fq };
-      if (histogramRange) {
-        tableQuery.startTime = histogramRange.from.toString();
-        tableQuery.endTime = histogramRange.to.toString();
-      }
-      const promises: Promise<Stats>[] = [
-        getRecords(tableQuery).then(res => {
-          const flows = showDuplicates ? res.records : mergeFlowReporters(res.records);
-          setFlows(flows);
-          return res.stats;
-        })
-      ];
-      if (showHistogram) {
-        promises.push(
-          Result.fromPromise(getMetrics({ ...fq, function: 'count', aggregateBy: 'app', type: 'Flows' }, range)).then(
-            res => {
-              const totalFlowCount = res.map(m => m.metrics[0]).mapError(err => getStructuredHTTPError(err));
-              currentMetrics = { ...currentMetrics, totalFlowCount };
-              setMetrics(currentMetrics);
-              return res.map(r => r.stats).or({ numQueries: 0, limitReached: false, dataSources: [] } as Stats);
-            }
-          )
-        );
-      } else {
-        currentMetrics = { ...currentMetrics, totalRate: Result.empty() };
-        setMetrics(currentMetrics);
-      }
-      return Promise.all(promises);
-    },
-    [caps.flowQuery, caps.fetchFunctions, fetchCallbacks]
-  );
 
   React.useImperativeHandle(ref, () => ({
     fetch
@@ -213,6 +188,81 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
     };
   }, [handleResize, handleScroll, props.loading]);
 
+  React.useEffect(() => {
+    document.addEventListener('scroll', fetchOlderIfVisible, true);
+    window.addEventListener('resize', fetchOlderIfVisible);
+    fetchOlderIfVisible();
+    return () => {
+      document.removeEventListener('scroll', fetchOlderIfVisible, true);
+      window.removeEventListener('resize', fetchOlderIfVisible);
+    };
+  }, [fetchOlderIfVisible, loadingOlder, props.flows.length]);
+
+  React.useEffect(() => {
+    const sentinel = paginationSentinelRef.current;
+    if (!sentinel || typeof IntersectionObserver === 'undefined') {
+      return;
+    }
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          void fetchOlder();
+        }
+      },
+      { rootMargin: '0px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [fetchOlder, props.flows.length]);
+
+  const fetchNewerOnPull = React.useCallback(
+    (deltaY: number, target: EventTarget | null) => {
+      const table = document.getElementById('table-container');
+      if (!table || !(target instanceof Node) || !table.contains(target)) {
+        return;
+      }
+      const distanceToTop = getDistanceToTableTop(table, target);
+      if (
+        deltaY < 0 &&
+        distanceToTop !== undefined &&
+        distanceToTop <= 200 &&
+        activeSortId === ColumnsId.endtime &&
+        activeSortDirection === SortByDirection.asc
+      ) {
+        void fetchNewer(distanceToTop <= 1);
+      }
+    },
+    [activeSortDirection, activeSortId, fetchNewer]
+  );
+
+  React.useEffect(() => {
+    const handleWheel = (event: WheelEvent) => fetchNewerOnPull(event.deltaY, event.target);
+    const handleTouchStart = (event: TouchEvent) => {
+      touchStartYRef.current = event.touches[0]?.clientY;
+    };
+    const handleTouchMove = (event: TouchEvent) => {
+      const startY = touchStartYRef.current;
+      const currentY = event.touches[0]?.clientY;
+      if (startY !== undefined && currentY !== undefined && startY - currentY <= -20) {
+        fetchNewerOnPull(startY - currentY, event.target);
+      }
+    };
+    const resetTouch = () => {
+      touchStartYRef.current = undefined;
+    };
+
+    document.addEventListener('wheel', handleWheel, { capture: true, passive: true });
+    document.addEventListener('touchstart', handleTouchStart, { capture: true, passive: true });
+    document.addEventListener('touchmove', handleTouchMove, { capture: true, passive: true });
+    document.addEventListener('touchend', resetTouch, true);
+    return () => {
+      document.removeEventListener('wheel', handleWheel, true);
+      document.removeEventListener('touchstart', handleTouchStart, true);
+      document.removeEventListener('touchmove', handleTouchMove, true);
+      document.removeEventListener('touchend', resetTouch, true);
+    };
+  }, [fetchNewerOnPull]);
+
   // sort function
   const getSortedFlows = React.useCallback(() => {
     const found = activeSortId && props.columns.find(c => c.id === activeSortId);
@@ -302,6 +352,22 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
 
   return (
     <div id="table-container">
+      {(loadingNewer || upToDate) && (
+        <div
+          className="netflow-table-pagination-status netflow-table-pagination-status--top-loading"
+          role="status"
+          aria-live="polite"
+        >
+          {loadingNewer ? (
+            <>
+              <Spinner size="sm" aria-label={t('Loading newer flows')} />
+              <span data-test="loading-newer-flows">{t('Loading newer flows')}</span>
+            </>
+          ) : (
+            <span data-test="flows-up-to-date">{t('Already up to date')}</span>
+          )}
+        </div>
+      )}
       <Table
         data-test="table-composable"
         data-test-cols-count={props.columns.length}
@@ -326,6 +392,25 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
           {getBody()}
         </Tbody>
       </Table>
+      {(loadingOlder || !hasMoreOlder) && (
+        <div
+          className={`netflow-table-pagination-status ${
+            loadingOlder ? 'netflow-table-pagination-status--loading' : 'netflow-table-pagination-status--end'
+          }`}
+          role="status"
+          aria-live="polite"
+        >
+          {loadingOlder ? (
+            <>
+              <Spinner size="sm" aria-label={t('Loading older flows')} />
+              <span data-test="loading-older-flows">{t('Loading older flows')}</span>
+            </>
+          ) : (
+            <span data-test="no-older-flows">{t('End of available flows')}</span>
+          )}
+        </div>
+      )}
+      <div ref={paginationSentinelRef} aria-hidden="true" style={{ height: '1px' }} />
     </div>
   );
 });
