@@ -8,12 +8,14 @@ import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContextSingleton } from '../../../utils/context';
 import { useDiscardGuard } from '../../../utils/discard-guard-hook';
-import { flowMetricNewPath, navigateTo, useNavigate, useParams } from '../../../utils/url';
+import { flowMetricPath, navigateTo, useNavigate, useParams } from '../../../utils/url';
 import { safeYAMLToJS } from '../../../utils/yaml';
 import { DynamicForm } from '../dynamic-form/dynamic-form';
 import { ErrorTemplate } from '../dynamic-form/templates';
+import { EditorType } from '../editor-toggle';
 import '../forms.css';
-import ResourceWatcher, { Consumer } from '../resource-watcher';
+import { useResourceEditor } from '../resource-form';
+import ResourceWatcher, { Consumer, useResourceWatcher } from '../resource-watcher';
 import { getFilteredUISchema } from '../utils';
 import { flowMetricUISchema } from './uiSchema';
 
@@ -28,6 +30,8 @@ export const FlowMetricWizard: FC<FlowMetricWizardProps> = props => {
   const params = useParams<{ name?: string; namespace?: string }>();
   const navigate = useNavigate();
   const [discard, discardModal] = useDiscardGuard();
+  const editor = useResourceEditor();
+  const watcherContext = useResourceWatcher();
   const [schema, setSchema] = React.useState<RJSFSchema | null>(null);
 
   const [data, setData] = React.useState<any>(null);
@@ -41,12 +45,13 @@ export const FlowMetricWizard: FC<FlowMetricWizardProps> = props => {
       const filteredSchema = getFilteredUISchema(flowMetricUISchema, paths);
       return (
         <DynamicForm
-          formData={data}
+          formData={editor?.data ?? data}
           schema={schema}
           uiSchema={filteredSchema} // see if we can regenerate this from CSV
           validator={validator}
           onChange={event => {
             setData(event.formData);
+            editor?.setData(event.formData);
             discard.markDirty();
           }}
           errors={errors}
@@ -54,7 +59,7 @@ export const FlowMetricWizard: FC<FlowMetricWizardProps> = props => {
         />
       );
     },
-    [data, discard, paths, schema]
+    [data, discard, editor, paths, schema]
   );
 
   const onStepChange = React.useCallback((_event: React.MouseEvent<HTMLButtonElement>, step: WizardStepType) => {
@@ -73,7 +78,98 @@ export const FlowMetricWizard: FC<FlowMetricWizardProps> = props => {
     }
   }, []);
 
-  return (
+  const wizardContent = (
+    <Consumer>
+      {ctx => {
+        // first init schema & data when watch resource query got results
+        if (schema == null) {
+          setSchema(ctx.schema);
+        }
+        if (data == null && !editor?.data) {
+          setData(ctx.data);
+        }
+        return (
+          <PageSection hasBodyWrapper={false} id="pageSection">
+            {!editor && (
+              <div id="pageHeader">
+                <Title headingLevel="h1" size="2xl">
+                  {t('Network Observability FlowMetric setup')}
+                </Title>
+              </div>
+            )}
+            <div id="wizard-container">
+              <Wizard
+                id="flowMetricWizard"
+                onStepChange={onStepChange}
+                onSave={() => {
+                  discard.clearDirty();
+                  ctx.onSubmit(editor?.data ?? data);
+                }}
+                onClose={() => discard.requestClose(() => navigateTo('/'))}
+              >
+                <WizardStep name={t('Overview')} id="overview">
+                  <span className="co-pre-line">
+                    {t(
+                      // eslint-disable-next-line max-len
+                      'You can create custom metrics out of the network flows using the FlowMetric API. A FlowCollector resource must be created as well in order to produce the flows. Each flow consists in a set of fields with values, such as source name and destination name. These fields can be leveraged as Prometheus labels to enable customized metrics and dashboards.'
+                    )}
+                    <br />
+                    <br />
+                    {t(
+                      // eslint-disable-next-line max-len
+                      'This simplified setup guides you through the common aspects of the FlowMetric configuration. For advanced configuration, please use YAML or the '
+                    )}
+                    <Button
+                      id="open-flow-metrics-form"
+                      data-test-id="open-flow-metrics-form"
+                      className="no-padding"
+                      variant="link"
+                      onClick={() => (editor ? editor.setView(EditorType.FORM) : navigateTo(flowMetricPath()))}
+                    >
+                      {t('FlowMetric form')}
+                    </Button>
+                    {'.'}
+                    <br /> <br />
+                    {t('Resource configuration')}
+                  </span>
+                  {form(ctx.errors)}
+                </WizardStep>
+                <WizardStep name={t('Metric')} id="metric">
+                  {form(ctx.errors)}
+                </WizardStep>
+                <WizardStep name={t('Data')} id="data">
+                  {form(ctx.errors)}
+                </WizardStep>
+                <WizardStep
+                  name={t('Review')}
+                  id="review-step"
+                  body={{ className: 'wizard-editor-container' }}
+                  footer={ContextSingleton.isStandalone() ? undefined : <></>}
+                >
+                  <ResourceYAMLEditor
+                    initialResource={editor?.data ?? data}
+                    onSave={content => {
+                      const updatedData = safeYAMLToJS(content);
+                      setData(updatedData);
+                      editor?.setData(updatedData);
+                      discard.clearDirty();
+                      ctx.onSubmit(updatedData);
+                    }}
+                  />
+                  <>{!_.isEmpty(ctx.errors) && <ErrorTemplate errors={ctx.errors} />}</>
+                </WizardStep>
+              </Wizard>
+            </div>
+            {discardModal}
+          </PageSection>
+        );
+      }}
+    </Consumer>
+  );
+
+  return watcherContext.kind === 'FlowMetric' ? (
+    wizardContent
+  ) : (
     <ResourceWatcher
       group="flows.netobserv.io"
       version="v1alpha1"
@@ -85,89 +181,7 @@ export const FlowMetricWizard: FC<FlowMetricWizardProps> = props => {
       }}
       defaultFrom="CRD"
     >
-      <Consumer>
-        {ctx => {
-          // first init schema & data when watch resource query got results
-          if (schema == null) {
-            setSchema(ctx.schema);
-          }
-          if (data == null) {
-            setData(ctx.data);
-          }
-          return (
-            <PageSection hasBodyWrapper={false} id="pageSection">
-              <div id="pageHeader">
-                <Title headingLevel="h1" size="2xl">
-                  {t('Network Observability FlowMetric setup')}
-                </Title>
-              </div>
-              <div id="wizard-container">
-                <Wizard
-                  id="flowMetricWizard"
-                  onStepChange={onStepChange}
-                  onSave={() => {
-                    discard.clearDirty();
-                    ctx.onSubmit(data);
-                  }}
-                  onClose={() => discard.requestClose(() => navigateTo('/'))}
-                >
-                  <WizardStep name={t('Overview')} id="overview">
-                    <span className="co-pre-line">
-                      {t(
-                        // eslint-disable-next-line max-len
-                        'You can create custom metrics out of the network flows using the FlowMetric API. A FlowCollector resource must be created as well in order to produce the flows. Each flow consists in a set of fields with values, such as source name and destination name. These fields can be leveraged as Prometheus labels to enable customized metrics and dashboards.'
-                      )}
-                      <br />
-                      <br />
-                      {t(
-                        // eslint-disable-next-line max-len
-                        'This simplified setup guides you through the common aspects of the FlowMetric configuration. For advanced configuration, please use YAML or the '
-                      )}
-                      <Button
-                        id="open-flow-metrics-form"
-                        data-test-id="open-flow-metrics-form"
-                        className="no-padding"
-                        variant="link"
-                        onClick={() => navigateTo(flowMetricNewPath)}
-                      >
-                        {t('FlowMetric form')}
-                      </Button>
-                      {'.'}
-                      <br /> <br />
-                      {t('Resource configuration')}
-                    </span>
-                    {form(ctx.errors)}
-                  </WizardStep>
-                  <WizardStep name={t('Metric')} id="metric">
-                    {form(ctx.errors)}
-                  </WizardStep>
-                  <WizardStep name={t('Data')} id="data">
-                    {form(ctx.errors)}
-                  </WizardStep>
-                  <WizardStep
-                    name={t('Review')}
-                    id="review-step"
-                    body={{ className: 'wizard-editor-container' }}
-                    footer={ContextSingleton.isStandalone() ? undefined : <></>}
-                  >
-                    <ResourceYAMLEditor
-                      initialResource={data}
-                      onSave={content => {
-                        const updatedData = safeYAMLToJS(content);
-                        setData(updatedData);
-                        discard.clearDirty();
-                        ctx.onSubmit(updatedData);
-                      }}
-                    />
-                    <>{!_.isEmpty(ctx.errors) && <ErrorTemplate errors={ctx.errors} />}</>
-                  </WizardStep>
-                </Wizard>
-              </div>
-              {discardModal}
-            </PageSection>
-          );
-        }}
-      </Consumer>
+      {wizardContent}
     </ResourceWatcher>
   );
 };

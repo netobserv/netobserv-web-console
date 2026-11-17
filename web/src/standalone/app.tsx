@@ -16,10 +16,8 @@ import React from 'react';
 import { BrowserRouter, Navigate, NavLink, Route, Routes } from 'react-router';
 import FlowCollectorForm from '../components/forms/flowCollector/form';
 import FlowCollectorStatus from '../components/forms/flowCollector/status';
-import FlowCollectorWizard from '../components/forms/flowCollector/wizard';
 import FlowCollectorSliceForm from '../components/forms/flowCollectorSlice/form';
 import FlowMetricForm from '../components/forms/flowMetric/form';
-import FlowMetricWizard from '../components/forms/flowMetric/wizard';
 import HealthRuleWizard from '../components/forms/healthRule/wizard';
 import NetworkHealth from '../components/health/network-health';
 import NetflowTrafficDevTab from '../components/netflow-traffic-dev-tab';
@@ -94,7 +92,7 @@ const allPages = [
   {
     id: 'flowCollector-wizard',
     name: 'FlowCollector wizard',
-    content: <FlowCollectorWizard name="cluster" />
+    content: <FlowCollectorForm name="cluster" />
   },
   {
     id: 'flowCollector',
@@ -114,7 +112,7 @@ const allPages = [
   {
     id: 'flowMetric-wizard',
     name: 'FlowMetric wizard',
-    content: <FlowMetricWizard name="flowmetric-sample" />
+    content: <FlowMetricForm name="flowmetric-sample" />
   },
   {
     id: 'flowMetric',
