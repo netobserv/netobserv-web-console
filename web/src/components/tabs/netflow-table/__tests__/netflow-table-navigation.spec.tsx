@@ -1,14 +1,14 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import * as React from 'react';
 
-import { ShuffledColumnSample } from '../../../__tests-data__/columns';
-import { FlowsSample } from '../../../__tests-data__/flows';
 import { ColumnsId } from '../../../../utils/columns';
 import {
   localStorageSortDirectionKey,
   localStorageSortIdKey,
   setLocalStorage
 } from '../../../../utils/local-storage-hook';
+import { ShuffledColumnSample } from '../../../__tests-data__/columns';
+import { FlowsSample } from '../../../__tests-data__/flows';
 import { Size } from '../../../dropdowns/table-display-dropdown';
 import NetflowTable from '../netflow-table';
 
@@ -28,7 +28,7 @@ jest.mock('../use-netflow-table-pagination', () => ({
   })
 }));
 
-describe('NetflowTable navigation controls', () => {
+describe('NetflowTable keyboard navigation', () => {
   const mocks = {
     allowPktDrops: true,
     size: 'm' as Size,
@@ -45,18 +45,16 @@ describe('NetflowTable navigation controls', () => {
     setLocalStorage(localStorageSortDirectionKey, 'asc');
   });
 
-  it('requests newer flows at the top and older flows at the bottom', () => {
+  it('maps Home and End to the newest and oldest page actions', () => {
     const scrollBy = jest.spyOn(window, 'scrollBy').mockImplementation(() => undefined);
-    render(<NetflowTable flows={FlowsSample} columns={ShuffledColumnSample} {...mocks} />);
+    const { container } = render(<NetflowTable flows={FlowsSample} columns={ShuffledColumnSample} {...mocks} />);
+    const tableContainer = container.querySelector('#table-container') as HTMLDivElement;
 
-    fireEvent.click(screen.getByRole('button', { name: 'Go to start' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Page up' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Page down' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Go to end' }));
+    fireEvent.keyDown(tableContainer, { key: 'Home' });
+    fireEvent.keyDown(tableContainer, { key: 'End' });
 
-    expect(mockFetchNewer).toHaveBeenNthCalledWith(1, true);
-    expect(mockFetchNewer).toHaveBeenNthCalledWith(2, true);
-    expect(mockFetchOlder).toHaveBeenCalledTimes(2);
+    expect(mockFetchNewer).toHaveBeenCalledWith(true);
+    expect(mockFetchOlder).toHaveBeenCalledTimes(1);
     expect(scrollBy).toHaveBeenCalled();
     scrollBy.mockRestore();
   });
@@ -86,14 +84,17 @@ describe('NetflowTable navigation controls', () => {
     jest.spyOn(header, 'getBoundingClientRect').mockReturnValue(makeRect(0));
     const scrollBy = jest.spyOn(window, 'scrollBy').mockImplementation(() => undefined);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Page up' }));
+    const tableContainer = container.querySelector('#table-container') as HTMLDivElement;
+    fireEvent.keyDown(tableContainer, { key: 'PageUp' });
     expect(scrollBy).toHaveBeenLastCalledWith({ top: -300, behavior: 'smooth' });
     expect(mockFetchNewer).toHaveBeenCalledWith(false);
 
-    const rowHeight = Number.parseFloat((container.querySelector('tbody tr[data-test^="tr-"]') as HTMLElement).style.height);
+    const rowHeight = Number.parseFloat(
+      (container.querySelector('tbody tr[data-test^="tr-"]') as HTMLElement).style.height
+    );
     const lastLoadedPosition = flows.length * rowHeight - 300;
     tableRect.mockReturnValue(makeRect(-lastLoadedPosition));
-    fireEvent.click(screen.getByRole('button', { name: 'Page down' }));
+    fireEvent.keyDown(tableContainer, { key: 'PageDown' });
     expect(mockFetchOlder).toHaveBeenCalledTimes(1);
 
     scrollBy.mockRestore();

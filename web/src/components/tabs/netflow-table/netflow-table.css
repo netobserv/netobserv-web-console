@@ -8,22 +8,8 @@
   overflow: hidden;
 }
 
-.netflow-table-navigation {
-  position: sticky;
-  inset-block-start: 0;
-  z-index: var(--pf-t--global--z-index--sm);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.25rem;
-  box-sizing: border-box;
-  height: 2.5rem;
-  padding-inline: 0.5rem;
-  background-color: var(--pf-t--global--background--color--primary--default);
-}
-
 #table-container>.pf-v6-c-table.pf-m-sticky-header>.pf-v6-c-table__thead {
-  inset-block-start: 2.5rem;
+  inset-block-start: 0;
 }
 
 .netflow-table-pagination-status {

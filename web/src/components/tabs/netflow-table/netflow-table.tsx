@@ -19,7 +19,6 @@ import { usePrevious } from '../../../utils/previous-hook';
 import { Size } from '../../dropdowns/table-display-dropdown';
 import { Empty } from '../../messages/empty';
 import { NetflowTableHeader } from './netflow-table-header';
-import { NetflowTableNavigation } from './netflow-table-navigation';
 import NetflowTableRow from './netflow-table-row';
 import './netflow-table.css';
 import { useNetflowTablePagination } from './use-netflow-table-pagination';
@@ -315,6 +314,44 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
     void fetchOlder();
   }, [fetchOlder]);
 
+  const handleTableKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      const target = event.target;
+      if (
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey ||
+        !(target instanceof HTMLElement) ||
+        target.closest(
+          'input, textarea, select, button, a[href], [contenteditable="true"], [role="button"], [role="combobox"]'
+        )
+      ) {
+        return;
+      }
+
+      switch (event.key) {
+        case 'PageUp':
+          event.preventDefault();
+          handlePageUp();
+          break;
+        case 'PageDown':
+          event.preventDefault();
+          handlePageDown();
+          break;
+        case 'Home':
+          event.preventDefault();
+          handleStart();
+          break;
+        case 'End':
+          event.preventDefault();
+          handleEnd();
+          break;
+      }
+    },
+    [handleEnd, handlePageDown, handlePageUp, handleStart]
+  );
+
   React.useEffect(() => {
     const handleWheel = (event: WheelEvent) => fetchNewerOnPull(event.deltaY, event.target);
     const handleTouchStart = (event: TouchEvent) => {
@@ -463,7 +500,14 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
   }
 
   return (
-    <div id="table-container">
+    <div
+      id="table-container"
+      role="region"
+      aria-label={t('Flow table navigation')}
+      aria-keyshortcuts="PageUp PageDown Home End"
+      tabIndex={0}
+      onKeyDown={handleTableKeyDown}
+    >
       {(loadingNewer || upToDate) && (
         <div
           className="netflow-table-pagination-status netflow-table-pagination-status--top-loading"
@@ -480,12 +524,6 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
           )}
         </div>
       )}
-      <NetflowTableNavigation
-        onStart={handleStart}
-        onPageUp={handlePageUp}
-        onPageDown={handlePageDown}
-        onEnd={handleEnd}
-      />
       <Table
         data-test="table-composable"
         data-test-cols-count={props.columns.length}
