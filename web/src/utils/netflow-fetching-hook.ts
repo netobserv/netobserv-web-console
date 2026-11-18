@@ -350,7 +350,7 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
               setLastDuration(endDate.getTime() - startDate.getTime());
             })
         );
-      } else if (hadPreviousError && selectedViewId === 'table' && caps.allowLoki) {
+      } else if (hadPreviousError && caps.allowLoki && (selectedViewId === 'table' || selectedViewId === 'topology')) {
         setTimeout(() => tick(resetTablePagination));
       }
     },
