@@ -21,6 +21,7 @@ import (
 )
 
 var timeNowArg = regexp.MustCompile(`\${timeNow-(\d+)}`)
+var timeNowEndArg = regexp.MustCompile(`\${timeNow\+1}`)
 
 func TestLokiFiltering(t *testing.T) {
 	testCases := []struct {
@@ -125,7 +126,7 @@ func TestLokiFiltering(t *testing.T) {
 	}, {
 		name:          "Time range",
 		inputPath:     "?timeRange=300000",
-		outputQueries: []string{`?query={app="netobserv-flowcollector"}&start=${timeNow-300000}`},
+		outputQueries: []string{`?query={app="netobserv-flowcollector"}&start=${timeNow-300000}&end=${timeNow+1}`},
 	}, {
 		name:      "Strict label match",
 		inputPath: "?filters=" + url.QueryEscape("SrcK8S_Namespace~\"exact-namespace\""),
@@ -324,11 +325,11 @@ func injectTime(t *testing.T, queries []string, now int64) []string {
 			require.NoError(t, err)
 			// giving 1-second room to the start time to avoid flaky tests
 			expectedStart := int(now - timeNowDiff)
-			modifiedQueries = append(modifiedQueries, []string{
-				timeNowArg.ReplaceAllString(query, strconv.Itoa(expectedStart-1)),
-				timeNowArg.ReplaceAllString(query, strconv.Itoa(expectedStart)),
-				timeNowArg.ReplaceAllString(query, strconv.Itoa(expectedStart+1)),
-			}...)
+			for skew := -1; skew <= 1; skew++ {
+				candidate := timeNowArg.ReplaceAllString(query, strconv.Itoa(expectedStart+skew))
+				candidate = timeNowEndArg.ReplaceAllString(candidate, strconv.Itoa(int(now)+skew+1))
+				modifiedQueries = append(modifiedQueries, candidate)
+			}
 		} else {
 			modifiedQueries = append(modifiedQueries, query)
 		}

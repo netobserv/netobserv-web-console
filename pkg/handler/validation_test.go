@@ -50,6 +50,17 @@ func TestGetEndTime(t *testing.T) {
 	assert.Contains(t, err.Error(), "Could not parse end time")
 }
 
+func TestGetFlowQueryTimesUsesOneServerTimeForRelativeRange(t *testing.T) {
+	now := time.Unix(1_700_000_000, 0)
+	params := url.Values{timeRangeKey: []string{"300"}}
+
+	start, end, err := getFlowQueryTimes(params, now)
+	assert.NoError(t, err)
+	assert.Equal(t, now.Unix()-300, start.Unix())
+	assert.Equal(t, now.Unix()+1, end.Unix())
+	assert.Equal(t, strconv.FormatInt(now.Unix(), 10), params.Get(endTimeKey))
+}
+
 func TestGetRecordType(t *testing.T) {
 	// Valid
 	params := url.Values{

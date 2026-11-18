@@ -27,6 +27,7 @@ export interface StreamResult {
 export interface RecordsResult {
   records: Record[];
   stats: Stats;
+  unixTimestamp?: number;
 }
 
 export interface FlowMetricsResult {

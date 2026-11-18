@@ -27,7 +27,8 @@ export const getFlowRecords = (params: FlowQuery): Promise<RecordsResult> => {
     const aggQR: AggregatedQueryResponse = r.data;
     return {
       records: (aggQR.result as StreamResult[]).flatMap(r => parseStream(r)),
-      stats: aggQR.stats
+      stats: aggQR.stats,
+      unixTimestamp: aggQR.unixTimestamp
     };
   });
 };

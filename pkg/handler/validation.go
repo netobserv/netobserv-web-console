@@ -13,6 +13,10 @@ import (
 )
 
 func getStartTime(params url.Values) (time.Time, error) {
+	return getStartTimeAt(params, time.Now())
+}
+
+func getStartTimeAt(params url.Values, now time.Time) (time.Time, error) {
 	start := params.Get(startTimeKey)
 	var sTime time.Time
 	if len(start) == 0 {
@@ -22,7 +26,7 @@ func getStartTime(params url.Values) (time.Time, error) {
 			if err != nil {
 				return sTime, errors.New("Could not parse time range: " + err.Error())
 			}
-			sTime = time.Now().Add(-time.Second * time.Duration(r))
+			sTime = now.Add(-time.Second * time.Duration(r))
 		}
 	} else {
 		// Make sure it is a valid int
@@ -37,16 +41,20 @@ func getStartTime(params url.Values) (time.Time, error) {
 
 // getEndTime will parse end time and ceil it to the next second
 func getEndTime(params url.Values) (time.Time, error) {
+	return getEndTimeAt(params, time.Now())
+}
+
+func getEndTimeAt(params url.Values, _ time.Time) (time.Time, error) {
 	end := params.Get(endTimeKey)
 	var eTime time.Time
-	if len(end) == 0 {
-		return eTime, nil
+	if len(end) > 0 {
+		r, err := strconv.ParseInt(end, 10, 64)
+		if err != nil {
+			return eTime, errors.New("Could not parse end time: " + err.Error())
+		}
+		eTime = time.Unix(r+1, 0)
 	}
-	r, err := strconv.ParseInt(end, 10, 64)
-	if err != nil {
-		return eTime, errors.New("Could not parse end time: " + err.Error())
-	}
-	return time.Unix(r+1, 0), nil
+	return eTime, nil
 }
 
 // getLimit returns limit parsed as int

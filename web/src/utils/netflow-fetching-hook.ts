@@ -409,7 +409,9 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
     ]
   );
 
-  tickRef.current = tick;
+  React.useEffect(() => {
+    tickRef.current = tick;
+  }, [tick]);
 
   usePoll(tick, interval);
 
