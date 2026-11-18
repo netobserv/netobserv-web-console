@@ -7,21 +7,17 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 
+	"github.com/netobserv/network-observability-console-plugin/pkg/backend/backends"
 	"github.com/netobserv/network-observability-console-plugin/pkg/config"
 	"github.com/netobserv/network-observability-console-plugin/pkg/handler"
 	"github.com/netobserv/network-observability-console-plugin/pkg/handler/alertingmock"
 	"github.com/netobserv/network-observability-console-plugin/pkg/kubernetes/auth"
-	"github.com/netobserv/network-observability-console-plugin/pkg/prometheus"
 )
 
 func setupRoutes(ctx context.Context, cfg *config.Config, authChecker auth.Checker) *mux.Router {
-	var promInventory *prometheus.Inventory
-	if cfg.IsPromEnabled() {
-		promInventory = prometheus.NewInventory(&cfg.Prometheus)
-	}
-
 	r := mux.NewRouter()
-	h := handler.Handlers{Cfg: cfg, PromInventory: promInventory}
+	bo := backends.NewOrchestrator(cfg)
+	h := handler.Handlers{Cfg: cfg, Backends: bo}
 
 	// Role
 	r.PathPrefix("/").Subrouter().HandleFunc("/role", getRole(authChecker))

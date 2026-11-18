@@ -2,11 +2,15 @@ package merger
 
 import (
 	"fmt"
+	"slices"
 	"sort"
+	"sync"
+	"time"
 
 	pmodel "github.com/prometheus/common/model"
 
 	"github.com/netobserv/network-observability-console-plugin/pkg/model"
+	"github.com/netobserv/network-observability-console-plugin/pkg/utils/constants"
 )
 
 // MatrixMerger aggregates multiple Matrix results from Loki or Prometheus queries.
@@ -17,6 +21,8 @@ type MatrixMerger struct {
 	numQueries   int
 	reqLimit     int
 	limitReached bool
+	datasources  []constants.DataSource
+	mu           sync.RWMutex
 }
 
 // NewMatrixMerger creates a new MatrixMerger with the given per-query result limit.
@@ -35,21 +41,58 @@ type indexedSampleStream struct {
 	index  int
 }
 
-// Add merges a new QueryResponseData (Matrix result) into the aggregated result.
-func (m *MatrixMerger) Add(from model.QueryResponseData) (model.ResultValue, error) {
-	matrix, ok := from.Result.(model.Matrix)
+// Add merges a new QueryResponse (Matrix result) into the aggregated result.
+func (m *MatrixMerger) Add(from *model.QueryResponse, ds constants.DataSource) (model.ResultValue, error) {
+	matrix, ok := from.Data.Result.(model.Matrix)
 	if !ok {
 		return nil, fmt.Errorf("unexpected result type for MatrixMerger: %T", from)
 	}
 
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
 	m.numQueries++
-	m.stats = append(m.stats, from.Stats)
+	if !slices.Contains(m.datasources, ds) {
+		m.datasources = append(m.datasources, ds)
+	}
+	m.stats = append(m.stats, from.Data.Stats)
+	m.mergeStreams(matrix)
+
 	// In Matrix results, the limit stands for the "topk" value, which relates to the number of streams
 	//	(ie LabelSet cardinality)
-	if len(matrix) >= m.reqLimit {
+	if from.LimitReached || (m.reqLimit > 0 && len(m.merged) >= m.reqLimit) {
 		m.limitReached = true
 	}
-	for _, sampleStream := range matrix {
+	return m.merged, nil
+}
+
+// Add merges a new QueryResponse (Matrix result) into the aggregated result.
+func (m *MatrixMerger) Merge(other *model.AggregatedQueryResponse) (model.ResultValue, error) {
+	matrix, ok := other.Result.(model.Matrix)
+	if !ok {
+		return nil, fmt.Errorf("unexpected result type for MatrixMerger: %T", other)
+	}
+
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	m.numQueries += other.Stats.NumQueries
+	for _, ds := range other.Stats.DataSources {
+		if !slices.Contains(m.datasources, ds) {
+			m.datasources = append(m.datasources, ds)
+		}
+	}
+	m.stats = append(m.stats, other.Stats.QueriesStats...)
+	m.mergeStreams(matrix)
+
+	if other.Stats.LimitReached || (m.reqLimit > 0 && len(m.merged) >= m.reqLimit) {
+		m.limitReached = true
+	}
+	return m.merged, nil
+}
+
+func (m *MatrixMerger) mergeStreams(other model.Matrix) {
+	for _, sampleStream := range other {
 		skey := sampleStream.Metric.String()
 		idxSampleStream, sampleStreamExists := m.index[skey]
 		if !sampleStreamExists {
@@ -73,11 +116,12 @@ func (m *MatrixMerger) Add(from model.QueryResponseData) (model.ResultValue, err
 			}
 		}
 	}
-	return m.merged, nil
 }
 
 // Get returns the final aggregated AggregatedQueryResponse.
 func (m *MatrixMerger) Get() *model.AggregatedQueryResponse {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
 	for idx, stream := range m.merged {
 		skey := stream.Metric.String()
 		if indexed, ok := m.index[skey]; ok {
@@ -96,6 +140,9 @@ func (m *MatrixMerger) Get() *model.AggregatedQueryResponse {
 			NumQueries:   m.numQueries,
 			LimitReached: m.limitReached,
 			QueriesStats: m.stats,
+			DataSources:  m.datasources,
+			TotalEntries: len(m.merged),
 		},
+		UnixTimestamp: time.Now().Unix(),
 	}
 }
