@@ -82,8 +82,12 @@ func TestGetMockFlowTargetTime(t *testing.T) {
 	if err != nil {
 		t.Fatalf("pageFlowRecords returned an error for an available window: %v", err)
 	}
-	if entries := countEntries(t, availablePage); len(entries) != 1 {
+	entries := countEntries(t, availablePage)
+	if len(entries) != 1 {
 		t.Fatalf("expected the available window to return its entry, got %d entries", len(entries))
+	}
+	if got := entries[0].Timestamp.Unix(); got != availableEnd-1 {
+		t.Fatalf("expected available entry timestamp %d, got %d", availableEnd-1, got)
 	}
 }
 

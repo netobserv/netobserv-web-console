@@ -134,6 +134,7 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
     loadingOlder,
     loadingNewer,
     olderError,
+    newerError,
     upToDate
   } = useNetflowTablePagination(props.flows, props.onLoadedRangeChange);
   const width = props.columns.reduce((prev, cur) => prev + cur.width, 0);
@@ -509,10 +510,10 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
       tabIndex={0}
       onKeyDown={handleTableKeyDown}
     >
-      {(loadingNewer || upToDate) && (
+      {(loadingNewer || newerError || upToDate) && (
         <div
-          className="netflow-table-pagination-status netflow-table-pagination-status--top-loading"
-          role="status"
+          className={`netflow-table-pagination-status netflow-table-pagination-status--top-loading ${newerError ? 'netflow-table-pagination-status--error' : ''}`}
+          role={newerError && !loadingNewer ? 'alert' : 'status'}
           aria-live="polite"
         >
           {loadingNewer ? (
@@ -520,6 +521,10 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
               <Spinner size="sm" aria-label={t('Loading newer flows')} />
               <span data-test="loading-newer-flows">{t('Loading newer flows')}</span>
             </>
+          ) : newerError ? (
+            <span data-test="newer-flows-error">
+              {t('Unable to load newer flows')}: {typeof newerError === 'string' ? newerError : newerError.toString()}
+            </span>
           ) : (
             <span data-test="flows-up-to-date">{t('Already up to date')}</span>
           )}

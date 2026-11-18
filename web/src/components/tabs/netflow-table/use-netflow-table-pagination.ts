@@ -18,6 +18,7 @@ import { Result } from '../../../utils/result';
 interface FlowPagingState {
   signature: string;
   query: StructuredFlowQuery;
+  initialRange: TimeRange;
   sessionFlows: Record[];
   currentStart: number;
   nextEnd: number;
@@ -41,18 +42,19 @@ interface FlowPagingState {
   blockedByError: boolean;
 }
 
-// The flows handler rounds its endTime parameter up by one second. Subtract two
-// seconds to make the cursor exclusive and avoid fetching the oldest flow from
-// the previous page again.
-const getExclusiveEndTime = (timestamp: number): number => timestamp - 2;
+// The flows handler rounds its endTime parameter up by one second. Subtract one
+// second so the next query ends immediately before the completed second.
+const getExclusiveEndTime = (timestamp: number): number => timestamp - 1;
 const MAX_OLDER_LOOKBACK_SECONDS = 14 * 24 * 60 * 60;
 const NEWER_QUERY_OVERLAP_SECONDS = 30;
 const MAX_NEWER_PAGES_PER_PULL = 20;
 const NEWER_REQUEST_COOLDOWN_MS = 750;
+const DEFAULT_LOKI_MAX_ENTRIES_LIMIT = 5000;
+const MAX_BOUNDARY_QUERY_LIMIT = 100_000;
 
 const movePagingWindowBack = (paging: FlowPagingState, expand = false): void => {
   const previousEnd = paging.currentStart;
-  if (previousEnd <= paging.maxOlderStart + 2) {
+  if (previousEnd <= paging.maxOlderStart) {
     paging.hasMore = false;
     return;
   }
@@ -77,8 +79,12 @@ const getRecordTimeSeconds = (record: Record): number | undefined => {
 };
 
 const getLokiTimestampSeconds = (record: Record): number | undefined => {
-  const timestamp = Number(record.lokiTimestampNs);
-  return Number.isFinite(timestamp) && timestamp > 0 ? Math.floor(timestamp / 1_000_000_000) : undefined;
+  const timestamp = record.lokiTimestampNs;
+  if (!timestamp || !/^\d+$/.test(timestamp)) {
+    return undefined;
+  }
+  const seconds = Number(timestamp.slice(0, -9) || '0');
+  return Number.isSafeInteger(seconds) && seconds > 0 ? seconds : undefined;
 };
 
 const getPagingTimeSeconds = (record: Record): number | undefined =>
@@ -89,14 +95,14 @@ const getOldestTimeSeconds = (records: Record[]): number | undefined => {
   return times.length > 0 ? Math.min(...times) : undefined;
 };
 
-const MAX_BOUNDARY_QUERY_LIMIT = 100_000;
-
 const getCompleteTimestampSecond = async (
   query: StructuredFlowQuery,
   timestamp: number,
-  getRecords: (query: StructuredFlowQuery) => Promise<{ records: Record[]; stats: Stats }>
+  getRecords: (query: StructuredFlowQuery) => Promise<{ records: Record[]; stats: Stats }>,
+  maxEntriesLimit: number
 ): Promise<Record[]> => {
-  let limit = Math.max(1, query.limit);
+  const queryLimit = Math.max(1, Math.min(maxEntriesLimit, MAX_BOUNDARY_QUERY_LIMIT));
+  let limit = Math.min(Math.max(1, query.limit), queryLimit);
   let previousRecordCount = -1;
   while (true) {
     const response = await getRecords({
@@ -109,11 +115,11 @@ const getCompleteTimestampSecond = async (
     if (!response.stats.limitReached) {
       return response.records;
     }
-    if (limit >= MAX_BOUNDARY_QUERY_LIMIT || response.records.length <= previousRecordCount) {
+    if (limit >= queryLimit || response.records.length <= previousRecordCount) {
       throw new Error(`Unable to retrieve all flows at ${timestamp}; the query limit was reached.`);
     }
     previousRecordCount = response.records.length;
-    limit = Math.min(limit * 2, MAX_BOUNDARY_QUERY_LIMIT);
+    limit = Math.min(limit * 2, queryLimit);
   }
 };
 
@@ -135,6 +141,31 @@ const appendSessionFlows = (paging: FlowPagingState, records: Record[]): Record[
   const newFlows = records.filter(flow => !existingKeys.has(flow.key));
   paging.sessionFlows = paging.sessionFlows.concat(newFlows);
   return newFlows;
+};
+
+const replaceSessionBoundaryFlows = (paging: FlowPagingState, timestamp: number, records: Record[]): Record[] => {
+  if (paging.showDuplicates) {
+    return appendSessionFlows(paging, records);
+  }
+
+  const firstBoundaryIndex = paging.sessionFlows.findIndex(flow => getPagingTimeSeconds(flow) === timestamp);
+  const insertIndex =
+    firstBoundaryIndex < 0
+      ? paging.sessionFlows.length
+      : paging.sessionFlows.slice(0, firstBoundaryIndex).filter(flow => getPagingTimeSeconds(flow) !== timestamp)
+          .length;
+  const outsideBoundary = paging.sessionFlows.filter(flow => getPagingTimeSeconds(flow) !== timestamp);
+  const outsideKeys = new Set(outsideBoundary.map(flow => flow.key));
+  const completedBoundary = mergeFlowReporters(records).filter(flow => !outsideKeys.has(flow.key));
+  const previousBoundaryKeys = new Set(
+    paging.sessionFlows.filter(flow => getPagingTimeSeconds(flow) === timestamp).map(flow => flow.key)
+  );
+  paging.sessionFlows = [
+    ...outsideBoundary.slice(0, insertIndex),
+    ...completedBoundary,
+    ...outsideBoundary.slice(insertIndex)
+  ];
+  return completedBoundary.filter(flow => !previousBoundaryKeys.has(flow.key));
 };
 
 const getLoadedFlowsRange = (flows: Record[]): TimeRange | undefined => {
@@ -176,12 +207,14 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
   const [loadingOlder, setLoadingOlder] = React.useState(false);
   const [olderError, setOlderError] = React.useState<StructuredError | string>();
   const [loadingNewer, setLoadingNewer] = React.useState(false);
+  const [newerError, setNewerError] = React.useState<StructuredError | string>();
   const [upToDate, setUpToDate] = React.useState(false);
   const upToDateTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const upToDateUntilRef = React.useRef(0);
   const newerRequestCooldownUntilRef = React.useRef(0);
   const [hasMoreOlder, setHasMoreOlder] = React.useState(true);
   const pagingRef = React.useRef<FlowPagingState | undefined>(undefined);
+  const boundaryQueryLimitRef = React.useRef<number | undefined>(undefined);
 
   React.useEffect(
     () => () => {
@@ -197,6 +230,29 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
   React.useEffect(() => {
     flowsRef.current = flows;
   }, [flows]);
+
+  const getBoundaryQueryLimit = React.useCallback(async () => {
+    if (boundaryQueryLimitRef.current !== undefined) {
+      return boundaryQueryLimitRef.current;
+    }
+    try {
+      const response = (await caps.fetchFunctions.getLimits?.()) as
+        | { max_entries_limit_per_query?: unknown; limits_config?: { max_entries_limit_per_query?: unknown } }
+        | undefined;
+      const configuredLimit = Number(
+        response?.max_entries_limit_per_query ?? response?.limits_config?.max_entries_limit_per_query
+      );
+      if (Number.isSafeInteger(configuredLimit) && configuredLimit > 0) {
+        boundaryQueryLimitRef.current = configuredLimit;
+        return configuredLimit;
+      }
+    } catch {
+      // The limits endpoint is admin-only in some deployments. Use Loki's
+      // default limit when the effective value cannot be read.
+    }
+    boundaryQueryLimitRef.current = DEFAULT_LOKI_MAX_ENTRIES_LIMIT;
+    return DEFAULT_LOKI_MAX_ENTRIES_LIMIT;
+  }, [caps.fetchFunctions]);
 
   const fetchTotalFlowCount = React.useCallback(
     (query: StructuredFlowQuery, range: number | TimeRange): Promise<Stats> => {
@@ -233,12 +289,10 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
         const boundaryFlows = await getCompleteTimestampSecond(
           paging.query,
           boundaryTime,
-          caps.fetchFunctions.getRecords
+          caps.fetchFunctions.getRecords,
+          await getBoundaryQueryLimit()
         );
-        const newFlows = appendSessionFlows(
-          paging,
-          paging.showDuplicates ? boundaryFlows : mergeFlowReporters(boundaryFlows)
-        );
+        const newFlows = replaceSessionBoundaryFlows(paging, boundaryTime, boundaryFlows);
         if (newFlows.length > 0) {
           paging.loadedStart = Math.min(paging.loadedStart ?? boundaryTime, boundaryTime);
         }
@@ -296,12 +350,10 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
           const boundaryFlows = await getCompleteTimestampSecond(
             paging.query,
             boundarySecond,
-            caps.fetchFunctions.getRecords
+            caps.fetchFunctions.getRecords,
+            await getBoundaryQueryLimit()
           );
-          const boundaryNewFlows = appendSessionFlows(
-            paging,
-            paging.showDuplicates ? boundaryFlows : mergeFlowReporters(boundaryFlows)
-          );
+          const boundaryNewFlows = replaceSessionBoundaryFlows(paging, boundarySecond, boundaryFlows);
           if (boundaryNewFlows.length > 0) {
             paging.loadedStart = Math.min(paging.loadedStart ?? boundarySecond, boundarySecond);
           }
@@ -353,7 +405,7 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
       isFetchingPageRef.current = false;
       setLoadingOlder(false);
     }
-  }, [caps.fetchFunctions, fetchCallbacks, fetchTotalFlowCount, onLoadedRangeChange]);
+  }, [caps.fetchFunctions, fetchCallbacks, fetchTotalFlowCount, getBoundaryQueryLimit, onLoadedRangeChange]);
 
   const fetchNewer = React.useCallback(
     async (showUpToDateIfEmpty = false) => {
@@ -373,6 +425,7 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
         upToDateTimeoutRef.current = undefined;
       }
       setUpToDate(false);
+      setNewerError(undefined);
       newerRequestCooldownUntilRef.current = Date.now() + NEWER_REQUEST_COOLDOWN_MS;
       isFetchingPageRef.current = true;
       setLoadingNewer(true);
@@ -417,12 +470,13 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
               ...(await getCompleteTimestampSecond(
                 paging.query,
                 Math.min(...boundaryTimes),
-                caps.fetchFunctions.getRecords
+                caps.fetchFunctions.getRecords,
+                await getBoundaryQueryLimit()
               ))
             );
           }
           const nextEnd = Math.min(queryEnd - 1, getExclusiveEndTime(oldestTime));
-          if (nextEnd <= intervalStart) {
+          if (nextEnd < intervalStart) {
             complete = true;
             break;
           }
@@ -476,14 +530,14 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
         }
       } catch (err) {
         if (pagingRef.current === paging) {
-          fetchCallbacks.setError(getStructuredHTTPError(err));
+          setNewerError(getStructuredHTTPError(err));
         }
       } finally {
         isFetchingPageRef.current = false;
         setLoadingNewer(false);
       }
     },
-    [caps.fetchFunctions, fetchCallbacks, fetchTotalFlowCount, onLoadedRangeChange]
+    [caps.fetchFunctions, fetchCallbacks, fetchTotalFlowCount, getBoundaryQueryLimit, onLoadedRangeChange]
   );
 
   const fetchOlderIfVisible = React.useCallback(
@@ -560,6 +614,7 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
         paging = {
           signature,
           query: tableQuery,
+          initialRange: { ...tableRange },
           sessionFlows: [],
           currentStart: tableRange.from - pageDuration,
           nextEnd: getExclusiveEndTime(tableRange.from),
@@ -586,10 +641,19 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
       const metricsRange =
         showHistogram && paging.metricsStart !== undefined ? extendTimeRangeToStart(range, paging.metricsStart) : range;
       const promises: Promise<Stats>[] = [
-        getRecords(tableQuery).then(res => {
+        getRecords(
+          !paging.initializedFromResult && typeof range === 'number' && histogramRange === undefined
+            ? {
+                ...tableQuery,
+                timeRange: undefined,
+                startTime: String(paging.initialRange.from),
+                endTime: String(paging.initialRange.to)
+              }
+            : tableQuery
+        ).then(res => {
           const currentFlows = showDuplicates ? res.records : mergeFlowReporters(res.records);
           if (!paging.initializedFromResult) {
-            const pageStart = tableRange.from;
+            const pageStart = paging.initialRange.from;
             if (res.stats.limitReached) {
               const oldestTime = getOldestTimeSeconds(res.records);
               const boundaryTimes = res.records
@@ -639,6 +703,7 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
     loadingOlder,
     loadingNewer,
     olderError,
+    newerError,
     upToDate
   };
 };

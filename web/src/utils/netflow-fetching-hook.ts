@@ -248,9 +248,20 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | StructuredError | undefined>();
   const errorRef = React.useRef(error);
+  const tickRef = React.useRef<((resetTablePagination?: boolean) => void) | undefined>(undefined);
+  const retryResetTablePaginationRef = React.useRef(false);
+  const retryTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   React.useEffect(() => {
     errorRef.current = error;
   }, [error]);
+  React.useEffect(
+    () => () => {
+      if (retryTimeoutRef.current !== undefined) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+    },
+    []
+  );
   const [flows, setFlows] = React.useState<Record[]>([]);
   const [stats, setStats] = React.useState<Stats | undefined>(undefined);
   const [metrics, setMetrics] = React.useState<NetflowMetrics>(defaultNetflowMetrics);
@@ -301,14 +312,25 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
     [updateTableFilters]
   );
 
+  const scheduleTickRetry = React.useCallback(() => {
+    if (retryTimeoutRef.current !== undefined) {
+      return;
+    }
+    retryTimeoutRef.current = setTimeout(() => {
+      retryTimeoutRef.current = undefined;
+      tickRef.current?.(retryResetTablePaginationRef.current);
+    });
+  }, []);
+
   const tick = React.useCallback(
     (resetTablePagination = false) => {
+      retryResetTablePaginationRef.current = resetTablePagination;
       const modals = { isTRModalOpen, isOverviewModalOpen, isColModalOpen, isExportModalOpen };
       if (!canTick(initState, modals)) return;
 
       if (drawerRef.current == null) {
         console.debug('tick called before drawer rendering. Retrying after render');
-        setTimeout(() => tick(resetTablePagination));
+        scheduleTickRetry();
         return;
       }
 
@@ -337,6 +359,10 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
       });
 
       if (promises) {
+        if (retryTimeoutRef.current !== undefined) {
+          clearTimeout(retryTimeoutRef.current);
+          retryTimeoutRef.current = undefined;
+        }
         const startDate = new Date();
         setStats(undefined);
         manageWarnings(
@@ -350,8 +376,11 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
               setLastDuration(endDate.getTime() - startDate.getTime());
             })
         );
-      } else if (hadPreviousError && caps.allowLoki && (selectedViewId === 'table' || selectedViewId === 'topology')) {
-        setTimeout(() => tick(resetTablePagination));
+      } else if (
+        hadPreviousError &&
+        ((selectedViewId === 'table' && caps.allowLoki) || selectedViewId === 'topology')
+      ) {
+        scheduleTickRetry();
       }
     },
     [
@@ -375,9 +404,12 @@ export function useDataFetching(params: UseDataFetchingParams): UseDataFetchingR
       config.columns,
       drawerRef,
       filters,
-      initState
+      initState,
+      scheduleTickRetry
     ]
   );
+
+  tickRef.current = tick;
 
   usePoll(tick, interval);
 

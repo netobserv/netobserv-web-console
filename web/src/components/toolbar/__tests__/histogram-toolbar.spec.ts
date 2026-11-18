@@ -8,9 +8,14 @@ describe('getZoomedTimeRange', () => {
   });
 
   it('clamps a short displayed interval to the default range when zooming out', () => {
-    const displayedRange = { from: 1_000, to: 1_200 };
+    const displayedRange = { from: 1_000, to: 1_100 };
 
-    expect(getZoomedTimeRange(displayedRange, false, 2_200_000)).toEqual({ from: 950, to: 1_250 });
+    expect(getZoomedTimeRange(displayedRange, false, 2_200_000)).toEqual({ from: 900, to: 1_200 });
+  });
+
+  it('preserves the normal expansion when the displayed interval is just under the default range', () => {
+    expect(getZoomedTimeRange({ from: 1_000, to: 1_299 }, false, 2_200_000)).toEqual({ from: 851, to: 1_448 });
+    expect(getZoomedTimeRange({ from: 1_000, to: 1_300 }, false, 2_200_000)).toEqual({ from: 850, to: 1_450 });
   });
 
   it('zooms in around the displayed interval and respects the minimum range', () => {

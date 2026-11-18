@@ -36,18 +36,19 @@ export const getZoomedTimeRange = (range: TimeRange, zoomIn: boolean, now: numbe
   }
 
   const step = Math.floor(duration / 2);
-  if (duration >= defaultTimeRange) {
-    return {
-      from: range.from - step,
-      // Zooming out keeps the complete displayed interval, even if its end
-      // is later than the most recent refresh time.
-      to: Math.min(range.to + step, Math.max(getDateMsInSeconds(now), range.to))
-    };
+  const updatedRange = {
+    from: range.from - step,
+    // Zooming out keeps the complete displayed interval, even if its end
+    // is later than the most recent refresh time.
+    to: Math.min(range.to + step, Math.max(getDateMsInSeconds(now), range.to))
+  };
+  if (updatedRange.to - updatedRange.from >= defaultTimeRange) {
+    return updatedRange;
   }
 
   const targetDuration = defaultTimeRange;
-  // Keep the displayed interval intact, even when its end is later than the
-  // most recent refresh time. Clamp short intervals to the default duration.
+  // Keep the displayed interval intact while ensuring very short ranges still
+  // expand to the default duration.
   const to = Math.min(
     range.to + Math.ceil((targetDuration - duration) / 2),
     Math.max(getDateMsInSeconds(now), range.to)
