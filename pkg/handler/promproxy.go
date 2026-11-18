@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/netobserv/network-observability-console-plugin/pkg/backend/prometheus"
 	"github.com/netobserv/network-observability-console-plugin/pkg/handler/apierrors"
-	"github.com/netobserv/network-observability-console-plugin/pkg/prometheus"
 )
 
 func (h *Handlers) PromProxyRules() func(w http.ResponseWriter, r *http.Request) {

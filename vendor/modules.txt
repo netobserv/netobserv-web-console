@@ -112,6 +112,9 @@ github.com/netobserv/netobserv-ebpf-agent/pkg/utils/networkevents
 # github.com/ovn-org/ovn-kubernetes/go-controller v0.0.0-20250227173154-57a2590a1d16
 ## explicit; go 1.22.0
 github.com/ovn-org/ovn-kubernetes/go-controller/observability-lib/model
+# github.com/pandatix/go-abnf v0.5.5
+## explicit; go 1.26.0
+github.com/pandatix/go-abnf
 # github.com/prometheus/client_golang v1.25.0
 ## explicit; go 1.26.0
 github.com/prometheus/client_golang/api
@@ -126,9 +129,11 @@ github.com/prometheus/client_golang/prometheus/promhttp/internal
 # github.com/prometheus/client_model v0.6.3
 ## explicit; go 1.23
 github.com/prometheus/client_model/go
-# github.com/prometheus/common v0.72.1
+# github.com/prometheus/common v0.74.0
 ## explicit; go 1.26.0
 github.com/prometheus/common/config
+github.com/prometheus/common/config/internal/secretvalue
+github.com/prometheus/common/config/secret
 github.com/prometheus/common/expfmt
 github.com/prometheus/common/model
 # github.com/prometheus/procfs v0.22.0
@@ -153,13 +158,13 @@ github.com/stretchr/testify/require
 # github.com/x448/float16 v0.8.4
 ## explicit; go 1.11
 github.com/x448/float16
-# go.yaml.in/yaml/v2 v2.4.4
+# go.yaml.in/yaml/v2 v2.4.5
 ## explicit; go 1.15
 go.yaml.in/yaml/v2
 # go.yaml.in/yaml/v3 v3.0.5
 ## explicit; go 1.16
 go.yaml.in/yaml/v3
-# golang.org/x/net v0.61.0
+# golang.org/x/net v0.62.0
 ## explicit; go 1.26.0
 golang.org/x/net/http/httpguts
 golang.org/x/net/http/httpproxy
@@ -170,11 +175,14 @@ golang.org/x/net/internal/httpcommon
 golang.org/x/net/internal/httpsfv
 golang.org/x/net/internal/timeseries
 golang.org/x/net/trace
-# golang.org/x/oauth2 v0.37.0
+# golang.org/x/oauth2 v0.38.0
 ## explicit; go 1.26.0
 golang.org/x/oauth2
 golang.org/x/oauth2/clientcredentials
 golang.org/x/oauth2/internal
+# golang.org/x/sync v0.24.0
+## explicit; go 1.26.0
+golang.org/x/sync/errgroup
 # golang.org/x/sys v0.49.0
 ## explicit; go 1.26.0
 golang.org/x/sys/plan9
@@ -234,7 +242,7 @@ gopkg.in/inf.v0
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
-# k8s.io/api v0.37.1
+# k8s.io/api v0.37.2
 ## explicit; go 1.26.0
 k8s.io/api/admissionregistration/v1
 k8s.io/api/admissionregistration/v1alpha1
@@ -292,7 +300,7 @@ k8s.io/api/storage/v1alpha1
 k8s.io/api/storage/v1beta1
 k8s.io/api/storagemigration/v1
 k8s.io/api/storagemigration/v1beta1
-# k8s.io/apimachinery v0.37.1
+# k8s.io/apimachinery v0.37.2
 ## explicit; go 1.26.0
 k8s.io/apimachinery/pkg/api/equality
 k8s.io/apimachinery/pkg/api/errors
@@ -346,7 +354,7 @@ k8s.io/apimachinery/pkg/version
 k8s.io/apimachinery/pkg/watch
 k8s.io/apimachinery/third_party/forked/golang/json
 k8s.io/apimachinery/third_party/forked/golang/reflect
-# k8s.io/client-go v0.37.1
+# k8s.io/client-go v0.37.2
 ## explicit; go 1.26.0
 k8s.io/client-go/applyconfigurations/admissionregistration/v1
 k8s.io/client-go/applyconfigurations/admissionregistration/v1alpha1

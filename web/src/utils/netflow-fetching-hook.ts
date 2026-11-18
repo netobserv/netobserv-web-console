@@ -83,7 +83,7 @@ export function dispatchFetch(params: DispatchFetchParams): Promise<Stats[]> | u
       if (allowLoki) {
         promises = drawerRef.current?.getTableHandle()?.fetch(range, histogramRange, showHistogram, showDuplicates);
       } else {
-        setError(t('Only available when FlowCollector.loki.enable is true'));
+        setError(t('Only available when Loki is enabled in the FlowCollector'));
       }
       break;
     case 'overview':
