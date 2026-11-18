@@ -9,7 +9,7 @@ import (
 type MultiQueries []SingleQuery
 
 // singleQuery is an intersect group of matches (AND'ed)
-type SingleQuery = []Match
+type SingleQuery []Match
 
 type Match struct {
 	Key             string
@@ -86,15 +86,22 @@ func Parse(raw string) (MultiQueries, error) {
 func (m MultiQueries) Distribute(toDistribute []SingleQuery, ignorePred func(SingleQuery) bool) MultiQueries {
 	result := MultiQueries{}
 	for _, qOrig := range m {
-		if ignorePred(qOrig) {
+		if ignorePred != nil && ignorePred(qOrig) {
 			result = append(result, qOrig)
 			continue
 		}
-		for _, qToDistribute := range toDistribute {
-			qDistributed := qToDistribute
-			qDistributed = append(qDistributed, qOrig...)
-			result = append(result, qDistributed)
-		}
+		distributed := qOrig.MultiplySingle(toDistribute)
+		result = append(result, distributed...)
+	}
+	return result
+}
+
+func (s SingleQuery) MultiplySingle(toDistribute []SingleQuery) MultiQueries {
+	result := MultiQueries{}
+	for _, qToDistribute := range toDistribute {
+		qDistributed := qToDistribute
+		qDistributed = append(qDistributed, s...)
+		result = append(result, qDistributed)
 	}
 	return result
 }
