@@ -305,13 +305,13 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
     const targetPosition = Math.min(maxPosition, currentPosition + metrics.height);
     getScrollRoot(container).scrollBy({ top: targetPosition - metrics.position, behavior: 'smooth' });
     if (maxPosition - targetPosition <= 200) {
-      void fetchOlder();
+      void fetchOlder(true);
     }
   }, [fetchOlder, getRowHeight, props.flows.length]);
 
   const handleEnd = React.useCallback(() => {
     paginationSentinelRef.current?.scrollIntoView?.({ behavior: 'auto', block: 'end' });
-    void fetchOlder();
+    void fetchOlder(true);
   }, [fetchOlder]);
 
   const handleTableKeyDown = React.useCallback(

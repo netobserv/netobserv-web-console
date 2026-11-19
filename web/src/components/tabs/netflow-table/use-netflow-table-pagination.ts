@@ -13,6 +13,7 @@ import {
 } from '../../../utils/datetime';
 import { getStructuredHTTPError, StructuredError } from '../../../utils/errors';
 import { mergeFlowReporters } from '../../../utils/flows';
+import { get7Tuple } from '../../../utils/ids';
 import { Result } from '../../../utils/result';
 
 interface FlowPagingState {
@@ -190,12 +191,64 @@ const replaceSessionBoundaryFlows = (
 };
 
 const getLoadedFlowsRange = (flows: Record[]): TimeRange | undefined => {
-  const times = flows.map(getRecordTimeSeconds).filter((value): value is number => value !== undefined);
-  if (times.length === 0) {
+  let from: number | undefined;
+  let to: number | undefined;
+  flows.forEach(flow => {
+    const time = getRecordTimeSeconds(flow);
+    if (time === undefined) {
+      return;
+    }
+    from = from === undefined ? time : Math.min(from, time);
+    to = to === undefined ? time : Math.max(to, time);
+  });
+  if (from === undefined || to === undefined) {
     return undefined;
   }
-  const from = Math.min(...times);
-  return { from, to: Math.max(from + 1, Math.max(...times)) };
+  return { from, to: Math.max(from + 1, to) };
+};
+
+const isFlowInRange = (flow: Record, range: TimeRange): boolean => {
+  const time = getPagingTimeSeconds(flow);
+  return time !== undefined && time >= range.from && time <= range.to;
+};
+
+const mergeRefreshedSessionFlows = (
+  sessionFlows: Record[],
+  currentFlows: Record[],
+  refreshedRange: TimeRange,
+  showDuplicates: boolean
+): Record[] => {
+  if (showDuplicates) {
+    const currentFlowsByKey = new Map(currentFlows.map(flow => [flow.key, flow]));
+    const sessionKeys = new Set(sessionFlows.map(flow => flow.key));
+    const refreshedSessionFlows = sessionFlows.map(flow => currentFlowsByKey.get(flow.key) ?? flow);
+    const newCurrentFlows = currentFlows.filter(flow => !sessionKeys.has(flow.key));
+    return [...newCurrentFlows, ...refreshedSessionFlows];
+  }
+
+  const currentFlowsByTuple = new Map(currentFlows.map(flow => [get7Tuple(flow), flow]));
+  const sessionTuples = new Set(sessionFlows.map(get7Tuple));
+  const insertedTuples = new Set<string>();
+  const refreshedSessionFlows: Record[] = [];
+
+  sessionFlows.forEach(flow => {
+    const tuple = get7Tuple(flow);
+    const refreshedFlow = isFlowInRange(flow, refreshedRange) ? currentFlowsByTuple.get(tuple) : undefined;
+    if (!refreshedFlow) {
+      refreshedSessionFlows.push(flow);
+      return;
+    }
+    if (!insertedTuples.has(tuple)) {
+      refreshedSessionFlows.push(refreshedFlow);
+      insertedTuples.add(tuple);
+    }
+  });
+
+  const newCurrentFlows = currentFlows.filter(flow => {
+    const tuple = get7Tuple(flow);
+    return !sessionTuples.has(tuple) && !insertedTuples.has(tuple);
+  });
+  return [...newCurrentFlows, ...refreshedSessionFlows];
 };
 
 const getFlowCountQuery = (query: StructuredFlowQuery, range: number | TimeRange): StructuredFlowQuery => {
@@ -236,6 +289,15 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
   const [hasMoreOlder, setHasMoreOlder] = React.useState(true);
   const pagingRef = React.useRef<FlowPagingState | undefined>(undefined);
   const boundaryQueryLimitRef = React.useRef<CachedBoundaryQueryLimit | undefined>(undefined);
+
+  const clearUpToDateBadge = React.useCallback(() => {
+    if (upToDateTimeoutRef.current !== undefined) {
+      clearTimeout(upToDateTimeoutRef.current);
+      upToDateTimeoutRef.current = undefined;
+    }
+    upToDateUntilRef.current = 0;
+    setUpToDate(false);
+  }, []);
 
   React.useEffect(
     () => () => {
@@ -294,153 +356,159 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
     [caps.fetchFunctions, fetchCallbacks]
   );
 
-  const fetchOlder = React.useCallback(async () => {
-    const paging = pagingRef.current;
-    if (
-      !paging ||
-      !paging.initializedFromResult ||
-      !paging.hasMore ||
-      paging.blockedByError ||
-      isFetchingPageRef.current
-    ) {
-      return;
-    }
+  const fetchOlder = React.useCallback(
+    async (retryBlockedByError = false) => {
+      const paging = pagingRef.current;
+      if (paging?.blockedByError && retryBlockedByError) {
+        paging.blockedByError = false;
+      }
+      if (
+        !paging ||
+        !paging.initializedFromResult ||
+        !paging.hasMore ||
+        paging.blockedByError ||
+        isFetchingPageRef.current
+      ) {
+        return;
+      }
 
-    isFetchingPageRef.current = true;
-    setOlderError(undefined);
-    setLoadingOlder(true);
-    try {
-      if (paging.pendingOlderBoundary !== undefined) {
-        const boundaryTime = paging.pendingOlderBoundary;
-        const maxEntriesLimit = await getBoundaryQueryLimit();
-        const sessionFlowsAtRequestStart = paging.sessionFlows.slice();
-        const boundaryFlows = await getCompleteTimestampSecond(
-          paging.query,
-          boundaryTime,
-          caps.fetchFunctions.getRecords,
-          maxEntriesLimit
-        );
-        const newFlows = replaceSessionBoundaryFlows(paging, boundaryTime, boundaryFlows, sessionFlowsAtRequestStart);
+      isFetchingPageRef.current = true;
+      setOlderError(undefined);
+      setLoadingOlder(true);
+      try {
+        if (paging.pendingOlderBoundary !== undefined) {
+          const boundaryTime = paging.pendingOlderBoundary;
+          const maxEntriesLimit = await getBoundaryQueryLimit();
+          const sessionFlowsAtRequestStart = paging.sessionFlows.slice();
+          const boundaryFlows = await getCompleteTimestampSecond(
+            paging.query,
+            boundaryTime,
+            caps.fetchFunctions.getRecords,
+            maxEntriesLimit
+          );
+          const newFlows = replaceSessionBoundaryFlows(paging, boundaryTime, boundaryFlows, sessionFlowsAtRequestStart);
+          if (newFlows.length > 0) {
+            paging.loadedStart = Math.min(paging.loadedStart ?? boundaryTime, boundaryTime);
+          }
+          paging.pendingOlderBoundary = undefined;
+          if (paging.pendingOlderNeedsCursorAdvance) {
+            advanceOlderCursor(paging, boundaryTime);
+          }
+          paging.pendingOlderNeedsCursorAdvance = undefined;
+
+          if (pagingRef.current === paging) {
+            if (!paging.hasMore) {
+              setHasMoreOlder(false);
+            }
+            flowsRef.current = paging.sessionFlows;
+            fetchCallbacks.setFlows(paging.sessionFlows);
+            onLoadedRangeChange?.(getLoadedFlowsRange(paging.sessionFlows));
+
+            if (paging.showHistogram && paging.loadedStart !== undefined) {
+              const currentMetricsStart = paging.metricsStart ?? paging.metricBaseStart;
+              const metricsStart = Math.min(currentMetricsStart, paging.loadedStart);
+              const shouldExtendRange = metricsStart < currentMetricsStart;
+              const shouldPinRelativeRange = paging.metricsStart === undefined && typeof paging.range === 'number';
+              if (shouldExtendRange || shouldPinRelativeRange) {
+                paging.metricsStart = metricsStart;
+                await fetchTotalFlowCount(paging.query, extendTimeRangeToStart(paging.range, metricsStart));
+              }
+            }
+          }
+          return;
+        }
+
+        const requestStart = paging.currentStart;
+        const query = {
+          ...paging.query,
+          timeRange: undefined,
+          startTime: String(paging.currentStart),
+          endTime: String(paging.nextEnd)
+        };
+        const res = await caps.fetchFunctions.getRecords(query);
+        const older = paging.showDuplicates ? res.records : mergeFlowReporters(res.records);
+        const newFlows = appendSessionFlows(paging, older);
         if (newFlows.length > 0) {
-          paging.loadedStart = Math.min(paging.loadedStart ?? boundaryTime, boundaryTime);
+          paging.loadedStart = Math.min(paging.loadedStart ?? requestStart, requestStart);
         }
-        paging.pendingOlderBoundary = undefined;
-        if (paging.pendingOlderNeedsCursorAdvance) {
-          advanceOlderCursor(paging, boundaryTime);
+
+        if (res.stats.limitReached) {
+          const oldestTime = getOldestTimeSeconds(res.records);
+          const boundaryTimes = res.records
+            .map(getLokiTimestampSeconds)
+            .filter((value): value is number => value !== undefined);
+          if (boundaryTimes.length > 0) {
+            const boundarySecond = Math.min(...boundaryTimes);
+            paging.pendingOlderBoundary = boundarySecond;
+            paging.pendingOlderNeedsCursorAdvance = true;
+            const maxEntriesLimit = await getBoundaryQueryLimit();
+            const sessionFlowsAtRequestStart = paging.sessionFlows.slice();
+            const boundaryFlows = await getCompleteTimestampSecond(
+              paging.query,
+              boundarySecond,
+              caps.fetchFunctions.getRecords,
+              maxEntriesLimit
+            );
+            const boundaryNewFlows = replaceSessionBoundaryFlows(
+              paging,
+              boundarySecond,
+              boundaryFlows,
+              sessionFlowsAtRequestStart
+            );
+            if (boundaryNewFlows.length > 0) {
+              paging.loadedStart = Math.min(paging.loadedStart ?? boundarySecond, boundarySecond);
+            }
+            paging.pendingOlderBoundary = undefined;
+            advanceOlderCursor(paging, boundarySecond);
+            paging.pendingOlderNeedsCursorAdvance = undefined;
+          } else if (oldestTime !== undefined) {
+            advanceOlderCursor(paging, oldestTime);
+          } else {
+            movePagingWindowBack(paging);
+          }
+        } else if (res.records.length === 0) {
+          // Loki can have gaps between flows. Widen the next lookback window
+          // instead of treating one empty interval as the end of its history.
+          movePagingWindowBack(paging, true);
+        } else {
+          movePagingWindowBack(paging);
         }
-        paging.pendingOlderNeedsCursorAdvance = undefined;
 
         if (pagingRef.current === paging) {
           if (!paging.hasMore) {
             setHasMoreOlder(false);
           }
-          flowsRef.current = paging.sessionFlows;
-          fetchCallbacks.setFlows(paging.sessionFlows);
-          onLoadedRangeChange?.(getLoadedFlowsRange(paging.sessionFlows));
+          const combinedFlows = paging.sessionFlows;
+          flowsRef.current = combinedFlows;
+          fetchCallbacks.setFlows(combinedFlows);
+          onLoadedRangeChange?.(getLoadedFlowsRange(combinedFlows));
 
           if (paging.showHistogram && paging.loadedStart !== undefined) {
             const currentMetricsStart = paging.metricsStart ?? paging.metricBaseStart;
             const metricsStart = Math.min(currentMetricsStart, paging.loadedStart);
             const shouldExtendRange = metricsStart < currentMetricsStart;
             const shouldPinRelativeRange = paging.metricsStart === undefined && typeof paging.range === 'number';
-            if (shouldExtendRange || shouldPinRelativeRange) {
+            const shouldRefresh = shouldExtendRange || shouldPinRelativeRange;
+            if (shouldRefresh) {
               paging.metricsStart = metricsStart;
               await fetchTotalFlowCount(paging.query, extendTimeRangeToStart(paging.range, metricsStart));
             }
           }
         }
-        return;
-      }
-
-      const requestStart = paging.currentStart;
-      const query = {
-        ...paging.query,
-        timeRange: undefined,
-        startTime: String(paging.currentStart),
-        endTime: String(paging.nextEnd)
-      };
-      const res = await caps.fetchFunctions.getRecords(query);
-      const older = paging.showDuplicates ? res.records : mergeFlowReporters(res.records);
-      const newFlows = appendSessionFlows(paging, older);
-      if (newFlows.length > 0) {
-        paging.loadedStart = Math.min(paging.loadedStart ?? requestStart, requestStart);
-      }
-
-      if (res.stats.limitReached) {
-        const oldestTime = getOldestTimeSeconds(res.records);
-        const boundaryTimes = res.records
-          .map(getLokiTimestampSeconds)
-          .filter((value): value is number => value !== undefined);
-        if (boundaryTimes.length > 0) {
-          const boundarySecond = Math.min(...boundaryTimes);
-          paging.pendingOlderBoundary = boundarySecond;
-          paging.pendingOlderNeedsCursorAdvance = true;
-          const maxEntriesLimit = await getBoundaryQueryLimit();
-          const sessionFlowsAtRequestStart = paging.sessionFlows.slice();
-          const boundaryFlows = await getCompleteTimestampSecond(
-            paging.query,
-            boundarySecond,
-            caps.fetchFunctions.getRecords,
-            maxEntriesLimit
-          );
-          const boundaryNewFlows = replaceSessionBoundaryFlows(
-            paging,
-            boundarySecond,
-            boundaryFlows,
-            sessionFlowsAtRequestStart
-          );
-          if (boundaryNewFlows.length > 0) {
-            paging.loadedStart = Math.min(paging.loadedStart ?? boundarySecond, boundarySecond);
-          }
-          paging.pendingOlderBoundary = undefined;
-          advanceOlderCursor(paging, boundarySecond);
-          paging.pendingOlderNeedsCursorAdvance = undefined;
-        } else if (oldestTime !== undefined) {
-          advanceOlderCursor(paging, oldestTime);
-        } else {
-          movePagingWindowBack(paging);
+      } catch (err) {
+        if (pagingRef.current === paging) {
+          // A failed query doesn't prove that Loki has no older flows. Pause
+          // automatic retries and let the next user scroll retry the request.
+          paging.blockedByError = true;
+          setOlderError(getStructuredHTTPError(err));
         }
-      } else if (res.records.length === 0) {
-        // Loki can have gaps between flows. Widen the next lookback window
-        // instead of treating one empty interval as the end of its history.
-        movePagingWindowBack(paging, true);
-      } else {
-        movePagingWindowBack(paging);
+      } finally {
+        isFetchingPageRef.current = false;
+        setLoadingOlder(false);
       }
-
-      if (pagingRef.current === paging) {
-        if (!paging.hasMore) {
-          setHasMoreOlder(false);
-        }
-        const combinedFlows = paging.sessionFlows;
-        flowsRef.current = combinedFlows;
-        fetchCallbacks.setFlows(combinedFlows);
-        onLoadedRangeChange?.(getLoadedFlowsRange(combinedFlows));
-
-        if (paging.showHistogram && paging.loadedStart !== undefined) {
-          const currentMetricsStart = paging.metricsStart ?? paging.metricBaseStart;
-          const metricsStart = Math.min(currentMetricsStart, paging.loadedStart);
-          const shouldExtendRange = metricsStart < currentMetricsStart;
-          const shouldPinRelativeRange = paging.metricsStart === undefined && typeof paging.range === 'number';
-          const shouldRefresh = shouldExtendRange || shouldPinRelativeRange;
-          if (shouldRefresh) {
-            paging.metricsStart = metricsStart;
-            await fetchTotalFlowCount(paging.query, extendTimeRangeToStart(paging.range, metricsStart));
-          }
-        }
-      }
-    } catch (err) {
-      if (pagingRef.current === paging) {
-        // A failed query doesn't prove that Loki has no older flows. Pause
-        // automatic retries and let the next user scroll retry the request.
-        paging.blockedByError = true;
-        setOlderError(getStructuredHTTPError(err));
-      }
-    } finally {
-      isFetchingPageRef.current = false;
-      setLoadingOlder(false);
-    }
-  }, [caps.fetchFunctions, fetchCallbacks, fetchTotalFlowCount, getBoundaryQueryLimit, onLoadedRangeChange]);
+    },
+    [caps.fetchFunctions, fetchCallbacks, fetchTotalFlowCount, getBoundaryQueryLimit, onLoadedRangeChange]
+  );
 
   const fetchNewer = React.useCallback(
     async (showUpToDateIfEmpty = false) => {
@@ -466,11 +534,15 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
       setLoadingNewer(true);
       try {
         const isContinuing = paging.pendingNewerStart !== undefined && paging.pendingNewerEnd !== undefined;
+        let snapshotEnd = isContinuing ? paging.pendingNewerUntil : undefined;
+        const fallbackSnapshotEnd = Math.max(paging.newerUntil, Math.floor(Date.now() / 1000));
         const intervalStart = isContinuing
           ? paging.pendingNewerStart!
-          : Math.max(0, paging.newerUntil - NEWER_QUERY_OVERLAP_SECONDS);
-        const snapshotEnd = paging.pendingNewerUntil ?? Math.floor(Date.now() / 1000);
-        let queryEnd = isContinuing ? paging.pendingNewerEnd! : snapshotEnd;
+          : Math.max(0, Math.min(paging.newerUntil, fallbackSnapshotEnd) - NEWER_QUERY_OVERLAP_SECONDS);
+        let queryEnd = isContinuing ? paging.pendingNewerEnd! : fallbackSnapshotEnd;
+        if (isContinuing && queryEnd < intervalStart) {
+          return;
+        }
         let complete = false;
         let pageCount = 0;
         const receivedRecords: Record[] = [];
@@ -480,9 +552,16 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
             ...paging.query,
             timeRange: undefined,
             startTime: String(intervalStart),
-            endTime: String(queryEnd)
+            endTime: !isContinuing && pageCount === 0 ? undefined : String(queryEnd)
           };
           const res = await caps.fetchFunctions.getRecords(query);
+          if (snapshotEnd === undefined) {
+            snapshotEnd =
+              Number.isSafeInteger(res.unixTimestamp) && res.unixTimestamp! > 0
+                ? Math.max(paging.newerUntil, res.unixTimestamp!)
+                : fallbackSnapshotEnd;
+            queryEnd = Math.max(queryEnd, snapshotEnd);
+          }
           receivedRecords.push(...res.records);
           pageCount++;
 
@@ -538,19 +617,22 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
           }
 
           if (complete) {
-            paging.newerUntil = snapshotEnd;
+            paging.newerUntil = Math.max(paging.newerUntil, snapshotEnd ?? fallbackSnapshotEnd);
             paging.pendingNewerStart = undefined;
             paging.pendingNewerEnd = undefined;
             paging.pendingNewerUntil = undefined;
           } else {
             paging.pendingNewerStart = intervalStart;
             paging.pendingNewerEnd = queryEnd;
-            paging.pendingNewerUntil = snapshotEnd;
+            paging.pendingNewerUntil = Math.max(paging.newerUntil, snapshotEnd ?? fallbackSnapshotEnd);
           }
 
           if (paging.showHistogram) {
             const metricsRange = extendTimeRangeToStart(paging.range, paging.metricsStart ?? paging.metricBaseStart);
             await fetchTotalFlowCount(paging.query, metricsRange);
+          }
+          if (pagingRef.current !== paging) {
+            return;
           }
 
           if (complete && newFlows.length === 0 && showUpToDateIfEmpty) {
@@ -636,6 +718,7 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
       let paging = pagingRef.current;
       if (resetPagination || !paging || paging.signature !== signature) {
         setNewerError(undefined);
+        clearUpToDateBadge();
         if (resetPagination) {
           // A manual refresh starts a new browsing session from the newest
           // query result; carrying older pages forward can leave gaps as a
@@ -715,11 +798,19 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
             paging.initializedFromResult = true;
           }
           if (pagingRef.current === paging) {
-            const currentFlowsByKey = new Map(currentFlows.map(flow => [flow.key, flow]));
-            const sessionKeys = new Set(paging.sessionFlows.map(flow => flow.key));
-            const refreshedSessionFlows = paging.sessionFlows.map(flow => currentFlowsByKey.get(flow.key) ?? flow);
-            const newCurrentFlows = currentFlows.filter(flow => !sessionKeys.has(flow.key));
-            const combinedFlows = [...newCurrentFlows, ...refreshedSessionFlows];
+            const refreshedRange =
+              typeof range === 'number' &&
+              histogramRange === undefined &&
+              Number.isSafeInteger(res.unixTimestamp) &&
+              res.unixTimestamp! > 0
+                ? { from: res.unixTimestamp! - range, to: res.unixTimestamp! }
+                : tableRange;
+            const combinedFlows = mergeRefreshedSessionFlows(
+              paging.sessionFlows,
+              currentFlows,
+              refreshedRange,
+              showDuplicates
+            );
             paging.sessionFlows = combinedFlows;
             flowsRef.current = combinedFlows;
             setFlows(combinedFlows);
@@ -733,7 +824,7 @@ export const useNetflowTablePagination = (flows: Record[], onLoadedRangeChange?:
       }
       return Promise.all(promises);
     },
-    [caps.flowQuery, caps.fetchFunctions, fetchCallbacks, fetchTotalFlowCount, onLoadedRangeChange]
+    [caps.flowQuery, caps.fetchFunctions, fetchCallbacks, fetchTotalFlowCount, clearUpToDateBadge, onLoadedRangeChange]
   );
 
   return {

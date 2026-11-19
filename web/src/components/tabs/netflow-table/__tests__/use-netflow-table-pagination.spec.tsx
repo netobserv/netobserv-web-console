@@ -17,14 +17,15 @@ const makeWrapper = (
   setError = jest.fn(),
   limit = 1,
   maxEntriesLimit?: number,
-  getLimitsFn?: jest.Mock
+  getLimitsFn?: jest.Mock,
+  getMetricsFn?: jest.Mock
 ): React.FC<React.PropsWithChildren> => {
   const context = {
     caps: {
       flowQuery: { limit },
       fetchFunctions: {
         getRecords,
-        getMetrics: jest.fn(),
+        getMetrics: getMetricsFn ?? jest.fn(),
         getLimits:
           getLimitsFn ??
           (maxEntriesLimit === undefined
@@ -374,6 +375,69 @@ describe('useNetflowTablePagination', () => {
     expect(setFlows).toHaveBeenLastCalledWith([electedFlow]);
   });
 
+  it('reconciles refreshed tuple elections with the loaded session', async () => {
+    const timestamp = Math.floor(Date.now() / 1000) - 30;
+    const provisionalFlow: Record = {
+      ...FlowsSample[0],
+      key: FlowsSample[0].key + 420,
+      labels: { ...FlowsSample[0].labels, FlowDirection: FlowDirection.Ingress },
+      fields: { ...FlowsSample[0].fields, TimeFlowEndMs: timestamp * 1000 }
+    };
+    const electedFlow: Record = {
+      ...provisionalFlow,
+      key: provisionalFlow.key + 1,
+      labels: { ...provisionalFlow.labels, FlowDirection: FlowDirection.Egress },
+      fields: { ...provisionalFlow.fields, PktDropPackets: 2 }
+    };
+    const getRecords = jest
+      .fn()
+      .mockResolvedValueOnce({ records: [provisionalFlow], stats })
+      .mockResolvedValueOnce({ records: [electedFlow], stats });
+    const setFlows = jest.fn();
+    const wrapper = makeWrapper(getRecords, setFlows);
+    const { result } = renderHook(() => useNetflowTablePagination([]), { wrapper });
+
+    await act(async () => {
+      await result.current.fetch({ from: timestamp - 30, to: timestamp + 30 }, undefined, false, false);
+    });
+    await act(async () => {
+      await result.current.fetch({ from: timestamp - 30, to: timestamp + 30 }, undefined, false, false);
+    });
+
+    expect(setFlows).toHaveBeenLastCalledWith([electedFlow]);
+  });
+
+  it('preserves duplicate reporters when refreshing a loaded session', async () => {
+    const timestamp = Math.floor(Date.now() / 1000) - 30;
+    const ingressFlow: Record = {
+      ...FlowsSample[0],
+      key: FlowsSample[0].key + 430,
+      labels: { ...FlowsSample[0].labels, FlowDirection: FlowDirection.Ingress },
+      fields: { ...FlowsSample[0].fields, TimeFlowEndMs: timestamp * 1000 }
+    };
+    const egressFlow: Record = {
+      ...ingressFlow,
+      key: ingressFlow.key + 1,
+      labels: { ...ingressFlow.labels, FlowDirection: FlowDirection.Egress }
+    };
+    const getRecords = jest
+      .fn()
+      .mockResolvedValueOnce({ records: [ingressFlow], stats })
+      .mockResolvedValueOnce({ records: [egressFlow], stats });
+    const setFlows = jest.fn();
+    const wrapper = makeWrapper(getRecords, setFlows);
+    const { result } = renderHook(() => useNetflowTablePagination([]), { wrapper });
+
+    await act(async () => {
+      await result.current.fetch({ from: timestamp - 30, to: timestamp + 30 }, undefined, false, true);
+    });
+    await act(async () => {
+      await result.current.fetch({ from: timestamp - 30, to: timestamp + 30 }, undefined, false, true);
+    });
+
+    expect(setFlows).toHaveBeenLastCalledWith([egressFlow, ingressFlow]);
+  });
+
   it('preserves flows published while an older boundary query is in flight', async () => {
     const timestamp = Math.floor(Date.now() / 1000) - 30;
     const boundaryFlow: Record = {
@@ -445,6 +509,39 @@ describe('useNetflowTablePagination', () => {
     });
 
     expect(setFlows).toHaveBeenLastCalledWith([newerFlow, initialFlow]);
+  });
+
+  it('uses the server timestamp to anchor fresh newer pulls', async () => {
+    const initialNow = 1_700_000_000_000;
+    const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(initialNow);
+    const initialFlow: Record = {
+      ...FlowsSample[0],
+      fields: { ...FlowsSample[0].fields, TimeFlowEndMs: 999_000 }
+    };
+    const getRecords = jest
+      .fn()
+      .mockResolvedValueOnce({ records: [initialFlow], stats, unixTimestamp: 1000 })
+      .mockResolvedValueOnce({ records: [], stats, unixTimestamp: 1010 })
+      .mockResolvedValueOnce({ records: [], stats, unixTimestamp: 1015 });
+    const wrapper = makeWrapper(getRecords, jest.fn());
+    const { result } = renderHook(() => useNetflowTablePagination([]), { wrapper });
+
+    await act(async () => {
+      await result.current.fetch(60, undefined, false, false);
+    });
+    await act(async () => {
+      await result.current.fetchNewer();
+    });
+
+    expect(getRecords.mock.calls[1][0]).toEqual(expect.objectContaining({ startTime: '970', endTime: undefined }));
+
+    nowSpy.mockReturnValue(initialNow + 1000);
+    await act(async () => {
+      await result.current.fetchNewer();
+    });
+
+    expect(getRecords.mock.calls[2][0]).toEqual(expect.objectContaining({ startTime: '980', endTime: undefined }));
+    nowSpy.mockRestore();
   });
 
   it('queries the remaining newer boundary when the next end equals the interval start', async () => {
@@ -532,6 +629,37 @@ describe('useNetflowTablePagination', () => {
     expect(setFlows).toHaveBeenLastCalledWith([initialFlow]);
   });
 
+  it('keeps automatic older retries blocked until an explicit retry is requested', async () => {
+    const initialFlow = FlowsSample[0];
+    const olderFlow: Record = { ...initialFlow, key: initialFlow.key + 103 };
+    const getRecords = jest
+      .fn()
+      .mockResolvedValueOnce({ records: [initialFlow], stats: { ...stats, limitReached: true } })
+      .mockRejectedValueOnce(new Error('older page failed'))
+      .mockResolvedValueOnce({ records: [olderFlow], stats });
+    const setFlows = jest.fn();
+    const wrapper = makeWrapper(getRecords, setFlows);
+    const { result } = renderHook(() => useNetflowTablePagination([]), { wrapper });
+
+    await act(async () => {
+      await result.current.fetch(60, undefined, false, false);
+    });
+    await act(async () => {
+      await result.current.fetchOlder();
+    });
+    await act(async () => {
+      await result.current.fetchOlder();
+    });
+    expect(getRecords).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      await result.current.fetchOlder(true);
+    });
+
+    expect(getRecords).toHaveBeenCalledTimes(3);
+    expect(setFlows).toHaveBeenLastCalledWith([initialFlow, olderFlow]);
+  });
+
   it('does not publish an older-page response after unmount', async () => {
     const initialFlow = FlowsSample[0];
     const olderFlow: Record = { ...initialFlow, key: initialFlow.key + 102 };
@@ -581,5 +709,44 @@ describe('useNetflowTablePagination', () => {
 
     expect(result.current.upToDate).toBe(true);
     unmount();
+  });
+
+  it('does not show a stale up-to-date status after the paging session changes', async () => {
+    const initialFlow = FlowsSample[0];
+    let resolveMetrics: ((value: { metrics: unknown[]; stats: Stats }) => void) | undefined;
+    const pendingMetrics = new Promise<{ metrics: unknown[]; stats: Stats }>(resolve => {
+      resolveMetrics = resolve;
+    });
+    const getMetrics = jest
+      .fn()
+      .mockResolvedValueOnce({ metrics: [], stats })
+      .mockReturnValueOnce(pendingMetrics)
+      .mockResolvedValueOnce({ metrics: [], stats });
+    const getRecords = jest
+      .fn()
+      .mockResolvedValueOnce({ records: [initialFlow], stats, unixTimestamp: 1000 })
+      .mockResolvedValueOnce({ records: [], stats, unixTimestamp: 1010 })
+      .mockResolvedValueOnce({ records: [initialFlow], stats });
+    const wrapper = makeWrapper(getRecords, jest.fn(), jest.fn(), 1, undefined, undefined, getMetrics);
+    const { result } = renderHook(() => useNetflowTablePagination([]), { wrapper });
+
+    await act(async () => {
+      await result.current.fetch(60, undefined, true, false);
+    });
+
+    let newerPromise: Promise<void> | undefined;
+    await act(async () => {
+      newerPromise = result.current.fetchNewer(true);
+      await Promise.resolve();
+    });
+    await act(async () => {
+      await result.current.fetch({ from: 900, to: 960 }, undefined, true, false);
+    });
+    await act(async () => {
+      resolveMetrics?.({ metrics: [], stats });
+      await newerPromise;
+    });
+
+    expect(result.current.upToDate).toBe(false);
   });
 });
