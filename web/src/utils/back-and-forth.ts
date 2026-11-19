@@ -1,5 +1,5 @@
 import { FlowMetricsResult, RecordsResult } from '../api/query-response';
-import { getFlowMetrics, getFlowRecords } from '../api/routes';
+import { getFlowMetrics, getFlowRecords, getLimits as getLokiLimits } from '../api/routes';
 import { Filter, FilterDefinition } from '../model/filters';
 import { filtersToString, StructuredFlowQuery, structuredToRawQuery } from '../model/flow-query';
 import { computeStepInterval, TimeRange } from './datetime';
@@ -41,7 +41,8 @@ export const getFetchFunctions = (filterDefinitions: FilterDefinition[]) => {
       }
       const rawQ = structuredToRawQuery(q);
       return getFlowMetrics(rawQ, range);
-    }
+    },
+    getLimits: getLokiLimits
   };
 };
 

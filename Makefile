@@ -251,7 +251,7 @@ serve: YQ ## Run backend
 
 .PHONY: serve-mock
 serve-mock: YQ ## Run backend using mocks
-	$(YQ) '.server.port |= 9001 | .server.metricsPort |= 9002 | .consoleMode |= "Mock"' ./config/sample-config.yaml > ./config/config.yaml
+	$(YQ) '.server.port |= 9001 | .server.metricsPort |= 9002 | .consoleMode |= "Mock" | .prometheus.url |= ""' ./config/sample-config.yaml > ./config/config.yaml
 	./plugin-backend $(CMDLINE_ARGS)
 
 ##@ Images

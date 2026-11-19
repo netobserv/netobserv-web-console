@@ -111,6 +111,25 @@ export const rangeToSeconds = (range: TimeRange | number): number => {
   return range.to - range.from;
 };
 
+export const getTimeRangeBounds = (range: TimeRange | number, now = Math.floor(Date.now() / 1000)): TimeRange =>
+  typeof range === 'number' ? { from: now - range, to: now } : range;
+
+export const getTimeRangeDuration = (range: TimeRange): number => range.to - range.from;
+
+export const shiftTimeRange = (range: TimeRange, periods: number): TimeRange => {
+  const shift = getTimeRangeDuration(range) * periods;
+  return { from: range.from + shift, to: range.to + shift };
+};
+
+export const extendTimeRangeToStart = (
+  range: TimeRange | number,
+  from: number,
+  now = Math.floor(Date.now() / 1000)
+): TimeRange => {
+  const bounds = getTimeRangeBounds(range, now);
+  return { from: Math.min(bounds.from, from), to: bounds.to };
+};
+
 export const computeStepInterval = (range: TimeRange | number) => {
   const seconds = rangeToSeconds(range);
   let interval = Math.floor(seconds / 10);

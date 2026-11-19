@@ -27,6 +27,7 @@ export interface StreamResult {
 export interface RecordsResult {
   records: Record[];
   stats: Stats;
+  unixTimestamp?: number;
 }
 
 export interface FlowMetricsResult {
@@ -45,7 +46,8 @@ export const parseStream = (raw: StreamResult): Record[] => {
     return {
       labels: raw.stream as Flow,
       key: cyrb53(v.join(',')),
-      fields: fields
+      fields,
+      lokiTimestampNs: v[0]
     };
   });
 };

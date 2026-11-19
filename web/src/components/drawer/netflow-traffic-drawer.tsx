@@ -69,6 +69,7 @@ export interface NetflowTrafficDrawerProps {
   lastRefresh: Date | undefined;
   range: TimeRange | number;
   setRange: (tr: TimeRange | number) => void;
+  onLoadedRangeChange?: (range?: TimeRange) => void;
   setRecordType: (r: RecordType) => void;
   stats?: Stats;
   lastDuration?: number;
@@ -261,6 +262,7 @@ export const NetflowTrafficDrawer = React.forwardRef<NetflowTrafficDrawerHandle,
                 loading={props.loading}
                 allowPktDrops={caps.isPktDrop}
                 flows={props.flows}
+                onLoadedRangeChange={props.onLoadedRangeChange}
                 selectedRecord={props.selectedRecord}
                 size={props.size}
                 onSelect={onRecordSelect}

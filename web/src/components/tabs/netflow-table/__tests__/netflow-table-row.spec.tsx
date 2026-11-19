@@ -13,8 +13,7 @@ describe('<NetflowTableRow />', () => {
     allowPktDrops: true,
     size: 'm' as Size,
     onSelect: jest.fn(),
-    tableWidth: 100,
-    showContent: true
+    tableWidth: 100
   };
 
   it('should render component', async () => {

@@ -19,8 +19,8 @@ describe('netflow-table', () => {
 
   it('displays table and rows', () => {
     cy.get('#table-container').should('exist');
-    //expect 50 results without filters
-    cy.get('#table-container').find('tr').its('length').should('be.gte', 50);
+    // Rows are virtualized, so only the visible rows are mounted in the DOM.
+    cy.get('#table-container').find('tbody tr[data-test^="tr-"]').its('length').should('be.gt', 0);
     cy.get('#flowsCount').contains('+ Flows');
 
     cy.addFilter('namespace', c.namespace);

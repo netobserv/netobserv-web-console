@@ -18,10 +18,43 @@ export interface HistogramToolbarProps {
   guidedTourHandle: GuidedTourHandle | null;
   setRange: (tr: TimeRange | number) => void;
   histogramRange?: TimeRange;
+  loadedRange?: TimeRange;
   setHistogramRange: (tr: TimeRange) => void;
   resetRange: () => void;
   tick: () => void;
 }
+
+export const getZoomedTimeRange = (range: TimeRange, zoomIn: boolean, now: number): TimeRange | undefined => {
+  const duration = range.to - range.from;
+  if (zoomIn) {
+    const step = Math.floor(duration / 4);
+    if (step <= 0) {
+      return undefined;
+    }
+    const updatedRange = { from: range.from + step, to: range.to - step };
+    return updatedRange.to - updatedRange.from >= defaultTimeRange ? updatedRange : undefined;
+  }
+
+  const step = Math.floor(duration / 2);
+  const updatedRange = {
+    from: range.from - step,
+    // Zooming out keeps the complete displayed interval, even if its end
+    // is later than the most recent refresh time.
+    to: Math.min(range.to + step, Math.max(getDateMsInSeconds(now), range.to))
+  };
+  if (updatedRange.to - updatedRange.from >= defaultTimeRange) {
+    return updatedRange;
+  }
+
+  const targetDuration = defaultTimeRange;
+  // Keep the displayed interval intact while ensuring very short ranges still
+  // expand to the default duration.
+  const to = Math.min(
+    range.to + Math.ceil((targetDuration - duration) / 2),
+    Math.max(getDateMsInSeconds(now), range.to)
+  );
+  return { from: to - targetDuration, to };
+};
 
 export const HistogramToolbar: React.FC<HistogramToolbarProps> = props => {
   const { t } = useTranslation('plugin__netobserv-plugin');
@@ -67,9 +100,10 @@ export const HistogramToolbar: React.FC<HistogramToolbarProps> = props => {
     (zoomIn: boolean) => {
       const timeRangeOptions = getTimeRangeOptions(t, false);
       const keys = Object.keys(timeRangeOptions);
+      const displayedRange = props.loadedRange ?? props.range;
 
-      if (typeof props.range === 'number') {
-        const selectedKey = formatDuration(getDateSInMiliseconds(props.range as number));
+      if (typeof displayedRange === 'number') {
+        const selectedKey = formatDuration(getDateSInMiliseconds(displayedRange));
         let index = keys.indexOf(selectedKey);
         if (zoomIn && index > 0) {
           index--;
@@ -79,24 +113,15 @@ export const HistogramToolbar: React.FC<HistogramToolbarProps> = props => {
 
         props.setRange(getDateMsInSeconds(parseDuration(keys[index])));
       } else {
-        const updatedRange = { ...props.range };
-        const factor = Math.floor(((zoomIn ? -1 : 1) * (props.range.to - props.range.from)) / (zoomIn ? 4 : 2));
-
-        updatedRange.from -= factor;
-        updatedRange.to += factor;
-
-        if (updatedRange.to - updatedRange.from >= getDateMsInSeconds(parseDuration(keys[0]))) {
-          const now = props.lastRefresh ? props.lastRefresh.getTime() : new Date().getTime();
-          if (getDateSInMiliseconds(updatedRange.to) > now) {
-            updatedRange.to = getDateMsInSeconds(now);
-          }
-
+        const now = props.lastRefresh ? props.lastRefresh.getTime() : new Date().getTime();
+        const updatedRange = getZoomedTimeRange(displayedRange, zoomIn, now);
+        if (updatedRange) {
           props.setRange(updatedRange);
         }
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [props.lastRefresh, props.range]
+    [props.lastRefresh, props.loadedRange, props.range]
   );
 
   return (
@@ -109,6 +134,7 @@ export const HistogramToolbar: React.FC<HistogramToolbarProps> = props => {
           limit={props.limit}
           isDark={isDarkTheme}
           range={props.histogramRange}
+          loadedRange={props.loadedRange}
           guidedTourHandle={props.guidedTourHandle}
           setRange={props.setHistogramRange}
           moveRange={moveRange}
