@@ -72,19 +72,19 @@ export const filterByHashId = (hashId: string): string => {
   return encodeURIComponent(`_HashId="${hashId}"`);
 };
 
+const isMetricIn = (metricType: MetricType | undefined, metricTypes: MetricType[]): boolean => {
+  return metricType ? metricTypes.includes(metricType) : false;
+};
+
 export const isTimeMetric = (metricType: MetricType | undefined) => {
-  return ['DnsLatencyMs', 'TimeFlowRttNs'].includes(metricType || '');
+  return isMetricIn(metricType, ['DnsLatencyMs', 'TimeFlowRttNs']);
+};
+
+export const isVolumeMetric = (metricType: MetricType | undefined): boolean => {
+  return isMetricIn(metricType, ['Bytes', 'Packets', 'PktDropBytes', 'PktDropPackets']);
 };
 
 /** Volume metrics used for topology rate edges; TLS lock / cleartext hints apply only here (not DNS latency or RTT). */
 export const showTLSHints = (metricType: MetricType | undefined): boolean => {
-  if (!metricType) {
-    return false;
-  }
-  return (
-    metricType === 'Bytes' ||
-    metricType === 'Packets' ||
-    metricType === 'PktDropBytes' ||
-    metricType === 'PktDropPackets'
-  );
+  return isVolumeMetric(metricType);
 };

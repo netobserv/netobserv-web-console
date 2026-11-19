@@ -43,6 +43,8 @@ import {
   toggleDirElementFilter,
   TopologyOptions
 } from '../../../../model/topology';
+import { getTopologyEdgeId } from '../../../../utils/ids';
+import { matchPeer } from '../../../../utils/metrics';
 import { usePrevious } from '../../../../utils/previous-hook';
 import { Empty } from '../../../messages/empty';
 import { SearchEvent, SearchHandle } from '../../../search/search';
@@ -58,6 +60,85 @@ let lastNodeIdsFound: string[] = [];
 
 const zoomIn = 4 / 3;
 const zoomOut = 3 / 4;
+
+type HighlightableEdgeData = {
+  aggregatedEdgeIds?: string[];
+  hideEdgeTag?: boolean;
+  highlightColorIndex?: number;
+  sourceId?: string;
+  targetId?: string;
+};
+
+const matchesTopologyId = (id: string | undefined, topologyId: string | undefined) =>
+  Boolean(id && topologyId && id.toLowerCase().includes(topologyId.toLowerCase()));
+
+const edgeMatchesTopologyId = (
+  edgeId: string,
+  data: HighlightableEdgeData,
+  topologyId: string | undefined,
+  sourceId?: string,
+  targetId?: string
+) =>
+  [edgeId, sourceId, targetId, data.sourceId, data.targetId, ...(data.aggregatedEdgeIds || [])].some(id =>
+    matchesTopologyId(id, topologyId)
+  );
+
+const getSelectedNodeMetrics = (selectedData: NodeData | undefined, metrics: TopologyMetrics[]) => {
+  if (!selectedData) {
+    return [];
+  }
+  return metrics
+    .filter(
+      m =>
+        m.source.id !== m.destination.id &&
+        (matchPeer(selectedData, m.source) || matchPeer(selectedData, m.destination))
+    )
+    .sort((a, b) => getStat(b.stats, 'sum') - getStat(a.stats, 'sum'))
+    .slice(0, 5);
+};
+
+const getMetricEdgeIds = (metric: TopologyMetrics) => [
+  getTopologyEdgeId(metric.source.id, metric.destination.id),
+  getTopologyEdgeId(metric.destination.id, metric.source.id)
+];
+
+const matchesMetricEdge = (edgeId: string, data: HighlightableEdgeData, metric: TopologyMetrics) => {
+  const metricEdgeIds = getMetricEdgeIds(metric);
+  if (metricEdgeIds.includes(edgeId)) {
+    return true;
+  }
+  if (data.sourceId && data.targetId) {
+    const dataEdgeIds = [
+      getTopologyEdgeId(data.sourceId, data.targetId),
+      getTopologyEdgeId(data.targetId, data.sourceId)
+    ];
+    if (dataEdgeIds.some(id => metricEdgeIds.includes(id))) {
+      return true;
+    }
+  }
+  return Boolean(data.aggregatedEdgeIds?.some(id => metricEdgeIds.includes(id)));
+};
+
+const getMetricGraphHighlightColorIndex = (
+  edgeId: string,
+  data: HighlightableEdgeData,
+  selectedData: NodeData | undefined,
+  metrics: TopologyMetrics[]
+) => {
+  const selectedMetrics = getSelectedNodeMetrics(selectedData, metrics);
+  const metricIndex = selectedMetrics.findIndex(metric => matchesMetricEdge(edgeId, data, metric));
+  return metricIndex >= 0 ? metricIndex + 1 : undefined;
+};
+
+const getMaxEdgeStat = (metrics: TopologyMetrics[], metricFunction: StatFunction) => {
+  const edgeStats = new Map<string, number>();
+  metrics.forEach(metric => {
+    const edgeIds = [metric.source.id, metric.destination.id].sort();
+    const edgeId = getTopologyEdgeId(edgeIds[0], edgeIds[1]);
+    edgeStats.set(edgeId, (edgeStats.get(edgeId) || 0) + getStat(metric.stats, metricFunction));
+  });
+  return Math.max(0, ...edgeStats.values());
+};
 const fitPadding = 80;
 
 export interface TopologyContentProps {
@@ -328,7 +409,7 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
 
   //get options with updated max edge value, metric type and function
   const getOptions = React.useCallback(() => {
-    const maxEdgeStat = Math.max(...metrics.map(m => getStat(m.stats, metricFunction)));
+    const maxEdgeStat = getMaxEdgeStat(metrics, metricFunction);
     const opts: TopologyOptions = {
       ...options,
       maxEdgeStat,
@@ -429,6 +510,19 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
 
     // Highlight all selected aggregate path segments (selection can be multi-id).
     const selectedIdsForHighlight = selectedIdsRef.current;
+    const selectedNodeData =
+      selectedIdsForHighlight.length === 1
+        ? (updatedModel.nodes?.find(n => n.id === selectedIdsForHighlight[0])?.data as NodeData | undefined)
+        : undefined;
+    updatedModel.edges?.forEach(e => {
+      const data = e.data as HighlightableEdgeData;
+      const highlightColorIndex = getMetricGraphHighlightColorIndex(e.id, data, selectedNodeData, metrics);
+      const highlighted =
+        Boolean(e.data?.highlighted) ||
+        Boolean(selectedNodeData && edgeMatchesTopologyId(e.id, data, selectedNodeData.peer.id, e.source, e.target));
+      const hideEdgeTag = Boolean(selectedNodeData && !highlighted);
+      e.data = { ...e.data, highlighted, hideEdgeTag, highlightColorIndex };
+    });
     if (selectedIdsForHighlight.length > 1) {
       updatedModel.edges?.forEach(e => {
         if (selectedIdsForHighlight.includes(e.id)) {
@@ -494,6 +588,11 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
     if (!highlightedId && selectedIds.length === 1) {
       highlightedId = selectedIds[0];
     }
+    const selectedElement = selectedIds.length === 1 ? controller.getElementById(selectedIds[0]) : undefined;
+    const selectedNodeData =
+      selectedElement && (selectedElement.getType() === 'node' || selectedElement.getType() === 'group')
+        ? (selectedElement.getData() as NodeData)
+        : undefined;
 
     runInAction(() => {
       controller.getElements().forEach(el => {
@@ -502,8 +601,8 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
         }
         const data = el.getData() || {};
         if (data.shadowed) {
-          if (data.highlighted) {
-            el.setData({ ...data, highlighted: false });
+          if (data.highlighted || data.highlightColorIndex) {
+            el.setData({ ...data, highlighted: false, highlightColorIndex: undefined });
           }
           return;
         }
@@ -512,31 +611,40 @@ export const TopologyContent: React.FC<TopologyContentProps> = ({
         if (highlightedId) {
           if (el.getType() === 'node' || el.getType() === 'group') {
             const peerId = data.peer?.id as string | undefined;
-            highlighted = !!peerId && highlightedId.includes(peerId);
+            highlighted = matchesTopologyId(highlightedId, peerId);
           } else if (isEdge(el)) {
-            highlighted =
-              el.getId().includes(highlightedId) ||
-              el.getSource().getId() === highlightedId ||
-              el.getTarget().getId() === highlightedId;
-            const leafIds = (data.aggregatedEdgeIds as string[] | undefined) || [];
-            if (!highlighted && leafIds.length) {
-              highlighted = leafIds.some(
-                id =>
-                  id.includes(highlightedId) || id.startsWith(`${highlightedId}.`) || id.endsWith(`.${highlightedId}`)
-              );
-            }
+            const edgeData = data as HighlightableEdgeData;
+            const selectedPeerId = selectedNodeData?.peer.id || highlightedId;
+            highlighted = edgeMatchesTopologyId(
+              el.getId(),
+              edgeData,
+              selectedPeerId,
+              el.getSource().getId(),
+              el.getTarget().getId()
+            );
           }
         }
         if (selectedIds.length > 1 && selectedIds.includes(el.getId())) {
           highlighted = true;
         }
 
-        if (Boolean(data.highlighted) !== highlighted) {
-          el.setData({ ...data, highlighted });
+        const edgeElement = isEdge(el);
+        const hideEdgeTag = edgeElement ? Boolean(selectedNodeData && !highlighted) : undefined;
+        const highlightColorIndex =
+          highlighted && edgeElement
+            ? getMetricGraphHighlightColorIndex(el.getId(), data as HighlightableEdgeData, selectedNodeData, metrics)
+            : undefined;
+
+        if (
+          Boolean(data.highlighted) !== highlighted ||
+          (edgeElement && Boolean(data.hideEdgeTag) !== hideEdgeTag) ||
+          data.highlightColorIndex !== highlightColorIndex
+        ) {
+          el.setData({ ...data, highlighted, ...(edgeElement ? { hideEdgeTag } : {}), highlightColorIndex });
         }
       });
     });
-  }, [controller, hoveredId, selectedIds]);
+  }, [controller, hoveredId, metrics, selectedIds]);
 
   //update model on layout / metrics / filters change
   React.useEffect(() => {

@@ -33,6 +33,36 @@ g.netobserv.topology.pf-topology__edge.dark>.pf-topology__edge__tag>.pf-topology
   fill: #E0E0E0;
 }
 
+g.netobserv.topology.pf-topology__edge
+  .netobserv-topology-edge-tag--directional:not(.pf-m-info):not(.pf-m-success):not(.pf-m-warning):not(.pf-m-danger)
+  > .pf-topology__edge__tag__background {
+  fill: var(--pf-t--global--background--color--floating--default, #ffffff);
+}
+
+g.netobserv.topology.pf-topology__edge.dark
+  .netobserv-topology-edge-tag--directional:not(.pf-m-info):not(.pf-m-success):not(.pf-m-warning):not(.pf-m-danger)
+  > .pf-topology__edge__tag__background {
+  fill: #151515;
+}
+
+g.netobserv.topology.pf-topology__edge
+  .netobserv-topology-edge-tag--directional:not(.pf-m-info):not(.pf-m-success):not(.pf-m-warning):not(.pf-m-danger)
+  > text {
+  fill: var(--pf-t--global--text--color--regular, #151515);
+  font-weight: 600;
+  stroke: transparent;
+}
+
+g.netobserv.topology.pf-topology__edge.dark
+  .netobserv-topology-edge-tag--directional:not(.pf-m-info):not(.pf-m-success):not(.pf-m-warning):not(.pf-m-danger)
+  > text,
+g.netobserv.topology.pf-topology__edge.dark
+  .netobserv-topology-edge-tag--directional:not(.pf-m-info):not(.pf-m-success):not(.pf-m-warning):not(.pf-m-danger)
+  > text
+  tspan {
+  fill: #ffffff;
+}
+
 /* TLS lock on edge tag: default / unknown */
 g.netobserv.topology.pf-topology__edge:not(.dark) .netobserv-topology-edge-lock--unknown path {
   fill: var(--pf-t--global--text--color--inverse);
@@ -109,12 +139,52 @@ g.netobserv.topology.node-highlighted>g>.pf-topology__node__background {
   stroke-width: 2px;
 }
 
-g.netobserv.topology.pf-topology__edge.edge-highlighted>.pf-topology__edge__link,
-g.netobserv.topology.pf-topology__edge.edge-highlighted>.pf-topology-connector-arrow,
-g.netobserv.topology.pf-topology__edge.edge-highlighted.dark>.pf-topology__edge__link,
-g.netobserv.topology.pf-topology__edge.edge-highlighted.dark>.pf-topology-connector-arrow {
-  stroke: var(--pf-t--global--color--brand--default);
-  fill: var(--pf-t--global--color--brand--clicked);
+g.netobserv.topology.pf-topology__edge.edge-highlighted:not(.edge-highlight-has-chart-color)>.pf-topology__edge__link,
+g.netobserv.topology.pf-topology__edge.edge-highlighted:not(.edge-highlight-has-chart-color)>.pf-topology-connector-arrow,
+g.netobserv.topology.pf-topology__edge.edge-highlighted:not(.edge-highlight-has-chart-color).dark>.pf-topology__edge__link,
+g.netobserv.topology.pf-topology__edge.edge-highlighted:not(.edge-highlight-has-chart-color).dark>.pf-topology-connector-arrow {
+  stroke-width: 2.5px;
+}
+
+g.netobserv.topology.pf-topology__edge>.pf-topology-connector-arrow.netobserv-topology-edge-arrow--secondary,
+g.netobserv.topology.pf-topology__edge.edge-highlighted.edge-highlight-has-chart-color
+  >.pf-topology-connector-arrow.netobserv-topology-edge-arrow--secondary {
+  fill: var(--pf-t--global--background--color--primary--default, #ffffff);
+}
+
+g.netobserv.topology.pf-topology__edge.dark>.pf-topology-connector-arrow.netobserv-topology-edge-arrow--secondary,
+g.netobserv.topology.pf-topology__edge.edge-highlighted.edge-highlight-has-chart-color.dark
+  >.pf-topology-connector-arrow.netobserv-topology-edge-arrow--secondary {
+  fill: var(--pf-t--global--background--color--primary--default, #151515);
+}
+
+g.netobserv.topology.pf-topology__edge.edge-highlight-color-1 {
+  --netobserv-topology-edge-highlight-color: var(--pf-v6-chart-theme--multi-color-unordered--ColorScale--100, #0066cc);
+}
+
+g.netobserv.topology.pf-topology__edge.edge-highlight-color-2 {
+  --netobserv-topology-edge-highlight-color: var(--pf-v6-chart-theme--multi-color-unordered--ColorScale--200, #dca614);
+}
+
+g.netobserv.topology.pf-topology__edge.edge-highlight-color-3 {
+  --netobserv-topology-edge-highlight-color: var(--pf-v6-chart-theme--multi-color-unordered--ColorScale--300, #63993d);
+}
+
+g.netobserv.topology.pf-topology__edge.edge-highlight-color-4 {
+  --netobserv-topology-edge-highlight-color: var(--pf-v6-chart-theme--multi-color-unordered--ColorScale--400, #5e40be);
+}
+
+g.netobserv.topology.pf-topology__edge.edge-highlight-color-5 {
+  --netobserv-topology-edge-highlight-color: var(--pf-v6-chart-theme--multi-color-unordered--ColorScale--500, #ca6c0f);
+}
+
+g.netobserv.topology.pf-topology__edge.edge-highlighted.edge-highlight-has-chart-color>.pf-topology__edge__link,
+g.netobserv.topology.pf-topology__edge.edge-highlighted.edge-highlight-has-chart-color>.pf-topology-connector-arrow,
+g.netobserv.topology.pf-topology__edge.edge-highlighted.edge-highlight-has-chart-color.dark>.pf-topology__edge__link,
+g.netobserv.topology.pf-topology__edge.edge-highlighted.edge-highlight-has-chart-color.dark>.pf-topology-connector-arrow {
+  stroke: var(--netobserv-topology-edge-highlight-color);
+  fill: var(--netobserv-topology-edge-highlight-color);
+  stroke-width: 2.5px;
 }
 
 g.netobserv.pf-topology__group>.pf-topology__group__background {

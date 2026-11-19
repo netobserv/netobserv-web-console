@@ -24,6 +24,7 @@ import {
 import { getConnectorStartPoint } from '@patternfly/react-topology/dist/esm/components/edges/terminals/terminalUtils';
 import styles from '@patternfly/react-topology/src/css/topology-components';
 import * as React from 'react';
+import type { EdgeTagPart } from '../../../../../model/topology';
 import type { TlsLockSeverity } from '../../../../../utils/tls-lock-severity';
 import TopologyConnectorTag from './topology-connector-tag';
 
@@ -58,6 +59,8 @@ interface DefaultEdgeProps {
   endTerminalSize?: number;
   /** Tag to show for the terminal */
   tag?: string;
+  /** Optional colored chunks for a single edge tag. */
+  tagParts?: EdgeTagPart[];
   /** Additional classes added to the tag */
   tagClass?: string;
   /** The status to indicate on the tag */
@@ -90,7 +93,10 @@ interface DefaultEdgeProps {
   shadowed?: boolean;
   filtered?: boolean;
   drops?: number;
+  forwardValue?: number;
+  reverseValue?: number;
   highlighted?: boolean;
+  highlightColorIndex?: number;
   isDark?: boolean;
 }
 
@@ -118,6 +124,7 @@ const DefaultEdgeInner: React.FunctionComponent<DefaultEdgeInnerProps> = observe
     endTerminalStatus,
     endTerminalSize = 14,
     tag,
+    tagParts,
     tagClass,
     tagStatus,
     tagTlsSecure,
@@ -131,7 +138,10 @@ const DefaultEdgeInner: React.FunctionComponent<DefaultEdgeInnerProps> = observe
     shadowed,
     filtered,
     drops,
+    forwardValue,
+    reverseValue,
     highlighted,
+    highlightColorIndex,
     isDark,
     'data-test': dataTest
   }) => {
@@ -173,6 +183,8 @@ const DefaultEdgeInner: React.FunctionComponent<DefaultEdgeInnerProps> = observe
       filtered && 'edge-filtered',
       drops && 'edge-has-drops',
       highlighted && 'edge-highlighted',
+      highlighted && highlightColorIndex && 'edge-highlight-has-chart-color',
+      highlighted && highlightColorIndex && `edge-highlight-color-${highlightColorIndex}`,
       isDark && 'dark'
     );
 
@@ -201,6 +213,40 @@ const DefaultEdgeInner: React.FunctionComponent<DefaultEdgeInnerProps> = observe
     const scale = element.getGraph().getScale();
     const tagScale = hover && !(detailsLevel === ScaleDetailsLevel.high) ? Math.max(1, 1 / scale) : 1;
     const tagPositionScale = hover && !(detailsLevel === ScaleDetailsLevel.high) ? Math.min(1, scale) : 1;
+    const tagStartPoint = element.getStartPoint().scale(tagPositionScale);
+    const tagEndPoint = element.getEndPoint().scale(tagPositionScale);
+    const showTlsLock = (showLock: boolean) => ({
+      showLeadingLock: showLock ? tagTlsSecure : undefined,
+      showCleartextLock: showLock ? tagTlsCleartext : undefined,
+      lockSeverity: showLock ? tagTlsLockSeverity : undefined
+    });
+    const renderTag = (value: string, className = tagClass, offset = 0, alignWithEdge = false, showLock = true) => (
+      <TopologyConnectorTag
+        className={className}
+        startPoint={tagStartPoint}
+        endPoint={tagEndPoint}
+        tag={value}
+        tagParts={tagParts}
+        status={tagStatus}
+        offset={offset}
+        alignWithEdge={alignWithEdge}
+        {...showTlsLock(showLock)}
+      />
+    );
+    const forwardStat = forwardValue ?? 0;
+    const reverseStat = reverseValue ?? 0;
+    const forwardHasMostTraffic = forwardStat > 0 && (!reverseStat || forwardStat >= reverseStat);
+    const reverseHasMostTraffic = reverseStat > 0 && (!forwardStat || reverseStat >= forwardStat);
+    const startTerminalClasses = css(
+      startTerminalClass,
+      reverseValue ? 'netobserv-topology-edge-arrow--reverse' : undefined,
+      reverseValue && !reverseHasMostTraffic ? 'netobserv-topology-edge-arrow--secondary' : undefined
+    );
+    const endTerminalClasses = css(
+      endTerminalClass,
+      forwardValue ? 'netobserv-topology-edge-arrow--forward' : undefined,
+      forwardValue && !forwardHasMostTraffic ? 'netobserv-topology-edge-arrow--secondary' : undefined
+    );
 
     return (
       <Layer id={dragging || hover ? topLayer : undefined}>
@@ -221,20 +267,19 @@ const DefaultEdgeInner: React.FunctionComponent<DefaultEdgeInnerProps> = observe
           <path className={linkClassName} d={d} style={{ animationDuration: `${edgeAnimationDuration}s` }} />
           {showTag && (
             <g transform={`scale(${hover ? tagScale : 1})`}>
-              <TopologyConnectorTag
-                className={tagClass}
-                startPoint={element.getStartPoint().scale(tagPositionScale)}
-                endPoint={element.getEndPoint().scale(tagPositionScale)}
-                tag={tag || ''}
-                status={tagStatus}
-                showLeadingLock={tagTlsSecure}
-                showCleartextLock={tagTlsCleartext}
-                lockSeverity={tagTlsLockSeverity}
-              />
+              {tag
+                ? renderTag(
+                    tag,
+                    css(tagClass, tagParts?.length && 'netobserv-topology-edge-tag--directional'),
+                    0,
+                    Boolean(tagParts?.length)
+                  )
+                : null}
+              {!tag && (tagTlsSecure || tagTlsCleartext) && renderTag('')}
             </g>
           )}
           <DefaultConnectorTerminal
-            className={startTerminalClass}
+            className={startTerminalClasses}
             isTarget={false}
             edge={element}
             size={startTerminalSize}
@@ -244,7 +289,7 @@ const DefaultEdgeInner: React.FunctionComponent<DefaultEdgeInnerProps> = observe
             highlight={dragging || hover}
           />
           <DefaultConnectorTerminal
-            className={endTerminalClass}
+            className={endTerminalClasses}
             isTarget
             dragRef={targetDragRef}
             edge={element}

@@ -14,9 +14,13 @@ const StyleEdge: React.FC<StyleEdgeProps> = ({ element, ...rest }) => {
 
   const passedData = React.useMemo(() => {
     const newData = { ...data };
-    if (detailsLevel !== ScaleDetailsLevel.high) {
+    newData.forwardValue = data.forwardBps;
+    newData.reverseValue = data.reverseBps;
+    if (detailsLevel !== ScaleDetailsLevel.high || data.hideEdgeTag) {
       newData.tag = undefined;
+      newData.tagParts = undefined;
       newData.tagTlsSecure = undefined;
+      newData.tagTlsCleartext = undefined;
     }
     Object.keys(newData).forEach(key => {
       if (newData[key] === undefined) {
