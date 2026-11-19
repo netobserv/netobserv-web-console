@@ -27,6 +27,7 @@ export interface RuleDetailsProps {
   kind: HealthSuperKind;
   resourceHealth: HealthStat;
   severityFilter?: Severity;
+  onFlowCapture?: (item: HealthItem) => void;
 }
 
 // Helper: Get direction from recording rule name
@@ -68,11 +69,19 @@ const RuleTableRow: React.FC<{
   scoreDetail: ScoreDetail;
   impact: number;
   rawImpact: number;
-}> = ({ item, resourceName, kind, t, scoreDetail, impact, rawImpact }) => {
+  onFlowCapture?: (item: HealthItem) => void;
+}> = ({ item, resourceName, kind, t, scoreDetail, impact, rawImpact, onFlowCapture }) => {
   const isAlert = item.state !== 'recording';
   const labels = React.useMemo(() => getItemFilteredLabels(item, resourceName), [item, resourceName]);
   const links = React.useMemo(() => getLinks(t, kind, item, resourceName), [item, kind, resourceName, t]);
   const direction = React.useMemo(() => getDirection(item.ruleName), [item]);
+  const actions = React.useMemo(
+    () => [
+      ...(onFlowCapture ? [{ title: t('FlowCapture'), onClick: () => onFlowCapture(item) }] : []),
+      ...links.map(l => ({ title: <a href={l.url}>{l.name}</a> }))
+    ],
+    [item, links, onFlowCapture, t]
+  );
 
   return (
     <Tr>
@@ -137,10 +146,7 @@ const RuleTableRow: React.FC<{
       <Td dataLabel={t('Description')}>{item.description}</Td>
       <Td noPadding>
         <span data-test="rule-details-actions">
-          <ActionsColumn
-            isDisabled={links.length === 0}
-            items={links.map(l => ({ title: <a href={l.url}>{l.name}</a> }))}
-          />
+          <ActionsColumn isDisabled={actions.length === 0} items={actions} />
         </span>
       </Td>
     </Tr>
@@ -155,11 +161,19 @@ const RuleCard: React.FC<{
   t: TFunction;
   impact: number;
   rawImpact: number;
-}> = ({ item, resourceName, kind, t, impact, rawImpact }) => {
+  onFlowCapture?: (item: HealthItem) => void;
+}> = ({ item, resourceName, kind, t, impact, rawImpact, onFlowCapture }) => {
   const isAlert = item.state !== 'recording';
   const labels = React.useMemo(() => getItemFilteredLabels(item, resourceName), [item, resourceName]);
   const links = React.useMemo(() => getLinks(t, kind, item, resourceName), [item, kind, resourceName, t]);
   const direction = React.useMemo(() => getDirection(item.ruleName), [item]);
+  const actions = React.useMemo(
+    () => [
+      ...(onFlowCapture ? [{ title: t('FlowCapture'), onClick: () => onFlowCapture(item) }] : []),
+      ...links.map(l => ({ title: <a href={l.url}>{l.name}</a> }))
+    ],
+    [item, links, onFlowCapture, t]
+  );
 
   return (
     <div className="rule-details-row" data-test="rule-details-row">
@@ -205,10 +219,7 @@ const RuleCard: React.FC<{
             </FlexItem>
             <FlexItem>
               <span data-test="rule-details-actions">
-                <ActionsColumn
-                  isDisabled={links.length === 0}
-                  items={links.map(l => ({ title: <a href={l.url}>{l.name}</a> }))}
-                />
+                <ActionsColumn isDisabled={actions.length === 0} items={actions} />
               </span>
             </FlexItem>
           </Flex>
@@ -270,7 +281,7 @@ const RuleCard: React.FC<{
   );
 };
 
-export const RuleDetails: React.FC<RuleDetailsProps> = ({ kind, resourceHealth, severityFilter }) => {
+export const RuleDetails: React.FC<RuleDetailsProps> = ({ kind, resourceHealth, severityFilter, onFlowCapture }) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
 
   const resourceName = resourceHealth.name || 'Global';
@@ -343,6 +354,7 @@ export const RuleDetails: React.FC<RuleDetailsProps> = ({ kind, resourceHealth, 
               resourceName={resourceName}
               kind={kind}
               t={t}
+              onFlowCapture={onFlowCapture}
             />
           ))}
         </Tbody>
@@ -362,6 +374,7 @@ export const RuleDetails: React.FC<RuleDetailsProps> = ({ kind, resourceHealth, 
           t={t}
           impact={r.impact}
           rawImpact={r.pointsLost}
+          onFlowCapture={onFlowCapture}
         />
       ))}
     </Flex>

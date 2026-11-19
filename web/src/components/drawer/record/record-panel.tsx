@@ -39,6 +39,8 @@ import { TimeRange } from '../../../utils/datetime';
 import { findFilter } from '../../../utils/filter-definitions';
 import { defaultSize, maxSize, minSize } from '../../../utils/panel';
 import { defaultTimeRange } from '../../../utils/router';
+import { flowCaptureNewPath, useNavigate } from '../../../utils/url';
+import { captureFromRecord } from '../../forms/flowCapture/types';
 import RecordField, { RecordFieldFilter } from './record-field';
 import './record-panel.css';
 
@@ -76,6 +78,7 @@ export const RecordPanel: React.FC<RecordDrawerProps> = ({
   onClose
 }) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
+  const navigate = useNavigate();
   const [hidden, setHidden] = React.useState<string[]>([]);
   const [activeTab, setActiveTab] = React.useState<string>('details');
 
@@ -404,6 +407,18 @@ export const RecordPanel: React.FC<RecordDrawerProps> = ({
           {getTitle()}
         </Content>
         <DrawerActions>
+          <Button
+            className="flowcapture-action-button"
+            variant="primary"
+            size="sm"
+            onClick={() =>
+              navigate(flowCaptureNewPath(), {
+                state: { capture: captureFromRecord(record), flowCaptureSource: 'flow' }
+              })
+            }
+          >
+            {t('FlowCapture')}
+          </Button>
           <DrawerCloseButton data-test-id="drawer-close-button" className="drawer-close-button" onClick={onClose} />
         </DrawerActions>
       </DrawerHead>

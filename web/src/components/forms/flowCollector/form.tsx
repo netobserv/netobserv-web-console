@@ -39,6 +39,13 @@ export const FlowCollectorForm: FC<FlowCollectorFormProps> = props => {
       name={name}
       onSuccess={() => navigate(flowCollectorPath('status')!)}
       defaultFrom="CSVExample"
+      initialData={{
+        metadata: { name: 'cluster' },
+        spec: {
+          deploymentModel: 'Service',
+          agent: { type: 'eBPF', ebpf: { sampling: 50 } }
+        }
+      }}
     >
       <ResourceForm uiSchema={flowCollectorUISchema} />
     </ResourceWatcher>
