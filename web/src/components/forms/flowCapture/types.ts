@@ -144,11 +144,48 @@ const addressRegex = (value: string): string | undefined => {
   if (!address) return undefined;
   const [ip, prefix] = address.split('/');
   const prefixLength = Number(prefix);
-  if (ip.includes(':') || prefixLength === 32) return `^${ip.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`;
-  const octets = ip.split('.');
+  if (ip.includes(':')) {
+    if (prefixLength === 128) return `^${ip.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`;
+    if (prefixLength % 16 !== 0) return undefined;
+    const groups = ip.split('::');
+    const left = groups[0] ? groups[0].split(':') : [];
+    const right = groups[1] ? groups[1].split(':') : [];
+    const expanded = [...left, ...Array(8 - left.length - right.length).fill('0'), ...right];
+    const fixed = expanded.slice(0, prefixLength / 16).map(group => group.padStart(4, '0').toLowerCase());
+    const escaped = fixed.map(group => group.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const suffix = '(?:[0-9a-f]{1,4}:?)*';
+    const alternatives = [`^${escaped.join(':')}(?::[0-9a-f]{1,4}){0,${8 - fixed.length}}$`];
+    for (let start = 0; start < fixed.length; start++) {
+      if (fixed[start] !== '0000') continue;
+      let end = start;
+      while (end + 1 < fixed.length && fixed[end + 1] === '0000') end++;
+      const before = escaped.slice(0, start).join(':');
+      const after = escaped.slice(end + 1).join(':');
+      alternatives.push(`^${before ? `${before}::` : '::'}${after ? `${after}:` : ''}${suffix}$`);
+      start = end;
+    }
+    if (fixed.length < 8) {
+      alternatives.push(`^${escaped.join(':')}::${suffix}$`);
+    }
+    return `(?:${alternatives.join('|')})`;
+  }
+  const octets = ip.split('.').map(Number);
+  if (octets.length !== 4 || octets.some(octet => Number.isNaN(octet))) return undefined;
   const fixedOctets = Math.floor(prefixLength / 8);
-  if (prefixLength % 8 !== 0 || fixedOctets === 0) return undefined;
-  return `^${octets.slice(0, fixedOctets).join('\\.')}(?:\\.[0-9]{1,3}){${4 - fixedOctets}}$`;
+  const remainder = prefixLength % 8;
+  const escape = (input: string) => input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const values = (from: number, to: number) =>
+    `(?:${Array.from({ length: to - from + 1 }, (_, i) => from + i).join('|')})`;
+  const fixed = octets.slice(0, fixedOctets).map(String);
+  if (remainder === 0) {
+    if (fixedOctets === 4) return `^${octets.map(String).map(escape).join('\\.')}$`;
+    const prefixText = fixed.length ? `${fixed.map(escape).join('\\.')}\\.` : '';
+    return `^${prefixText}${values(0, 255)}(?:\\.[0-9]{1,3}){${3 - fixedOctets}}$`;
+  }
+  const networkOctet = octets[fixedOctets] & (0xff << (8 - remainder));
+  const rangeEnd = networkOctet + (1 << (8 - remainder)) - 1;
+  const prefixText = [...fixed.map(escape), values(networkOctet, rangeEnd)].join('\\.');
+  return `^${prefixText}(?:\\.[0-9]{1,3}){${3 - fixedOctets}}$`;
 };
 
 const filterQueryExpression = (filter: Filter): string | undefined => {
@@ -217,6 +254,15 @@ const hasMixedAgentAndPipelineFilters = (filters: Filters): boolean => {
   return (
     enabled.some(filter => filter.compare === FilterCompare.equal && agentFilterIds.has(filter.def.id)) &&
     enabled.some(filter => filter.compare !== FilterCompare.equal || !agentFilterIds.has(filter.def.id))
+  );
+};
+
+const hasUnsafeAgentAlternatives = (filters: Filters): boolean => {
+  const agentFilters = filters.list.filter(
+    filter => filter.compare === FilterCompare.equal && agentFilterIds.has(filter.def.id)
+  );
+  return (
+    agentFilters.length > 1 || agentFilters.some(filter => filter.values.filter(value => !value.disabled).length > 1)
   );
 };
 
@@ -373,6 +419,8 @@ const queryFromTopologyPeer = (
 
 const queryFromRecord = (record: Record): string | undefined => {
   const queryFields: Array<{ field: keyof Record['fields']; side?: 'Src' | 'Dst' }> = [
+    { field: 'SrcAddr' },
+    { field: 'DstAddr' },
     { field: 'SrcK8S_Namespace' },
     { field: 'DstK8S_Namespace' },
     { field: 'SrcK8S_Name', side: 'Src' },
@@ -402,8 +450,20 @@ export const captureFromRecord = (record: Record): FlowCaptureResource => {
   };
   const srcAddress = src && normalizeAddress(src);
   const dstAddress = dst && normalizeAddress(dst);
-  if (srcAddress) filters.push({ ...flowRule, cidr: srcAddress, direction: 'Ingress' });
-  if (dstAddress) filters.push({ ...flowRule, cidr: dstAddress, direction: 'Egress' });
+  if (srcAddress)
+    filters.push({
+      ...flowRule,
+      cidr: srcAddress,
+      ...(dst ? { peerIP: dst } : {}),
+      direction: 'Ingress'
+    });
+  if (dstAddress)
+    filters.push({
+      ...flowRule,
+      cidr: dstAddress,
+      ...(src ? { peerIP: src } : {}),
+      direction: 'Egress'
+    });
   if (!srcAddress && !dstAddress && Object.keys(flowRule).length > 0) filters.push(flowRule);
   const query = queryFromRecord(record);
   const interfaces = fields.Interfaces ?? record.labels.Interfaces;
@@ -436,7 +496,7 @@ export const captureFromFilters = (filters: Filters): FlowCaptureResource => {
     filter: Filters['list'][number],
     key: keyof FlowCaptureFilter,
     direction?: string,
-    transform: (input: string) => string = cleanFilterValue
+    transform: (input: string) => string | undefined = cleanFilterValue
   ) => {
     filter.values
       .filter(value => !value.disabled)
@@ -482,7 +542,7 @@ export const captureFromFilters = (filters: Filters): FlowCaptureResource => {
           add(filter, 'protocol', undefined, normalizeProtocol);
           break;
         case 'direction':
-          add(filter, 'direction');
+          add(filter, 'direction', undefined, value => normalizeDirection(cleanFilterValue(value)));
           break;
         case 'port':
           add(filter, 'port');
@@ -509,7 +569,7 @@ export const captureFromFilters = (filters: Filters): FlowCaptureResource => {
       }
     });
 
-  let forcePipelineQuery = false;
+  let forcePipelineQuery = filters.match === 'any' && hasUnsafeAgentAlternatives(filters);
   if (filters.match === 'all' && captureFilters.length > 1) {
     let hasConflict = false;
     const combined = captureFilters.reduce<FlowCaptureFilter | undefined>((result, rule) => {
