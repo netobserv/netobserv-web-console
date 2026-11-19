@@ -536,6 +536,7 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
         data-test-rows-count={props.flows.length}
         aria-label="Netflow table"
         variant="compact"
+        gridBreakPoint=""
         style={{ minWidth: `${width}em` }}
         isStickyHeader
       >
