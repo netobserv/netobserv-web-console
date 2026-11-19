@@ -152,7 +152,10 @@ const addressRegex = (value: string): string | undefined => {
     const right = groups[1] ? groups[1].split(':') : [];
     const expanded = [...left, ...Array(8 - left.length - right.length).fill('0'), ...right];
     const fixed = expanded.slice(0, prefixLength / 16).map(group => group.padStart(4, '0').toLowerCase());
-    const escaped = fixed.map(group => group.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const escaped = fixed.map(group => {
+      const significant = group.replace(/^0+/, '');
+      return significant ? `0{0,${4 - significant.length}}${significant}` : '0{1,4}';
+    });
     const suffix = '(?:[0-9a-f]{1,4}:?)*';
     const alternatives = [`^${escaped.join(':')}(?::[0-9a-f]{1,4}){0,${8 - fixed.length}}$`];
     for (let start = 0; start < fixed.length; start++) {
