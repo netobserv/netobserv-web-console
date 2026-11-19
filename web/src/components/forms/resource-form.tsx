@@ -5,7 +5,9 @@ import { UiSchema } from '@rjsf/utils';
 import _ from 'lodash';
 import React, { FC, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { DiscardGuard } from '../../utils/discard-guard-hook';
 import { useDiscardGuard } from '../../utils/discard-guard-hook';
+import { useSearchParams } from '../../utils/url';
 import { safeYAMLToJS } from '../../utils/yaml';
 import { DynamicForm } from './dynamic-form/dynamic-form';
 import { ErrorTemplate } from './dynamic-form/templates';
@@ -17,14 +19,60 @@ import { Consumer } from './resource-watcher';
 
 export type ResourceFormProps = {
   uiSchema: UiSchema;
+  wizardChild?: JSX.Element;
+  initialViewType?: EditorType;
 };
 
-export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
+export type ResourceEditorContextValue = {
+  data: any;
+  setData: React.Dispatch<React.SetStateAction<any>>;
+  setView: (view: EditorType) => void;
+  discard: DiscardGuard;
+};
+
+export const ResourceEditorContext = React.createContext<ResourceEditorContextValue | null>(null);
+
+export const useResourceEditor = () => React.useContext(ResourceEditorContext);
+
+export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema, wizardChild, initialViewType = EditorType.FORM }) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
-  const [viewType, setViewType] = React.useState(EditorType.CUSTOM);
+  const [, setSearchParams] = useSearchParams();
+  const [viewType, setViewType] = React.useState(() => {
+    const requestedView = new URLSearchParams(window.location.search).get('view');
+    if (requestedView === EditorType.FORM) {
+      return EditorType.FORM;
+    }
+    if (requestedView === EditorType.WIZARD && wizardChild) {
+      return EditorType.WIZARD;
+    }
+    if (requestedView === EditorType.YAML) {
+      return EditorType.YAML;
+    }
+    if (window.location.pathname.endsWith('/yaml')) {
+      return EditorType.YAML;
+    }
+    return initialViewType;
+  });
   const [data, setData] = React.useState<any>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [discard, discardModal] = useDiscardGuard();
+
+  const changeView = React.useCallback(
+    (next: EditorType) => {
+      setViewType(next);
+      setSearchParams(previous => {
+        const nextParams = new URLSearchParams(previous);
+        const routeDefaultsToForm = initialViewType === EditorType.FORM && !window.location.pathname.endsWith('/yaml');
+        if (next === EditorType.FORM && routeDefaultsToForm) {
+          nextParams.delete('view');
+        } else {
+          nextParams.set('view', next);
+        }
+        return nextParams;
+      });
+    },
+    [initialViewType, setSearchParams]
+  );
 
   const hasChanged = React.useCallback(
     (existing: any) => {
@@ -53,53 +101,56 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
               </FormHelperText>
             </div>
             <Suspense fallback={<></>}>
-              <EditorToggle
-                type={viewType}
-                updated={hasChanged(ctx.data)}
-                isUpdate={ctx.isUpdate}
-                onReload={() => setData(ctx.data)}
-                onChange={setViewType}
-                onSubmit={() => {
-                  discard.clearDirty();
-                  ctx.onSubmit(data);
-                }}
-                onCancel={() => discard.requestClose(() => window.history.back())}
-                onDelete={() => setDeleteModalOpen(true)}
-                customChild={
-                  ctx.schema ? (
-                    <DynamicForm
-                      showAlert
-                      formData={data}
-                      schema={ctx.schema}
-                      uiSchema={uiSchema}
-                      validator={SchemaValidator}
-                      errors={ctx.errors}
-                      onError={errs => ctx.setErrors(_.map(errs, error => error.stack))}
-                      onChange={event => {
-                        setData(event.formData);
-                        discard.markDirty();
-                      }}
-                      skipDefaults={ctx.skipDefaults}
-                    />
-                  ) : (
-                    <></>
-                  )
-                }
-                yamlChild={
-                  <>
-                    <ResourceYAMLEditor
-                      initialResource={data}
-                      onSave={content => {
-                        const updatedData = safeYAMLToJS(content);
-                        setData(updatedData);
-                        discard.clearDirty();
-                        ctx.onSubmit(updatedData);
-                      }}
-                    />
-                    <>{ctx.errors.length > 0 && <ErrorTemplate errors={ctx.errors} />}</>
-                  </>
-                }
-              />
+              <ResourceEditorContext.Provider value={{ data, setData, setView: changeView, discard }}>
+                <EditorToggle
+                  type={viewType}
+                  updated={hasChanged(ctx.data)}
+                  isUpdate={ctx.isUpdate}
+                  onReload={() => setData(ctx.data)}
+                  onChange={changeView}
+                  onSubmit={() => {
+                    discard.clearDirty();
+                    ctx.onSubmit(data);
+                  }}
+                  onCancel={() => discard.requestClose(() => window.history.back())}
+                  onDelete={() => setDeleteModalOpen(true)}
+                  formChild={
+                    ctx.schema ? (
+                      <DynamicForm
+                        showAlert
+                        formData={data}
+                        schema={ctx.schema}
+                        uiSchema={uiSchema}
+                        validator={SchemaValidator}
+                        errors={ctx.errors}
+                        onError={errs => ctx.setErrors(_.map(errs, error => error.stack))}
+                        onChange={event => {
+                          setData(event.formData);
+                          discard.markDirty();
+                        }}
+                        skipDefaults={ctx.skipDefaults}
+                      />
+                    ) : (
+                      <></>
+                    )
+                  }
+                  wizardChild={wizardChild}
+                  yamlChild={
+                    <>
+                      <ResourceYAMLEditor
+                        initialResource={data}
+                        onSave={content => {
+                          const updatedData = safeYAMLToJS(content);
+                          setData(updatedData);
+                          discard.clearDirty();
+                          ctx.onSubmit(updatedData);
+                        }}
+                      />
+                      <>{ctx.errors.length > 0 && <ErrorTemplate errors={ctx.errors} />}</>
+                    </>
+                  }
+                />
+              </ResourceEditorContext.Provider>
             </Suspense>
             {isDeleteModalOpen && (
               <ResourceDeleteModal
