@@ -1,4 +1,16 @@
-import { ActionGroup, Alert, Button, Flex, FlexItem, Radio } from '@patternfly/react-core';
+import {
+  ActionGroup,
+  ActionList,
+  ActionListGroup,
+  ActionListItem,
+  Alert,
+  Button,
+  Flex,
+  FlexItem,
+  Radio,
+  WizardFooterWrapper,
+  WizardStepType
+} from '@patternfly/react-core';
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContextSingleton } from '../../utils/context';
@@ -9,6 +21,66 @@ export enum EditorType {
   WIZARD = 'wizard',
   YAML = 'yaml'
 }
+
+export type WizardEditorFooterProps = {
+  activeStep: WizardStepType;
+  onNext: (event: React.MouseEvent<HTMLButtonElement>) => void | Promise<void>;
+  onBack: (event: React.MouseEvent<HTMLButtonElement>) => void | Promise<void>;
+  isLastStep: boolean;
+  isUpdate: boolean;
+  onSubmit: () => void;
+  onCancel: () => void;
+  onDelete?: () => void;
+};
+
+export const WizardEditorFooter: FC<WizardEditorFooterProps> = ({
+  activeStep,
+  onNext,
+  onBack,
+  isLastStep,
+  isUpdate,
+  onSubmit,
+  onCancel,
+  onDelete
+}) => {
+  const { t } = useTranslation('plugin__netobserv-plugin');
+
+  return (
+    <WizardFooterWrapper>
+      <ActionList>
+        <ActionListGroup>
+          <ActionListItem>
+            <Button variant="secondary" onClick={onBack} isDisabled={activeStep.index === 1}>
+              {t('Back')}
+            </Button>
+          </ActionListItem>
+          <ActionListItem>
+            <Button variant="secondary" onClick={onNext} isDisabled={isLastStep}>
+              {t('Next')}
+            </Button>
+          </ActionListItem>
+          <ActionListItem>
+            <Button variant="primary" onClick={onSubmit} isDisabled={!isLastStep}>
+              {isUpdate ? t('Update') : t('Create')}
+            </Button>
+          </ActionListItem>
+          <ActionListItem>
+            <Button variant="link" onClick={onCancel}>
+              {t('Cancel')}
+            </Button>
+          </ActionListItem>
+          {isUpdate && onDelete && (
+            <ActionListItem>
+              <Button variant="danger" onClick={onDelete}>
+                {t('Delete')}
+              </Button>
+            </ActionListItem>
+          )}
+        </ActionListGroup>
+      </ActionList>
+    </WizardFooterWrapper>
+  );
+};
 
 type EditorToggleProps = {
   type: EditorType;

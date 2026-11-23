@@ -49,6 +49,7 @@ export const FlowCollectorForm: FC<FlowCollectorFormProps> = props => {
     >
       <ResourceForm
         uiSchema={flowCollectorUISchema}
+        cancelPath={flowCollectorPath('status')!}
         initialViewType={isFlowCollectorWizardPath() ? EditorType.WIZARD : EditorType.FORM}
         wizardChild={<FlowCollectorWizard name={name} />}
       />

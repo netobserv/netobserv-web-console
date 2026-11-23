@@ -7,7 +7,7 @@ import React, { FC, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DiscardGuard } from '../../utils/discard-guard-hook';
 import { useDiscardGuard } from '../../utils/discard-guard-hook';
-import { useSearchParams } from '../../utils/url';
+import { useNavigate, useSearchParams } from '../../utils/url';
 import { safeYAMLToJS } from '../../utils/yaml';
 import { DynamicForm } from './dynamic-form/dynamic-form';
 import { ErrorTemplate } from './dynamic-form/templates';
@@ -21,6 +21,7 @@ export type ResourceFormProps = {
   uiSchema: UiSchema;
   wizardChild?: JSX.Element;
   initialViewType?: EditorType;
+  cancelPath?: string;
 };
 
 export type ResourceEditorContextValue = {
@@ -28,14 +29,22 @@ export type ResourceEditorContextValue = {
   setData: React.Dispatch<React.SetStateAction<any>>;
   setView: (view: EditorType) => void;
   discard: DiscardGuard;
+  cancel: () => void;
+  deleteResource: () => void;
 };
 
 export const ResourceEditorContext = React.createContext<ResourceEditorContextValue | null>(null);
 
 export const useResourceEditor = () => React.useContext(ResourceEditorContext);
 
-export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema, wizardChild, initialViewType = EditorType.FORM }) => {
+export const ResourceForm: FC<ResourceFormProps> = ({
+  uiSchema,
+  wizardChild,
+  initialViewType = EditorType.FORM,
+  cancelPath
+}) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
+  const navigate = useNavigate();
   const [, setSearchParams] = useSearchParams();
   const [viewType, setViewType] = React.useState(() => {
     const requestedView = new URLSearchParams(window.location.search).get('view');
@@ -60,18 +69,20 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema, wizardChild, ini
   const changeView = React.useCallback(
     (next: EditorType) => {
       setViewType(next);
-      setSearchParams(previous => {
-        const nextParams = new URLSearchParams(previous);
-        const routeDefaultsToForm = initialViewType === EditorType.FORM && !window.location.pathname.endsWith('/yaml');
-        if (next === EditorType.FORM && routeDefaultsToForm) {
-          nextParams.delete('view');
-        } else {
-          nextParams.set('view', next);
-        }
-        return nextParams;
-      },
-      { replace: true }
-    );
+      setSearchParams(
+        previous => {
+          const nextParams = new URLSearchParams(previous);
+          const routeDefaultsToForm =
+            initialViewType === EditorType.FORM && !window.location.pathname.endsWith('/yaml');
+          if (next === EditorType.FORM && routeDefaultsToForm) {
+            nextParams.delete('view');
+          } else {
+            nextParams.set('view', next);
+          }
+          return nextParams;
+        },
+        { replace: true }
+      );
     },
     [initialViewType, setSearchParams]
   );
@@ -90,6 +101,14 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema, wizardChild, ini
         if (data == null) {
           setData(ctx.data);
         }
+        const cancel = () =>
+          discard.requestClose(() => {
+            if (ctx.isUpdate && cancelPath) {
+              navigate(cancelPath);
+            } else {
+              window.history.back();
+            }
+          });
         return (
           <PageSection hasBodyWrapper={false} id="pageSection">
             <div id="pageHeader">
@@ -103,7 +122,16 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema, wizardChild, ini
               </FormHelperText>
             </div>
             <Suspense fallback={<></>}>
-              <ResourceEditorContext.Provider value={{ data, setData, setView: changeView, discard }}>
+              <ResourceEditorContext.Provider
+                value={{
+                  data,
+                  setData,
+                  setView: changeView,
+                  discard,
+                  cancel,
+                  deleteResource: () => setDeleteModalOpen(true)
+                }}
+              >
                 <EditorToggle
                   type={viewType}
                   updated={hasChanged(ctx.data)}
@@ -114,7 +142,7 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema, wizardChild, ini
                     discard.clearDirty();
                     ctx.onSubmit(data);
                   }}
-                  onCancel={() => discard.requestClose(() => window.history.back())}
+                  onCancel={cancel}
                   onDelete={() => setDeleteModalOpen(true)}
                   formChild={
                     ctx.schema ? (
@@ -141,6 +169,13 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema, wizardChild, ini
                     <>
                       <ResourceYAMLEditor
                         initialResource={data}
+                        onChange={content => {
+                          const updatedData = safeYAMLToJS(content, null);
+                          if (updatedData && typeof updatedData === 'object') {
+                            setData(updatedData);
+                            discard.markDirty();
+                          }
+                        }}
                         onSave={content => {
                           const updatedData = safeYAMLToJS(content);
                           setData(updatedData);

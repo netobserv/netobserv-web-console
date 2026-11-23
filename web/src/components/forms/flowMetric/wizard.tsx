@@ -6,13 +6,12 @@ import validator from '@rjsf/validator-ajv8';
 import _ from 'lodash';
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ContextSingleton } from '../../../utils/context';
 import { useDiscardGuard } from '../../../utils/discard-guard-hook';
 import { flowMetricPath, navigateTo, useNavigate, useParams } from '../../../utils/url';
 import { safeYAMLToJS } from '../../../utils/yaml';
 import { DynamicForm } from '../dynamic-form/dynamic-form';
 import { ErrorTemplate } from '../dynamic-form/templates';
-import { EditorType } from '../editor-toggle';
+import { EditorType, WizardEditorFooter } from '../editor-toggle';
 import '../forms.css';
 import { useResourceEditor } from '../resource-form';
 import ResourceWatcher, { Consumer, useResourceWatcher } from '../resource-watcher';
@@ -102,11 +101,21 @@ export const FlowMetricWizard: FC<FlowMetricWizardProps> = props => {
               <Wizard
                 id="flowMetricWizard"
                 onStepChange={onStepChange}
-                onSave={() => {
-                  discardGuard.clearDirty();
-                  ctx.onSubmit(editor?.data ?? data);
-                }}
-                onClose={() => discardGuard.requestClose(() => navigateTo('/'))}
+                footer={(activeStep, onNext, onBack) => (
+                  <WizardEditorFooter
+                    activeStep={activeStep}
+                    onNext={onNext}
+                    onBack={onBack}
+                    isLastStep={activeStep.id === 'review-step'}
+                    isUpdate={ctx.isUpdate}
+                    onSubmit={() => {
+                      discardGuard.clearDirty();
+                      ctx.onSubmit(editor?.data ?? data);
+                    }}
+                    onCancel={() => (editor ? editor.cancel() : discardGuard.requestClose(() => navigateTo('/')))}
+                    onDelete={editor?.deleteResource}
+                  />
+                )}
               >
                 <WizardStep name={t('Overview')} id="overview">
                   <span className="co-pre-line">
@@ -141,12 +150,7 @@ export const FlowMetricWizard: FC<FlowMetricWizardProps> = props => {
                 <WizardStep name={t('Data')} id="data">
                   {form(ctx.errors)}
                 </WizardStep>
-                <WizardStep
-                  name={t('Review')}
-                  id="review-step"
-                  body={{ className: 'wizard-editor-container' }}
-                  footer={ContextSingleton.isStandalone() ? undefined : <></>}
-                >
+                <WizardStep name={t('Review')} id="review-step" body={{ className: 'wizard-editor-container' }}>
                   <ResourceYAMLEditor
                     initialResource={editor?.data ?? data}
                     onSave={content => {

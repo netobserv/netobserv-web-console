@@ -1,13 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  Button,
-  PageSection,
-  Title,
-  Wizard,
-  WizardFooterWrapper,
-  WizardStep,
-  WizardStepType
-} from '@patternfly/react-core';
+import { Button, PageSection, Title, Wizard, WizardStep, WizardStepType } from '@patternfly/react-core';
 import { RJSFSchema } from '@rjsf/utils';
 import validator from '@rjsf/validator-ajv8';
 import _ from 'lodash';
@@ -18,7 +10,7 @@ import { useDiscardGuard } from '../../../utils/discard-guard-hook';
 import { flowCollectorPath, navigateTo, useNavigate, useParams, useSearchParams } from '../../../utils/url';
 import { DynamicForm } from '../dynamic-form/dynamic-form';
 import { ErrorTemplate } from '../dynamic-form/templates';
-import { EditorType } from '../editor-toggle';
+import { EditorType, WizardEditorFooter } from '../editor-toggle';
 import '../forms.css';
 import { useResourceEditor } from '../resource-form';
 import ResourceWatcher, { Consumer, useResourceWatcher } from '../resource-watcher';
@@ -183,8 +175,22 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
               <Wizard
                 startIndex={startIndex}
                 onStepChange={onStepChange}
-                onSave={() => submitFlowCollector(ctx, editor?.data ?? data)}
-                onClose={() => discardGuard.requestClose(() => navigateTo('/'))}
+                footer={(activeStep, onNext, onBack) => (
+                  <WizardEditorFooter
+                    activeStep={activeStep}
+                    onNext={onNext}
+                    onBack={onBack}
+                    isLastStep={activeStep.id === 'consumption'}
+                    isUpdate={ctx.isUpdate}
+                    onSubmit={() => submitFlowCollector(ctx, editor?.data ?? data)}
+                    onCancel={() =>
+                      editor
+                        ? editor.cancel()
+                        : discardGuard.requestClose(() => navigateTo(flowCollectorPath('status')!))
+                    }
+                    onDelete={editor?.deleteResource}
+                  />
+                )}
               >
                 <WizardStep name={t('Overview')} id="overview">
                   <span className="co-pre-line">
@@ -221,28 +227,7 @@ export const FlowCollectorWizard: FC<FlowCollectorWizardProps> = props => {
                 <WizardStep name={t('Loki')} id="loki">
                   {form(ctx.errors)}
                 </WizardStep>
-                <WizardStep
-                  name={t('Consumption')}
-                  id="consumption"
-                  footer={
-                    <WizardFooterWrapper>
-                      <Button
-                        variant="primary"
-                        data-test-id="flowcollector-wizard-consumption-submit"
-                        onClick={() => submitFlowCollector(ctx, editor?.data ?? data)}
-                      >
-                        {t('Submit')}
-                      </Button>
-                      <Button
-                        variant="link"
-                        data-test-id="flowcollector-wizard-consumption-cancel"
-                        onClick={() => discardGuard.requestClose(() => navigateTo('/'))}
-                      >
-                        {t('Cancel')}
-                      </Button>
-                    </WizardFooterWrapper>
-                  }
-                >
+                <WizardStep name={t('Consumption')} id="consumption">
                   <Consumption flowCollector={editor?.data ?? data} setSampling={setSampling} />
                   <>{!_.isEmpty(ctx.errors) && <ErrorTemplate errors={ctx.errors} />}</>
                 </WizardStep>

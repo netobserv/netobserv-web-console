@@ -31,8 +31,14 @@ export const AtomicFieldTemplate: React.FC<FieldTemplateProps> = ({
   // put description before or after children based on widget type
   const descriptionFirst = uiSchema?.['ui:descriptionFirst'] === 'true';
   return (
-    <FormField id={id} defaultLabel={label} required={required || false} schema={schema} uiSchema={uiSchema || {}}>
-      {descriptionFirst && description}
+    <FormField
+      id={id}
+      defaultLabel={label}
+      required={required || false}
+      schema={schema}
+      uiSchema={uiSchema || {}}
+      description={descriptionFirst ? description : undefined}
+    >
       {children}
       {!descriptionFirst && description}
       {!_.isEmpty(rawErrors) && (
