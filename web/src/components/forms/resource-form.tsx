@@ -69,7 +69,9 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema, wizardChild, ini
           nextParams.set('view', next);
         }
         return nextParams;
-      });
+      },
+      { replace: true }
+    );
     },
     [initialViewType, setSearchParams]
   );

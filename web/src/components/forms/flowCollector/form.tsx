@@ -43,6 +43,7 @@ export const FlowCollectorForm: FC<FlowCollectorFormProps> = props => {
       version="v1beta2"
       kind="FlowCollector"
       name={name}
+      skipCRError={isSetupRoute}
       onSuccess={() => navigate(flowCollectorPath('status')!)}
       defaultFrom="CSVExample"
     >
