@@ -21,7 +21,7 @@ const eBPFPanels = [
     "dropped-flows-rate-chart",
     "ringbuffer-/-hashmap-ratio-chart",
     "buffer-size-chart",
-    "filtered-flows-rate-chart"
+    "filtered-packets-rate-chart"
 ]
 
 const operatorPanels = [
