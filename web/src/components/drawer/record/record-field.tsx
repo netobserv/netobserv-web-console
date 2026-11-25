@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { FlowDirection, getDirectionDisplayString, Record } from '../../../api/ipfix';
 import { Column, ColumnsId, getFullColumnName, isKubeObj, KubeObj } from '../../../utils/columns';
 import { dateFormatter, getFormattedDate, timeMSFormatter, utcDateTimeFormatter } from '../../../utils/datetime';
-import { dnsCodesNames, dnsErrorsValues, getDNSErrorDescription, getDNSRcodeDescription } from '../../../utils/dns';
+import { dnsCodesNames, getDNSErrorDescription, getDNSRcodeDescription } from '../../../utils/dns';
 import { getDSCPDocUrl, getDSCPServiceClassDescription, getDSCPServiceClassName } from '../../../utils/dscp';
 import { formatDurationAboveMillisecond, formatDurationAboveNanosecond } from '../../../utils/duration';
 import { getICMPCode, getICMPDocUrl, getICMPType, ICMPAllTypesValues, isValidICMPProto } from '../../../utils/icmp';
@@ -94,9 +94,7 @@ export const RecordField: React.FC<RecordFieldProps> = ({
   const emptyDnsErrorText = () => {
     return emptyText(
       flow.fields.DnsErrno
-        ? `${t('DNS Error')} ${flow.fields.DnsErrno}: ${getDNSErrorDescription(
-            flow.fields.DnsErrno as dnsErrorsValues
-          )}`
+        ? `${t('DNS Error')} ${flow.fields.DnsErrno}: ${getDNSErrorDescription(flow.fields.DnsErrno)}`
         : undefined
     );
   };
@@ -589,9 +587,7 @@ export const RecordField: React.FC<RecordFieldProps> = ({
       case ColumnsId.dnserrno: {
         return singleContainer(
           typeof value === 'number' && !isNaN(value)
-            ? simpleTextWithTooltip(
-                detailed && value ? `${value}: ${getDNSErrorDescription(value as dnsErrorsValues)}` : String(value)
-              )
+            ? simpleTextWithTooltip(detailed && value ? `${value}: ${getDNSErrorDescription(value)}` : String(value))
             : emptyText()
         );
       }
