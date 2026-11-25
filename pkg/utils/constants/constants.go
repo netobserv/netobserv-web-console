@@ -43,6 +43,7 @@ const (
 	DataSourceAuto    DataSource = "auto"
 	DataSourceProm    DataSource = "prom"
 	DataSourceLoki    DataSource = "loki"
+	DataSourceMock    DataSource = "mock"
 	DefaultDataSource DataSource = DataSourceAuto
 
 	PacketLossDropped PacketLoss = "dropped"

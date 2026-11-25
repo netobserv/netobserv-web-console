@@ -6,19 +6,30 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/netobserv/network-observability-console-plugin/pkg/backend"
+	"github.com/netobserv/network-observability-console-plugin/pkg/backend/backends"
+	"github.com/netobserv/network-observability-console-plugin/pkg/backend/loki"
 	"github.com/netobserv/network-observability-console-plugin/pkg/config"
+	"github.com/netobserv/network-observability-console-plugin/pkg/httpclient"
 	"github.com/netobserv/network-observability-console-plugin/pkg/httpclient/httpclienttest"
 )
 
-var h = Handlers{Cfg: &config.Config{Loki: config.Loki{
-	URL:    "http://loki",
-	Labels: []string{"_RecordType", "SrcK8S_Namespace", "DstK8S_Namespace", "SrcK8S_OwnerName", "DstK8S_OwnerName"},
-}}}
+var cfg = config.Config{
+	Loki: config.Loki{
+		URL:    "http://loki",
+		Labels: []string{"_RecordType", "SrcK8S_Namespace", "DstK8S_Namespace", "SrcK8S_OwnerName", "DstK8S_OwnerName"},
+	},
+	Frontend: config.Frontend{
+		ConsoleMode: config.Mock,
+	},
+}
+var h = Handlers{Cfg: &cfg, Backends: backends.NewOrchestrator(&cfg)}
 
 const testLokiBaseURL = "http://loki/loki/api/v1/"
 
 func TestGetSourceOwnerNames(t *testing.T) {
 	lokiClientMock := new(httpclienttest.HTTPClientMock)
+	loki.MockProvider = func() httpclient.Caller { return lokiClientMock }
 	lokiClientMock.SpyURL(func(url string) {
 		assert.Equal(
 			t,
@@ -26,14 +37,14 @@ func TestGetSourceOwnerNames(t *testing.T) {
 			url,
 		)
 	})
-	cl := clients{loki: lokiClientMock}
-	_, _, _ = h.getNamesForPrefix(context.Background(), cl, "Src", "Deployment", "default")
+	_, _, _ = h.getNamesForPrefix(context.Background(), &backend.QueryContext{}, "Src", "Deployment", "default")
 
 	lokiClientMock.AssertNumberOfCalls(t, "Get", 1)
 }
 
 func TestGetDestPodNames(t *testing.T) {
 	lokiClientMock := new(httpclienttest.HTTPClientMock)
+	loki.MockProvider = func() httpclient.Caller { return lokiClientMock }
 	lokiClientMock.SpyURL(func(url string) {
 		assert.Equal(
 			t,
@@ -41,14 +52,14 @@ func TestGetDestPodNames(t *testing.T) {
 			url,
 		)
 	})
-	cl := clients{loki: lokiClientMock}
-	_, _, _ = h.getNamesForPrefix(context.Background(), cl, "Dst", "Pod", "default")
+	_, _, _ = h.getNamesForPrefix(context.Background(), &backend.QueryContext{}, "Dst", "Pod", "default")
 
 	lokiClientMock.AssertNumberOfCalls(t, "Get", 1)
 }
 
 func TestGetSourceNodeNames(t *testing.T) {
 	lokiClientMock := new(httpclienttest.HTTPClientMock)
+	loki.MockProvider = func() httpclient.Caller { return lokiClientMock }
 	lokiClientMock.SpyURL(func(url string) {
 		assert.Equal(
 			t,
@@ -56,14 +67,14 @@ func TestGetSourceNodeNames(t *testing.T) {
 			url,
 		)
 	})
-	cl := clients{loki: lokiClientMock}
-	_, _, _ = h.getNamesForPrefix(context.Background(), cl, "Src", "Node", "")
+	_, _, _ = h.getNamesForPrefix(context.Background(), &backend.QueryContext{}, "Src", "Node", "")
 
 	lokiClientMock.AssertNumberOfCalls(t, "Get", 1)
 }
 
 func TestGetLabelValues(t *testing.T) {
 	lokiClientMock := new(httpclienttest.HTTPClientMock)
+	loki.MockProvider = func() httpclient.Caller { return lokiClientMock }
 	lokiClientMock.SpyURL(func(url string) {
 		assert.Equal(
 			t,
@@ -71,8 +82,7 @@ func TestGetLabelValues(t *testing.T) {
 			url,
 		)
 	})
-	cl := clients{loki: lokiClientMock}
-	_, _, _ = h.getLabelValues(context.Background(), cl, "DstK8S_Namespace", false)
+	_, _, _ = h.Backends.GetLabelValues(context.Background(), &backend.QueryContext{}, "DstK8S_Namespace")
 
 	lokiClientMock.AssertNumberOfCalls(t, "Get", 1)
 }
