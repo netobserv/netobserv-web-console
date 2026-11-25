@@ -43,6 +43,7 @@ updates:
         update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
       - dependency-name: "cypress"
         update-types: ["version-update:semver-major"] # breaking changes in cypress 16, such as removal of cy.exec
+      - dependency-name: "port-numbers" # completely freeze port-numbers (v6 works well, is simple & stable, and pulls nothing; v7 is node-only; v8 has too frequent updates)
 
   - package-ecosystem: "docker"
     directory: "/"
@@ -90,6 +91,7 @@ updates:
         update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
       - dependency-name: "cypress"
         update-types: ["version-update:semver-major"] # breaking changes in cypress 16, such as removal of cy.exec
+      - dependency-name: "port-numbers" # completely freeze port-numbers (v6 works well, is simple & stable, and pulls nothing; v7 is node-only; v8 has too frequent updates)
 
   - package-ecosystem: "docker"
     directory: "/"
