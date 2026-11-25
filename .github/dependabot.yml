@@ -37,6 +37,8 @@ updates:
         update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
       - dependency-name: "@patternfly/react-table"
         update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
+      - dependency-name: "@patternfly/react-charts"
+        update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
       - dependency-name: "mobx"
         update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
       - dependency-name: "cypress"
@@ -81,6 +83,8 @@ updates:
       - dependency-name: "@patternfly/react-drag-drop"
         update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
       - dependency-name: "@patternfly/react-table"
+        update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
+      - dependency-name: "@patternfly/react-charts"
         update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
       - dependency-name: "mobx"
         update-types: ["version-update:semver-major"] # must stay aligned with plugin SDK
