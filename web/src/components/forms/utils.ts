@@ -177,8 +177,11 @@ export const getUpdatedCR = (data: any, updatedData: any) => {
   // unrelated update (e.g. a K8s watch) forces a redraw.
   return {
     ...(data ?? {}),
-    metadata: updatedData.metadata,
-    spec: updatedData.spec
+    // Fields hidden by a filtered uiSchema are omitted by RJSF from the event
+    // payload. Preserve them so setup-step edits cannot erase metadata.name or
+    // the parts of spec owned by another wizard step.
+    metadata: { ...(data?.metadata ?? {}), ...(updatedData.metadata ?? {}) },
+    spec: { ...(data?.spec ?? {}), ...(updatedData.spec ?? {}) }
   };
 };
 
