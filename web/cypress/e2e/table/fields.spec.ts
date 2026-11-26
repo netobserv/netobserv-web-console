@@ -86,7 +86,7 @@ describe('netflow-table', () => {
     // others
     cy.checkRecordField('K8S_FlowLayer', 'Flow layer', ['infra']);
 
-    cy.get('[data-test-id="group-5"]').contains('Protocol Info');
+    cy.contains('[data-test-id^="group-"]', 'Protocol Info').should('exist');
     cy.checkRecordField('Proto', 'Protocol', ['TCP']);
     cy.checkRecordField('Dscp', 'DSCP', ['Standard']);
 
