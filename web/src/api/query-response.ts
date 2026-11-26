@@ -40,6 +40,11 @@ export interface GenericMetricsResult {
   stats: Stats;
 }
 
+export type RawTopologyMetrics = {
+  metric: Flow;
+  values: [number, unknown][];
+};
+
 export const parseStream = (raw: StreamResult): Record[] => {
   return raw.values.map(v => {
     const fields = JSON.parse(v[1]) as Flow;

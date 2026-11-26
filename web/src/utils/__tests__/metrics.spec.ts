@@ -10,7 +10,8 @@ import {
   hydratePeer,
   hydrateTopologyMetrics,
   matchPeer,
-  mergeTlsIntoTopologyMetrics
+  mergeTlsIntoTopologyMetrics,
+  normalizeMetrics
 } from '../metrics';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
