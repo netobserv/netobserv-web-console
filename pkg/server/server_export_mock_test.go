@@ -28,7 +28,7 @@ func mockExportConfig() *config.Config {
 				"K8S_FlowLayer", "FlowDirection",
 			},
 		},
-		Frontend: config.Frontend{},
+		Frontend: config.Frontend{ConsoleMode: config.Mock},
 	}
 }
 

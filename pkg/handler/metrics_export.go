@@ -12,16 +12,17 @@ import (
 	"strings"
 	"time"
 
+	"github.com/netobserv/network-observability-console-plugin/pkg/backend"
 	"github.com/netobserv/network-observability-console-plugin/pkg/export"
 	"github.com/netobserv/network-observability-console-plugin/pkg/handler/apierrors"
 	"github.com/netobserv/network-observability-console-plugin/pkg/metrics"
 	"github.com/netobserv/network-observability-console-plugin/pkg/metricsexport"
 	"github.com/netobserv/network-observability-console-plugin/pkg/model"
-	"github.com/netobserv/network-observability-console-plugin/pkg/utils/constants"
 )
 
 const (
 	includeTopologyEdgesKey = "includeTopologyEdges"
+	namespaceKey            = "namespace"
 	// exportMetricsMaxBodyBytes caps POST /flow/metrics/export JSON bodies.
 	// Overview batch payloads are small (query metadata only); 1MiB is generous headroom.
 	exportMetricsMaxBodyBytes = 1 << 20
@@ -175,28 +176,28 @@ func (h *Handlers) exportMetricsPost(ctx context.Context, w http.ResponseWriter,
 }
 
 func (h *Handlers) fetchTopologyForExport(ctx context.Context, headers http.Header, params url.Values) (*model.AggregatedQueryResponse, int, error) {
-	namespace := params.Get(namespaceKey)
-	clients, sterr := newClients(h.Cfg, headers, false, namespace)
-	if sterr != nil {
-		return nil, http.StatusInternalServerError, sterr
-	}
-
-	ds, err := getDatasource(params)
+	qctx, err := queryContextFromParams(params, headers)
 	if err != nil {
 		return nil, http.StatusBadRequest, err
 	}
 
-	flows, code, err := h.getTopologyFlows(ctx, clients, params, ds)
-	var promClErr *apierrors.PromClientError
-	if err != nil &&
-		ds == constants.DataSourceAuto &&
-		h.Cfg.IsLokiEnabled() &&
-		(code == http.StatusForbidden || code == http.StatusUnauthorized) &&
-		errors.As(err, &promClErr) {
-		hlog.Info("Retrying metrics export with Loki...")
-		flows, code, err = h.getTopologyFlows(ctx, clients, params, constants.DataSourceLoki)
+	query, err := parseTopologyParams(params)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
 	}
-	return flows, code, err
+	return h.Backends.Metrics(ctx, qctx, query)
+}
+
+func queryContextFromParams(params url.Values, headers http.Header) (*backend.QueryContext, error) {
+	ds, err := getDatasource(params)
+	if err != nil {
+		return nil, err
+	}
+	return &backend.QueryContext{
+		DataSource:    ds,
+		RequestHeader: headers,
+		Tenant:        params.Get(tenantKey),
+	}, nil
 }
 
 func (h *Handlers) buildMetricsExportReport(
