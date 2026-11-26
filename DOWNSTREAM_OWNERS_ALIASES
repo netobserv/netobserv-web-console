@@ -21,3 +21,15 @@ aliases:
   - kapjain-rh
   - leandroberetta
   - mffiedler
+  netobserv-qe-approvers:
+  - Amoghrd
+  - memodi
+  - mffiedler
+  - kapjain-rh
+  - oliver-smakal
+  netobserv-qe-reviewers:
+  - Amoghrd
+  - memodi
+  - mffiedler
+  - kapjain-rh
+  - oliver-smakal
