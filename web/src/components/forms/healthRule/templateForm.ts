@@ -197,7 +197,8 @@ export const removeHealthRuleFromFlowCollector = (flowCollector: any, template: 
   }
   return next;
 };
-export const wrapTemplateForm = (form: TemplateRuleForm): HealthRuleFormData => ({
+
+const wrapTemplateForm = (form: TemplateRuleForm): HealthRuleFormData => ({
   apiVersion: 'netobserv.io/v1',
   kind: 'HealthRuleForm',
   metadata: { name: 'health-rule' },
@@ -214,9 +215,6 @@ export const unwrapTemplateForm = (data: HealthRuleFormData | null | undefined):
   }
   return defaultTemplateForm();
 };
-
-export const templateFormDataToRule = (data: HealthRuleFormData | null | undefined): FLPHealthRule =>
-  templateFormToFLPHealthRule(unwrapTemplateForm(data));
 
 export const ruleToTemplateFormData = (rule: FLPHealthRule): HealthRuleFormData =>
   wrapTemplateForm(flpHealthRuleToTemplateForm(rule));

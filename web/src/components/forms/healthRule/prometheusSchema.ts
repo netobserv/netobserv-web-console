@@ -6,7 +6,7 @@
 import * as _ from 'lodash';
 import { HealthRuleMode } from './types';
 
-export const prometheusRuleSchema = {
+const prometheusRuleSchema = {
   type: 'object',
   required: ['apiVersion', 'kind', 'metadata', 'spec'],
   properties: {

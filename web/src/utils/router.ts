@@ -24,13 +24,13 @@ import {
 const filtersSeparator = ';';
 const filterValuesSeparator = ',';
 export const defaultTimeRange = 300;
-export const defaultRecordType: RecordType = 'flowLog';
-export const defaultDataSource: DataSource = 'auto';
-export const defaultMatch: Match = 'all';
-export const defaultPacketLoss: PacketLoss = 'all';
 export const defaultMetricFunction: StatFunction = 'last';
 export const defaultMetricType: MetricType = 'Bytes';
 export const defaultMetricScope = 'namespace';
+const defaultRecordType: RecordType = 'flowLog';
+const defaultDataSource: DataSource = 'auto';
+const defaultMatch: Match = 'all';
+const defaultPacketLoss: PacketLoss = 'all';
 const defaultShowDuplicates = false;
 
 export const getRangeFromURL = (): number | TimeRange => {
@@ -59,14 +59,6 @@ export const getShowDupFromURL = (): boolean => {
 
 export const getLimitFromURL = (fallback: number): number => {
   return getURLParamAsNumber(URLParam.Limit) || fallback;
-};
-
-export const getPercentileFromURL = (fallback: number): number => {
-  return getURLParamAsNumber(URLParam.Percentile) || fallback;
-};
-
-export const getMatchFromURL = (): Match => {
-  return (getURLParam(URLParam.Match) as Match | null) || defaultMatch;
 };
 
 export const getPacketLossFromURL = (): PacketLoss => {
@@ -166,16 +158,8 @@ export const setURLLimit = (limit: number, replace?: boolean) => {
   setURLParam(URLParam.Limit, String(limit), replace);
 };
 
-export const setURLPercentile = (percentile: number, replace?: boolean) => {
-  setURLParam(URLParam.Percentile, String(percentile), replace);
-};
-
 export const setURLShowDup = (show: boolean, replace?: boolean) => {
   setURLParam(URLParam.ShowDuplicates, String(show), replace);
-};
-
-export const setURLMatch = (match: Match, replace?: boolean) => {
-  setURLParam(URLParam.Match, match, replace);
 };
 
 export const setURLPacketLoss = (pl: PacketLoss, replace?: boolean) => {

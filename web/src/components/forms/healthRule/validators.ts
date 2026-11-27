@@ -9,14 +9,14 @@ import {
   TRENDING_TEMPLATES
 } from './types';
 
-export type ValidationResult = {
+type ValidationResult = {
   errors: string[];
   warnings: string[];
 };
 
 const emptyResult = (): ValidationResult => ({ errors: [], warnings: [] });
 
-export const parseThresholdFloat = (value: string | number | undefined | null): number | undefined => {
+const parseThresholdFloat = (value: string | number | undefined | null): number | undefined => {
   if (value === undefined || value === null || value === '') {
     return undefined;
   }
@@ -80,7 +80,7 @@ export const validateThresholds = (thresholds: HealthRuleThresholds, pathPrefix:
   return errors;
 };
 
-export const validateVariant = (
+const validateVariant = (
   template: HealthRuleTemplate,
   variant: HealthRuleVariantForm,
   index: number

@@ -18,10 +18,10 @@ import { UiSchemaOptionsWithDependency } from './types';
 import { useSchemaDescription, useSchemaLabel } from './utils';
 
 /** Token resolved at render time so FlowCollector form can deep-link without circular imports. */
-export const HEALTH_RULE_WIZARD_HREF_TOKEN = '__health_rule_wizard__';
+const healthRuleWizardHrefToken = '__health_rule_wizard__';
 
 const resolveExternalHref = (href: string): string => {
-  if (href === HEALTH_RULE_WIZARD_HREF_TOKEN) {
+  if (href === healthRuleWizardHrefToken) {
     return ContextSingleton.isStandalone() ? '/console-health-rule-wizard' : '/network-health/rules/setup';
   }
   return href;

@@ -27,9 +27,6 @@ export const OVN_RULES_GROUP_NAMES = [
   'cluster-network-operator-master.rules'
 ] as const;
 
-/** @deprecated Kept for existing callers/tests; prefer OVN_RULES_GROUP_NAMES. */
-export const OVN_RULES_GROUP_NAME = OVN_RULES_GROUP_NAMES[0];
-
 const OVN_RULES_GROUP_NAME_SET = new Set<string>(OVN_RULES_GROUP_NAMES);
 
 /** Best-effort OVN group detection (downstream group names or any ovn-kubernetes file path). */

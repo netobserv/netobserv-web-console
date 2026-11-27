@@ -25,7 +25,7 @@ export type RecordFieldFilter = {
   isDelete: boolean;
 };
 
-export const maxArrayIndex = 2;
+const maxArrayIndex = 2;
 
 export type FlexValue = 'flexDefault' | 'flexNone' | 'flex_1' | 'flex_2' | 'flex_3' | 'flex_4';
 export type FlexWrapValue = 'wrap' | 'wrapReverse' | 'nowrap';

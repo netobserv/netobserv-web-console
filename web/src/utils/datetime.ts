@@ -77,16 +77,6 @@ export const dateTimeFormatter = new Intl.DateTimeFormat(getLanguage(), {
   year: 'numeric'
 });
 
-export const dateTimeMSFormatter = new Intl.DateTimeFormat(getLanguage(), {
-  month: 'short',
-  day: 'numeric',
-  hour: 'numeric',
-  minute: 'numeric',
-  second: 'numeric',
-  fractionalSecondDigits: 3,
-  year: 'numeric'
-});
-
 export const utcDateTimeFormatter = new Intl.DateTimeFormat(getLanguage(), {
   weekday: 'short',
   month: 'short',

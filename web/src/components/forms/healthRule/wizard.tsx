@@ -72,15 +72,6 @@ import {
 import { validateCustomForm, validatePromQLSoft, validateTemplateForm } from './validators';
 import { ConfigStepIntro, SourceModeStep } from './wizardSteps';
 
-export {
-  healthRuleEditCustomPath,
-  healthRuleEditTemplatePath,
-  healthRuleSetupPath,
-  networkHealthCreatedPath,
-  networkHealthPath,
-  resolveHealthRuleWizardArgs
-} from './paths';
-
 export type HealthRuleWizardProps = {
   initialState?: WizardState;
 };

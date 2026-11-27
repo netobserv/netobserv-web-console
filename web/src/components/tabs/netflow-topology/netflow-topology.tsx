@@ -39,7 +39,7 @@ import { buildStats, HealthStats } from '../../health/health-helper';
 import { SearchEvent, SearchHandle } from '../../search/search';
 import { ScopeSlider } from '../../slider/scope-slider';
 import componentFactory from './2d/componentFactories/componentFactory';
-import stylesComponentFactory from './2d/componentFactories/stylesComponentFactory';
+import { stylesComponentFactory } from './2d/componentFactories/stylesComponentFactory';
 import layoutFactory from './2d/layouts/layoutFactory';
 import { TopologyContent } from './2d/topology-content';
 import './netflow-topology.css';

@@ -5,7 +5,7 @@
 export type TlsLockSeverity = 'deprecated' | 'legacy' | 'modern' | 'pqc' | 'unknown';
 
 /** Post-quantum TLS groups (PQC compliance is based on TLSGroup + TLS 1.3). */
-export const PQC_TLS_GROUPS = new Set(['X25519MLKEM768', 'Secp256r1MLKEM768', 'Secp384r1MLKEM1024']);
+const pqcTlsGroups = new Set(['X25519MLKEM768', 'Secp256r1MLKEM768', 'Secp384r1MLKEM1024']);
 
 /** Higher rank = worse / more alarming for edge lock coloring (deprecated wins over pqc). */
 const SEVERITY_RANK: Record<TlsLockSeverity, number> = {
@@ -42,7 +42,7 @@ export const classifyTlsVersionString = (raw: string): TlsLockSeverity | null =>
 /** Lock color for a TLSGroup row in the drawer (PQC when TLS 1.3 is also observed on the link). */
 export const tlsLockSeverityForGroupLabel = (group: string, versionLabels: string[]): TlsLockSeverity => {
   const hasModern = versionLabels.map(stripApproxPrefix).some(v => classifyTlsVersionString(v) === 'modern');
-  if (hasModern && PQC_TLS_GROUPS.has(group)) {
+  if (hasModern && pqcTlsGroups.has(group)) {
     return 'pqc';
   }
   return 'unknown';
@@ -51,7 +51,7 @@ export const tlsLockSeverityForGroupLabel = (group: string, versionLabels: strin
 /** TLS 1.3 with a PQC TLSGroup → pqc; otherwise derive from version alone. */
 export const classifyTlsLockSeverity = (versionLabel: string, tlsGroup?: string): TlsLockSeverity => {
   const versionClass = classifyTlsVersionString(versionLabel);
-  if (versionClass === 'modern' && tlsGroup && PQC_TLS_GROUPS.has(tlsGroup)) {
+  if (versionClass === 'modern' && tlsGroup && pqcTlsGroups.has(tlsGroup)) {
     return 'pqc';
   }
   return versionClass ?? 'unknown';
@@ -67,7 +67,7 @@ export const aggregateTlsLockSeverity = (
   let best: TlsLockSeverity | undefined;
 
   const hasModern = versions.some(v => classifyTlsVersionString(v) === 'modern');
-  const hasPqcGroup = groups.some(g => PQC_TLS_GROUPS.has(g));
+  const hasPqcGroup = groups.some(g => pqcTlsGroups.has(g));
   if (hasModern && hasPqcGroup) {
     best = 'pqc';
   }

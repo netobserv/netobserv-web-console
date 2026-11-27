@@ -1,7 +1,7 @@
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { ScopeConfigDef } from '../model/scope';
 
-export const defaultHost = '/api/proxy/plugin/netobserv-plugin/backend';
+const defaultHost = '/api/proxy/plugin/netobserv-plugin/backend';
 export class ContextSingleton {
   private static instance: ContextSingleton;
   private isStandalone: boolean;

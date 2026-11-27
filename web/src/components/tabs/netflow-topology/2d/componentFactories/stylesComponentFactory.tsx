@@ -40,5 +40,3 @@ export const stylesComponentFactory: ComponentFactory = (
       return undefined;
   }
 };
-
-export default stylesComponentFactory;

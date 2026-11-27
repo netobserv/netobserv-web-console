@@ -6,7 +6,7 @@ import {
   buildRecordingMetadataAnnotation,
   defaultPrometheusRuleFormData,
   ensureNetworkHealthLabels,
-  NETWORK_HEALTH_ANNOTATION_KEY,
+  networkHealthAnnotationKey,
   parseHealthAnnotation,
   prometheusFormDataToCustomForm,
   prometheusRuleToFormData
@@ -212,8 +212,8 @@ describe('health-rule builders', () => {
     expect(pr.metadata.labels?.netobserv).toBe('true');
     expect(pr.spec.groups[0].rules[0].alert).toBe('IncomingTrafficSurge');
     expect(pr.spec.groups[0].rules[0].labels?.netobserv).toBe('true');
-    expect(pr.spec.groups[0].rules[0].annotations?.[NETWORK_HEALTH_ANNOTATION_KEY]).toContain('DstK8S_Namespace');
-    expect(pr.spec.groups[0].rules[0].annotations?.[NETWORK_HEALTH_ANNOTATION_KEY]).toContain('"alertThreshold":"100"');
+    expect(pr.spec.groups[0].rules[0].annotations?.[networkHealthAnnotationKey]).toContain('DstK8S_Namespace');
+    expect(pr.spec.groups[0].rules[0].annotations?.[networkHealthAnnotationKey]).toContain('"alertThreshold":"100"');
   });
 
   it('builds recording PrometheusRule with metadata annotation', () => {
@@ -302,7 +302,7 @@ describe('health-rule annotations', () => {
     };
 
     const saved = ensureNetworkHealthLabels(formData, 'Alert');
-    const ann = saved.spec.groups[0].rules[0].annotations[NETWORK_HEALTH_ANNOTATION_KEY];
+    const ann = saved.spec.groups[0].rules[0].annotations[networkHealthAnnotationKey];
     expect(ann).toContain('"alertThreshold":"42"');
     expect(ann).not.toContain('"threshold":');
     expect(saved.spec.groups[0].rules[0].healthDisplay).toBeUndefined();

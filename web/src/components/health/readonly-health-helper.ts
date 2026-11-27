@@ -49,7 +49,7 @@ export type ReadonlyHealthStats = {
   byNode: HealthStat[];
 };
 
-export const normalizeNodeLabelValue = (value: string): string => {
+const normalizeNodeLabelValue = (value: string): string => {
   if (value.startsWith('[')) {
     const end = value.indexOf(']');
     if (end !== -1 && end + 1 < value.length && value[end + 1] === ':') {
