@@ -61,9 +61,21 @@ export const netflowTrafficPath = () => {
 
 const flowCollectorBasePath = '/k8s/cluster/flows.netobserv.io~v1beta2~FlowCollector';
 
+const isOperatorCreatePath = (pathname: string, resource: string): boolean =>
+  pathname.includes(`/operators.coreos.com~v1alpha1~ClusterServiceVersion/`) &&
+  pathname.includes(`/flows.netobserv.io~${resource}/~new`);
+
 export const flowCollectorPath = (action: 'new' | 'setup' | 'edit' | 'status') => {
-  if (ContextSingleton.isStandalone() && !ContextSingleton.isMock()) {
-    return undefined;
+  if (ContextSingleton.isStandalone()) {
+    switch (action) {
+      case 'new':
+      case 'edit':
+        return '/console-flowCollector';
+      case 'setup':
+        return '/console-flowCollector-wizard';
+      case 'status':
+        return '/console-flowCollector-status';
+    }
   }
   switch (action) {
     case 'new':
@@ -91,6 +103,9 @@ export const isFlowCollectorCreatePath = (pathname: string = window.location.pat
   return segment === '~new' || segment === 'setup';
 };
 
+export const isFlowCollectorWizardPath = (pathname: string = window.location.pathname): boolean =>
+  pathname.startsWith(flowCollectorPath('setup')!) || isOperatorCreatePath(pathname, 'v1beta2~FlowCollector');
+
 /**
  * Resolves the FlowCollector instance name from the URL on edit/yaml routes.
  * Form routes use static segments (e.g. `/edit`, `/cluster/yaml`) rather than a `:name` param
@@ -109,7 +124,18 @@ export const getFlowCollectorResourceName = (pathname: string = window.location.
   }
   return segment;
 };
-export const flowMetricNewPath = '/k8s/cluster/flows.netobserv.io~v1alpha1~FlowMetric/~new';
+
+const flowMetricBasePath = '/k8s/cluster/flows.netobserv.io~v1alpha1~FlowMetric';
+
+export const flowMetricPath = () => {
+  if (ContextSingleton.isStandalone()) {
+    return '/console-flowMetric';
+  }
+  return `${flowMetricBasePath}/~new`;
+};
+
+export const isFlowMetricWizardPath = (pathname: string = window.location.pathname): boolean =>
+  pathname === '/console-flowMetric-wizard' || isOperatorCreatePath(pathname, 'v1alpha1~FlowMetric');
 
 // React-router query argument (not backend routes)
 export enum URLParam {

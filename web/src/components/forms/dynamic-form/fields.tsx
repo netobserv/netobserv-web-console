@@ -138,9 +138,18 @@ export type FormFieldProps = {
   required: boolean;
   schema: JSONSchema7;
   uiSchema: UiSchema;
+  description?: React.ReactNode;
 };
 
-export const FormField: React.FC<FormFieldProps> = ({ children, id, defaultLabel, required, schema, uiSchema }) => {
+export const FormField: React.FC<FormFieldProps> = ({
+  children,
+  id,
+  defaultLabel,
+  required,
+  schema,
+  uiSchema,
+  description
+}) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
   const [showLabel, label] = useSchemaLabel(schema, uiSchema, defaultLabel || t('Value'));
 
@@ -149,6 +158,7 @@ export const FormField: React.FC<FormFieldProps> = ({ children, id, defaultLabel
       {showLabel && label ? (
         <Flex direction={{ default: 'row' }}>
           <FlexItem flex={{ default: 'flex_1' }}>
+            {description}
             <label className={classnames('form-label', { 'co-required': required })} htmlFor={id}>
               {label}
             </label>

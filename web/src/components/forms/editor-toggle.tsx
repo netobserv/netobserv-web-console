@@ -1,13 +1,86 @@
-import { ActionGroup, Alert, Button, Flex, FlexItem, Radio } from '@patternfly/react-core';
+import {
+  ActionGroup,
+  ActionList,
+  ActionListGroup,
+  ActionListItem,
+  Alert,
+  Button,
+  Flex,
+  FlexItem,
+  Radio,
+  WizardFooterWrapper,
+  WizardStepType
+} from '@patternfly/react-core';
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContextSingleton } from '../../utils/context';
 import './forms.css';
 
 export enum EditorType {
-  CUSTOM = 'custom',
+  FORM = 'form',
+  WIZARD = 'wizard',
   YAML = 'yaml'
 }
+
+export type WizardEditorFooterProps = {
+  activeStep: WizardStepType;
+  onNext: (event: React.MouseEvent<HTMLButtonElement>) => void | Promise<void>;
+  onBack: (event: React.MouseEvent<HTMLButtonElement>) => void | Promise<void>;
+  isLastStep: boolean;
+  isUpdate: boolean;
+  onSubmit: () => void;
+  onCancel: () => void;
+  onDelete?: () => void;
+};
+
+export const WizardEditorFooter: FC<WizardEditorFooterProps> = ({
+  activeStep,
+  onNext,
+  onBack,
+  isLastStep,
+  isUpdate,
+  onSubmit,
+  onCancel,
+  onDelete
+}) => {
+  const { t } = useTranslation('plugin__netobserv-plugin');
+
+  return (
+    <WizardFooterWrapper>
+      <ActionList>
+        <ActionListGroup>
+          <ActionListItem>
+            <Button variant="secondary" onClick={onBack} isDisabled={activeStep.index === 1}>
+              {t('Back')}
+            </Button>
+          </ActionListItem>
+          <ActionListItem>
+            <Button variant="secondary" onClick={onNext} isDisabled={isLastStep}>
+              {t('Next')}
+            </Button>
+          </ActionListItem>
+          <ActionListItem>
+            <Button variant="primary" onClick={onSubmit} isDisabled={!isLastStep}>
+              {isUpdate ? t('Update') : t('Create')}
+            </Button>
+          </ActionListItem>
+          <ActionListItem>
+            <Button variant="link" onClick={onCancel}>
+              {t('Cancel')}
+            </Button>
+          </ActionListItem>
+          {isUpdate && onDelete && (
+            <ActionListItem>
+              <Button variant="danger" onClick={onDelete}>
+                {t('Delete')}
+              </Button>
+            </ActionListItem>
+          )}
+        </ActionListGroup>
+      </ActionList>
+    </WizardFooterWrapper>
+  );
+};
 
 type EditorToggleProps = {
   type: EditorType;
@@ -15,7 +88,8 @@ type EditorToggleProps = {
   onSubmit: () => void;
   onCancel: () => void;
   onDelete: () => void;
-  customChild: JSX.Element;
+  formChild: JSX.Element;
+  wizardChild?: JSX.Element;
   yamlChild: JSX.Element;
   updated: boolean;
   isUpdate: boolean;
@@ -29,7 +103,8 @@ export const EditorToggle: FC<EditorToggleProps> = ({
   onCancel,
   onReload,
   onDelete,
-  customChild,
+  formChild,
+  wizardChild,
   yamlChild,
   updated,
   isUpdate
@@ -54,20 +129,31 @@ export const EditorToggle: FC<EditorToggleProps> = ({
           <label className="editor-toggle-label" id="radio-group-title-editor-toggle">
             {t('Configure via:')}
           </label>
+          {wizardChild && (
+            <Radio
+              data-test={`${EditorType.WIZARD}-view-input`}
+              id={EditorType.WIZARD}
+              isChecked={type === EditorType.WIZARD}
+              label={t('Wizard')}
+              name={EditorType.WIZARD}
+              onChange={(event, checked) => checked && onChange(EditorType.WIZARD)}
+              value={EditorType.WIZARD}
+            />
+          )}
           <Radio
-            data-test={`${EditorType.CUSTOM}-view-input`}
-            id={EditorType.CUSTOM}
-            isChecked={type === EditorType.CUSTOM}
-            label={t('Form view')}
-            name={EditorType.CUSTOM}
-            onChange={(event, checked) => checked && onChange(EditorType.CUSTOM)}
-            value={EditorType.CUSTOM}
+            data-test={`${EditorType.FORM}-view-input`}
+            id={EditorType.FORM}
+            isChecked={type === EditorType.FORM}
+            label={t('Form')}
+            name={EditorType.FORM}
+            onChange={(event, checked) => checked && onChange(EditorType.FORM)}
+            value={EditorType.FORM}
           />
           <Radio
             data-test={`${EditorType.YAML}-view-input`}
             id={EditorType.YAML}
             isChecked={type === EditorType.YAML}
-            label={t('YAML view')}
+            label={t('YAML')}
             name={EditorType.YAML}
             onChange={(event, checked) => checked && onChange(EditorType.YAML)}
             value={EditorType.YAML}
@@ -75,9 +161,9 @@ export const EditorToggle: FC<EditorToggleProps> = ({
         </Flex>
       </FlexItem>
       <FlexItem id="editor-content-container" flex={{ default: 'flex_1' }}>
-        {type === EditorType.CUSTOM ? customChild : yamlChild}
+        {type === EditorType.FORM ? formChild : type === EditorType.WIZARD ? wizardChild : yamlChild}
       </FlexItem>
-      {(type === EditorType.CUSTOM || ContextSingleton.isStandalone()) && (
+      {type !== EditorType.WIZARD && (type === EditorType.FORM || ContextSingleton.isStandalone()) && (
         <FlexItem id="editor-toggle-footer" style={{ paddingBottom: '30px' }}>
           {updated && (
             <Alert isInline className="co-alert" variant="info" title={t('This object has been updated.')}>

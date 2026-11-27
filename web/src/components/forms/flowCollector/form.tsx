@@ -4,12 +4,15 @@ import {
   flowCollectorPath,
   getFlowCollectorResourceName,
   isFlowCollectorCreatePath,
+  isFlowCollectorWizardPath,
   useNavigate,
   useParams
 } from '../../../utils/url';
+import { EditorType } from '../editor-toggle';
 import { ResourceForm } from '../resource-form';
 import { ResourceWatcher } from '../resource-watcher';
 import { flowCollectorUISchema } from './uiSchema';
+import { FlowCollectorWizard } from './wizard';
 
 export type FlowCollectorFormProps = {
   name?: string;
@@ -18,9 +21,12 @@ export type FlowCollectorFormProps = {
 export const FlowCollectorForm: FC<FlowCollectorFormProps> = props => {
   const params = useParams<{ name?: string }>();
   const navigate = useNavigate();
+  const isSetupRoute = window.location.pathname.startsWith(flowCollectorPath('setup')!);
 
   let name: string | undefined;
-  if (isFlowCollectorCreatePath()) {
+  if (isSetupRoute) {
+    name = 'cluster';
+  } else if (isFlowCollectorCreatePath()) {
     // Create route: do not watch an existing resource (wizard bypass lands here).
     name = undefined;
   } else {
@@ -37,10 +43,16 @@ export const FlowCollectorForm: FC<FlowCollectorFormProps> = props => {
       version="v1beta2"
       kind="FlowCollector"
       name={name}
+      skipCRError={isSetupRoute}
       onSuccess={() => navigate(flowCollectorPath('status')!)}
       defaultFrom="CSVExample"
     >
-      <ResourceForm uiSchema={flowCollectorUISchema} />
+      <ResourceForm
+        uiSchema={flowCollectorUISchema}
+        cancelPath={flowCollectorPath('status')!}
+        initialViewType={isFlowCollectorWizardPath() ? EditorType.WIZARD : EditorType.FORM}
+        wizardChild={<FlowCollectorWizard name={name} />}
+      />
     </ResourceWatcher>
   );
 };
