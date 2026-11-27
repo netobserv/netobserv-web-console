@@ -38,10 +38,12 @@ type ResultType string
 
 // ResultType values
 const (
-	ResultTypeStream = "streams"
-	ResultTypeScalar = "scalar"
-	ResultTypeVector = "vector"
-	ResultTypeMatrix = "matrix"
+	ResultTypeStream          = "streams"
+	ResultTypeScalar          = "scalar"
+	ResultTypeVector          = "vector"
+	ResultTypeMatrix          = "matrix"
+	ResultTypeTopologyMetrics = "topologyMetrics"
+	ResultTypeGenericMetrics  = "genericMetrics"
 )
 
 // ResultValue interface mimics the promql.Value interface
@@ -67,6 +69,23 @@ func (Vector) Type() ResultType { return ResultTypeVector }
 
 // Type implements the ResultValue interface
 func (Matrix) Type() ResultType { return ResultTypeMatrix }
+
+// EnrichedMetrics is the opaque JSON array for topologyMetrics / genericMetrics results.
+type EnrichedMetrics []interface{}
+
+// EnrichedMetricsResult wraps enriched metrics so AggregatedQueryResponse can round-trip them.
+type EnrichedMetricsResult struct {
+	resultType ResultType
+	data       EnrichedMetrics
+}
+
+// Type implements the ResultValue interface.
+func (e EnrichedMetricsResult) Type() ResultType { return e.resultType }
+
+// MarshalJSON encodes the underlying enriched metrics array.
+func (e EnrichedMetricsResult) MarshalJSON() ([]byte, error) {
+	return json.Marshal(e.data)
+}
 
 // Scalar is a single timestamp/float with no labels
 type Scalar model.Scalar
@@ -153,6 +172,11 @@ func unmarshalQueryResponseData(data []byte) (ResultType, ResultValue, interface
 		var v Scalar
 		err = json.Unmarshal(unmarshal.Result, &v)
 		value = v
+	case ResultTypeTopologyMetrics, ResultTypeGenericMetrics:
+		// Enriched /api/flow/metrics payloads: keep result as opaque JSON-decoded value.
+		var raw EnrichedMetrics
+		err = json.Unmarshal(unmarshal.Result, &raw)
+		value = EnrichedMetricsResult{resultType: unmarshal.Type, data: raw}
 	default:
 		return "", nil, nil, fmt.Errorf("unknown type: %s", unmarshal.Type)
 	}

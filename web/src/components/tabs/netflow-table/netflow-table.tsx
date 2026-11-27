@@ -220,8 +220,8 @@ export const NetflowTable = React.forwardRef<NetflowTableHandle, NetflowTablePro
       return props.flows;
     } else {
       return activeSortDirection === 'desc'
-        ? props.flows.sort((a: Record, b: Record) => found.sort(a, b, found))
-        : props.flows.sort((a: Record, b: Record) => found.sort(b, a, found));
+        ? props.flows.sort((a: Record, b: Record) => found.sort(b, a, found))
+        : props.flows.sort((a: Record, b: Record) => found.sort(a, b, found));
     }
   }, [activeSortDirection, activeSortId, props.columns, props.flows]);
 

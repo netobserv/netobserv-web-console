@@ -56,8 +56,15 @@ func (h *Handlers) GetTopology(ctx context.Context) func(w http.ResponseWriter, 
 			return
 		}
 
+		enriched, err := enrichTopologyResponse(metrics, r.URL.Query(), h.Cfg.Frontend.Scopes)
+		if err != nil {
+			code = http.StatusInternalServerError
+			apierrors.Write(w, code, err)
+			return
+		}
+
 		code = http.StatusOK
-		writeJSON(w, code, metrics)
+		writeJSON(w, code, enriched)
 	}
 }
 

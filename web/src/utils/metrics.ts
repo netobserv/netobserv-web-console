@@ -166,6 +166,81 @@ export const parseGenericMetrics = (
   return raw.map(r => parseGenericMetric(r, start, end, step, aggregateBy, forceZeros));
 };
 
+type PeerDisplayFields = Partial<TopologyMetricPeer> & {
+  resourceKind?: string;
+  isAmbiguous?: boolean;
+};
+
+/** Restore display methods on topology peers received from the backend. */
+export const hydratePeer = (peer: PeerDisplayFields): TopologyMetricPeer => {
+  const hydrated: TopologyMetricPeer = {
+    ...peer,
+    id: peer.id || idUnknown,
+    isAmbiguous: !!peer.isAmbiguous,
+    getDisplayName: () => undefined
+  };
+
+  const setForNameAndType = (nt: NameAndType) => {
+    const { type, name } = nt;
+    hydrated.resourceKind = hydrated.resourceKind || type;
+    hydrated.getDisplayName = (inclNamespace, disambiguate) => {
+      const disamb = disambiguate && hydrated.isAmbiguous ? ` (${shortKindMap[type] || type.toLowerCase()})` : '';
+      return (hydrated.namespace && inclNamespace ? `${hydrated.namespace}.${name}` : name) + disamb;
+    };
+  };
+
+  if (hydrated.resource) {
+    setForNameAndType(hydrated.resource);
+  } else if (hydrated.owner) {
+    setForNameAndType(hydrated.owner);
+  } else {
+    const custom = getCustomScopes().find(sc => sc.name === hydrated.resourceKind && hydrated[sc.id]);
+    if (custom) {
+      hydrated.getDisplayName = () => hydrated[custom.id] as string;
+    } else {
+      getCustomScopes()
+        .slice()
+        .reverse()
+        .forEach(sc => {
+          const value = hydrated[sc.id] as string | undefined;
+          if (value && hydrated.getDisplayName(false, false) === undefined) {
+            hydrated.resourceKind ||= sc.name;
+            hydrated.getDisplayName = () => value;
+          }
+        });
+    }
+    if (hydrated.getDisplayName(false, false) === undefined) {
+      if (hydrated.subnetLabel && hydrated.addr) {
+        hydrated.getDisplayName = () => `${hydrated.subnetLabel} (${hydrated.addr})`;
+      } else if (hydrated.subnetLabel) {
+        hydrated.getDisplayName = () => hydrated.subnetLabel;
+      } else if (hydrated.addr) {
+        hydrated.getDisplayName = () => hydrated.addr;
+      }
+    }
+  }
+  return hydrated;
+};
+
+export const hydrateTopologyMetrics = (metrics: TopologyMetrics[]): TopologyMetrics[] =>
+  metrics.map(metric => ({
+    ...metric,
+    source: hydratePeer(metric.source),
+    destination: hydratePeer(metric.destination)
+  }));
+
+export const genericMetricsFromTopology = (metrics: TopologyMetrics[], aggregateBy: Field): GenericMetric[] =>
+  metrics.map(metric => {
+    const displayName = metric.source.getDisplayName(false, false);
+    return {
+      name: displayName || (metric.source.id !== idUnknown ? metric.source.id : ''),
+      values: metric.values,
+      stats: metric.stats,
+      aggregateBy,
+      ...(metric.tls ? { tls: metric.tls } : {})
+    };
+  });
+
 export const createPeer = (fields: Partial<TopologyMetricPeer>): TopologyMetricPeer => {
   const newPeer: TopologyMetricPeer = {
     id: getPeerId(fields),
