@@ -41,7 +41,7 @@ export const autocompleteProtocol = (value: string): Promise<FilterOption[]> => 
   return Promise.resolve(protocolOptions.filter(opt => startsWithPredicate(opt.name, opt.value, value)));
 };
 
-export const getDirectionOptions = (t: TFunction, allowInner: boolean): FilterOption[] => {
+const getDirectionOptions = (t: TFunction, allowInner: boolean): FilterOption[] => {
   const directions = [
     { name: t('Ingress'), value: String(FlowDirection.Ingress) },
     { name: t('Egress'), value: String(FlowDirection.Egress) }
@@ -112,7 +112,7 @@ export const autocompleteNamespace = (value: string): Promise<FilterOption[]> =>
   });
 };
 
-export const autocompleteName = (kind: string, namespace: string, name: string): Promise<FilterOption[]> => {
+const autocompleteName = (kind: string, namespace: string, name: string): Promise<FilterOption[]> => {
   if (autoCompleteCache.hasNames(kind, namespace)) {
     const options = (autoCompleteCache.getNames(kind, namespace) || []).map(toFilterOption);
     return Promise.resolve(matchOptions(options, name));

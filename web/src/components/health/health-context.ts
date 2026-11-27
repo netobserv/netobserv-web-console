@@ -97,8 +97,6 @@ export const getHealthContextDefinition = (contextId: string): HealthContextDefi
   };
 };
 
-export const isNetobservScoredContext = (contextId: string): boolean => getHealthContextDefinition(contextId).scored;
-
 export const isReadonlyAlertsContext = (contextId: string): boolean =>
   getHealthContextDefinition(contextId).kind === 'readonly-alerts';
 

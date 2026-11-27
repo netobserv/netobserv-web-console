@@ -342,8 +342,8 @@ export type DropCausesValues = (typeof dropCauses)[number]['value'];
 
 export type DropCausesNames = (typeof dropCauses)[number]['name'];
 
-export const coreDropCausesDocUrl = 'https://github.com/torvalds/linux/blob/master/include/net/dropreason-core.h';
-export const ovsDropCausesDocUrl =
+const coreDropCausesDocUrl = 'https://github.com/torvalds/linux/blob/master/include/net/dropreason-core.h';
+const ovsDropCausesDocUrl =
   'https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/net/openvswitch/drop.h';
 
 export const getDropCauseDescription = (name: DropCausesNames): string => {

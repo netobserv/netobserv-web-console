@@ -328,7 +328,7 @@ export const emptyStat = (name: string, namespace?: string, k8sKind?: string): H
 };
 
 export type NamedItem = HealthItem & { name: string; superKind: HealthSuperKind; k8sKind: string; namespace?: string };
-export const toNamedItem = (item: HealthItem): NamedItem | undefined => {
+const toNamedItem = (item: HealthItem): NamedItem | undefined => {
   if (item.metadata.workloadLabels && item.metadata.namespaceLabels && item.metadata.kindLabels) {
     const name = getLabelValue(item, item.metadata.workloadLabels);
     const namespace = getLabelValue(item, item.metadata.namespaceLabels);
@@ -638,7 +638,7 @@ export const apportionToOneDecimal = (values: number[]): number[] => {
 };
 
 // Score [0,1]; lower is better
-export const computeExcessRatio = (item: HealthItem): number => {
+const computeExcessRatio = (item: HealthItem): number => {
   // Assuming the alert value is a [0-n] percentage. Needs update if more use cases come up.
   const threshold = item.thresholdF;
   const upper = item.metadata.upperBoundF;

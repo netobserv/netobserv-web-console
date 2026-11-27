@@ -1,13 +1,20 @@
 import { SortByDirection, Table, Tbody } from '@patternfly/react-table';
 import { fireEvent, render } from '@testing-library/react';
+import * as _ from 'lodash';
 import * as React from 'react';
 import { Column, ColumnsId, ColumnSizeMap } from '../../../../utils/columns';
-import {
-  AllSelectedColumnSample,
-  DefaultColumnSample,
-  filterOrderedColumnsByIds
-} from '../../../__tests-data__/columns';
+import { AllSelectedColumnSample, DefaultColumnSample } from '../../../__tests-data__/columns';
 import { NetflowTableHeader } from '../netflow-table-header';
+
+const filterOrderedColumnsByIds = (ids: ColumnsId[]) => {
+  return _.cloneDeep(DefaultColumnSample)
+    .sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id))
+    .map(c => {
+      c.isSelected = ids.includes(c.id);
+      return c;
+    })
+    .filter(c => c.isSelected);
+};
 
 const NetflowTableHeaderWrapper: React.FC<{
   onSort: (id: ColumnsId, direction: SortByDirection) => void;

@@ -106,7 +106,7 @@ export const getFlowCollectorOverallStatus = (
   return { status: 'pending' };
 };
 
-export const appendRecursive = (obj: any, key: string, value?: string) => {
+const appendRecursive = (obj: any, key: string, value?: string) => {
   if (!obj) {
     return obj;
   }
@@ -136,7 +136,7 @@ export const appendRecursive = (obj: any, key: string, value?: string) => {
   return obj;
 };
 
-export const setFlat = (obj: any) => {
+const setFlat = (obj: any) => {
   if (!obj) {
     return obj;
   }
@@ -186,7 +186,7 @@ export const exampleForModel = (csv: ClusterServiceVersionKind, group: string, v
   return parseALMExamples(csv).find((s: K8sResourceKind) => s.kind === kind && s.apiVersion === `${group}/${version}`);
 };
 
-export const parseALMExamples = (csv: ClusterServiceVersionKind): K8sResourceKind[] => {
+const parseALMExamples = (csv: ClusterServiceVersionKind): K8sResourceKind[] => {
   try {
     return JSON.parse(csv?.metadata?.annotations?.['alm-examples'] ?? '[]');
   } catch (e) {

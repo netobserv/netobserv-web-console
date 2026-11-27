@@ -9,7 +9,7 @@
  *     ovn-kubernetes/ovn-kubernetes helm/ovn-kubernetes/templates/ovnkube-alerts.yaml
  *     (PrometheusRule group general.rules, namespace ovn-kubernetes).
  */
-export const OVN_DOWNSTREAM_PLATFORM_ALERT_NAMES: readonly string[] = [
+const OVN_DOWNSTREAM_PLATFORM_ALERT_NAMES: readonly string[] = [
   'NodeWithoutOVNKubeNodePodRunning',
   'OVNKubernetesControllerDisconnectedSouthboundDatabase',
   'OVNKubernetesNodePodAddError',
@@ -28,7 +28,7 @@ export const OVN_DOWNSTREAM_PLATFORM_ALERT_NAMES: readonly string[] = [
   'V6SubnetAllocationThresholdExceeded'
 ];
 
-export const OVN_UPSTREAM_PLATFORM_ALERT_NAMES: readonly string[] = [
+const OVN_UPSTREAM_PLATFORM_ALERT_NAMES: readonly string[] = [
   'OvnKubeNoRunningManager',
   'OvnKubeManagerMultipleLeaders',
   'OvnKubeManagerNoLeader',
@@ -65,6 +65,6 @@ export const OVN_PLATFORM_ALERT_NAMES: readonly string[] = [
   ...OVN_UPSTREAM_PLATFORM_ALERT_NAMES
 ];
 
-export const OVN_PLATFORM_ALERT_NAME_SET = new Set<string>(OVN_PLATFORM_ALERT_NAMES);
+const OVN_PLATFORM_ALERT_NAME_SET = new Set<string>(OVN_PLATFORM_ALERT_NAMES);
 
 export const isOvnPlatformAlertName = (name: string): boolean => OVN_PLATFORM_ALERT_NAME_SET.has(name);

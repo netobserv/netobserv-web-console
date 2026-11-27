@@ -7,7 +7,7 @@ import * as React from 'react';
 import { classifyTlsVersionString, type TlsLockSeverity } from '../../utils/tls-lock-severity';
 
 /** Fill colors aligned with `topology-content.css` lock modifiers. */
-export const tlsLockFillForSeverity = (severity: TlsLockSeverity): string => {
+const tlsLockFillForSeverity = (severity: TlsLockSeverity): string => {
   switch (severity) {
     case 'deprecated':
       return 'var(--pf-t--global--danger-color--100, #c9190b)';
@@ -22,7 +22,7 @@ export const tlsLockFillForSeverity = (severity: TlsLockSeverity): string => {
   }
 };
 
-export const tlsLockFillForVersionLabel = (label: string): string => {
+const tlsLockFillForVersionLabel = (label: string): string => {
   const c = classifyTlsVersionString(label);
   return tlsLockFillForSeverity(c ?? 'unknown');
 };

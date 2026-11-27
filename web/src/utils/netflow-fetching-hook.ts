@@ -58,7 +58,7 @@ export interface DispatchFetchParams {
   t: (key: string) => string;
 }
 
-export function dispatchFetch(params: DispatchFetchParams): Promise<Stats[]> | undefined {
+function dispatchFetch(params: DispatchFetchParams): Promise<Stats[]> | undefined {
   const {
     selectedViewId,
     drawerRef,

@@ -1,12 +1,12 @@
 import { ReadOnlyValue, ReadOnlyValues } from './values';
 
 // https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml
-export const icmpProto = 1;
-export const icmpV6Proto = 58;
-export const icmpProtos = [icmpProto, icmpV6Proto];
+const icmpProto = 1;
+const icmpV6Proto = 58;
+const icmpProtos = [icmpProto, icmpV6Proto];
 
 //https://github.com/torvalds/linux/blob/master/include/uapi/linux/icmp.h
-export const icmpTypes: ReadOnlyValues = [
+const icmpTypes: ReadOnlyValues = [
   { value: 0, name: 'ICMP_ECHOREPLY', description: 'Echo Reply' },
   { value: 3, name: 'ICMP_DEST_UNREACH', description: 'Destination Unreachable' },
   { value: 4, name: 'ICMP_SOURCE_QUENCH', description: 'Source Quench' },
@@ -27,7 +27,7 @@ export type ICMPTypesValues = (typeof icmpTypes)[number]['value'];
 
 export type ICMPTypeNames = (typeof icmpTypes)[number]['name'];
 
-export const icmpUnreachCodes: ReadOnlyValues = [
+const icmpUnreachCodes: ReadOnlyValues = [
   { value: 0, name: 'ICMP_NET_UNREACH', description: 'Network Unreachable' },
   { value: 1, name: 'ICMP_HOST_UNREACH', description: 'Host Unreachable' },
   { value: 2, name: 'ICMP_PROT_UNREACH', description: 'Protocol Unreachable' },
@@ -51,7 +51,7 @@ export type ICMPUnreachCodesValues = (typeof icmpUnreachCodes)[number]['value'];
 
 export type ICMPUnreachCodesNames = (typeof icmpUnreachCodes)[number]['name'];
 
-export const icmpRedirectCodes: ReadOnlyValues = [
+const icmpRedirectCodes: ReadOnlyValues = [
   { value: 0, name: 'ICMP_REDIR_NET', description: 'Redirect Net' },
   { value: 1, name: 'ICMP_REDIR_HOST', description: 'Redirect Host' },
   { value: 2, name: 'ICMP_REDIR_NETTOS', description: 'Redirect Net for TOS' },
@@ -62,7 +62,7 @@ export type ICMPRedirectCodesValues = (typeof icmpRedirectCodes)[number]['value'
 
 export type ICMPRedirectCodesNames = (typeof icmpRedirectCodes)[number]['name'];
 
-export const icmpTimeExceededCodes: ReadOnlyValues = [
+const icmpTimeExceededCodes: ReadOnlyValues = [
   { value: 0, name: 'ICMP_EXC_TTL', description: 'TTL count exceeded' },
   { value: 1, name: 'ICMP_EXC_FRAGTIME', description: 'Fragment Reass time exceeded' }
 ] as const;
@@ -72,7 +72,7 @@ export type ICMPTimeExceededCodesValues = (typeof icmpTimeExceededCodes)[number]
 export type ICMPTimeExceededCodesNames = (typeof icmpTimeExceededCodes)[number]['name'];
 
 // https://github.com/torvalds/linux/blob/master/include/uapi/linux/icmpv6.h
-export const icmpV6Types: ReadOnlyValues = [
+const icmpV6Types: ReadOnlyValues = [
   { value: 1, name: 'ICMPV6_DEST_UNREACH', description: 'Destination Unreachable' },
   { value: 2, name: 'ICMPV6_PKT_TOOBIG', description: 'Packet Too Big' },
   { value: 3, name: 'ICMPV6_TIME_EXCEED', description: 'Time Exceeded' },
@@ -99,7 +99,7 @@ export type ICMPV6TypesValues = (typeof icmpV6Types)[number]['value'];
 
 export type ICMPV6TypeNames = (typeof icmpV6Types)[number]['name'];
 
-export const icmpV6UnreachCodes: ReadOnlyValues = [
+const icmpV6UnreachCodes: ReadOnlyValues = [
   { value: 0, name: 'ICMPV6_NOROUTE', description: 'no route to destination' },
   {
     value: 1,
@@ -117,7 +117,7 @@ export type ICMPV6UnreachCodesValues = (typeof icmpV6UnreachCodes)[number]['valu
 
 export type ICMPV6UnreachCodesNames = (typeof icmpV6UnreachCodes)[number]['name'];
 
-export const icmpV6TimeExceededCodes: ReadOnlyValues = [
+const icmpV6TimeExceededCodes: ReadOnlyValues = [
   { value: 0, name: 'ICMPV6_EXC_HOPLIMIT', description: 'hop limit exceeded in transit  ' },
   { value: 1, name: 'ICMPV6_EXC_FRAGTIME', description: 'fragment reassembly time exceeded  ' }
 ] as const;
@@ -126,7 +126,7 @@ export type ICMPV6TimeExceededCodesValues = (typeof icmpV6TimeExceededCodes)[num
 
 export type ICMPV6TimeExceededCodesNames = (typeof icmpV6TimeExceededCodes)[number]['name'];
 
-export const icmpV6ParamprobCodes: ReadOnlyValues = [
+const icmpV6ParamprobCodes: ReadOnlyValues = [
   { value: 0, name: 'ICMPV6_HDR_FIELD', description: 'erroneous header field encountered' },
   { value: 1, name: 'ICMPV6_UNK_NEXTHDR', description: 'unrecognized Next Header type encountered' },
   { value: 2, name: 'ICMPV6_UNK_OPTION', description: 'unrecognized IPv6 option encountered' },

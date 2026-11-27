@@ -33,7 +33,7 @@ import { ForceSimulation } from '@patternfly/react-topology/dist/esm/layouts/For
 import { action, makeObservable } from 'mobx';
 import { collectLayoutLinks } from './layout-edges';
 
-export const layoutDefaults: LayoutOptions = {
+const layoutDefaults: LayoutOptions = {
   linkDistance: 60,
   nodeDistance: 35,
   groupDistance: 35,

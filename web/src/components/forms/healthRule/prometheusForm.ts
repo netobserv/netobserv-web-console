@@ -14,8 +14,8 @@ import {
   PrometheusRuleResource
 } from './types';
 
-export const NETWORK_HEALTH_ANNOTATION_KEY = 'netobserv_io_network_health';
-export const RECORDING_METADATA_ANNOTATION = 'netobserv.io/network-health';
+export const networkHealthAnnotationKey = 'netobserv_io_network_health';
+const recordingMetadataAnnotation = 'netobserv.io/network-health';
 
 const isPresentScalar = (value: string | number | undefined | null): boolean =>
   value !== undefined && value !== null && value !== '';
@@ -46,7 +46,8 @@ export const buildAlertHealthAnnotation = (fields: HealthAnnotationFields): stri
   }
   return JSON.stringify(payload);
 };
-export const buildRecordingHealthInner = (fields: HealthAnnotationFields): string => {
+
+const buildRecordingHealthInner = (fields: HealthAnnotationFields): string => {
   const payload: Record<string, unknown> = {};
   if (fields.namespaceLabels?.length) {
     payload.namespaceLabels = fields.namespaceLabels;
@@ -93,7 +94,7 @@ export const buildRecordingMetadataAnnotation = (
       [recordName]: {
         ...(summary ? { summary } : {}),
         ...(description ? { description } : {}),
-        [NETWORK_HEALTH_ANNOTATION_KEY]: buildRecordingHealthInner(fields)
+        [networkHealthAnnotationKey]: buildRecordingHealthInner(fields)
       }
     },
     null,
@@ -101,7 +102,7 @@ export const buildRecordingMetadataAnnotation = (
   );
 };
 
-export const parseRecordingMetadata = (
+const parseRecordingMetadata = (
   annotation: string | undefined
 ): Record<string, { summary?: string; description?: string; netobserv_io_network_health?: string }> => {
   if (!annotation) {
@@ -130,13 +131,11 @@ export const parseHealthAnnotation = (raw: string | undefined): HealthAnnotation
   }
 };
 
-export const commaSeparatedToList = (value: string): string[] =>
+const commaSeparatedToList = (value: string): string[] =>
   value
     .split(',')
     .map(s => s.trim())
     .filter(Boolean);
-
-export const listToCommaSeparated = (list?: string[]): string => (list || []).join(', ');
 
 export type RuleHealthDisplay = {
   unit?: string;
@@ -394,14 +393,14 @@ export const ensureNetworkHealthLabels = (pr: any, mode: HealthRuleMode = 'Alert
           ...(message ? { message } : {})
         };
         if (hasHealthDisplayContent(healthDisplay)) {
-          rule.annotations[NETWORK_HEALTH_ANNOTATION_KEY] = buildAlertHealthAnnotation(fields);
+          rule.annotations[networkHealthAnnotationKey] = buildAlertHealthAnnotation(fields);
         }
       } else {
         const preserved = { ...(rule.annotations || {}) };
         delete preserved.summary;
         delete preserved.message;
         delete preserved.description;
-        delete preserved[NETWORK_HEALTH_ANNOTATION_KEY];
+        delete preserved[networkHealthAnnotationKey];
         if (Object.keys(preserved).length) {
           rule.annotations = preserved;
         } else {
@@ -434,7 +433,7 @@ export const ensureNetworkHealthLabels = (pr: any, mode: HealthRuleMode = 'Alert
     });
     next.metadata.annotations = {
       ...(next.metadata.annotations || {}),
-      [RECORDING_METADATA_ANNOTATION]: JSON.stringify(built, null, 2)
+      [recordingMetadataAnnotation]: JSON.stringify(built, null, 2)
     };
   }
 
@@ -450,12 +449,12 @@ export const prometheusRuleToFormData = (pr: any): any => {
   const next = _.cloneDeep(pr || {});
   const firstRule = next.spec?.groups?.[0]?.rules?.[0];
   const mode: HealthRuleMode = firstRule?.record ? 'Recording' : 'Alert';
-  const recordingMeta = parseRecordingMetadata(next.metadata?.annotations?.[RECORDING_METADATA_ANNOTATION]);
+  const recordingMeta = parseRecordingMetadata(next.metadata?.annotations?.[recordingMetadataAnnotation]);
 
   (next.spec?.groups || []).forEach((g: PrometheusRuleFormGroup) => {
     (g.rules || []).forEach((rule: PrometheusRuleFormRule) => {
       if (mode === 'Alert') {
-        const healthRaw = rule.annotations?.[NETWORK_HEALTH_ANNOTATION_KEY];
+        const healthRaw = rule.annotations?.[networkHealthAnnotationKey];
         rule.labels = {
           severity: rule.labels?.severity || 'warning',
           netobserv: 'true'
@@ -493,7 +492,7 @@ export const buildPrometheusRule = (
       ? {
           summary: form.summary || form.alertName || '',
           message: form.description || form.summary || '',
-          [NETWORK_HEALTH_ANNOTATION_KEY]: buildAlertHealthAnnotation(form.health)
+          [networkHealthAnnotationKey]: buildAlertHealthAnnotation(form.health)
         }
       : undefined;
 
@@ -515,7 +514,7 @@ export const buildPrometheusRule = (
   const metadataAnnotations =
     mode === 'Recording'
       ? {
-          [RECORDING_METADATA_ANNOTATION]: buildRecordingMetadataAnnotation(
+          [recordingMetadataAnnotation]: buildRecordingMetadataAnnotation(
             form.recordName || form.name,
             form.summary,
             form.description,

@@ -5,11 +5,11 @@ export interface AlertsResult {
   status: string;
 }
 
-export interface AlertsResultData {
+interface AlertsResultData {
   groups: AlertsGroups[];
 }
 
-export interface AlertsGroups {
+interface AlertsGroups {
   name?: string;
   file?: string;
   interval?: number;
@@ -23,7 +23,7 @@ export interface SilencedAlert {
   matchers: SilenceMatcher[];
 }
 
-export interface SilencedAlertStatus {
+interface SilencedAlertStatus {
   state: string;
 }
 

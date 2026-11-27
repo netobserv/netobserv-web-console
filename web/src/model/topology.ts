@@ -302,8 +302,7 @@ export const toggleElementFilter = (
   toggleFilter(result, defValue, isFiltered, setFilters);
 };
 
-export const defaultNodeTruncateLength = 25;
-export const defaultNodeSize = 75;
+const defaultNodeSize = 75;
 
 export type NodeData = {
   nodeType: NodeType;
@@ -469,7 +468,7 @@ const getEdgeTag = (value: number, options: TopologyOptions, t: TFunction) => {
  * After structural aggregation, copy/sum leaf NetObserv metrics onto aggregate segments.
  * Metric tags and TLS hints go on the bridge (or sole segment); stubs keep visual flags only.
  */
-export const applyAggregateEdgeData = (
+const applyAggregateEdgeData = (
   edges: EdgeModel[],
   options: TopologyOptions,
   highlightedId: string,

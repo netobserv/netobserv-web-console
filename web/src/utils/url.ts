@@ -234,12 +234,6 @@ export const removeURLParam = (param: URLParam, replace?: boolean) => {
   }
 };
 
-export const clearURLParams = () => {
-  const url = new URL(window.location.href);
-  console.info('clearing url parameters ' + url);
-  window.history.pushState({}, '', url.pathname);
-};
-
 export const getPathWithParams = (pathName = '') => {
   return `${pathName}?${new URLSearchParams(window.location.search).toString()}`;
 };
@@ -248,8 +242,4 @@ export const getPathWithParams = (pathName = '') => {
 export const navigateTo = (path: string) => {
   window.history.pushState({}, '', path);
   window.dispatchEvent(new PopStateEvent('popstate'));
-};
-
-export const navigateBack = () => {
-  window.history.back();
 };

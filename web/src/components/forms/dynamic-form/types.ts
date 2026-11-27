@@ -1,4 +1,4 @@
-export type DynamicFormFieldDependency = {
+type DynamicFormFieldDependency = {
   controlFieldPath: string[];
   controlFieldValue: string;
   controlFieldName: string;

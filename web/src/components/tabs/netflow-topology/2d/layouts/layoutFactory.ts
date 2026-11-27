@@ -13,8 +13,8 @@ import { BreadthFirstLayout } from './breadthFirstLayout';
 import { ColaGroupsLayout } from './colaGroupsLayout';
 import { ColaLayout } from './colaLayout';
 
-const layoutFactory: LayoutFactory = (type: LayoutName, graph: Graph): Layout | undefined => {
-  switch (type) {
+const layoutFactory: LayoutFactory = (type: string, graph: Graph): Layout | undefined => {
+  switch (type as LayoutName) {
     case 'BreadthFirst':
       return new BreadthFirstLayout(graph);
     case 'Cola':

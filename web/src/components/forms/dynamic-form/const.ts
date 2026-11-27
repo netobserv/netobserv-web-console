@@ -27,7 +27,3 @@ export const K8sUISchema = {
 
 export const jsonSchemaGroupTypes: string[] = ['object', 'array'];
 export const jsonSchemaNumberTypes: string[] = ['number', 'integer'];
-
-export const thousand = 10 ** 3;
-export const million = 10 ** 6;
-export const billion = 10 ** 9;

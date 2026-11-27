@@ -81,10 +81,6 @@ export const getDateFromSecondsString = (seconds: string): Date => {
   }
 };
 
-export const getDateStringInSeconds = (date: Date): string => {
-  return (date.getTime() / s).toString();
-};
-
 export const getDateMsInSeconds = (time: number): number => {
   return Math.floor(time / s);
 };

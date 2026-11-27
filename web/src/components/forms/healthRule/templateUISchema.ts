@@ -36,7 +36,7 @@ const applyVariantPlaceholders = (items: UiSchema | undefined, placeholders: Var
  * Flattened UI schema for a single health rule — inspired by FlowCollector wizard:
  * flat layout, reordered fields, advanced/rarely used fields hidden.
  */
-export const healthRuleTemplateUISchema: UiSchema = {
+const healthRuleTemplateUISchema: UiSchema = {
   'ui:title': 'Health rule',
   'ui:flat': 'true',
   apiVersion: {

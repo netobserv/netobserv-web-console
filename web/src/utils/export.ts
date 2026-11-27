@@ -324,7 +324,7 @@ export const areChartsSizedForExport = (root: Element): boolean => {
   });
 };
 
-export const waitForNextPaint = (): Promise<void> =>
+const waitForNextPaint = (): Promise<void> =>
   new Promise(resolve => {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => resolve());
