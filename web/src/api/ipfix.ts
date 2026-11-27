@@ -6,6 +6,8 @@ export interface Record {
   labels: Flow;
   key: number;
   fields: Flow;
+  /** Loki entry timestamp in nanoseconds, used to page complete timestamp seconds. */
+  lokiTimestampNs?: string;
 }
 
 export const getRecordValue = (record: Record, field: Field, defaultValue?: string | number) => {

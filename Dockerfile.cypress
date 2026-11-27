@@ -54,7 +54,10 @@ COPY --from=go-builder /opt/app-root/plugin-backend ./
 
 COPY mocks mocks
 COPY config/sample-config.yaml ./config/config.yaml
-RUN sed -i -e 's/consoleMode: .*/consoleMode: Mock/g' ./config/config.yaml
+RUN sed -i \
+    -e 's/consoleMode: .*/consoleMode: Mock/g' \
+    -e 's#url: https://localhost:9090#url: ""#' \
+    ./config/config.yaml
 COPY scripts/cypress.sh .
 
 # Install the Cypress binary matching the version pinned in web/package.json.

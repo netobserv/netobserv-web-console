@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/netobserv/network-observability-console-plugin/pkg/backend"
@@ -45,7 +46,8 @@ func (h *Handlers) GetFlows(ctx context.Context) func(w http.ResponseWriter, r *
 		params := r.URL.Query()
 		hlog.Debugf("GetFlows query params: %s (dataSource=%s)", params, qctx.DataSource)
 
-		q, err := parseRawFlowsQuery(params)
+		queryTime := time.Now()
+		q, err := parseRawFlowsQueryAt(params, queryTime)
 		if err != nil {
 			code = http.StatusBadRequest
 			apierrors.Write(w, code, err)
@@ -58,6 +60,7 @@ func (h *Handlers) GetFlows(ctx context.Context) func(w http.ResponseWriter, r *
 			apierrors.Write(w, code, err)
 			return
 		}
+		flows.UnixTimestamp = queryTime.Unix()
 
 		code = http.StatusOK
 		writeJSON(w, code, flows)
@@ -65,11 +68,11 @@ func (h *Handlers) GetFlows(ctx context.Context) func(w http.ResponseWriter, r *
 }
 
 func parseRawFlowsQuery(params url.Values) (*backends.FullFlowsParams, error) {
-	start, err := getStartTime(params)
-	if err != nil {
-		return nil, err
-	}
-	end, err := getEndTime(params)
+	return parseRawFlowsQueryAt(params, time.Now())
+}
+
+func parseRawFlowsQueryAt(params url.Values, now time.Time) (*backends.FullFlowsParams, error) {
+	start, end, err := getFlowQueryTimes(params, now)
 	if err != nil {
 		return nil, err
 	}
@@ -114,4 +117,18 @@ func parseRawFlowsQuery(params url.Values) (*backends.FullFlowsParams, error) {
 		},
 		FilterGroups: filterGroups,
 	}, nil
+}
+
+func getFlowQueryTimes(params url.Values, now time.Time) (start, end time.Time, err error) {
+	if params.Get(timeRangeKey) != "" && params.Get(startTimeKey) == "" && params.Get(endTimeKey) == "" {
+		// Resolve the relative range once and return the same server clock anchor to
+		// clients so follow-up pagination uses the interval Loki actually queried.
+		params.Set(endTimeKey, strconv.FormatInt(now.Unix(), 10))
+	}
+	start, err = getStartTimeAt(params, now)
+	if err != nil {
+		return time.Time{}, time.Time{}, err
+	}
+	end, err = getEndTimeAt(params, now)
+	return start, end, err
 }
