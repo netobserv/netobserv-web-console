@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import { FormHelperText, PageSection, Title } from '@patternfly/react-core';
-import { UiSchema } from '@rjsf/utils';
+import { createErrorHandler, CustomValidator, toErrorList, UiSchema, unwrapErrorHandler } from '@rjsf/utils';
 import _ from 'lodash';
 import React, { FC, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,11 +17,23 @@ import { Consumer } from './resource-watcher';
 
 export type ResourceFormProps = {
   uiSchema: UiSchema;
+  initialViewType?: EditorType;
+  createTitle?: string;
+  formContext?: Record<string, unknown>;
+  customValidate?: CustomValidator;
+  transformData?: (data: any) => any;
 };
 
-export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
+export const ResourceForm: FC<ResourceFormProps> = ({
+  uiSchema,
+  initialViewType = EditorType.CUSTOM,
+  createTitle,
+  formContext,
+  customValidate,
+  transformData
+}) => {
   const { t } = useTranslation('plugin__netobserv-plugin');
-  const [viewType, setViewType] = React.useState(EditorType.CUSTOM);
+  const [viewType, setViewType] = React.useState(initialViewType);
   const [data, setData] = React.useState<any>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [discard, discardModal] = useDiscardGuard();
@@ -36,6 +48,28 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
   return (
     <Consumer>
       {ctx => {
+        const submit = (candidate: any) => {
+          const transformed = transformData ? transformData(candidate) : candidate;
+          if (customValidate) {
+            const validationData = {
+              ...transformed,
+              spec: {
+                ...(transformed?.spec || {}),
+                filters: transformed?.spec?.filters || [],
+                queries: transformed?.spec?.queries || []
+              }
+            };
+            const errorHandler = customValidate(transformed, createErrorHandler(validationData));
+            const messages = toErrorList(unwrapErrorHandler(errorHandler)).map(error => error.stack);
+            if (messages.length > 0) {
+              ctx.setErrors(messages);
+              return;
+            }
+          }
+          ctx.setErrors([]);
+          discard.clearDirty();
+          ctx.onSubmit(transformed);
+        };
         // first init data when watch resource query got results
         if (data == null) {
           setData(ctx.data);
@@ -44,7 +78,9 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
           <PageSection hasBodyWrapper={false} id="pageSection">
             <div id="pageHeader">
               <Title headingLevel="h1" size="2xl">
-                {ctx.isUpdate ? t('Update {{kind}}', { kind: ctx.kind }) : t('Create {{kind}}', { kind: ctx.kind })}
+                {ctx.isUpdate
+                  ? t('Update {{kind}}', { kind: ctx.kind })
+                  : createTitle || t('Create {{kind}}', { kind: ctx.kind })}
               </Title>
               <FormHelperText style={{ marginTop: 'var(--pf-t--global--spacer--xs)' }}>
                 {ctx.isUpdate
@@ -59,10 +95,7 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
                 isUpdate={ctx.isUpdate}
                 onReload={() => setData(ctx.data)}
                 onChange={setViewType}
-                onSubmit={() => {
-                  discard.clearDirty();
-                  ctx.onSubmit(data);
-                }}
+                onSubmit={() => submit(data)}
                 onCancel={() => discard.requestClose(() => window.history.back())}
                 onDelete={() => setDeleteModalOpen(true)}
                 customChild={
@@ -70,13 +103,15 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
                     <DynamicForm
                       showAlert
                       formData={data}
+                      formContext={formContext}
                       schema={ctx.schema}
                       uiSchema={uiSchema}
                       validator={SchemaValidator}
+                      customValidate={customValidate}
                       errors={ctx.errors}
                       onError={errs => ctx.setErrors(_.map(errs, error => error.stack))}
                       onChange={event => {
-                        setData(event.formData);
+                        setData(transformData ? transformData(event.formData) : event.formData);
                         discard.markDirty();
                       }}
                       skipDefaults={ctx.skipDefaults}
@@ -91,9 +126,9 @@ export const ResourceForm: FC<ResourceFormProps> = ({ uiSchema }) => {
                       initialResource={data}
                       onSave={content => {
                         const updatedData = safeYAMLToJS(content);
-                        setData(updatedData);
-                        discard.clearDirty();
-                        ctx.onSubmit(updatedData);
+                        const transformedData = transformData ? transformData(updatedData) : updatedData;
+                        setData(transformedData);
+                        submit(updatedData);
                       }}
                     />
                     <>{ctx.errors.length > 0 && <ErrorTemplate errors={ctx.errors} />}</>
